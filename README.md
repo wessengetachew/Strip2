@@ -1,10 +1,10 @@
 # Strip Arithmetic II — Slope, Width & the Singular Series
 
-**Live:** https://wessengetachew.github.io/Strips2/
+**Live:** https://wessengetachew.github.io/strip2/
 
 Part II of the strip series. Part I is
 [The Goldbach Diagonal](https://wessengetachew.github.io/Partition/); both extend the
-[C(n) block-coprime density suite](https://wessengetachew.github.io/smith/).
+[C(n) block-coprime density suite](https://wessengetachew.github.io/smith/page5).
 
 Single-file interactive page. No build step, no dependencies to install.
 
