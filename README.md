@@ -4,7 +4,7 @@
 
 Part II of the strip series. Part I is
 [The Goldbach Diagonal](https://wessengetachew.github.io/Partition/); both extend the
-[C(n) block-coprime density suite](https://wessengetachew.github.io/smith/page5.html).
+[C(n) block-coprime density suite](https://wessengetachew.github.io/smith/page2.html).
 
 Single-file interactive page. No build step, no dependencies to install.
 
