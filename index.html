@@ -1,0 +1,2575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Strip Arithmetic II — slope and width unify the gap diagonal, block-coprime density C(n), and the Goldbach singular series under one residue count nu_p.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Strip Arithmetic II — Slope, Width, and the Singular Series">
+<meta property="og:description" content="One residue count produces min(n+1,p) in C(n) and the Goldbach correction prod (p-1)/(p-2). Interactive, exact, verified.">
+<title>Strip Arithmetic II — Slope, Width &amp; the Singular Series · Wessen Getachew</title>
+
+<script>
+window.MathJax = {
+  tex:{ inlineMath:[['$','$']], displayMath:[['$$','$$'],['\\[','\\]']] },
+  options:{ skipHtmlTags:['script','noscript','style','textarea'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04040d;--bg1:#07071a;--bg2:#0c0c22;
+  --cream:#ddd8cc;--cream2:#b8b2a6;--cream3:#89837a;
+  --gold:#c8a84a;--gold2:rgba(200,168,74,.12);
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9b7fe8;--lime:#7ec87a;--amber:#f2a84a;
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.13);
+  --mono:'JetBrains Mono',monospace;--serif:'Spectral',serif;--disp:'Cinzel',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:13px;}
+
+/* ── NAV ── */
+#wg-pagenav{position:sticky;top:0;z-index:9999;display:flex;align-items:center;flex-wrap:wrap;
+  gap:6px;padding:8px 14px;background:#04040d;border-bottom:1px solid var(--edge2);}
+#wg-pagenav .wm{font-family:var(--disp);font-size:.7rem;color:var(--gold);letter-spacing:.14em;
+  margin-right:8px;flex-shrink:0;}
+.navbtn{display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:transparent;
+  border:1px solid rgba(200,168,74,.45);color:var(--gold);font-family:var(--mono);
+  flex-shrink:0;white-space:nowrap;text-decoration:none;transition:all .15s;}
+.navbtn:hover{background:var(--gold2);border-color:var(--gold);}
+.navbtn.tealb{border-color:rgba(61,200,184,.45);color:var(--teal);}
+.navbtn.tealb:hover{background:rgba(61,200,184,.12);border-color:var(--teal);}
+.navbtn.coralb{border-color:rgba(224,80,96,.5);color:var(--coral);}
+.navbtn.coralb:hover{background:rgba(224,80,96,.13);border-color:var(--coral);}
+
+#content{max-width:1180px;margin:0 auto;padding:0 20px 90px;}
+
+/* ── HERO ── */
+#hero{padding:48px 0 30px;text-align:center;border-bottom:1px solid var(--edge);}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;}
+h1{font-family:var(--disp);font-size:clamp(25px,4.6vw,44px);font-weight:500;line-height:1.22;
+  letter-spacing:.01em;margin-bottom:8px;}
+.sub{font-family:var(--serif);font-size:clamp(15px,2vw,18px);color:var(--cream2);
+  max-width:660px;margin:14px auto 0;line-height:1.7;font-style:italic;}
+
+h2{font-family:var(--disp);font-size:23px;font-weight:500;color:var(--gold);margin:48px 0 6px;
+  letter-spacing:.03em;}
+h2 .num{font-family:var(--mono);font-size:12px;color:var(--cream3);letter-spacing:.14em;
+  display:block;margin-bottom:7px;text-transform:uppercase;}
+h3{font-family:var(--disp);font-size:17px;font-weight:500;color:var(--teal);margin:26px 0 8px;}
+p{font-family:var(--serif);font-size:15.5px;line-height:1.78;color:var(--cream2);margin:0 0 15px;}
+p b,li b{color:var(--cream);font-weight:500;}
+p code,li code,td code{font-family:var(--mono);font-size:13px;color:var(--gold);
+  background:rgba(200,168,74,.08);padding:1px 5px;}
+a{color:var(--teal);}
+ul,ol{margin:0 0 16px 20px;}
+li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2);margin-bottom:7px;}
+
+.rule{height:1px;background:var(--edge);margin:34px 0;}
+.lead{border-left:2px solid var(--gold);padding:2px 0 2px 16px;margin:0 0 22px;}
+
+.callout{background:rgba(61,200,184,.055);border-left:2px solid var(--teal);
+  padding:15px 18px;margin:20px 0;}
+.callout.warn{background:rgba(224,80,96,.055);border-left-color:var(--coral);}
+.callout.warn .ch{color:var(--coral);}
+.ch{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--teal);display:block;margin-bottom:7px;}
+.callout p:last-child{margin-bottom:0;}
+
+/* ── PANELS ── */
+.panel{background:var(--bg1);border:1px solid var(--edge);padding:16px 18px;margin:22px 0;}
+.ptitle{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;}
+
+.ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px;}
+.cg{display:flex;align-items:center;gap:6px;}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--cream3);white-space:nowrap;}
+.val{font-family:var(--mono);font-size:11.5px;color:var(--gold);min-width:44px;
+  display:inline-block;text-align:right;}
+input[type=range]{width:118px;accent-color:var(--gold);cursor:pointer;height:18px;}
+input[type=number],input[type=text],select{background:rgba(255,255,255,.045);
+  border:1px solid var(--edge2);color:var(--cream);font-family:var(--mono);font-size:11.5px;
+  padding:4px 6px;outline:none;}
+input[type=number]{width:74px;}
+select{cursor:pointer;}
+.btn{background:transparent;border:1px solid var(--edge2);color:var(--cream2);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  padding:5px 11px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn:hover{border-color:var(--gold);color:var(--gold);}
+.btn.on{background:var(--gold2);border-color:var(--gold);color:var(--gold);}
+.btn.t{border-color:rgba(61,200,184,.4);color:var(--teal);}
+.btn.t:hover,.btn.t.on{background:rgba(61,200,184,.14);border-color:var(--teal);}
+.btn.c{border-color:rgba(224,80,96,.4);color:var(--coral);}
+.btn.c:hover,.btn.c.on{background:rgba(224,80,96,.14);border-color:var(--coral);}
+.sep{width:1px;height:20px;background:var(--edge2);}
+
+/* ── stepper: [◄P] [−] value [+] [P►] ── */
+.stepper{display:inline-flex;align-items:stretch;border:1px solid var(--edge2);height:26px;}
+.sbtn{background:transparent;border:none;border-right:1px solid var(--edge2);color:var(--cream3);
+  font-family:var(--mono);font-size:11px;padding:0 7px;cursor:pointer;transition:all .12s;
+  display:flex;align-items:center;user-select:none;}
+.sbtn:last-child{border-right:none;}
+.sbtn:hover{background:var(--gold2);color:var(--gold);}
+.sbtn:active{background:rgba(200,168,74,.24);}
+.sbtn.pj{color:var(--teal);font-size:10px;letter-spacing:.02em;}
+.sbtn.pj:hover{background:rgba(61,200,184,.14);color:var(--teal);}
+.sval{width:74px;background:rgba(255,255,255,.05);border:none;border-right:1px solid var(--edge2);
+  color:var(--gold);font-family:var(--mono);font-size:12px;text-align:center;outline:none;
+  -moz-appearance:textfield;}
+.sval::-webkit-outer-spin-button,.sval::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.sval:focus{background:rgba(200,168,74,.1);}
+.prime-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--teal);border:1px solid rgba(61,200,184,.4);padding:1px 5px;margin-left:6px;
+  opacity:0;transition:opacity .15s;}
+.prime-tag.on{opacity:1;}
+
+.prow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:9px 0;
+  border-bottom:1px solid var(--edge);}
+.prow:last-child{border-bottom:none;}
+.prow .plabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--cream3);width:78px;flex-shrink:0;}
+@media(max-width:700px){.prow .plabel{width:100%;margin-bottom:2px;}}
+
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 9px;
+  background:transparent;border:1px solid var(--edge2);color:var(--cream3);cursor:pointer;
+  transition:all .13s;white-space:nowrap;}
+.chip:hover{border-color:var(--gold);color:var(--gold);}
+.chip.on{background:var(--gold2);border-color:var(--gold);color:var(--gold);}
+.chip.tl{border-color:rgba(61,200,184,.35);color:var(--teal);}
+.chip.tl:hover,.chip.tl.on{background:rgba(61,200,184,.14);border-color:var(--teal);}
+.chip.cr{border-color:rgba(224,80,96,.35);color:var(--coral);}
+.chip.cr:hover,.chip.cr.on{background:rgba(224,80,96,.14);border-color:var(--coral);}
+.keyhint{font-family:var(--mono);font-size:10px;color:var(--cream3);margin-top:10px;
+  padding-top:9px;border-top:1px solid var(--edge);}
+.keyhint kbd{background:rgba(255,255,255,.07);border:1px solid var(--edge2);padding:1px 5px;
+  font-family:var(--mono);font-size:9.5px;color:var(--cream2);}
+
+/* ── lens — same conventions as Strip Arithmetic I ── */
+#lens{
+  position:absolute;display:none;pointer-events:none;z-index:30;
+  border:2px solid var(--gold);overflow:hidden;
+  /* Round by default; .sq for a square plate. Both plates on this page are
+     rectangular lattices, so both get .sq — a disk over a square window clips
+     exactly the corner cells you want when reading a strip across a boundary. */
+  border-radius:50%;
+  box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06) inset;
+  /* deliberately NOT image-rendering:pixelated — the lens draws at a
+     supersampled backing size and re-renders its contents as vectors rather
+     than blitting, so the browser's smooth downscale is what keeps type
+     readable. Cell edges stay hard because the cell layer itself is drawn
+     with imageSmoothingEnabled = false. */
+  background:var(--bg1);
+}
+#lens.on{display:block}
+#lens.sq{border-radius:5px}
+#lensinfo{
+  position:absolute;display:none;pointer-events:none;z-index:31;white-space:nowrap;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;line-height:1.5;
+  color:#fff;background:#04040d;border:1px solid var(--gold);border-radius:4px;
+  padding:5px 9px;box-shadow:0 6px 18px rgba(0,0,0,.7);text-align:center;
+}
+#lensinfo.on{display:block}
+#lensinfo .dim{color:var(--cream3)}
+#lensinfo b{color:var(--gold);font-weight:500}
+#lensinfo i{color:var(--teal);font-style:normal}
+#lensinfo u{color:var(--coral);text-decoration:none}
+
+.cvwrap{position:relative;background:#04040d;border:1px solid var(--edge);overflow:hidden;}
+canvas.main{display:block;width:100%;height:auto;cursor:crosshair;}
+.cvbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+  padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-top:none;
+  font-family:var(--mono);font-size:11px;color:var(--cream3);}
+.cvbar b{color:var(--teal);font-weight:500;}
+
+/* progress */
+#pre-wrap{margin:14px 0;display:none;}
+#pre-bar{height:3px;background:rgba(255,255,255,.08);overflow:hidden;}
+#pre-fill{height:100%;width:0%;background:var(--gold);transition:width .12s linear;}
+#pre-txt{font-family:var(--mono);font-size:10.5px;color:var(--cream3);margin-top:6px;}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;margin:14px 0;}
+th{text-align:left;padding:7px 8px;border-bottom:1px solid var(--edge2);color:var(--gold);
+  font-weight:500;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;}
+td{padding:6px 8px;border-bottom:1px solid var(--edge);color:var(--cream2);}
+td.n{text-align:right;font-variant-numeric:tabular-nums;}
+tr.good td{color:var(--lime);}
+tr.bad td{color:var(--coral);}
+.scroll{overflow-x:auto;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:760px){.grid2{grid-template-columns:1fr;}
+  input[type=range]{width:96px;} #content{padding:0 14px 70px;}}
+
+.foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--edge);
+  font-family:var(--mono);font-size:11px;color:var(--cream3);line-height:1.8;}
+mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+</style>
+</head>
+<body>
+
+<div id="wg-pagenav">
+  <span class="wm">WESSEN GETACHEW</span>
+  <a class="navbtn" href="index.html">← Page 1</a>
+  <a class="navbtn tealb" href="page2.html">Explorer</a>
+  <a class="navbtn" href="page5.html">P5 · Gap Diagonal</a>
+  <a class="navbtn" href="page6.html">P6 · Strip Correlations</a>
+  <a class="navbtn" href="page8.html">P8 · k-Tuples</a>
+  <a class="navbtn coralb" href="https://wessengetachew.github.io/Partition/"
+     title="Strip Arithmetic I — The Goldbach Diagonal">← Strip I · Goldbach Diagonal</a>
+</div>
+
+<div id="content">
+
+<div id="hero">
+  <div class="eyebrow">Strip Arithmetic II · Analytic Number Theory</div>
+  <h1>Slope, Width, and the Singular Series</h1>
+  <div class="sub" style="font-family:var(--mono);font-style:normal;font-size:11px;
+       letter-spacing:.14em;text-transform:uppercase;color:var(--cream3);margin-top:10px;">
+    Sequel to <a href="https://wessengetachew.github.io/Partition/" style="color:var(--coral);">Strip Arithmetic I — The Goldbach Diagonal</a>
+  </div>
+  <div class="sub">One residue count runs the whole family. It produces
+  <span style="color:var(--gold);font-style:normal;">min(n+1, p)</span> in C(n), and it produces the
+  Goldbach correction <span style="color:var(--gold);font-style:normal;">∏(p−1)/(p−2)</span>.
+  Same rule, two slopes.</div>
+</div>
+
+<h2><span class="num">§1 · The claim</span>C(n) is a strip width</h2>
+
+<div class="lead">
+<p>A block $\{M, M+1, \dots, M+n\}$ is $n+1$ adjacent diagonals of the coprimality lattice.
+The gap diagonal identity is the width-1 case. Block-coprime density $C(n)$ is the general
+width case. Turn the slope from $+1$ to $-1$ and the same machinery lands on Goldbach.</p>
+</div>
+
+<p>Most of what follows is one walk over a <b>strip</b>: the set of lattice points
+$(r, M)$ satisfying</p>
+
+$$ s \;\le\; b\,r - a\,M \;<\; s + w $$
+
+<p>for a slope $a/b$, an offset $s$, and a width $w$. The block case is the exception,
+and it is worth stating precisely because getting it wrong is easy: $C(n)$ is
+<b>not</b> the coprime density inside a diagonal strip. The block $\{M,\dots,M+n\}$
+runs along $M$, and the condition is a <b>conjunction</b> — the point $r$ must be
+coprime to every member:</p>
+
+$$ \gcd(r,\,M+j) = 1 \quad \text{for all } j = 0,\dots,n $$
+
+<p>A vertical band of $n+1$ columns with an AND across it, not an average within a
+diagonal strip. The density of cells surviving that AND is $D(n)$; the average
+coprime density inside a width-$(n{+}1)$ diagonal strip is a different and much
+larger number. Band mode below measures the first. This is the same condition
+<a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I</a> applies in its <i>block n</i> control, walked over
+the whole lattice here instead of along a single strip.</p>
+
+<div class="scroll"><table>
+<tr><th>Slope</th><th>Width</th><th>What the strip is</th><th>Exact density</th></tr>
+<tr><td><code>+1</code></td><td><code>1</code></td><td>Gap diagonal $r - M = g$</td><td>$\varphi(g)/g$</td></tr>
+<tr><td><code>vertical</code></td><td><code>n+1</code></td><td>Block of $n{+}1$ consecutive integers, <b>AND</b> across the band</td><td>$D(n) = \prod_p\!\left(1 - \tfrac{\min(n+1,p)}{p^2}\right)$</td></tr>
+<tr><td><code>−1</code></td><td><code>1</code></td><td>Goldbach anti-diagonal $r + M = N$ &mdash; <a href="https://wessengetachew.github.io/Partition/">Strip I</a></td><td>$\varphi(N)$ points exactly</td></tr>
+<tr><td><code>a/b</code></td><td><code>1</code></td><td>Farey sector ray</td><td>Stern–Brocot mediant structure</td></tr>
+</table></div>
+
+<h3>The rule underneath</h3>
+
+<p>Fix a finite set of integer offsets $\mathcal{H}$. For each prime $p$, let</p>
+
+$$ \nu_p(\mathcal{H}) \;=\; \#\{\, h \bmod p \;:\; h \in \mathcal{H} \,\} $$
+
+<p>be the number of <b>distinct residue classes</b> $\mathcal{H}$ occupies mod $p$. That single
+count drives everything. Where two offsets collide mod $p$, $\nu_p$ drops, and the local
+factor relaxes.</p>
+
+<div class="grid2">
+<div class="callout">
+<span class="ch">Slope +1 — the block</span>
+<p>$\mathcal{H} = \{0,1,\dots,n\}$. Consecutive integers, so by pigeonhole
+$\nu_p = \min(n+1, p)$ — every class is hit once $p \le n+1$. That is exactly the
+<b>saturation mechanism</b>: the local factor freezes at $1 - 1/p$ and stops moving.</p>
+</div>
+<div class="callout">
+<span class="ch">Slope −1 — Goldbach</span>
+<p>$\mathcal{H} = \{0, N\}$, since $r$ and $N-r$ must both be prime. So $\nu_p = 2$ —
+unless $p \mid N$, when the two offsets collide and $\nu_p = 1$. A collision, again,
+just a different cause.</p>
+</div>
+</div>
+
+<p>Feed $\nu_p$ into the Hardy–Littlewood singular series
+$\mathfrak{S} = \prod_p \frac{1 - \nu_p/p}{(1 - 1/p)^2}$ and the $\{0,N\}$ case collapses:</p>
+
+$$ \mathfrak{S}(N) \;=\; 2\,C_2 \prod_{\substack{p \mid N \\ p > 2}} \frac{p-1}{p-2},
+\qquad C_2 = \prod_{p>2}\left(1 - \frac{1}{(p-1)^2}\right) \approx 0.6601618158 $$
+
+<p>The $p = 2$ collision supplies the leading $2$. Every odd prime dividing $N$ supplies one
+$\frac{p-1}{p-2}$. <b>Nothing was added</b> — the correction is the collision count, read off
+the same rule that gives $\min(n+1,p)$.</p>
+
+<div class="callout warn">
+<span class="ch">What this is not</span>
+<p>The lattice counts <b>coprime</b> pairs, not prime pairs. $\varphi(N)$ on the anti-diagonal is
+exact and elementary; the step from there to prime pairs is the singular series as a
+<b>heuristic density</b>, and the gap between that heuristic and the truth is the entire
+difficulty of Goldbach. Nothing on this page proves anything about Goldbach's conjecture.
+What it does show is that the correction factor is not an extra ingredient.</p>
+</div>
+
+<h2><span class="num">§2 · The lattice</span>Strips at any slope and width</h2>
+
+<p>Coprimality for the full $G \times G$ lattice is precomputed once into a bitset and reused
+for every redraw. At $G = 10{,}000$ that is $10^8$ cells in 12.5 MB, built by clearing
+$(r,M)$ for each prime $p$ — about $G^2\sum_p p^{-2} \approx 4.5\times10^7$ operations rather
+than $10^8$ gcds.</p>
+
+<div class="panel">
+  <div class="ptitle">Lattice parameters</div>
+
+  <div class="prow">
+    <span class="plabel">Presets</span>
+    <button class="chip tl" id="ps-gap6"  onclick="preset('gap6')">Gap diagonal · g=6</button>
+    <button class="chip tl" id="ps-gap30" onclick="preset('gap30')">Gap diagonal · g=30</button>
+    <button class="chip"    id="ps-blk5"  onclick="preset('blk5')">C(n) block · n=5</button>
+    <button class="chip"    id="ps-blk29" onclick="preset('blk29')">C(n) block · n=29</button>
+    <button class="chip cr" id="ps-gsm"   onclick="preset('gsm')">Goldbach · N=210 smooth</button>
+    <button class="chip cr" id="ps-grg"   onclick="preset('grg')">Goldbach · N=206 rough</button>
+    <button class="chip"    id="ps-f12"   onclick="preset('f12')">Farey ray · 1/2</button>
+    <button class="chip"    id="ps-f23"   onclick="preset('f23')">Farey ray · 2/3</button>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">G</span>
+    <div class="stepper">
+      <button class="sbtn pj" onclick="pj('g',-1)" title="Previous prime">&#9668;P</button>
+      <button class="sbtn" onclick="bump('g',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="g-num" type="number" min="4" max="10000" value="109"
+             onchange="onG(+this.value)">
+      <button class="sbtn" onclick="bump('g',1)" title="+1">+</button>
+      <button class="sbtn pj" onclick="pj('g',1)" title="Next prime">P&#9658;</button>
+    </div>
+    <span class="prime-tag" id="g-pt">prime</span>
+    <input type="range" id="g-sl" min="4" max="4096" step="1" value="109" oninput="onG(+this.value)">
+    <span class="val" id="g-v">109</span>
+    <button class="chip" onclick="onG(4)">4</button>
+    <button class="chip" onclick="onG(16)">16</button>
+    <button class="chip" onclick="onG(64)">64</button>
+    <button class="chip" onclick="onG(109)">109</button>
+    <button class="chip" onclick="onG(256)">256</button>
+    <button class="chip" onclick="onG(1024)">1k</button>
+    <button class="chip" onclick="onG(2048)">2k</button>
+    <button class="chip" onclick="onG(4096)">4k</button>
+    <button class="chip" onclick="onG(10000)">10k</button>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Slope a/b</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="bump('a',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="sl-a" type="number" value="1" step="1" style="width:52px;"
+             onchange="reslope()">
+      <button class="sbtn" onclick="bump('a',1)" title="+1">+</button>
+    </div>
+    <span class="lbl">/</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="bump('b',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="sl-b" type="number" value="1" min="1" step="1" style="width:52px;"
+             onchange="reslope()">
+      <button class="sbtn" onclick="bump('b',1)" title="+1">+</button>
+    </div>
+    <button class="chip tl" id="pre-diag" onclick="preset('diag')">+1 diagonal</button>
+    <button class="chip cr" id="pre-anti" onclick="preset('anti')">&minus;1 Goldbach</button>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Offset s</span>
+    <div class="stepper">
+      <button class="sbtn pj" onclick="pj('off',-1)" title="Previous prime">&#9668;P</button>
+      <button class="sbtn" onclick="bump('off',-10)" title="&minus;10">&laquo;</button>
+      <button class="sbtn" onclick="bump('off',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="off-num" type="number" value="0" onchange="onOff(+this.value)">
+      <button class="sbtn" onclick="bump('off',1)" title="+1">+</button>
+      <button class="sbtn" onclick="bump('off',10)" title="+10">&raquo;</button>
+      <button class="sbtn pj" onclick="pj('off',1)" title="Next prime">P&#9658;</button>
+    </div>
+    <span class="prime-tag" id="off-pt">prime</span>
+    <input type="range" id="off-sl" min="-512" max="512" step="1" value="0" oninput="onOff(+this.value)">
+    <span class="val" id="off-v">0</span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Width w</span>
+    <div class="stepper">
+      <button class="sbtn pj" onclick="pj('w',-1)" title="Previous prime">&#9668;P</button>
+      <button class="sbtn" onclick="bump('w',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="w-num" type="number" min="1" value="1" onchange="onW(+this.value)">
+      <button class="sbtn" onclick="bump('w',1)" title="+1">+</button>
+      <button class="sbtn pj" onclick="pj('w',1)" title="Next prime">P&#9658;</button>
+    </div>
+    <span class="prime-tag" id="w-pt">prime</span>
+    <input type="range" id="w-sl" min="1" max="64" step="1" value="1" oninput="onW(+this.value)">
+    <span class="val" id="w-v">1</span>
+    <span class="lbl" id="w-blk">block n = 0</span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Walk</span>
+    <button class="chip on" id="wk-strip" onclick="setWalk('strip')">Strip &mdash; density in a slope a/b band</button>
+    <button class="chip cr" id="wk-band" onclick="setWalk('band')">Block &mdash; AND over n+1 columns</button>
+    <span class="lbl" id="wk-note" style="color:var(--cream3);"></span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Render</span>
+    <select id="cmode" onchange="redraw(true)">
+      <optgroup label="Coprimality">
+        <option value="binary">Coprime / not</option>
+        <option value="density">Block density (grey)</option>
+      </optgroup>
+      <optgroup label="gcd(r,M)">
+        <option value="gcd">gcd &mdash; value (log hue)</option>
+        <option value="spf">gcd &mdash; smallest prime factor</option>
+        <option value="lpf">gcd &mdash; largest prime factor</option>
+        <option value="omega">gcd &mdash; &omega;(g), distinct primes</option>
+        <option value="bomega">gcd &mdash; &Omega;(g), with multiplicity</option>
+        <option value="gcdband">gcd &mdash; banded (1 / 2 / 3 / 4-6 / 7+)</option>
+      </optgroup>
+    </select>
+    <button class="chip" id="b-strip" onclick="toggleStrip()">Strip: on</button>
+    <button class="chip" onclick="resetView()">Reset</button>
+  </div>
+
+  <div class="keyhint">
+    <kbd>&larr;</kbd><kbd>&rarr;</kbd> offset &plusmn;1 &nbsp;·&nbsp;
+    <kbd>Shift</kbd>+<kbd>&larr;&rarr;</kbd> &plusmn;10 &nbsp;·&nbsp;
+    <kbd>&uarr;</kbd><kbd>&darr;</kbd> width &plusmn;1 &nbsp;·&nbsp;
+    <kbd>P</kbd> next prime offset &nbsp;·&nbsp; <kbd>Shift</kbd>+<kbd>P</kbd> previous &nbsp;·&nbsp;
+    <kbd>D</kbd> diagonal &nbsp;·&nbsp; <kbd>G</kbd> Goldbach &nbsp;·&nbsp; <kbd>R</kbd> reset
+  </div>
+
+  <div id="pre-wrap"><div id="pre-bar"><div id="pre-fill"></div></div><div id="pre-txt"></div></div>
+
+  <div class="prow">
+    <span class="plabel">Lens</span>
+    <button class="chip tl on" id="lens-on" onclick="toggleLens()">Lens: on</button>
+    <span class="lbl">zoom</span>
+    <button class="chip" id="lz-2" onclick="setLensZoom(2)">2&times;</button>
+    <button class="chip on" id="lz-3" onclick="setLensZoom(3)">3&times;</button>
+    <button class="chip" id="lz-4" onclick="setLensZoom(4)">4&times;</button>
+    <button class="chip" id="lz-6" onclick="setLensZoom(6)">6&times;</button>
+    <button class="chip" id="lz-10" onclick="setLensZoom(10)">10&times;</button>
+    <button class="chip" id="lz-20" onclick="setLensZoom(20)">20&times;</button>
+    <button class="chip" id="lz-30" onclick="setLensZoom(30)">30&times;</button>
+    <button class="chip" id="lz-40" onclick="setLensZoom(40)">40&times;</button>
+    <button class="chip" id="lz-50" onclick="setLensZoom(50)">50&times;</button>
+    <button class="chip" id="lz-100" onclick="setLensZoom(100)">100&times;</button>
+    <div class="stepper">
+      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM-1)">&minus;</button>
+      <input class="sval" id="lz-in" type="number" min="1" max="500" step="1" value="3"
+             oninput="setLensZoom(+this.value,true)" style="width:60px;">
+      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM+1)">+</button>
+    </div>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Lens place</span>
+    <button class="chip on" id="lp-auto" onclick="setLensPin('auto')">Auto</button>
+    <button class="chip" id="lp-tl" onclick="setLensPin('tl')">&#9698; TL</button>
+    <button class="chip" id="lp-tr" onclick="setLensPin('tr')">&#9699; TR</button>
+    <button class="chip" id="lp-bl" onclick="setLensPin('bl')">&#9701; BL</button>
+    <button class="chip" id="lp-br" onclick="setLensPin('br')">&#9700; BR</button>
+    <span class="lbl">size</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="setLensSize(lensSize-20)">&minus;</button>
+      <input class="sval" id="ls-num" type="number" min="90" max="420" value="200"
+             onchange="setLensSize(+this.value)" style="width:56px;">
+      <button class="sbtn" onclick="setLensSize(lensSize+20)">+</button>
+    </div>
+    <span class="lbl">labels</span>
+    <select id="lens-lbl" onchange="lensRelabel()">
+      <optgroup label="Lattice">
+        <option value="rM">r/M</option>
+        <option value="r">r</option>
+        <option value="M">M</option>
+        <option value="dec">r/M decimal</option>
+        <option value="gcd">gcd(r,M)</option>
+      </optgroup>
+      <optgroup label="Strip coordinates">
+        <option value="v">v = b&middot;r &minus; a&middot;M &nbsp;(which strip)</option>
+        <option value="ar">b&middot;r &nbsp;(the b term)</option>
+        <option value="am">a&middot;M &nbsp;(the a term)</option>
+        <option value="terms">b&middot;r , a&middot;M</option>
+        <option value="gap">r &minus; M &nbsp;(gap g)</option>
+        <option value="sum">r + M &nbsp;(Goldbach N)</option>
+      </optgroup>
+      <option value="off">off</option>
+    </select>
+    <span class="lbl" style="color:var(--cream3);">labels appear once a magnified cell clears ~7&nbsp;px</span>
+  </div>
+
+  <div class="cvwrap">
+    <canvas id="cv" class="main"></canvas>
+    <canvas id="lens"></canvas>
+    <div id="lensinfo"></div>
+  </div>
+  <div class="cvbar">
+    <span id="bar-l">—</span>
+    <span id="bar-r">—</span>
+  </div>
+
+  <div class="ctrls" style="margin-top:12px;">
+    <span class="lbl">Export</span>
+    <button class="btn" onclick="exportPNG(2048)">2K</button>
+    <button class="btn" onclick="exportPNG(4096)">4K</button>
+    <button class="btn" onclick="exportPNG(8192)">8K</button>
+    <div class="sep"></div>
+    <button class="btn" onclick="exportCSV()">Strip CSV</button>
+    <button class="btn" onclick="exportState()">State report</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="ptitle">Live identity check — measured against exact</div>
+  <div class="scroll"><table id="idt">
+    <tr><th>Quantity</th><th>Measured on the strip</th><th>Exact</th><th>Δ</th></tr>
+  </table></div>
+  <p style="font-size:13px;color:var(--cream3);margin:8px 0 0;">
+  Slope $+1$, width 1, offset $g$: the strip density must equal $\varphi(g)/g$.
+  Slope $-1$, width 1, offset $N$: the point count must equal $\varphi(N)$ exactly &mdash;
+  this is the count behind <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I</a>'s central claim, that the
+  sum strip is fully coprime iff $\varphi(N) = N-1$, i.e. iff $N$ is prime.
+  Both are walked from the same bitset.</p>
+</div>
+
+<div class="panel">
+  <div class="ptitle">gcd distribution &mdash; counts, ratios, and the exact form</div>
+  <p style="font-size:13.5px;margin-bottom:12px;">
+  Over the square $[1,n]^2$, the number of ordered pairs with $\gcd(r,M)=d$ is exactly
+  $\Phi(\lfloor n/d \rfloor)$, where $\Phi(m) = 2\sum_{k\le m}\varphi(k) - 1$ counts the
+  coprime pairs in $[1,m]^2$. Two identities fall out and both are checked live below:
+  $\sum_d \Phi(\lfloor n/d\rfloor) = n^2$ exactly, and
+  $\Phi(n)/n^2 \to 6/\pi^2$.</p>
+
+  <div class="prow">
+    <span class="plabel">Sample n</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="bump('gn',-128)" title="&minus;128">&laquo;</button>
+      <button class="sbtn" onclick="bump('gn',-16)" title="&minus;16">&minus;</button>
+      <input class="sval" id="gn-num" type="number" min="16" max="4096" value="512"
+             onchange="setGN(+this.value)">
+      <button class="sbtn" onclick="bump('gn',16)" title="+16">+</button>
+      <button class="sbtn" onclick="bump('gn',128)" title="+128">&raquo;</button>
+    </div>
+    <button class="chip" onclick="setGN(256)">256</button>
+    <button class="chip" onclick="setGN(512)">512</button>
+    <button class="chip" onclick="setGN(1024)">1024</button>
+    <button class="chip" onclick="setGN(2048)">2048</button>
+    <span class="lbl">rows</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="bump('gr',-4)">&minus;</button>
+      <input class="sval" id="gr-num" type="number" min="4" max="64" value="16"
+             onchange="setGR(+this.value)">
+      <button class="sbtn" onclick="bump('gr',4)">+</button>
+    </div>
+    <button class="chip tl" onclick="gcdTable()">Recount</button>
+    <button class="chip" onclick="exportGcdCSV()">CSV</button>
+  </div>
+
+  <div id="gcd-sum" class="callout" style="margin:14px 0 10px;"></div>
+  <div class="scroll"><table id="gcdt"></table></div>
+</div>
+
+<div class="panel">
+  <div class="ptitle">Self test &mdash; every claim on this page, checked in the browser</div>
+  <p style="font-size:13.5px;margin-bottom:10px;">
+  Nothing here is asserted on trust. Each row recomputes a stated result from scratch and
+  compares it against an independent route &mdash; a bitset against direct gcd, a sieve against a
+  closed form, a convolution against a published constant. Red is a real failure.</p>
+  <p style="font-size:13px;color:var(--cream3);margin-bottom:10px;">
+  Most rows read <b style="color:var(--lime);">X / X agree</b>: the left number is how many
+  comparisons held, the right is how many were made. So <i>11,881 / 11,881 agree</i> means every
+  cell was checked and every one matched. A few rows compare a single quantity instead and print
+  the two values side by side.</p>
+  <div class="prow" style="border-bottom:none;padding-top:0;">
+    <button class="chip tl" onclick="selfTest()">Run all tests</button>
+    <span class="lbl" id="st-summary">not run</span>
+  </div>
+  <div class="scroll"><table id="stt"></table></div>
+</div>
+
+<h2><span class="num">§3 · The comet</span>Does ν<sub>p</sub> actually predict anything?</h2>
+
+<p>The Goldbach comet plots $r(N)$, the number of ordered prime pairs summing to $N$, against
+$N$. It famously splits into bands. The bands are $\mathfrak{S}(N)$ — dividing by it collapses
+them into a single curve. If the residue count were the wrong idea, that would not happen.</p>
+
+<div class="panel">
+  <div class="ptitle">Comet parameters</div>
+
+  <div class="prow">
+    <span class="plabel">N max</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="bump('n',-10000)" title="&minus;10000">&laquo;</button>
+      <button class="sbtn" onclick="bump('n',-2000)" title="&minus;2000">&minus;</button>
+      <input class="sval" id="n-num" type="number" min="5000" max="300000" step="2000"
+             value="60000" onchange="onN(+this.value)">
+      <button class="sbtn" onclick="bump('n',2000)" title="+2000">+</button>
+      <button class="sbtn" onclick="bump('n',10000)" title="+10000">&raquo;</button>
+    </div>
+    <input type="range" id="n-sl" min="5000" max="300000" step="5000" value="60000"
+           oninput="onN(+this.value)">
+    <span class="val" id="n-v">60000</span>
+    <button class="chip" onclick="onN(20000);buildComet()">20k</button>
+    <button class="chip" onclick="onN(60000);buildComet()">60k</button>
+    <button class="chip" onclick="onN(150000);buildComet()">150k</button>
+    <button class="chip" onclick="onN(300000);buildComet()">300k</button>
+    <button class="chip tl" onclick="buildComet()">Recompute</button>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">View</span>
+    <button class="chip tl on" id="cm-raw" onclick="setComet('raw')">Raw r(N)</button>
+    <button class="chip tl" id="cm-norm" onclick="setComet('norm')">&divide; &#120138;(N)</button>
+    <button class="chip tl" id="cm-ratio" onclick="setComet('ratio')">r(N) / &#120138;(N)&middot;li&#8322;(N)</button>
+    <span class="lbl" style="margin-left:6px;">point &alpha;</span>
+    <input type="range" id="a-sl" min="5" max="100" step="5" value="35" oninput="onAlpha(+this.value)">
+    <span class="val" id="a-v">.35</span>
+  </div>
+
+  <div id="cpre-wrap" style="margin:14px 0;display:none;">
+    <div id="cpre-bar" style="height:3px;background:rgba(255,255,255,.08);overflow:hidden;">
+      <div id="cpre-fill" style="height:100%;width:0%;background:var(--teal);transition:width .12s linear;"></div></div>
+    <div id="cpre-txt" style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);margin-top:6px;"></div>
+  </div>
+
+  <div class="cvwrap">
+    <canvas id="cv2" class="main"></canvas>
+    <canvas id="lens2"></canvas>
+    <div id="lensinfo2"></div>
+  </div>
+  <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span></div>
+
+  <div class="ctrls" style="margin-top:12px;">
+    <span class="lbl">Export</span>
+    <button class="btn" onclick="exportComet(2048)">2K</button>
+    <button class="btn" onclick="exportComet(4096)">4K</button>
+    <button class="btn" onclick="exportComet(8192)">8K</button>
+    <div class="sep"></div>
+    <button class="btn" onclick="exportCometCSV()">Comet CSV</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="ptitle">Spread of r(N) / (𝔖·li₂) — the number that matters</div>
+  <p style="font-size:13.5px;margin-bottom:10px;">If $\mathfrak{S}$ is doing real work, the
+  spread of the normalised ratio should be far tighter than the spread of the unnormalised one.
+  Computed live over every even $N$ in range.</p>
+  <div class="scroll"><table id="spread">
+    <tr><th>Normalisation</th><th>mean</th><th>std dev</th><th>min</th><th>max</th><th>max/min</th></tr>
+  </table></div>
+</div>
+
+<div class="panel">
+  <div class="ptitle">Neighbouring N, very different radicals</div>
+  <p style="font-size:13.5px;margin-bottom:10px;">Six even numbers of nearly identical size.
+  Without the correction the prediction is wrong by a factor of ~2.7 on the smooth ones.</p>
+  <div class="scroll"><table id="nbr">
+    <tr><th>N</th><th>rad(N)</th><th>r(N)</th><th>𝔖(N)</th><th>with 𝔖</th><th>without</th></tr>
+  </table></div>
+</div>
+
+<h2><span class="num">§4 · Limits</span>What is and isn't established</h2>
+
+<ul>
+<li><b>Exact.</b> $\varphi(g)/g$ on the $+1$ diagonal and $\varphi(N)$ on the $-1$ anti-diagonal
+are elementary identities, checked here by direct enumeration, not asymptotics.</li>
+<li><b>Exact.</b> $\nu_p = \min(n+1,p)$ for consecutive blocks, and $\nu_p \in \{1,2\}$ for
+$\{0,N\}$. Both are finite residue counts and both are verified above.</li>
+<li><b>Exact.</b> The algebraic collapse of $\prod_p \frac{1-\nu_p/p}{(1-1/p)^2}$ to
+$2C_2\prod_{p\mid N,\,p>2}\frac{p-1}{p-2}$.</li>
+<li><b>Heuristic.</b> That $\mathfrak{S}(N)\,\mathrm{li}_2(N)$ approximates $r(N)$. This is the
+Hardy–Littlewood conjecture. It is unproven. The comet shows it fits; fitting is not proof.</li>
+<li><b>Not claimed.</b> Any progress on Goldbach. The lattice sees coprimality; primality is
+strictly harder and nothing here bridges that.</li>
+</ul>
+
+<div class="callout">
+<span class="ch">Normalisation note</span>
+<p>$C(n)$ uses local factors $1 - \nu_p/p^2$ because it averages over block anchors — it is a
+density of integers. The singular series uses $\frac{1-\nu_p/p}{(1-1/p)^2}$ because it
+compares against a prime-density baseline. <b>Different normalisations of the same
+$\nu_p$.</b> Conflating them would be an error; the shared object is the residue count, not
+the Euler factor.</p>
+</div>
+
+<div class="foot">
+Strip Arithmetic II · Wessen Getachew · 2026<br>
+Part II of the strip series &mdash; <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I: The Goldbach Diagonal</a>.<br>
+Companion to <a href="page5.html">Page 5 — Gap Diagonal Identity</a>,
+<a href="page6.html">Page 6 — Strip Correlations</a> and
+<a href="page8.html">Page 8 — k-Block Density</a>.<br>
+Hardy &amp; Littlewood, <i>Partitio Numerorum III</i> (1923) for the singular series and the
+$\nu_p(\mathcal{H})$ formulation. $C_2$ is OEIS
+<a href="https://oeis.org/A005597" target="_blank" rel="noopener">A005597</a>.
+</div>
+
+</div>
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   STRIP ARITHMETIC II — engine
+
+   Performance model, because it drives every decision below:
+
+   · Coprimality for a G×G lattice is a BITSET, not a byte array. G=10,000 is
+     10^8 cells = 12.5 MB at 1 bit each; the same thing in Uint8Array is 100 MB
+     and will be killed on a phone.
+   · It is built by CLEARING, not by testing. For each prime p ≤ G, clear every
+     (r,M) with p|r and p|M. That is Σ_p (G/p)² = G²·Σ_p p⁻² ≈ 0.4522·G²
+     writes — about 4.5×10⁷ for G=10,000, versus 10⁸ gcd calls.
+   · Nothing is drawn per-cell. The base layer is one ImageData pass at canvas
+     resolution; when G exceeds the canvas the pixel aggregates its block and
+     shades by density, so G=10,000 costs the same ~2.6M reads as G=2,000.
+   · The base layer is cached. Slope/offset/width changes redraw only the
+     overlay, which is O(strip length), not O(G²).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+'use strict';
+
+/* ── state ─────────────────────────────────────────────────────────────── */
+let G = 512;                 // lattice size
+let COP = null;              // Uint32Array bitset, bit (M-1)*G+(r-1)
+let COP_G = 0;               // G the bitset was built for
+let SPF = null;              // smallest prime factor, 1..max(G, NMAX)
+let PRIMES = null;
+let slopeA = 1, slopeB = 1;  // strip slope a/b
+let offS = 1, widthW = 1;    // offset and width
+let showStrip = true;
+let baseCv = null, baseKey = '';   // cached base layer + its cache key
+let rafId = null;
+
+const C2 = 0.6601618158468696;     // twin-prime constant, A005597
+
+/* ── small utilities ───────────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+function fmt(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d); }
+function gcd(a, b) { while (b) { const t = a % b; a = b; b = t; } return a; }
+
+/* Smallest-prime-factor sieve. One pass, reused by every downstream routine
+   (factorisation, phi, radical, singular series) so nothing re-factors. */
+function buildSPF(n) {
+  const spf = new Int32Array(n + 1);
+  for (let i = 2; i <= n; i++) {
+    if (spf[i] === 0) {
+      for (let j = i; j <= n; j += i) if (spf[j] === 0) spf[j] = i;
+    }
+  }
+  return spf;
+}
+function primesUpTo(n) {
+  const mark = new Uint8Array(n + 1), out = [];
+  for (let i = 2; i <= n; i++) {
+    if (!mark[i]) { out.push(i); for (let j = i * i; j <= n; j += i) mark[j] = 1; }
+  }
+  return Int32Array.from(out);
+}
+/* Distinct prime factors. SPF is the fast path; the fallback matters because
+   callers can ask about n past the end of the table (fillNeighbours probes
+   NMAX+6). Without the guard spf[n] is undefined, p is undefined, and the
+   while loop pushes forever until the array throws. */
+function pfac(n, spf) {
+  const out = [];
+  if (n < 2) return out;
+  while (n > 1) {
+    let p = (spf && n < spf.length) ? spf[n] : 0;
+    if (!p) {                       // outside the table — factor directly
+      p = n;
+      for (let d = 2; d * d <= n; d++) if (n % d === 0) { p = d; break; }
+    }
+    out.push(p);
+    while (n % p === 0) n /= p;
+  }
+  return out;
+}
+function phi(n, spf) {
+  let r = n;
+  for (const p of pfac(n, spf)) r -= r / p;
+  return Math.round(r);
+}
+function rad(n, spf) { let r = 1; for (const p of pfac(n, spf)) r *= p; return r; }
+
+/* Singular series for H={0,N}: 2·C2·∏_{p|N,p>2} (p-1)/(p-2).
+   Derived from ν_p = 1 when p|N, else 2 — see §1. */
+function sigma(N, spf) {
+  if (N < 4 || (N & 1)) return 0;
+  let v = 2 * C2;
+  for (const p of pfac(N, spf)) if (p > 2) v *= (p - 1) / (p - 2);
+  return v;
+}
+/* li₂(x) = ∫₂ˣ dt/ln(t)² by composite Simpson, split at 100.
+   The integrand drops from ~2.08 at t=2 to ~0.047 at t=100 and then crawls,
+   so a single uniform panel width is wrong at both ends: fine enough for the
+   head wastes millions of steps on the tail, coarse enough for the tail loses
+   ~1.5% in the head. Two ranges fixes it for ~4k evaluations total.
+   Checked against a 400k-step reference: li2(20000)=270.9637, li2(300000)=2300.8131. */
+function simpson(a, b, n) {
+  const h = (b - a) / n;
+  let s = 1 / (Math.log(a) ** 2) + 1 / (Math.log(b) ** 2);
+  for (let i = 1; i < n; i++) s += (i & 1 ? 4 : 2) / (Math.log(a + i * h) ** 2);
+  return s * h / 3;
+}
+function li2(x) {
+  if (x <= 2) return 0;
+  if (x <= 100) return simpson(2, x, 2000);
+  return simpson(2, 100, 2000) + simpson(100, x, 2000);
+}
+
+/* ── the coprimality bitset ────────────────────────────────────────────── */
+/* Chunked over primes so the main thread stays responsive and the progress
+   bar means something. onDone fires once. */
+function buildCoprime(g, onDone) {
+  if (COP && COP_G === g) { onDone(); return; }
+  const words = Math.ceil((g * g) / 32);
+  const bytes = words * 4;
+  if (bytes > 200 * 1024 * 1024) {
+    alert('G=' + g + ' needs ' + (bytes / 1048576).toFixed(0) + ' MB. Lower G.');
+    onDone(false); return;
+  }
+  const t0 = performance.now();
+  const bits = new Uint32Array(words).fill(0xFFFFFFFF);
+  const ps = PRIMES.filter(p => p <= g);
+  let pi = 0;
+
+  $('pre-wrap').style.display = 'block';
+
+  function chunk() {
+    const deadline = performance.now() + 24;   // keep frames under ~1/40s
+    while (pi < ps.length && performance.now() < deadline) {
+      const p = ps[pi++];
+      // clear every (r,M) with p|r and p|M
+      for (let M = p; M <= g; M += p) {
+        const row = (M - 1) * g - 1;
+        for (let r = p; r <= g; r += p) {
+          const idx = row + r;
+          bits[idx >>> 5] &= ~(1 << (idx & 31));
+        }
+      }
+    }
+    const pct = Math.round(100 * pi / ps.length);
+    $('pre-fill').style.width = pct + '%';
+    $('pre-txt').textContent =
+      'Precomputing ' + g + '×' + g + ' coprimality — ' + pct + '%  ·  ' +
+      (bytes / 1048576).toFixed(1) + ' MB bitset  ·  ' + ps.length + ' primes';
+    if (pi < ps.length) { requestAnimationFrame(chunk); return; }
+
+    COP = bits; COP_G = g;
+    const ms = Math.round(performance.now() - t0);
+    $('pre-txt').textContent =
+      'Built ' + g + '×' + g + ' (' + (g * g).toLocaleString() + ' cells, ' +
+      (bytes / 1048576).toFixed(1) + ' MB) in ' + ms + ' ms';
+    setTimeout(() => { $('pre-wrap').style.display = 'none'; }, 1400);
+    onDone(true);
+  }
+  requestAnimationFrame(chunk);
+}
+function isCop(r, M) {                       // 1-indexed
+  if (r < 1 || M < 1 || r > COP_G || M > COP_G) return false;
+  const idx = (M - 1) * COP_G + (r - 1);
+  return (COP[idx >>> 5] >>> (idx & 31)) & 1;
+}
+
+/* ── base layer ────────────────────────────────────────────────────────── */
+/* One ImageData pass. When G > canvas side, each pixel aggregates a
+   (G/S)×(G/S) block and shades by how many of its cells are coprime, so the
+   cost is bounded by canvas area, not by G². */
+function buildBase(S, mode) {
+  const key = COP_G + '|' + S + '|' + mode;
+  if (baseCv && baseKey === key) return baseCv;
+
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(S, S);
+  const d = img.data;
+  const g = COP_G, scale = g / S;
+
+  const GOLD = [200, 168, 74], TEAL = [61, 200, 184];
+
+  for (let py = 0; py < S; py++) {
+    const M0 = Math.floor(py * scale) + 1;
+    const M1 = Math.min(g, Math.floor((py + 1) * scale)) + 1;
+    for (let px = 0; px < S; px++) {
+      const r0 = Math.floor(px * scale) + 1;
+      const r1 = Math.min(g, Math.floor((px + 1) * scale)) + 1;
+      let hit = 0, tot = 0;
+      for (let M = M0; M < Math.max(M1, M0 + 1); M++) {
+        for (let r = r0; r < Math.max(r1, r0 + 1); r++) {
+          tot++; if (isCop(r, M)) hit++;
+        }
+      }
+      const frac = tot ? hit / tot : 0;
+      const o = (py * S + px) * 4;
+      let cr, cg, cb, ca;
+      if (mode === 'binary') {
+        cr = GOLD[0]; cg = GOLD[1]; cb = GOLD[2];
+        ca = frac > 0 ? Math.round(255 * Math.min(1, frac * 1.6)) : 0;
+      } else if (mode === 'density') {
+        const v = Math.round(255 * frac);
+        cr = cg = cb = v; ca = 255;
+      } else {
+        // gcd-valued modes. A gcd cannot be averaged, so unlike binary/density
+        // these SAMPLE the block's representative cell rather than aggregate
+        // it — stated in the caption so the picture is not read as exact when
+        // G exceeds the canvas.
+        const gg = gcd(r0, M0);
+        const rgb = gcdColor(mode, gg);
+        cr = rgb[0]; cg = rgb[1]; cb = rgb[2]; ca = rgb[3];
+      }
+      d[o] = cr; d[o + 1] = cg; d[o + 2] = cb; d[o + 3] = ca;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  baseCv = cv; baseKey = key;
+  return cv;
+}
+function hsl2rgb(h, s, l) {
+  h /= 360;
+  const f = (p, q, t) => {
+    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const q = l < .5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  return [Math.round(f(p, q, h + 1 / 3) * 255),
+          Math.round(f(p, q, h) * 255),
+          Math.round(f(p, q, h - 1 / 3) * 255)];
+}
+
+/* ── gcd colouring ─────────────────────────────────────────────────────── */
+/* omega / bigOmega without allocating a factor array — these run once per
+   pixel over a 1200x1200 base layer, so 1.4M calls per rebuild. */
+function omega(n) {
+  let c = 0;
+  while (n > 1) {
+    const p = (SPF && n < SPF.length) ? SPF[n] : smallestFactor(n);
+    c++; while (n % p === 0) n /= p;
+  }
+  return c;
+}
+function bigOmega(n) {
+  let c = 0;
+  while (n > 1) {
+    const p = (SPF && n < SPF.length) ? SPF[n] : smallestFactor(n);
+    while (n % p === 0) { n /= p; c++; }
+  }
+  return c;
+}
+function largestFactor(n) {
+  let last = 1;
+  while (n > 1) {
+    const p = (SPF && n < SPF.length) ? SPF[n] : smallestFactor(n);
+    last = p; while (n % p === 0) n /= p;
+  }
+  return last;
+}
+function smallestFactor(n) {
+  if (n % 2 === 0) return 2;
+  for (let d = 3; d * d <= n; d += 2) if (n % d === 0) return d;
+  return n;
+}
+const COPRIME_RGBA = [26, 30, 52, 190];        // gcd = 1, deliberately quiet
+function gcdColor(mode, g) {
+  if (g === 1) return COPRIME_RGBA;
+  let h, sat = 0.64, lig = 0.56, a = 215;
+  if (mode === 'gcd') {
+    h = (Math.log(g) / Math.log(4096)) * 300;            // log so 2 and 4096 differ
+  } else if (mode === 'spf') {
+    h = (Math.log(SPF && g < SPF.length ? SPF[g] : smallestFactor(g)) / Math.log(97)) * 300;
+  } else if (mode === 'lpf') {
+    h = (Math.log(largestFactor(g)) / Math.log(4096)) * 300;
+  } else if (mode === 'omega') {
+    const w = Math.min(5, omega(g));
+    h = [0, 172, 44, 352, 268, 96][w]; sat = 0.66; lig = 0.55;
+  } else if (mode === 'bomega') {
+    const w = Math.min(7, bigOmega(g));
+    h = [0, 172, 150, 44, 20, 352, 300, 268][w]; sat = 0.66;
+  } else {                                                // gcdband
+    const b = g === 2 ? 0 : g === 3 ? 1 : g <= 6 ? 2 : g <= 12 ? 3 : 4;
+    h = [172, 44, 20, 352, 268][b]; sat = 0.62;
+  }
+  const rgb = hsl2rgb(h, sat, lig);
+  return [rgb[0], rgb[1], rgb[2], a];
+}
+
+/* ── phi sieve and the coprime-pair counting function ──────────────────── */
+/* PHI[k] = Euler phi. PHIC[n] = Phi(n) = # ordered pairs in [1,n]^2 with
+   gcd 1 = 2*sum_{k<=n} phi(k) - 1. Both O(n), so the exact side of the gcd
+   table never needs a single gcd call. Verified against direct enumeration
+   in the self test. */
+let PHI = null, PHIC = null, PHI_N = 0;
+function buildPhi(n) {
+  if (PHI && PHI_N >= n) return;
+  const ph = new Int32Array(n + 1);
+  for (let i = 0; i <= n; i++) ph[i] = i;
+  for (let i = 2; i <= n; i++) {
+    if (ph[i] === i) for (let j = i; j <= n; j += i) ph[j] -= ph[j] / i;
+  }
+  const cum = new Float64Array(n + 1);
+  let acc = 0;
+  for (let k = 1; k <= n; k++) { acc += ph[k]; cum[k] = 2 * acc - 1; }
+  PHI = ph; PHIC = cum; PHI_N = n;
+}
+function Phi(m) { return m < 1 ? 0 : PHIC[m]; }
+
+/* ── gcd distribution ──────────────────────────────────────────────────── */
+let gcdN = 512, gcdRows = 16, GCD_LAST = null;
+function setGN(v) { gcdN = Math.max(16, Math.min(4096, Math.round(v))); $('gn-num').value = gcdN; gcdTable(); }
+function setGR(v) { gcdRows = Math.max(4, Math.min(64, Math.round(v))); $('gr-num').value = gcdRows; gcdTable(); }
+
+/* Measured side walks the square and computes gcd directly — an independent
+   route from the Phi formula, which is the entire point of comparing them. */
+function gcdCounts(n) {
+  const cnt = new Int32Array(n + 1);
+  for (let M = 1; M <= n; M++) for (let r = 1; r <= n; r++) cnt[gcd(r, M)]++;
+  return cnt;
+}
+function gcdTable() {
+  const n = gcdN;
+  buildPhi(n);
+  const t0 = performance.now();
+  const cnt = gcdCounts(n);
+  const ms = Math.round(performance.now() - t0);
+  GCD_LAST = { n, cnt };
+
+  let total = 0, exactTotal = 0, mismatches = 0;
+  for (let d = 1; d <= n; d++) {
+    total += cnt[d];
+    const ex = Phi(Math.floor(n / d));
+    exactTotal += ex;
+    if (cnt[d] !== ex) mismatches++;
+  }
+  const sq = n * n;
+  const cop = cnt[1] / sq, target = 6 / (Math.PI * Math.PI);
+
+  $('gcd-sum').innerHTML =
+    '<span class="ch">Totals</span>' +
+    '<p style="margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.9;">' +
+    'cells n&sup2; = <b style="color:var(--gold)">' + sq.toLocaleString() + '</b> &nbsp;·&nbsp; ' +
+    'measured &Sigma;<sub>d</sub> = <b style="color:' + (total === sq ? 'var(--lime)' : 'var(--coral)') + '">' +
+      total.toLocaleString() + '</b> &nbsp;·&nbsp; ' +
+    'exact &Sigma;<sub>d</sub> &Phi;(&lfloor;n/d&rfloor;) = <b style="color:' +
+      (exactTotal === sq ? 'var(--lime)' : 'var(--coral)') + '">' + exactTotal.toLocaleString() + '</b><br>' +
+    'per-d mismatches = <b style="color:' + (mismatches ? 'var(--coral)' : 'var(--lime)') + '">' +
+      mismatches + '</b> of ' + n + ' &nbsp;·&nbsp; ' +
+    'coprime share &Phi;(n)/n&sup2; = <b style="color:var(--teal)">' + cop.toFixed(9) + '</b> ' +
+    'vs 6/&pi;&sup2; = <b>' + target.toFixed(9) + '</b> ' +
+    '(&Delta; ' + Math.abs(cop - target).toExponential(2) + ') &nbsp;·&nbsp; ' + ms + ' ms</p>';
+
+  const t = $('gcdt');
+  t.innerHTML = '<tr><th>d</th><th>count gcd=d</th><th>exact &Phi;(&lfloor;n/d&rfloor;)</th>' +
+    '<th>share of n&sup2;</th><th>6/(&pi;&sup2;d&sup2;)</th><th>&Delta;</th></tr>';
+  for (let d = 1; d <= Math.min(gcdRows, n); d++) {
+    const ex = Phi(Math.floor(n / d));
+    const share = cnt[d] / sq, theory = target / (d * d);
+    t.insertAdjacentHTML('beforeend',
+      '<tr class="' + (cnt[d] === ex ? 'good' : 'bad') + '">' +
+      '<td class="n">' + d + '</td>' +
+      '<td class="n">' + cnt[d].toLocaleString() + '</td>' +
+      '<td class="n">' + ex.toLocaleString() + '</td>' +
+      '<td class="n">' + share.toFixed(7) + '</td>' +
+      '<td class="n">' + theory.toFixed(7) + '</td>' +
+      '<td class="n">' + (cnt[d] - ex) + '</td></tr>');
+  }
+}
+function exportGcdCSV() {
+  if (!GCD_LAST) gcdTable();
+  const { n, cnt } = GCD_LAST;
+  let s = 'd,count,exact_Phi,share,asymptotic_6_over_pi2_d2\n';
+  const sq = n * n, target = 6 / (Math.PI * Math.PI);
+  for (let d = 1; d <= n; d++) {
+    if (!cnt[d]) continue;
+    s += d + ',' + cnt[d] + ',' + Phi(Math.floor(n / d)) + ',' +
+      (cnt[d] / sq).toFixed(9) + ',' + (target / (d * d)).toFixed(9) + '\n';
+  }
+  dlText(s, 'gcd-distribution-n' + n + '.csv');
+}
+
+/* ── strip walk ────────────────────────────────────────────────────────── */
+/* Returns the cells of {s ≤ b·r − a·M < s+w} inside the lattice, plus counts.
+   Iterating M and solving for r keeps this O(strip length) — never O(G²). */
+function walkStrip(limitPts) {
+  const pts = [];
+  let total = 0, cop = 0;
+  const a = slopeA, b = slopeB, g = COP_G;
+  if (!b) return { pts, total, cop };
+  for (let M = 1; M <= g; M++) {
+    // b·r − a·M ∈ [s, s+w)  ⇒  r ∈ [(s + aM)/b, (s + w + aM)/b)
+    const lo = Math.ceil((offS + a * M) / b);
+    const hi = Math.ceil((offS + widthW + a * M) / b) - 1;
+    for (let r = Math.max(1, lo); r <= Math.min(g, hi); r++) {
+      total++;
+      const c = isCop(r, M);
+      if (c) cop++;
+      if (limitPts && pts.length < limitPts) pts.push([r, M, c ? 1 : 0]);
+    }
+  }
+  return { pts, total, cop };
+}
+
+/* ── block band ────────────────────────────────────────── */
+/* C(n) is NOT the coprime density inside a diagonal strip. That was an error in
+   an earlier draft of this page — measured as a strip average it came out 0.578
+   at n=5 against D(5)=0.194, a factor of three. The block {M..M+n} runs along M
+   and the condition is a conjunction: r must be coprime to every column in the
+   band. Measured that way it converges to D(n). */
+let walkMode = 'strip';
+function setWalk(m) {
+  walkMode = m;
+  $('wk-strip').classList.toggle('on', m === 'strip');
+  $('wk-band').classList.toggle('on', m === 'band');
+  $('wk-note').textContent = m === 'band'
+    ? 'width w = n+1; offset is ignored, the band is anchored at M'
+    : '';
+  redraw(true);
+}
+/* D(n) = prod_p (1 - min(n+1,p)/p^2), cached — the product runs over ~18k
+   primes and the width control can move every frame. */
+const _Dcache = new Map();
+let _Dprimes = null;
+function Dn(n) {
+  if (_Dcache.has(n)) return _Dcache.get(n);
+  if (!_Dprimes) _Dprimes = primesUpTo(200000);
+  let v = 1;
+  for (let i = 0; i < _Dprimes.length; i++) {
+    const p = _Dprimes[i];
+    v *= 1 - Math.min(n + 1, p) / (p * p);
+  }
+  _Dcache.set(n, v);
+  return v;
+}
+function inBand(r, M, w, g) {
+  if (M + w - 1 > g) return false;
+  for (let j = 0; j < w; j++) if (gcd(r, M + j) !== 1) return false;
+  return true;
+}
+/* O(G^2 * w), so the measurement is capped — and the cap is reported rather
+   than silently changing what the number means. */
+function walkBand(w, capOverride) {
+  const cap = capOverride || Math.min(COP_G, 600);
+  let total = 0, good = 0;
+  for (let r = 1; r <= cap; r++)
+    for (let M = 1; M + w - 1 <= cap; M++) { total++; if (inBand(r, M, w, cap)) good++; }
+  return { total, good, cap };
+}
+
+/* ── main render ───────────────────────────────────────────────────────── */
+function redraw(rebuildBase) {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(() => { rafId = null; doRedraw(rebuildBase); });
+}
+function doRedraw(rebuildBase) {
+  if (!COP) return;
+  const cv = $('cv');
+  const wrapW = cv.parentElement.clientWidth || 800;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const S = Math.round(Math.min(wrapW, 900));
+  if (cv.width !== Math.round(S * dpr)) {
+    cv.width = Math.round(S * dpr); cv.height = Math.round(S * dpr);
+    cv.style.height = S + 'px';
+  }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, S, S);
+
+  if (rebuildBase) baseKey = '';
+  const base = buildBase(Math.min(COP_G, 1200), $('cmode').value);
+  ctx.imageSmoothingEnabled = COP_G > 1200;
+  ctx.drawImage(base, 0, 0, S, S);
+
+  if (walkMode === 'band') {
+    drawBandOverlay(ctx, S);
+    const bs = walkBand(widthW);
+    updateBarBand(bs);
+    updateIdentityBand(bs);
+  } else {
+    const st = walkStrip(0);
+    if (showStrip) drawStripOverlay(ctx, S);
+    updateBar(st);
+    updateIdentity(st);
+  }
+}
+function drawStripOverlay(ctx, S) {
+  const g = COP_G, k = S / g, a = slopeA, b = slopeB;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(224,80,96,.85)';
+  ctx.fillStyle = 'rgba(224,80,96,.13)';
+  ctx.lineWidth = 1.2;
+  // The strip is a band between two parallel lines; draw it as a polygon in
+  // lattice coords, one clip per edge, rather than cell by cell.
+  ctx.beginPath();
+  const edge = (off) => {
+    const p = [];
+    for (let M = 0; M <= g; M++) {
+      const r = (off + a * M) / b;
+      p.push([r * k, M * k]);
+    }
+    return p;
+  };
+  const lo = edge(offS), hi = edge(offS + widthW);
+  ctx.moveTo(lo[0][0], lo[0][1]);
+  for (const q of lo) ctx.lineTo(q[0], q[1]);
+  for (let i = hi.length - 1; i >= 0; i--) ctx.lineTo(hi[i][0], hi[i][1]);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+function drawBandOverlay(ctx, S) {
+  // The band is anchored at each M, so there is no single region to outline —
+  // mark the surviving cells instead, which is what the AND actually selects.
+  const g = COP_G, k = S / g, w = widthW, cap = Math.min(g, 600);
+  ctx.save();
+  ctx.fillStyle = 'rgba(224,80,96,.85)';
+  const sz = Math.max(1, k);
+  let drawn = 0;
+  for (let r = 1; r <= cap && drawn < 400000; r++)
+    for (let M = 1; M + w - 1 <= cap; M++)
+      if (inBand(r, M, w, cap)) { ctx.fillRect((r - 1) * k, (M - 1) * k, sz, sz); drawn++; }
+  ctx.restore();
+}
+function updateBarBand(bs) {
+  const d = bs.total ? bs.good / bs.total : 0;
+  $('bar-l').innerHTML = 'G=<b>' + COP_G + '</b> \u00b7 <b>band</b> of w=<b>' + widthW +
+    '</b> columns (n=<b>' + (widthW - 1) + '</b>) \u00b7 measured on ' + bs.cap + '\u00d7' + bs.cap;
+  $('bar-r').innerHTML = 'cells <b>' + bs.total.toLocaleString() + '</b> \u00b7 survive AND <b>' +
+    bs.good.toLocaleString() + '</b> \u00b7 density <b>' + fmt(d, 6) + '</b>';
+}
+function updateIdentityBand(bs) {
+  const t = $('idt');
+  t.innerHTML = '<tr><th>Quantity</th><th>Measured on the band</th><th>Exact</th><th>\u0394</th></tr>';
+  const n = widthW - 1;
+  const meas = bs.total ? bs.good / bs.total : 0;
+  const ex = Dn(n);
+  const rel = ex ? Math.abs(meas - ex) / ex : 1;
+  // Finite-G bias, not noise: a band of n+1 columns loses its last n columns at
+  // the edge, so the deficit scales as (n+1)/cap. Measured offline at cap =
+  // 200/400/800/1600 for n = 0,1,2,5,9 the relative error stays under
+  // 4(n+1)/cap throughout, so that is the tolerance. Claiming tighter would
+  // just paint a converging number red.
+  const tol = 0.005 + 4 * (n + 1) / bs.cap;
+  t.insertAdjacentHTML('beforeend',
+    '<tr class="' + (rel < tol ? 'good' : 'bad') + '"><td>Band density, n=' + n +
+    '</td><td class="n">' + fmt(meas, 6) + '</td><td class="n">D(' + n + ') = ' + fmt(ex, 6) +
+    '</td><td class="n">' + fmt(Math.abs(meas - ex), 6) + '</td></tr>');
+  t.insertAdjacentHTML('beforeend',
+    '<tr><td>C(' + n + ') = \u03b6(2)\u00b7D(' + n + ')</td><td class="n">' +
+    fmt(meas * 1.6449340668, 6) + '</td><td class="n">' + fmt(ex * 1.6449340668, 6) +
+    '</td><td class="n">rel ' + fmt(rel, 4) + '</td></tr>');
+  t.insertAdjacentHTML('beforeend',
+    '<tr><td colspan="4" style="color:var(--cream3);">Measured on ' + bs.cap + '\u00d7' + bs.cap +
+    '. Finite-G bias scales as (n+1)/G, so at n=' + n + ' the expected error here is about ' +
+    fmt(100 * 4 * (n + 1) / bs.cap, 1) + '%. Raise G for a tighter read.</td></tr>');
+}
+function updateBar(st) {
+  const d = st.total ? st.cop / st.total : 0;
+  $('bar-l').innerHTML = 'G=<b>' + COP_G + '</b> · slope <b>' + slopeA + '/' + slopeB +
+    '</b> · s=<b>' + offS + '</b> · w=<b>' + widthW + '</b>';
+  $('bar-r').innerHTML = 'strip cells <b>' + st.total.toLocaleString() + '</b> · coprime <b>' +
+    st.cop.toLocaleString() + '</b> · density <b>' + fmt(d, 6) + '</b>';
+}
+
+/* ── live identity check ───────────────────────────────────────────────── */
+/* The two exact statements the page rests on, measured from the same bitset
+   the picture is drawn from. If these ever disagree, the picture is wrong. */
+function updateIdentity(st) {
+  const t = $('idt');
+  t.innerHTML = '<tr><th>Quantity</th><th>Measured on the strip</th><th>Exact</th><th>Δ</th></tr>';
+  const rows = [];
+  const meas = st.total ? st.cop / st.total : 0;
+
+  if (slopeA === 1 && slopeB === 1 && widthW === 1 && offS === 0) {
+    // r - M = 0 is the main diagonal: gcd(r,r) = r, so the only coprime cell is
+    // (1,1). phi(0) is undefined, so this degenerate case gets its own row
+    // instead of falling through to "no closed form".
+    rows.push(['Main diagonal r = M', st.cop, 'exactly 1, at (1,1)',
+               Math.abs(st.cop - 1), st.cop === 1]);
+  } else if (slopeA === 1 && slopeB === 1 && widthW === 1) {
+    const g0 = Math.abs(offS);
+    if (g0 >= 1 && g0 <= COP_G) {
+      const ex = phi(g0, SPF) / g0;
+      rows.push(['Diagonal density, g=' + g0, fmt(meas, 6), 'φ(' + g0 + ')/' + g0 + ' = ' + fmt(ex, 6),
+                 fmt(Math.abs(meas - ex), 6), Math.abs(meas - ex) < 0.02]);
+    }
+  }
+  if (slopeA === -1 && slopeB === 1 && widthW === 1) {
+    const N = offS;
+    if (N >= 2 && N <= COP_G) {
+      const ex = phi(N, SPF);
+      rows.push(['Anti-diagonal count, N=' + N, st.cop, 'φ(' + N + ') = ' + ex,
+                 Math.abs(st.cop - ex), st.cop === ex]);
+      if (!(N & 1) && N >= 4) {
+        rows.push(['Singular series 𝔖(' + N + ')', '—', fmt(sigma(N, SPF), 6), '—', true]);
+      }
+    }
+  }
+  if (!rows.length) {
+    rows.push(['No closed form for this slope/width', fmt(meas, 6),
+               slopeA === 1 && slopeB === 1 && widthW > 1
+                 ? 'for C(n) switch to Block mode'
+                 : 'try slope ±1 with w=1', '—', null]);
+  }
+  for (const r of rows) {
+    const cls = r[4] === true ? 'good' : (r[4] === false ? 'bad' : '');
+    t.insertAdjacentHTML('beforeend',
+      '<tr class="' + cls + '"><td>' + r[0] + '</td><td class="n">' + r[1] +
+      '</td><td class="n">' + r[2] + '</td><td class="n">' + r[3] + '</td></tr>');
+  }
+}
+
+/* ── controls ──────────────────────────────────────────────────────────── */
+/* Every numeric parameter gets the same five affordances: prev prime, −step,
+   type a value, +step, next prime. Sweeping a slider is fine for finding a
+   region; landing on an exact g or N is what the identities actually need,
+   and dragging a slider to precisely 210 is miserable. */
+
+function isPrime(n) {
+  if (n < 2) return false;
+  if (SPF && n < SPF.length) return SPF[n] === n;
+  if (n % 2 === 0) return n === 2;
+  for (let d = 3; d * d <= n; d += 2) if (n % d === 0) return false;
+  return true;
+}
+function nextPrime(n) { n = Math.floor(n) + 1; while (n < 1e7 && !isPrime(n)) n++; return n; }
+function prevPrime(n) { n = Math.floor(n) - 1; while (n > 2 && !isPrime(n)) n--; return Math.max(2, n); }
+
+/* Sign-aware for the offset: on the anti-diagonal s is N and is positive, but
+   on the +1 diagonal a negative g is just the mirrored strip, so step the
+   magnitude and keep the sign. */
+function pj(which, dir) {
+  const cur = { g: G, off: offS, w: widthW }[which];
+  if (cur === undefined) return;
+  const sign = (which === 'off' && cur < 0) ? -1 : 1;
+  const mag = Math.abs(cur);
+  const nxt = (dir > 0 ? nextPrime(mag) : prevPrime(mag)) * sign;
+  ({ g: onG, off: onOff, w: onW })[which](nxt);
+}
+function bump(which, d) {
+  if (which === 'g') return onG(G + d);
+  if (which === 'off') return onOff(offS + d);
+  if (which === 'w') return onW(widthW + d);
+  if (which === 'n') { onN(Math.max(5000, Math.min(300000, NMAX + d))); return; }
+  if (which === 'lz') return setLensZoom(LENS_ZOOM + d);
+  if (which === 'ls') return setLensSize(lensSize + d);
+  if (which === 'gn') return setGN(gcdN + d);
+  if (which === 'gr') return setGR(gcdRows + d);
+  if (which === 'a') { $('sl-a').value = (Math.round(+$('sl-a').value) || 0) + d; return reslope(); }
+  if (which === 'b') {
+    $('sl-b').value = Math.max(1, (Math.round(+$('sl-b').value) || 1) + d);
+    return reslope();
+  }
+}
+function markPrime(id, v) {
+  const el = $(id);
+  if (el) el.classList.toggle('on', isPrime(Math.abs(v)));
+}
+
+function onG(v) {
+  // Floor of 4, not 16: at G=4 the lattice is 16 cells and every one is
+  // legible, which is where the strip equation is readable before any of this
+  // is a picture. The clamp here was the real floor — the slider min was only
+  // the visible one, so both had to move.
+  v = Math.max(4, Math.min(10000, Math.round(v)));
+  G = v; $('g-v').textContent = v; $('g-num').value = v;
+  if (+$('g-sl').value !== Math.min(v, 4096)) $('g-sl').value = Math.min(v, 4096);
+  $('off-sl').min = -v; $('off-sl').max = v;
+  $('w-sl').max = Math.max(1, Math.min(256, v >> 2));
+  markPrime('g-pt', v);
+  buildPhi(Math.max(4096, v));   // exports quote Phi(G); keep the table ahead of G
+  buildCoprime(v, ok => { if (ok !== false) redraw(true); });
+}
+function reslope() {
+  slopeA = Math.round(+$('sl-a').value) || 1;
+  slopeB = Math.max(1, Math.round(+$('sl-b').value) || 1);
+  $('sl-a').value = slopeA; $('sl-b').value = slopeB;
+  syncPresetChips();
+  redraw(false);
+}
+function onOff(v) {
+  offS = Math.round(v) || 0;
+  $('off-v').textContent = offS;
+  $('off-num').value = offS;
+  if (Math.abs(offS) <= COP_G) $('off-sl').value = offS;
+  markPrime('off-pt', offS);
+  syncPresetChips();
+  redraw(false);
+}
+function onW(v) {
+  widthW = Math.max(1, Math.round(v) || 1);
+  $('w-v').textContent = widthW;
+  $('w-num').value = widthW;
+  if (widthW <= +$('w-sl').max) $('w-sl').value = widthW;
+  markPrime('w-pt', widthW);
+  // width w is a block of w consecutive integers, i.e. C(n) with n = w-1
+  $('w-blk').textContent = 'block n = ' + (widthW - 1);
+  syncPresetChips();
+  redraw(false);
+}
+function toggleStrip() {
+  showStrip = !showStrip;
+  $('b-strip').textContent = 'Strip: ' + (showStrip ? 'on' : 'off');
+  $('b-strip').classList.toggle('on', showStrip);
+  redraw(false);
+}
+
+/* Presets are the page's argument in button form: the same walk at four
+   settings is the gap diagonal, C(n), Goldbach, and a Farey ray. */
+const PRESETS = {
+  diag:  { a: 1,  b: 1, s: 6,   w: 1 },
+  anti:  { a: -1, b: 1, s: 210, w: 1, minG: 256 },
+  gap6:  { a: 1,  b: 1, s: 6,   w: 1 },
+  gap30: { a: 1,  b: 1, s: 30,  w: 1 },
+  blk5:  { a: 1,  b: 1, s: 0,   w: 6 },
+  blk29: { a: 1,  b: 1, s: 0,   w: 30 },
+  gsm:   { a: -1, b: 1, s: 210, w: 1, minG: 256 },   // 210 = 2·3·5·7, smooth
+  grg:   { a: -1, b: 1, s: 206, w: 1, minG: 256 },   // 206 = 2·103, rough
+  f12:   { a: 1,  b: 2, s: 1,   w: 1 },
+  f23:   { a: 2,  b: 3, s: 1,   w: 1 }
+};
+function preset(k) {
+  const P = PRESETS[k];
+  if (!P) return;
+  const go = () => {
+    $('sl-a').value = P.a; $('sl-b').value = P.b;
+    slopeA = P.a; slopeB = P.b;
+    offS = P.s; widthW = P.w;
+    $('off-num').value = P.s; $('off-v').textContent = P.s;
+    if (Math.abs(P.s) <= COP_G) $('off-sl').value = P.s;
+    $('w-num').value = P.w; $('w-v').textContent = P.w;
+    $('w-sl').value = Math.min(P.w, +$('w-sl').max);
+    $('w-blk').textContent = 'block n = ' + (P.w - 1);
+    markPrime('off-pt', P.s); markPrime('w-pt', P.w);
+    syncPresetChips();
+    redraw(false);
+  };
+  if (P.minG && G < P.minG) onG(P.minG);      // needs a big enough lattice
+  // onG is async through the bitset build, so re-apply once it lands
+  if (P.minG && COP_G < P.minG) setTimeout(go, 40); else go();
+}
+/* Light up whichever preset the current state actually matches, including
+   after the user arrives there by stepping rather than clicking. */
+function syncPresetChips() {
+  for (const k of Object.keys(PRESETS)) {
+    const el = $(k === 'diag' ? 'pre-diag' : k === 'anti' ? 'pre-anti' : 'ps-' + k);
+    if (!el) continue;
+    const P = PRESETS[k];
+    el.classList.toggle('on',
+      P.a === slopeA && P.b === slopeB && P.s === offS && P.w === widthW);
+  }
+}
+function resetView() {
+  $('sl-a').value = 1; $('sl-b').value = 1;
+  slopeA = 1; slopeB = 1;
+  onOff(0); onW(1); reslope();
+}
+
+/* Keyboard. Ignored while a field has focus so typing a value still works. */
+function onKey(e) {
+  const t = e.target.tagName;
+  if (t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
+  const big = e.shiftKey ? 10 : 1;
+  switch (e.key) {
+    case 'ArrowRight': bump('off', big); break;
+    case 'ArrowLeft':  bump('off', -big); break;
+    case 'ArrowUp':    bump('w', 1); break;
+    case 'ArrowDown':  bump('w', -1); break;
+    case 'p': case 'P': pj('off', e.shiftKey ? -1 : 1); break;
+    case 'd': case 'D': preset('diag'); break;
+    case 'g': case 'G': preset('anti'); break;
+    case 'r': case 'R': resetView(); break;
+    case 'l': case 'L': toggleLens(); break;
+    default: return;
+  }
+  e.preventDefault();
+}
+
+/* ── exports ───────────────────────────────────────────────────────────── */
+/* A bare plate PNG loses the entire argument — the reader gets a picture with
+   no G, no slope, no counts and no verdict, and cannot tell a strip from a band
+   or a pass from a failure. These compose the same way Strip Arithmetic I's
+   exports do: eyebrow, title, measured stats, a row of stat cards carrying the
+   numbers that decide the claim, the plate, then a footer stating the strip
+   equation and the render settings so the image is reproducible from itself. */
+
+const PAL = { bg: '#04040d', gold: '#c8a84a', teal: '#3dc8b8', coral: '#e05060',
+              lime: '#7ec87a', violet: '#9b7fe8', amber: '#f2a84a',
+              cream: '#ddd8cc', cream2: '#b8b2a6', cream3: '#89837a' };
+const MONO = '"JetBrains Mono",monospace', DISP = '"Cinzel",serif';
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function drawCard(ctx, x, y, w, h, value, label, color, S) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,255,255,.022)';
+  roundRect(ctx, x, y, w, h, 6 * S); ctx.fill();
+  ctx.strokeStyle = color + '55'; ctx.lineWidth = Math.max(1, 1.4 * S);
+  roundRect(ctx, x, y, w, h, 6 * S); ctx.stroke();
+  ctx.textAlign = 'center';
+  // shrink the value until it fits rather than letting it run past the border
+  let fs = 40 * S;
+  ctx.font = fs + 'px ' + MONO;
+  while (ctx.measureText(value).width > w - 20 * S && fs > 12 * S) {
+    fs -= 1.5 * S; ctx.font = fs + 'px ' + MONO;
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(value, x + w / 2, y + h * 0.52);
+  ctx.font = (13 * S) + 'px ' + MONO;
+  ctx.fillStyle = PAL.cream3;
+  ctx.fillText(label, x + w / 2, y + h * 0.80);
+  ctx.restore();
+}
+function cardRow(ctx, cards, x, y, totalW, h, S) {
+  const gap = 12 * S, w = (totalW - gap * (cards.length - 1)) / cards.length;
+  cards.forEach((c, i) => drawCard(ctx, x + i * (w + gap), y, w, h, c[0], c[1], c[2], S));
+}
+
+/* Which numbers decide the claim depends on which walk is live, so the card
+   row is built from the state rather than fixed. */
+function exportCards() {
+  const g = COP_G;
+  if (walkMode === 'band') {
+    const bs = walkBand(widthW);
+    const meas = bs.total ? bs.good / bs.total : 0, ex = Dn(widthW - 1);
+    const rel = ex ? Math.abs(meas - ex) / ex : 1;
+    const tol = 0.005 + 4 * widthW / bs.cap;
+    return [
+      [String(widthW), 'w · band width', PAL.gold],
+      [String(widthW - 1), 'n = w − 1', PAL.amber],
+      [bs.good.toLocaleString(), 'survive AND', PAL.lime],
+      [fmt(meas, 6), 'measured density', PAL.teal],
+      [fmt(ex, 6), 'D(' + (widthW - 1) + ') exact', PAL.violet],
+      [rel < tol ? 'MATCH' : 'rel ' + fmt(rel, 3),
+       'verdict · tol ' + fmt(tol, 3), rel < tol ? PAL.lime : PAL.coral]
+    ];
+  }
+  const st = walkStrip(0);
+  const d = st.total ? st.cop / st.total : 0;
+  const base = [
+    [slopeA + '/' + slopeB, 'slope a/b', PAL.gold],
+    [String(offS), 's · offset', PAL.amber],
+    [String(widthW), 'w · width', PAL.violet],
+    [st.total.toLocaleString(), 'cells in strip', PAL.cream2],
+    [st.cop.toLocaleString(), 'coprime', PAL.teal]
+  ];
+  if (slopeA === -1 && slopeB === 1 && widthW === 1 && offS >= 2 && offS <= g) {
+    const ex = PHI[offS];
+    base.push([st.cop === ex ? 'φ(' + offS + ') = ' + ex : 'φ=' + ex + ' vs ' + st.cop,
+               st.cop === ex ? 'anti-diagonal · exact' : 'MISMATCH',
+               st.cop === ex ? PAL.lime : PAL.coral]);
+  } else if (slopeA === 1 && slopeB === 1 && widthW === 1 && offS === 0) {
+    base.push([String(st.cop), 'main diagonal · exactly 1', st.cop === 1 ? PAL.lime : PAL.coral]);
+  } else if (slopeA === 1 && slopeB === 1 && widthW === 1 && Math.abs(offS) >= 1 && Math.abs(offS) <= g) {
+    const g0 = Math.abs(offS), ex = PHI[g0] / g0;
+    base.push([fmt(d, 5) + ' ≈ ' + fmt(ex, 5), 'density vs φ(g)/g',
+               Math.abs(d - ex) < 0.02 ? PAL.lime : PAL.coral]);
+  } else {
+    base.push([fmt(d, 6), 'strip density', PAL.teal]);
+  }
+  return base;
+}
+
+/* Draw the plate exactly as it appears on screen, at export resolution. */
+function paintPlate(ctx, x, y, side) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, side, side);
+  const base = buildBase(Math.min(COP_G, 2048), $('cmode').value);
+  ctx.imageSmoothingEnabled = COP_G > 2048;
+  ctx.drawImage(base, 0, 0, side, side);
+  ctx.imageSmoothingEnabled = true;
+  if (walkMode === 'band') drawBandOverlay(ctx, side);
+  else if (showStrip) drawStripOverlay(ctx, side);
+  ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
+  ctx.strokeRect(.5, .5, side - 1, side - 1);
+  ctx.restore();
+}
+
+async function exportPNG(px) {
+  if (!COP) return;
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+  const S = px / 1920;                       // every dimension below is at 1920
+  const m = 84 * S;
+  const plateSide = px - 2 * m;
+  const headerH = 470 * S, footerH = 118 * S;
+  const H = Math.round(headerH + plateSide + footerH);
+
+  const cv = document.createElement('canvas');
+  cv.width = px; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, px, H);
+  ctx.textBaseline = 'middle';
+
+  // eyebrow
+  ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold;
+  ctx.font = (17 * S) + 'px ' + MONO;
+  ctx.fillText('S T R I P   A R I T H M E T I C   I I   ·   W E S S E N   G E T A C H E W   ·   2 0 2 6',
+               px / 2, 52 * S);
+
+  // title
+  ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream;
+  ctx.font = (56 * S) + 'px ' + DISP;
+  ctx.fillText('Slope, Width & the Singular Series', m, 128 * S);
+
+  // measured lattice stats, right aligned against the title
+  const cop = (COP_G <= PHI_N) ? Phi(COP_G) : null;
+  const cells = COP_G * COP_G;
+  ctx.textAlign = 'right'; ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+  ctx.fillText('G = ' + COP_G + '   ·   G² = ' + cells.toLocaleString() + ' pts   ·   ' +
+               (walkMode === 'band' ? 'block band' : 'strip ' + slopeA + '/' + slopeB),
+               px - m, 112 * S);
+  if (cop !== null) {
+    const pct = 100 * cop / cells, target = 100 * 6 / (Math.PI * Math.PI);
+    ctx.fillText('gcd=1: ' + cop.toLocaleString() + '/' + cells.toLocaleString() + ' = ' +
+      pct.toFixed(2) + '%   ·   Δ 6/π² (' + target.toFixed(2) + '%): ' +
+      (pct - target >= 0 ? '+' : '') + (pct - target).toFixed(2) + '%', px - m, 146 * S);
+  }
+
+  // the equation this plate is a picture of
+  ctx.textAlign = 'left'; ctx.font = (24 * S) + 'px ' + MONO; ctx.fillStyle = PAL.teal;
+  ctx.fillText(walkMode === 'band'
+    ? 'gcd(r, M+j) = 1  for all j = 0…' + (widthW - 1) + '   ·   AND across the band   ·   density → D(' + (widthW - 1) + ')'
+    : offS + ' ≤ ' + slopeB + '·r − ' + slopeA + '·M < ' + (offS + widthW) +
+      (slopeA === -1 && slopeB === 1 && widthW === 1 ? '   ·   anti-diagonal r + M = ' + offS
+       : slopeA === 1 && slopeB === 1 && widthW === 1 ? '   ·   diagonal r − M = ' + offS : ''),
+    m, 212 * S);
+
+  // stat cards
+  cardRow(ctx, exportCards(), m, 252 * S, px - 2 * m, 128 * S, S);
+
+  // one line naming what the walk is
+  ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+  ctx.fillText(walkMode === 'band'
+    ? 'Block band — the C(n) condition, measured as a conjunction over n+1 columns, not as a strip average'
+    : 'Strip — coprime density inside the band, exact against φ(g)/g at slope +1 and φ(N) at slope −1',
+    m, 428 * S);
+
+  paintPlate(ctx, m, headerH, plateSide);
+
+  // footer
+  const fy = headerH + plateSide + 40 * S;
+  ctx.font = (16 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3; ctx.textAlign = 'left';
+  ctx.fillText('v = b·r − a·M   ·   slope ' + slopeA + '/' + slopeB + '   ·   s = ' + offS +
+    '   ·   w = ' + widthW + '   ·   G = ' + COP_G +
+    '   ·   render ' + $('cmode').value + '   ·   labels ' + $('lens-lbl').value, m, fy);
+  ctx.fillText('C(n) block-coprime density   ·   Strip Arithmetic II   ·   part II of the strip series',
+    m, fy + 30 * S);
+  ctx.textAlign = 'right'; ctx.fillStyle = PAL.cream3;
+  ctx.fillText('wessengetachew.github.io', px - m, fy);
+  ctx.fillStyle = PAL.coral;
+  ctx.fillText('Strip I · wessengetachew.github.io/Partition', px - m, fy + 30 * S);
+
+  dl(cv, 'strips2-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' +
+      slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + px + '.png');
+}
+function dl(cv, name) {
+  cv.toBlob(b => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+}
+function exportCSV() {
+  const st = walkStrip(500000);
+  let s = 'r,M,coprime\n';
+  for (const p of st.pts) s += p[0] + ',' + p[1] + ',' + p[2] + '\n';
+  dlText(s, 'strip-G' + COP_G + '-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW + '.csv');
+}
+function dlText(s, name) {
+  const b = new Blob([s], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function exportState() {
+  const st = walkStrip(0);
+  const L = [];
+  L.push('STRIP ARITHMETIC II — STATE REPORT');
+  L.push(new Date().toISOString());
+  L.push('');
+  L.push('LATTICE');
+  L.push('  G                 ' + COP_G);
+  L.push('  cells             ' + (COP_G * COP_G).toLocaleString());
+  L.push('  bitset            ' + (Math.ceil(COP_G * COP_G / 32) * 4 / 1048576).toFixed(2) + ' MB');
+  L.push('');
+  L.push('STRIP   ' + slopeA + '/' + slopeB + '   s=' + offS + '   w=' + widthW);
+  L.push('  cells in strip    ' + st.total.toLocaleString());
+  L.push('  coprime           ' + st.cop.toLocaleString());
+  L.push('  density           ' + (st.total ? (st.cop / st.total).toFixed(9) : '—'));
+  L.push('');
+  if (slopeA === 1 && slopeB === 1 && widthW === 1 && Math.abs(offS) >= 1) {
+    const g0 = Math.abs(offS);
+    L.push('  exact  phi(g)/g   ' + (phi(g0, SPF) / g0).toFixed(9));
+  }
+  if (slopeA === -1 && slopeB === 1 && widthW === 1 && offS >= 2) {
+    L.push('  exact  phi(N)     ' + phi(offS, SPF));
+    if (!(offS & 1) && offS >= 4) L.push('  sigma(N)          ' + sigma(offS, SPF).toFixed(9));
+  }
+  dlText(L.join('\n'), 'strips2-state.txt');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMET
+   r(N) for all even N ≤ NMAX by convolving the prime set, NOT by testing
+   each N separately. For every prime pair (p,q) with p+q ≤ NMAX, bump
+   count[p+q]. That is ~Σ_p π(NMAX−p) increments, which beats the
+   Σ_N π(N) cost of the naive loop by an order of magnitude.
+   ══════════════════════════════════════════════════════════════════════════ */
+let NMAX = 60000, RN = null, cometMode = 'raw', ptAlpha = .35;
+let SIG = null, LI2 = null;
+
+function buildComet() {
+  const n = NMAX;
+  if (!SPF || SPF.length <= n) { SPF = buildSPF(n + 1); }
+  const ps = primesUpTo(n);
+  const isP = new Uint8Array(n + 1);
+  for (let i = 0; i < ps.length; i++) isP[ps[i]] = 1;
+  const cnt = new Uint32Array(n + 1);
+
+  $('cpre-wrap').style.display = 'block';
+  const t0 = performance.now();
+  let i = 0;
+
+  function chunk() {
+    const deadline = performance.now() + 24;
+    while (i < ps.length && performance.now() < deadline) {
+      const p = ps[i++], lim = n - p;
+      for (let j = i - 1; j < ps.length; j++) {
+        const q = ps[j];
+        if (q > lim) break;
+        cnt[p + q] += (p === q) ? 1 : 2;      // ordered pairs
+      }
+    }
+    const pct = Math.round(100 * i / ps.length);
+    $('cpre-fill').style.width = pct + '%';
+    $('cpre-txt').textContent = 'Convolving ' + ps.length.toLocaleString() +
+      ' primes — ' + pct + '%';
+    if (i < ps.length) { requestAnimationFrame(chunk); return; }
+
+    RN = cnt;
+    SIG = new Float64Array(n + 1);
+    LI2 = new Float64Array(n + 1);
+    // Cumulative li₂ across even N. Seeded with the accurate value at N=4 and
+    // advanced by Simpson on each [N-2, N] rather than trapezoid — over the
+    // low range the trapezoid version drifts about 1.5% against reference.
+    let li = li2(4);
+    for (let N = 4; N <= n; N += 2) {
+      SIG[N] = sigma(N, SPF);
+      if (N > 4) {
+        li += (1 / (Math.log(N - 2) ** 2)
+             + 4 / (Math.log(N - 1) ** 2)
+             + 1 / (Math.log(N) ** 2)) * 2 / 6;
+      }
+      LI2[N] = li;
+    }
+    $('cpre-txt').textContent = 'r(N) for all even N ≤ ' + n.toLocaleString() +
+      ' in ' + Math.round(performance.now() - t0) + ' ms';
+    setTimeout(() => { $('cpre-wrap').style.display = 'none'; }, 1400);
+    drawComet(); fillSpread(); fillNeighbours();
+  }
+  requestAnimationFrame(chunk);
+}
+
+function drawComet() {
+  if (!RN) return;
+  const cv = $('cv2');
+  const wrapW = cv.parentElement.clientWidth || 800;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const W = Math.round(wrapW), H = Math.round(Math.min(460, wrapW * .55));
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, W, H);
+  paintComet(ctx, W, H, 1);
+}
+function valAt(N) {
+  if (cometMode === 'raw') return RN[N];
+  if (cometMode === 'norm') return SIG[N] ? RN[N] / SIG[N] : 0;
+  const pred = SIG[N] * LI2[N];
+  return pred > 0 ? RN[N] / pred : 0;
+}
+function paintComet(ctx, W, H, k) {
+  const PAD = 46 * k, n = NMAX;
+  let vmax = 0, vmin = Infinity;
+  for (let N = 4; N <= n; N += 2) {
+    const v = valAt(N);
+    if (v > vmax) vmax = v;
+    if (v < vmin) vmin = v;
+  }
+  if (cometMode === 'ratio') { vmin = Math.max(0, vmin); vmax = Math.min(vmax, 2); }
+  else vmin = 0;
+  const x = N => PAD + (N / n) * (W - PAD - 14 * k);
+  const y = v => H - PAD + 6 * k - ((v - vmin) / (vmax - vmin || 1)) * (H - PAD - 22 * k);
+
+  // axes
+  ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1 * k;
+  ctx.beginPath();
+  ctx.moveTo(PAD, 10 * k); ctx.lineTo(PAD, H - PAD + 6 * k);
+  ctx.lineTo(W - 10 * k, H - PAD + 6 * k); ctx.stroke();
+  ctx.fillStyle = 'rgba(184,178,166,.75)';
+  ctx.font = (11 * k) + 'px monospace';
+  for (let i = 0; i <= 5; i++) {
+    const v = vmin + (vmax - vmin) * i / 5;
+    ctx.fillText(cometMode === 'raw' ? Math.round(v) : v.toFixed(2), 4 * k, y(v) + 4 * k);
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    ctx.beginPath(); ctx.moveTo(PAD, y(v)); ctx.lineTo(W - 10 * k, y(v)); ctx.stroke();
+  }
+  for (let i = 0; i <= 4; i++) {
+    const N = Math.round(n * i / 4);
+    ctx.fillText(N >= 1000 ? (N / 1000) + 'k' : N, x(N) - 10 * k, H - PAD + 22 * k);
+  }
+
+  // reference line at 1 for the ratio view
+  if (cometMode === 'ratio' && vmin <= 1 && vmax >= 1) {
+    ctx.strokeStyle = 'rgba(200,168,74,.7)'; ctx.setLineDash([5 * k, 4 * k]);
+    ctx.beginPath(); ctx.moveTo(PAD, y(1)); ctx.lineTo(W - 10 * k, y(1)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(200,168,74,.9)';
+    ctx.fillText('1.0', W - 34 * k, y(1) - 5 * k);
+  }
+
+  // points — colour by number of distinct odd prime factors, which is what
+  // drives S(N) and therefore what separates the comet's bands
+  const r = Math.max(.5 * k, 1.1 * k);
+  for (let N = 4; N <= n; N += 2) {
+    const v = valAt(N);
+    if (!v) continue;
+    const w = pfac(N, SPF).filter(p => p > 2).length;
+    const hue = Math.min(300, 190 + w * 34);
+    ctx.fillStyle = 'hsla(' + hue + ',68%,58%,' + ptAlpha + ')';
+    ctx.fillRect(x(N), y(v), r, r);
+  }
+
+  ctx.fillStyle = 'rgba(200,168,74,.9)';
+  ctx.font = (12 * k) + 'px monospace';
+  const t = cometMode === 'raw' ? 'r(N) — ordered prime pairs summing to N'
+    : cometMode === 'norm' ? 'r(N) / 𝔖(N) — bands collapse'
+    : 'r(N) / (𝔖(N)·li₂(N)) — should sit at 1';
+  ctx.fillText(t, PAD + 6 * k, 20 * k);
+  // Publish the plate geometry in CSS px so the lens can re-render points as
+  // vectors at any magnification instead of blitting the rendered scatter.
+  if (k === 1) COMET_GEO = { x, y, inv: X => (X - PAD) / (W - PAD - 14) * n, vmin, vmax, PAD, W, H, n };
+  $('bar2-l').innerHTML = 'even N ≤ <b>' + NMAX.toLocaleString() + '</b> · colour = # distinct odd prime factors';
+  $('bar2-r').innerHTML = 'mode <b>' + cometMode + '</b>';
+}
+function setComet(m) {
+  cometMode = m;
+  for (const id of ['cm-raw', 'cm-norm', 'cm-ratio'])
+    $(id).classList.toggle('on', id === 'cm-' + m);
+  drawComet();
+}
+function onN(v) {
+  NMAX = Math.max(5000, Math.min(300000, Math.round(v)));
+  $('n-v').textContent = NMAX;
+  $('n-num').value = NMAX;
+  $('n-sl').value = NMAX;
+}
+function onAlpha(v) { ptAlpha = v / 100; $('a-v').textContent = ptAlpha.toFixed(2); drawComet(); }
+
+function stats(f) {
+  let s = 0, s2 = 0, n = 0, mn = Infinity, mx = -Infinity;
+  for (let N = 1000; N <= NMAX; N += 2) {
+    const v = f(N);
+    if (!isFinite(v) || v <= 0) continue;
+    s += v; s2 += v * v; n++;
+    if (v < mn) mn = v; if (v > mx) mx = v;
+  }
+  const mean = s / n, sd = Math.sqrt(Math.max(0, s2 / n - mean * mean));
+  return { mean, sd, mn, mx, n };
+}
+function fillSpread() {
+  const t = $('spread');
+  t.innerHTML = '<tr><th>Normalisation</th><th>mean</th><th>std dev</th><th>min</th><th>max</th><th>max/min</th></tr>';
+  const rows = [
+    ['r(N) / li₂(N) — no 𝔖', N => LI2[N] > 0 ? RN[N] / LI2[N] : 0],
+    ['r(N) / (2C₂·li₂(N)) — constant only', N => LI2[N] > 0 ? RN[N] / (2 * C2 * LI2[N]) : 0],
+    ['r(N) / (𝔖(N)·li₂(N)) — full ν_p', N => (SIG[N] * LI2[N]) > 0 ? RN[N] / (SIG[N] * LI2[N]) : 0]
+  ];
+  rows.forEach((r, i) => {
+    const s = stats(r[1]);
+    t.insertAdjacentHTML('beforeend',
+      '<tr class="' + (i === 2 ? 'good' : '') + '"><td>' + r[0] +
+      '</td><td class="n">' + fmt(s.mean, 4) + '</td><td class="n">' + fmt(s.sd, 4) +
+      '</td><td class="n">' + fmt(s.mn, 4) + '</td><td class="n">' + fmt(s.mx, 4) +
+      '</td><td class="n">' + fmt(s.mx / s.mn, 2) + '</td></tr>');
+  });
+}
+function fillNeighbours() {
+  const t = $('nbr');
+  t.innerHTML = '<tr><th>N</th><th>rad(N)</th><th>r(N)</th><th>𝔖(N)</th><th>with 𝔖</th><th>without</th></tr>';
+  // Anchor well inside the range: every probe must have RN/SIG/LI2 computed,
+  // and the anchor is chosen divisible by 30 so the smooth/rough contrast is
+  // actually visible.
+  const mid = Math.max(10020, Math.min(NMAX - 30, NMAX - (NMAX % 30) - 30));
+  const cands = [mid - 2, mid, mid + 2, mid + 6, mid - 10, mid - 12]
+    .filter(N => N >= 4 && N <= NMAX && !(N & 1));
+  for (const N of cands) {
+    const li = LI2[N], s = SIG[N];
+    const withS = s * li > 0 ? RN[N] / (s * li) : 0;
+    const without = li > 0 ? RN[N] / (2 * C2 * li) : 0;
+    const ok = Math.abs(withS - 1) < 0.12;
+    t.insertAdjacentHTML('beforeend',
+      '<tr class="' + (ok ? 'good' : '') + '"><td class="n">' + N +
+      '</td><td class="n">' + rad(N, SPF) + '</td><td class="n">' + RN[N] +
+      '</td><td class="n">' + fmt(s, 4) + '</td><td class="n">' + fmt(withS, 4) +
+      '</td><td class="n">' + fmt(without, 4) + '</td></tr>');
+  }
+}
+async function exportComet(px) {
+  if (!RN) return;
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+  const S = px / 1920, m = 84 * S;
+  const plotW = px - 2 * m, plotH = plotW * 0.42;
+  const headerH = 430 * S, footerH = 118 * S;
+  const H = Math.round(headerH + plotH + footerH);
+
+  const cv = document.createElement('canvas');
+  cv.width = px; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, px, H);
+  ctx.textBaseline = 'middle';
+
+  ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold; ctx.font = (17 * S) + 'px ' + MONO;
+  ctx.fillText('S T R I P   A R I T H M E T I C   I I   ·   W E S S E N   G E T A C H E W   ·   2 0 2 6',
+               px / 2, 52 * S);
+  ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream; ctx.font = (56 * S) + 'px ' + DISP;
+  ctx.fillText('The Goldbach Comet, Graded by 𝔖(N)', m, 128 * S);
+
+  const st1 = stats(N => LI2[N] > 0 ? RN[N] / (2 * C2 * LI2[N]) : 0);
+  const st2 = stats(N => (SIG[N] * LI2[N]) > 0 ? RN[N] / (SIG[N] * LI2[N]) : 0);
+  ctx.textAlign = 'right'; ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+  ctx.fillText('even N ≤ ' + NMAX.toLocaleString() + '   ·   ' + (NMAX / 2).toLocaleString() +
+               ' points   ·   view ' + cometMode, px - m, 112 * S);
+  ctx.fillText('C₂ = 0.6601618158   ·   𝔖(N) = 2C₂ ∏_{p|N, p>2} (p−1)/(p−2)', px - m, 146 * S);
+
+  ctx.textAlign = 'left'; ctx.font = (24 * S) + 'px ' + MONO; ctx.fillStyle = PAL.teal;
+  ctx.fillText('r(N) ~ 𝔖(N)·li₂(N)   ·   ν_p{0,N} = 1 if p|N else 2', m, 212 * S);
+
+  // the spread comparison is the whole claim, so it goes in the cards
+  cardRow(ctx, [
+    [fmt(st1.sd, 4), 'σ without 𝔖', PAL.coral],
+    [fmt(st2.sd, 4), 'σ with 𝔖', PAL.lime],
+    [fmt(st1.sd / st2.sd, 1) + '×', 'tighter', PAL.gold],
+    [fmt(st2.mean, 4), 'mean ratio', PAL.teal],
+    [fmt(st2.mn, 3) + '–' + fmt(st2.mx, 3), 'range with 𝔖', PAL.violet],
+    [fmt(st1.mx / st1.mn, 1) + '×', 'range without', PAL.amber]
+  ], m, 252 * S, px - 2 * m, 128 * S, S);
+
+  ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+  ctx.fillText('Colour = number of distinct odd prime factors of N — the quantity 𝔖(N) is built from',
+               m, 396 * S);
+
+  ctx.save();
+  ctx.translate(m, headerH);
+  ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, plotW, plotH);
+  paintComet(ctx, plotW, plotH, plotW / 900);
+  ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
+  ctx.strokeRect(.5, .5, plotW - 1, plotH - 1);
+  ctx.restore();
+
+  const fy = headerH + plotH + 40 * S;
+  ctx.font = (16 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3; ctx.textAlign = 'left';
+  ctx.fillText('r(N) = ordered prime pairs summing to N   ·   li₂ by composite Simpson   ·   ' +
+               'N max ' + NMAX.toLocaleString(), m, fy);
+  ctx.fillText('Hardy–Littlewood is a heuristic — the fit below is evidence, not proof', m, fy + 30 * S);
+  ctx.textAlign = 'right';
+  ctx.fillText('wessengetachew.github.io', px - m, fy);
+  ctx.fillStyle = PAL.coral;
+  ctx.fillText('Strip I · wessengetachew.github.io/Partition', px - m, fy + 30 * S);
+
+  dl(cv, 'goldbach-comet-' + cometMode + '-N' + NMAX + '-' + px + '.png');
+}
+function exportCometCSV() {
+  let s = 'N,r_N,sigma_N,li2_N,ratio\n';
+  for (let N = 4; N <= NMAX; N += 2) {
+    const p = SIG[N] * LI2[N];
+    s += N + ',' + RN[N] + ',' + SIG[N].toFixed(6) + ',' + LI2[N].toFixed(3) + ',' +
+      (p > 0 ? (RN[N] / p).toFixed(6) : '') + '\n';
+  }
+  dlText(s, 'goldbach-comet-N' + NMAX + '.csv');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LENS — same conventions as Strip Arithmetic I
+
+   LENS_ZOOM is the magnification you actually get, not px-per-cell: the source
+   window is lensSize/LENS_ZOOM CSS px wide, so 20x means 20x on screen at any
+   G. LENS_PIN is placement (auto / a fixed corner), not freeze.
+
+   The lens does NOT sample the base layer. Once G passes the canvas size the
+   base aggregates a (G/S)x(G/S) block per pixel, so at G=10,000 individual
+   cells are not present in it at all. The lens re-reads the bitset and draws
+   true cells as vectors at the magnified pitch, which makes it the only exact
+   view of the lattice at large G.
+   ══════════════════════════════════════════════════════════════════════════ */
+let LENS_ON = true, LENS_ZOOM = 3, LENS_PIN = 'auto', LENS_REDRAW = null;
+let lensSize = 200, lensAt = null;
+const LENS_PRESETS = [2, 3, 4, 6, 10, 20, 30, 40, 50, 100];
+
+function setLensZoom(z, fromInput) {
+  z = Math.max(1, Math.min(500, Math.round(+z) || 1));
+  LENS_ZOOM = z;
+  LENS_PRESETS.forEach(k => { const b = $('lz-' + k); if (b) b.classList.toggle('on', k === z); });
+  const inp = $('lz-in');
+  if (inp && !fromInput) inp.value = z;
+  if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
+}
+function setLensPin(v) {
+  LENS_PIN = v;
+  ['auto', 'tl', 'tr', 'bl', 'br'].forEach(k => {
+    const el = $('lp-' + k); if (el) el.classList.toggle('on', k === v);
+  });
+  if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
+}
+function lensRelabel() { if (typeof LENS_REDRAW === 'function') LENS_REDRAW(); }
+function setLensSize(v) {
+  lensSize = Math.max(90, Math.min(420, Math.round(v) || 200));
+  $('ls-num').value = lensSize;
+  if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
+}
+function toggleLens() {
+  LENS_ON = !LENS_ON;
+  $('lens-on').textContent = 'Lens: ' + (LENS_ON ? 'on' : 'off');
+  $('lens-on').classList.toggle('on', LENS_ON);
+  if (!LENS_ON) hideLens();
+}
+function hideLens() {
+  for (const id of ['lens', 'lensinfo', 'lens2', 'lensinfo2']) {
+    const el = $(id); if (el) el.classList.remove('on');
+  }
+  lensAt = null; LENS_REDRAW = null;
+}
+
+/* Pure mapping, testable without a DOM: canvas CSS px -> 1-indexed cell. */
+function cellAt(cx, cy, S, g) {
+  const r = Math.floor((cx / S) * g) + 1;
+  const M = Math.floor((cy / S) * g) + 1;
+  return { r: Math.max(1, Math.min(g, r)), M: Math.max(1, Math.min(g, M)) };
+}
+function inStrip(r, M) {
+  const v = slopeB * r - slopeA * M;
+  return v >= offS && v < offS + widthW;
+}
+
+/* Placement: auto trails the pointer and flips away from an edge; a fixed
+   corner parks the lens so it never covers what you are pointing at. */
+function placeLens(lens, info, wrap, px, py, html) {
+  const W = wrap.clientWidth, H = wrap.clientHeight, S = lensSize, pad = 6;
+  let lx, ly;
+  if (LENS_PIN === 'auto') {
+    lx = px + 24; ly = py + 24;
+    if (lx + S > W - 4) lx = px - S - 24;
+    if (ly + S > H - 4) ly = py - S - 24;
+  } else {
+    lx = (LENS_PIN === 'tl' || LENS_PIN === 'bl') ? 8 : W - S - 8;
+    ly = (LENS_PIN === 'tl' || LENS_PIN === 'tr') ? 8 : H - S - 8;
+  }
+  lens.style.left = Math.max(4, Math.min(W - S - 4, lx)) + 'px';
+  lens.style.top = Math.max(4, Math.min(H - S - 4, ly)) + 'px';
+  lens.classList.add('on');
+  lens.classList.add('sq');   // both plates here are rectangular lattices
+
+  info.innerHTML = html;
+  info.classList.add('on');
+  const l = parseFloat(lens.style.left) || 0, t = parseFloat(lens.style.top) || 0;
+  const iw = info.offsetWidth, ih = info.offsetHeight;
+  let ty = t - ih - pad;
+  if (ty < 2) ty = t + S + pad;                 // no headroom — fall below
+  ty = Math.max(2, Math.min(H - ih - 2, ty));
+  let tx = l + S / 2 - iw / 2;
+  tx = Math.max(2, Math.min(W - iw - 2, tx));
+  info.style.left = tx + 'px'; info.style.top = ty + 'px';
+}
+
+/* ── lattice lens ──────────────────────────────────────────────────────── */
+function drawLens(px, py) {
+  if (!LENS_ON || !COP) return;
+  const cv = $('cv'), lens = $('lens'), info = $('lensinfo');
+  const cssW = cv.getBoundingClientRect().width || 1;
+  const canvasPerCss = cv.width / cssW;
+
+  // supersampled backing — the downscale is what keeps the type crisp
+  const dprL = Math.min(devicePixelRatio || 1, 2) * 2;
+  lens.width = Math.round(lensSize * dprL);
+  lens.height = Math.round(lensSize * dprL);
+  lens.style.width = lensSize + 'px'; lens.style.height = lensSize + 'px';
+
+  const srcSize = Math.max(0.02, (lensSize / LENS_ZOOM) * canvasPerCss);
+  const gx = px * canvasPerCss, gy = py * canvasPerCss;
+  const sX = gx - srcSize / 2, sY = gy - srcSize / 2;
+  const k = lens.width / srcSize;               // source px -> lens px
+
+  const lctx = lens.getContext('2d');
+  lctx.setTransform(1, 0, 0, 1, 0, 0);
+  lctx.imageSmoothingEnabled = false;
+  lctx.fillStyle = '#04040d'; lctx.fillRect(0, 0, lens.width, lens.height);
+
+  const g = COP_G, cell = cv.width / g, mode = $('cmode').value;
+  const r0 = Math.max(1, Math.floor(sX / cell)), r1 = Math.min(g, Math.ceil((sX + srcSize) / cell) + 1);
+  const m0 = Math.max(1, Math.floor(sY / cell)), m1 = Math.min(g, Math.ceil((sY + srcSize) / cell) + 1);
+  const w = cell * k;
+  for (let M = m0; M <= m1; M++) {
+    const ly = ((M - 1) * cell - sY) * k;
+    for (let r = r0; r <= r1; r++) {
+      const lx = ((r - 1) * cell - sX) * k;
+      let col;
+      if (mode === 'binary' || mode === 'density') {
+        col = isCop(r, M) ? [200, 168, 74, 255] : [22, 24, 44, 255];
+      } else {
+        col = gcdColor(mode, gcd(r, M));
+      }
+      lctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (col[3] / 255) + ')';
+      lctx.fillRect(lx, ly, w + .5, w + .5);
+      if (showStrip && inStrip(r, M)) {
+        lctx.fillStyle = 'rgba(224,80,96,.32)';
+        lctx.fillRect(lx, ly, w + .5, w + .5);
+      }
+    }
+  }
+  if (w > 5) {                                   // cell edges once they read
+    lctx.strokeStyle = 'rgba(255,255,255,.10)'; lctx.lineWidth = Math.max(1, dprL * .5);
+    lctx.beginPath();
+    for (let r = r0; r <= r1 + 1; r++) { const x = ((r - 1) * cell - sX) * k; lctx.moveTo(x, 0); lctx.lineTo(x, lens.height); }
+    for (let M = m0; M <= m1 + 1; M++) { const y = ((M - 1) * cell - sY) * k; lctx.moveTo(0, y); lctx.lineTo(lens.width, y); }
+    lctx.stroke();
+  }
+  drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dprL);
+
+  // centre cell marker — the cell the pointer actually resolves to
+  const c = cellAt(px, py, cssW, g);
+  const cx = ((c.r - 1) * cell - sX) * k, cy = ((c.M - 1) * cell - sY) * k;
+  lctx.strokeStyle = '#3dc8b8'; lctx.lineWidth = Math.max(1.5, dprL);
+  lctx.strokeRect(cx, cy, w, w);
+
+  const gg = gcd(c.r, c.M);
+  const html = 'r <b>' + c.r + '</b> <span class="dim">·</span> M <b>' + c.M + '</b>' +
+    ' <span class="dim">·</span> gcd <b>' + gg + '</b>' +
+    (gg === 1 ? ' <i>coprime</i>' : ' <span class="dim">ω' + omega(gg) + ' Ω' + bigOmega(gg) + '</span>') +
+    (slopeA === -1 && slopeB === 1 ? '<br>r+M <b>' + (c.r + c.M) + '</b> <span class="dim">φ=</span>' +
+      (c.r + c.M <= PHI_N ? PHI[c.r + c.M] : '—') : '') +
+    (slopeA === 1 && slopeB === 1 ? '<br>r−M <b>' + (c.r - c.M) + '</b>' : '') +
+    (inStrip(c.r, c.M) ? ' <u>in strip</u>' : ' <span class="dim">outside</span>') +
+    (LENS_LABELS_HIDDEN
+      ? '<br><span class="dim">labels need more zoom</span>'
+      : '') +
+    (slopeB * c.r - slopeA * c.M !== c.r - c.M && slopeB * c.r - slopeA * c.M !== c.r + c.M
+      ? '<br>v = b·r−a·M <b>' + (slopeB * c.r - slopeA * c.M) + '</b>' : '');
+  placeLens(lens, info, cv.parentElement, px, py, html);
+  lensAt = { px, py };
+  LENS_REDRAW = () => { if (lensAt) drawLens(lensAt.px, lensAt.py); };
+}
+
+/* Labels are self-gating on font size: below ~7 CSS px the type would overlap,
+   so it is skipped and the magnified cells stand alone. Stroke-then-fill keeps
+   glyph edges hard over a busy backdrop — a shadow wide enough to separate
+   them also softens them. */
+let LENS_LABELS_HIDDEN = false;
+function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dprL) {
+  LENS_LABELS_HIDDEN = false;
+  const mode = $('lens-lbl').value;
+  if (mode === 'off') return;
+  const fs = Math.max(0, Math.min(26 * dprL, cell * k * 0.40));
+  // Below ~7 CSS px the type would overlap. Say so in the readout instead of
+  // silently doing nothing — a label mode that appears broken is worse than
+  // one that explains it needs more zoom.
+  if (fs / dprL < 7) { LENS_LABELS_HIDDEN = true; return; }
+  /* a and b only mean anything through the strip equation, so the strip modes
+     label the terms of v = b·r − a·M rather than the bare slope numbers: v
+     names which strip line a cell sits on, and at slope +1 / −1 it degenerates
+     to the gap r−M and the Goldbach sum r+M, which get their own modes so they
+     stay readable when the slope is something else. */
+  const textOf = (r, m) =>
+      mode === 'M'     ? '' + m
+    : mode === 'r'     ? '' + r
+    : mode === 'dec'   ? (r / m).toFixed(2)
+    : mode === 'gcd'   ? '' + gcd(r, m)
+    : mode === 'v'     ? '' + (slopeB * r - slopeA * m)
+    : mode === 'ar'    ? '' + (slopeB * r)
+    : mode === 'am'    ? '' + (slopeA * m)
+    : mode === 'terms' ? (slopeB * r) + ',' + (slopeA * m)
+    : mode === 'gap'   ? '' + (r - m)
+    : mode === 'sum'   ? '' + (r + m)
+    :                    r + '/' + m;
+  lctx.font = fs + 'px "JetBrains Mono",monospace';
+  lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
+  let drawn = 0;
+  for (let M = m0; M <= m1; M++) for (let r = r0; r <= r1; r++) {
+    const lx = ((r - 0.5) * cell - sX) * k, ly = ((M - 0.5) * cell - sY) * k;
+    if (lx < 2 || ly < 2 || lx > lens.width - 2 || ly > lens.height - 2) continue;
+    if (drawn++ > 600) return;
+    const co = gcd(r, M) === 1;
+    lctx.lineWidth = Math.max(1.5, fs * 0.20); lctx.lineJoin = 'round';
+    lctx.strokeStyle = 'rgba(4,4,13,.92)';
+    lctx.strokeText(textOf(r, M), lx, ly);
+    lctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
+    lctx.fillText(textOf(r, M), lx, ly);
+  }
+}
+
+/* ── comet lens ────────────────────────────────────────────────────────── */
+/* Same zoom semantics on a different plate: at N max = 300,000 there are
+   150,000 points in ~800 px, roughly 190 even N per column. */
+let COMET_GEO = null;
+function drawCometLens(px, py) {
+  if (!LENS_ON || !RN || !COMET_GEO) return;
+  const cv = $('cv2'), lens = $('lens2'), info = $('lensinfo2');
+  const G0 = COMET_GEO;
+  const dprL = Math.min(devicePixelRatio || 1, 2) * 2;
+  lens.width = Math.round(lensSize * dprL); lens.height = Math.round(lensSize * dprL);
+  lens.style.width = lensSize + 'px'; lens.style.height = lensSize + 'px';
+
+  const src = Math.max(2, lensSize / LENS_ZOOM);      // CSS px window
+  const k = lens.width / src;
+  const sX = px - src / 2, sY = py - src / 2;
+
+  const lctx = lens.getContext('2d');
+  lctx.setTransform(1, 0, 0, 1, 0, 0);
+  lctx.fillStyle = '#04040d'; lctx.fillRect(0, 0, lens.width, lens.height);
+
+  const nLo = Math.max(4, Math.floor(G0.inv(sX) / 2) * 2);
+  const nHi = Math.min(NMAX, Math.ceil(G0.inv(sX + src) / 2) * 2);
+  lctx.strokeStyle = 'rgba(255,255,255,.07)'; lctx.lineWidth = dprL * .5;
+  for (let i = 0; i <= 4; i++) {
+    const y = i * lens.height / 4;
+    lctx.beginPath(); lctx.moveTo(0, y); lctx.lineTo(lens.width, y); lctx.stroke();
+  }
+  const dot = Math.max(1.5, k * 1.1);
+  for (let N = nLo; N <= nHi; N += 2) {
+    const v = valAt(N); if (!v) continue;
+    const lx = (G0.x(N) - sX) * k, ly = (G0.y(v) - sY) * k;
+    if (lx < -20 || lx > lens.width + 20 || ly < -20 || ly > lens.height + 20) continue;
+    const w = pfac(N, SPF).filter(q => q > 2).length;
+    lctx.fillStyle = 'hsla(' + Math.min(300, 190 + w * 34) + ',68%,58%,.95)';
+    lctx.beginPath(); lctx.arc(lx, ly, dot, 0, 6.284); lctx.fill();
+  }
+  const Nc = Math.max(4, Math.min(NMAX, Math.round(G0.inv(px) / 2) * 2));
+  const vc = valAt(Nc);
+  if (vc) {
+    lctx.strokeStyle = '#3dc8b8'; lctx.lineWidth = Math.max(1.5, dprL);
+    lctx.beginPath(); lctx.arc((G0.x(Nc) - sX) * k, (G0.y(vc) - sY) * k, dot * 2.6, 0, 6.284); lctx.stroke();
+  }
+  const pred = SIG[Nc] * LI2[Nc];
+  const html = 'N <b>' + Nc + '</b> <span class="dim">rad</span> ' + rad(Nc, SPF) +
+    '<br>r(N) <b>' + RN[Nc] + '</b> <span class="dim">·</span> 𝔖 <i>' + SIG[Nc].toFixed(4) + '</i>' +
+    '<br>r/(𝔖·li₂) <u>' + (pred > 0 ? (RN[Nc] / pred).toFixed(4) : '—') + '</u>';
+  placeLens(lens, info, cv.parentElement, px, py, html);
+  LENS_REDRAW = () => drawCometLens(px, py);
+}
+
+/* ── pointer wiring ────────────────────────────────────────────────────── */
+function wireLens() {
+  const cv = $('cv'), cv2 = $('cv2');
+  const local = (el, e) => {
+    const b = el.getBoundingClientRect();
+    const t = (e.touches && e.touches[0]) ? e.touches[0] : e;
+    return { x: t.clientX - b.left, y: t.clientY - b.top, w: b.width, h: b.height };
+  };
+  const move = e => {
+    const p = local(cv, e);
+    if (p.x < 0 || p.y < 0 || p.x > p.w || p.y > p.w) { hideLens(); return; }
+    drawLens(p.x, p.y);
+  };
+  cv.addEventListener('mousemove', move);
+  cv.addEventListener('mouseleave', hideLens);
+  cv.addEventListener('touchmove', e => { e.preventDefault(); move(e); }, { passive: false });
+  cv.addEventListener('touchstart', e => { e.preventDefault(); move(e); }, { passive: false });
+
+  const move2 = e => {
+    const p = local(cv2, e);
+    if (p.x < 0 || p.y < 0 || p.x > p.w || p.y > p.h) { hideLens(); return; }
+    drawCometLens(p.x, p.y);
+  };
+  cv2.addEventListener('mousemove', move2);
+  cv2.addEventListener('mouseleave', hideLens);
+  cv2.addEventListener('touchmove', e => { e.preventDefault(); move2(e); }, { passive: false });
+  cv2.addEventListener('touchstart', e => { e.preventDefault(); move2(e); }, { passive: false });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SELF TEST
+   Each row recomputes a claim by an independent route. The rule is that the
+   two sides must not share an implementation: the bitset is checked against
+   direct gcd, the Phi formula against direct enumeration, the singular series
+   product against its closed form, the prime convolution against published
+   values. A test that calls the same function twice proves nothing.
+   ══════════════════════════════════════════════════════════════════════════ */
+function selfTest() {
+  const rows = [];
+  const add = (name, got, want, ok, note) =>
+    rows.push({ name, got, want, ok, note: note || '' });
+  /* Most of these tests count DISAGREEMENTS, so the honest pass value is zero.
+     Printing "computed 0 / expected 0" made a passing row look like a row that
+     never ran. Report the agreement instead: how many comparisons were made and
+     how many held. */
+  const addCount = (name, agree, total, note, sample) =>
+    rows.push({
+      name,
+      got: agree.toLocaleString() + ' / ' + total.toLocaleString() + ' agree' +
+           (sample ? '  (' + sample + ')' : ''),
+      want: 'all ' + total.toLocaleString(),
+      ok: agree === total,
+      note: note || ''
+    });
+  const near = (a, b, tol) => Math.abs(a - b) <= tol;
+  const t0 = performance.now();
+
+  buildPhi(4096);
+
+  /* — 1. phi sieve vs direct definition — */
+  {
+    let agree = 0, total = 0;
+    for (let n = 1; n <= 400; n++) {
+      let c = 0;
+      for (let k = 1; k <= n; k++) if (gcd(k, n) === 1) c++;
+      total++; if (c === PHI[n]) agree++;
+    }
+    addCount('φ sieve vs direct gcd count', agree, total, 'n ≤ 400',
+             'φ(400)=' + PHI[400]);
+  }
+
+  /* — 2. Phi(n) closed form vs direct pair enumeration — */
+  {
+    let agree = 0, total = 0;
+    for (const n of [1, 2, 3, 5, 10, 40, 120]) {
+      let c = 0;
+      for (let a = 1; a <= n; a++) for (let b = 1; b <= n; b++) if (gcd(a, b) === 1) c++;
+      total++; if (c === Phi(n)) agree++;
+    }
+    addCount('Φ(n) = 2Σφ(k)−1 vs enumeration', agree, total, 'n ≤ 120',
+             'Φ(120)=' + Phi(120).toLocaleString());
+  }
+
+  /* — 3. partition identity — */
+  {
+    let agree = 0, total = 0, last = 0;
+    for (const n of [10, 60, 120, 500, 1000]) {
+      let tot = 0;
+      for (let d = 1; d <= n; d++) tot += Phi(Math.floor(n / d));
+      total++; if (tot === n * n) agree++;
+      last = tot;
+    }
+    addCount('Σ_d Φ(⌊n/d⌋) = n²', agree, total, 'exact identity',
+             'n=1000: Σ=' + last.toLocaleString());
+  }
+
+  /* — 4. coprime density limit — */
+  {
+    const v = Phi(4096) / (4096 * 4096), t = 6 / (Math.PI * Math.PI);
+    add('Φ(n)/n² → 6/π²', v.toFixed(6), t.toFixed(6), near(v, t, 2e-3), 'n = 4096');
+  }
+
+  /* — 5. bitset vs direct gcd, every cell — */
+  {
+    let agree = 0, total = 0, cop = 0;
+    const n = Math.min(COP_G, 512);
+    for (let M = 1; M <= n; M++) for (let r = 1; r <= n; r++) {
+      const want = gcd(r, M) === 1 ? 1 : 0;
+      total++; if ((isCop(r, M) ? 1 : 0) === want) agree++;
+      if (want) cop++;
+    }
+    addCount('coprimality bitset vs gcd', agree, total, 'every cell at G=' + n,
+             cop.toLocaleString() + ' coprime');
+  }
+
+  /* — 6. anti-diagonal count = phi(N) — */
+  {
+    const sa = slopeA, sb = slopeB, so = offS, sw = widthW;
+    let agree = 0, total = 0; const shown = [];
+    for (const N of [60, 100, 210, 256, 330]) {
+      if (N > COP_G) continue;
+      slopeA = -1; slopeB = 1; offS = N; widthW = 1;
+      const got = walkStrip(0).cop;
+      total++; if (got === PHI[N]) agree++;
+      if (shown.length < 3) shown.push('N=' + N + '→' + got);
+    }
+    slopeA = sa; slopeB = sb; offS = so; widthW = sw;
+    addCount('anti-diagonal count = φ(N)', agree, total,
+             'N ≤ G only, so raise G for more', shown.join(', '));
+  }
+
+  /* — 7. diagonal density → phi(g)/g — */
+  {
+    const sa = slopeA, sb = slopeB, so = offS, sw = widthW;
+    let worst = 0;
+    for (const g0 of [6, 12, 30, 35]) {
+      slopeA = 1; slopeB = 1; offS = g0; widthW = 1;
+      const st2 = walkStrip(0);
+      worst = Math.max(worst, Math.abs(st2.cop / st2.total - PHI[g0] / g0));
+    }
+    slopeA = sa; slopeB = sb; offS = so; widthW = sw;
+    add('diagonal density → φ(g)/g', worst.toFixed(4), '&lt; 0.02', worst < 0.02, 'max deviation');
+  }
+
+  /* — 8. nu_p for consecutive blocks — */
+  {
+    let agree = 0, total = 0;
+    for (let n = 0; n < 40; n++) for (const p of [2, 3, 5, 7, 11, 13, 29, 97]) {
+      const seen = new Set();
+      for (let h = 0; h <= n; h++) seen.add(h % p);
+      total++; if (seen.size === Math.min(n + 1, p)) agree++;
+    }
+    addCount('ν_p{0..n} = min(n+1, p)', agree, total, 'n < 40 × 8 primes',
+             'saturates at p ≤ n+1');
+  }
+
+  /* — 9. nu_p for the Goldbach pair — */
+  {
+    let agree = 0, total = 0, collide = 0;
+    for (let N = 2; N < 300; N++) for (const p of [2, 3, 5, 7, 11, 13]) {
+      const seen = new Set([0 % p, N % p]);
+      const want = (N % p === 0) ? 1 : 2;
+      total++; if (seen.size === want) agree++;
+      if (want === 1) collide++;
+    }
+    addCount('ν_p{0,N} = 1 if p|N else 2', agree, total, 'N < 300 × 6 primes',
+             collide.toLocaleString() + ' collisions');
+  }
+
+  /* — 10. singular series: product form vs closed form — */
+  {
+    let worst = 0;
+    const ps = primesUpTo(20000);
+    for (const N of [206, 210, 1000, 2310, 30030]) {
+      let prod = 1;
+      for (const p of ps) {
+        const nu = (N % p === 0) ? 1 : 2;
+        prod *= (1 - nu / p) / ((1 - 1 / p) * (1 - 1 / p));
+      }
+      const closed = sigma(N, SPF);
+      worst = Math.max(worst, Math.abs(prod - closed) / closed);
+    }
+    add('𝔖 product vs 2C₂∏(p−1)/(p−2)', worst.toExponential(1), '&lt; 1e-3',
+        worst < 1e-3, 'truncation only');
+  }
+
+  /* — 11. twin-prime constant — */
+  add('C₂ constant', C2.toFixed(10), '0.6601618158', near(C2, 0.6601618158, 1e-9), 'A005597');
+
+  /* — 12. li2 vs high-resolution reference — */
+  {
+    const REF = { 1000: 34.6851, 20000: 270.9637, 60000: 631.1828, 300000: 2300.8131 };
+    let worst = 0;
+    for (const k in REF) worst = Math.max(worst, Math.abs(li2(+k) - REF[k]) / REF[k]);
+    add('li₂ vs 400k-step Simpson', worst.toExponential(1), '&lt; 1e-4', worst < 1e-4, '4 anchors');
+  }
+
+  /* — 13. prime-pair convolution vs known counts — */
+  {
+    const NM = 20000, cps = primesUpTo(NM), c = new Uint32Array(NM + 1);
+    for (let i = 0; i < cps.length; i++) {
+      const pp = cps[i], lim = NM - pp;
+      for (let j = i; j < cps.length; j++) { const q = cps[j]; if (q > lim) break; c[pp + q] += (pp === q) ? 1 : 2; }
+    }
+    const ok = c[10000] === 254 && c[20000] === 462;
+    add('r(N) ordered pair counts', 'r(10⁴)=' + c[10000] + ', r(2·10⁴)=' + c[20000],
+        'r(10⁴)=254, r(2·10⁴)=462', ok, 'independent convolution');
+  }
+
+  /* — 14. does S actually tighten the spread? — */
+  if (RN && SIG && LI2) {
+    const f1 = N => LI2[N] > 0 ? RN[N] / (2 * C2 * LI2[N]) : 0;
+    const f2 = N => (SIG[N] * LI2[N]) > 0 ? RN[N] / (SIG[N] * LI2[N]) : 0;
+    const a = stats(f1), b = stats(f2);
+    const better = b.sd < a.sd / 3;
+    add('𝔖 tightens the comet spread',
+        'σ ' + a.sd.toFixed(3) + ' → ' + b.sd.toFixed(3),
+        'at least 3× tighter', better, 'even N ≥ 1000');
+  } else {
+    add('𝔖 tightens the comet spread', 'comet not built', '—', null, 'run Recompute first');
+  }
+
+  /* — 15. band density converges to D(n), strip density does NOT — */
+  {
+    // Pinned to a 400x400 window so the result does not depend on whatever G
+    // the reader happens to be on — the test is about the identity, not the
+    // current view.
+    let ok = true, detail = [];
+    for (const n of [0, 1, 2, 5]) {
+      const b = walkBand(n + 1, 400);
+      const meas = b.good / b.total, ex = Dn(n);
+      const rel = Math.abs(meas - ex) / ex;
+      detail.push('n=' + n + ' ' + meas.toFixed(4));
+      if (rel > 0.005 + 4 * (n + 1) / 400) ok = false;
+    }
+    add('band AND-density → D(n)', detail.join(', '),
+        [0, 1, 2, 5].map(n => Dn(n).toFixed(4)).join(', '),
+        ok, '400×400 window');
+  }
+
+  /* — 16. gcd counts vs Phi — */
+  {
+    const n = 256, cnt = gcdCounts(n);
+    let agree = 0, tot = 0;
+    for (let d = 1; d <= n; d++) {
+      tot += cnt[d];
+      if (cnt[d] === Phi(Math.floor(n / d))) agree++;
+    }
+    addCount('count(gcd=d) = Φ(⌊n/d⌋)', agree, n, 'every divisor at n = 256',
+             'Σ=' + tot.toLocaleString() + ' = 256²');
+  }
+
+  /* — render — */
+  const t = $('stt');
+  t.innerHTML = '<tr><th>#</th><th>Claim</th><th>Result</th><th>Should be</th><th>Scope</th><th></th></tr>';
+  let pass = 0, failn = 0, skip = 0;
+  rows.forEach((r, i) => {
+    const cls = r.ok === true ? 'good' : r.ok === false ? 'bad' : '';
+    if (r.ok === true) pass++; else if (r.ok === false) failn++; else skip++;
+    t.insertAdjacentHTML('beforeend',
+      '<tr class="' + cls + '"><td class="n">' + (i + 1) + '</td><td>' + r.name +
+      '</td><td class="n">' + r.got + '</td><td class="n">' + r.want +
+      '</td><td>' + r.note + '</td><td class="n">' +
+      (r.ok === true ? '&#10003;' : r.ok === false ? '&#10007;' : '&ndash;') + '</td></tr>');
+  });
+  $('st-summary').innerHTML = '<b style="color:' + (failn ? 'var(--coral)' : 'var(--lime)') + '">' +
+    pass + ' passed</b>, ' + failn + ' failed' + (skip ? ', ' + skip + ' skipped' : '') +
+    ' &nbsp;·&nbsp; ' + Math.round(performance.now() - t0) + ' ms';
+}
+
+/* ── boot ──────────────────────────────────────────────────────────────── */
+function boot() {
+  const top = 300000;
+  SPF = buildSPF(top);
+  PRIMES = primesUpTo(10000);
+  $('b-strip').classList.add('on');
+  document.addEventListener('keydown', onKey);
+  wireLens();
+  setLensZoom(3); setLensPin('auto');
+  buildPhi(4096);
+  onG(109);
+  onOff(0); onW(1); reslope();
+  gcdTable();
+  buildComet();
+  // Run the battery once on load so a broken build is visible immediately
+  // rather than only when someone thinks to press the button.
+  setTimeout(selfTest, 1200);
+  let rt = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { redraw(false); drawComet(); }, 160);
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+</script>
+
+</body>
+</html>
