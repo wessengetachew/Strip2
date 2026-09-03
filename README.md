@@ -1,6 +1,6 @@
 # Strip Arithmetic II — Slope, Width & the Singular Series
 
-**Live:** https://wessengetachew.github.io/strip2/
+**Live:** https://wessengetachew.github.io/Strip2/
 
 Part II of the strip series. Part I is
 [The Goldbach Diagonal](https://wessengetachew.github.io/Partition/); both extend the
