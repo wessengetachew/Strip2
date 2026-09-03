@@ -189,19 +189,14 @@ canvas.main{display:block;width:100%;height:auto;cursor:crosshair;}
   font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:3px 8px;
   border-radius:3px;cursor:pointer;}
 .fs-btn:hover{border-color:var(--teal);color:var(--teal);}
-body.fs-open #content{padding-top:50vh;}
-.cvwrap.fs-pin{position:fixed;top:var(--navh,0px);left:0;right:0;width:100%;
-  height:calc(50vh - var(--navh,0px));z-index:800;
+body.fs-open #content{padding-top:var(--fsh,50vh);}
+.cvwrap.fs-pin{position:fixed;top:var(--navh,0px);left:0;right:0;width:100%;z-index:800;
   display:flex;align-items:center;justify-content:center;border-left:none;border-right:none;
   border-top:none;}
 .cvwrap.fs-pin canvas.main{width:auto;height:100%;max-width:100%;image-rendering:pixelated;}
-.fs-toolbar{display:none;position:absolute;top:0;left:0;right:0;z-index:900;
-  justify-content:space-between;align-items:center;padding:6px 10px;
-  background:linear-gradient(rgba(4,4,13,.92),rgba(4,4,13,.6));
-  font-family:var(--mono);font-size:10.5px;color:var(--cream3);pointer-events:none;}
-.fs-toolbar *{pointer-events:auto;}
-.cvwrap.fs-pin .fs-toolbar{display:flex;}
-.fs-toolbar .fs-btn{margin-left:0;background:rgba(4,4,13,.7);}
+.fsnavbtn{padding:4px 8px;min-width:28px;justify-content:center;font-size:12px;}
+.fsnavbtn.on{background:var(--gold2);border-color:var(--gold);}
+body.nav-collapsed #wg-pagenav{display:none;}
 
 /* progress */
 #pre-wrap{margin:14px 0;display:none;}
@@ -239,7 +234,10 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   <a class="navbtn" href="https://wessengetachew.github.io/smith/page8.html">P8 · k-Tuples</a>
   <a class="navbtn coralb" href="https://wessengetachew.github.io/Partition/"
      title="Strip Arithmetic I — The Goldbach Diagonal">← Strip I · Goldbach Diagonal</a>
+  <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
+     title="Fullscreen: Strip / block view">⛶ Strip</button>
 </div>
+
 
 <div id="content">
 
@@ -434,7 +432,7 @@ the same rule that gives $\min(n+1,p)$.</p>
         <option value="density">Block density (grey)</option>
       </optgroup>
       <optgroup label="gcd(r,M)">
-        <option value="gcd">gcd &mdash; value (log hue)</option>
+        <option value="gcd">gcd &mdash; value (modular hue)</option>
         <option value="spf">gcd &mdash; smallest prime factor</option>
         <option value="lpf">gcd &mdash; largest prime factor</option>
         <option value="omega">gcd &mdash; &omega;(g), distinct primes</option>
@@ -514,8 +512,6 @@ the same rule that gives $\min(n+1,p)$.</p>
   </div>
 
   <div class="cvwrap">
-    <div class="fs-toolbar"><span id="fslabel-cv">—</span>
-      <button class="fs-btn" onclick="toggleFS('cv')">⤫ Exit fullscreen</button></div>
     <canvas id="cv" class="main"></canvas>
     <canvas id="lens"></canvas>
     <div id="lensinfo"></div>
@@ -523,7 +519,7 @@ the same rule that gives $\min(n+1,p)$.</p>
   <div class="cvbar">
     <span id="bar-l">—</span>
     <span id="bar-r">—</span>
-    <button class="fs-btn" onclick="toggleFS('cv')" id="fsbtn-cv">⛶ Fullscreen</button>
+    <button class="fs-btn" onclick="toggleFS('cv')" id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
   </div>
 
   <div class="ctrls" style="margin-top:12px;">
@@ -646,14 +642,12 @@ them into a single curve. If the residue count were the wrong idea, that would n
   </div>
 
   <div class="cvwrap">
-    <div class="fs-toolbar"><span id="fslabel-cv2">—</span>
-      <button class="fs-btn" onclick="toggleFS('cv2')">⤫ Exit fullscreen</button></div>
     <canvas id="cv2" class="main"></canvas>
     <canvas id="lens2"></canvas>
     <div id="lensinfo2"></div>
   </div>
   <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span>
-    <button class="fs-btn" onclick="toggleFS('cv2')" id="fsbtn-cv2">⛶ Fullscreen</button>
+    <button class="fs-btn" onclick="toggleFS('cv2')" id="fsbtn-cv2" data-fs-target="cv2">⛶ Fullscreen</button>
   </div>
 
   <div class="ctrls" style="margin-top:12px;">
@@ -990,7 +984,11 @@ function gcdColor(mode, g) {
   if (g === 1) return COPRIME_RGBA;
   let h, sat = 0.64, lig = 0.56, a = 215;
   if (mode === 'gcd') {
-    h = (Math.log(g) / Math.log(4096)) * 300;            // log so 2 and 4096 differ
+    // modular hash instead of log: adjacent gcds (2,3,4…) land on very
+    // different hues rather than compressing together near the low end.
+    h = (g * 47) % 360;
+    sat = Math.max(0.25, 0.60 - g * 0.03);
+    lig = 0.42; a = 191;
   } else if (mode === 'spf') {
     h = (Math.log(SPF && g < SPF.length ? SPF[g] : smallestFactor(g)) / Math.log(97)) * 300;
   } else if (mode === 'lpf') {
@@ -1181,8 +1179,10 @@ function doRedraw(rebuildBase) {
   const wrap = cv.parentElement;
   const wrapW = wrap.clientWidth || 800;
   const dpr = Math.min(devicePixelRatio || 1, 2);
-  const cap = wrap.classList.contains('fs-pin') ? Math.min(900, Math.max(120, wrap.clientHeight - 8)) : 900;
+  const isFS = wrap.classList.contains('fs-pin');
+  const cap = isFS ? fsAvailH() : 900;
   const S = Math.round(Math.min(wrapW, cap));
+  if (isFS) syncFSChrome(wrap, S); else wrap.style.height = '';
   if (cv.width !== Math.round(S * dpr)) {
     cv.width = Math.round(S * dpr); cv.height = Math.round(S * dpr);
     cv.style.height = S + 'px';
@@ -1825,8 +1825,10 @@ function drawComet() {
   const wrapW = wrap.clientWidth || 800;
   const dpr = Math.min(devicePixelRatio || 1, 2);
   const W = Math.round(wrapW);
+  const isFS = wrap.classList.contains('fs-pin');
   let H = Math.round(Math.min(460, wrapW * .55));
-  if (wrap.classList.contains('fs-pin')) H = Math.round(Math.min(H, Math.max(100, wrap.clientHeight - 8)));
+  if (isFS) { H = Math.round(Math.min(H * 1.6, fsAvailH())); syncFSChrome(wrap, H); }
+  else wrap.style.height = '';
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   cv.style.height = H + 'px';
   const ctx = cv.getContext('2d');
@@ -2616,20 +2618,57 @@ function selfTest() {
 
 /* ── boot ──────────────────────────────────────────────────────────────── */
 function setNavH() {
-  document.documentElement.style.setProperty('--navh', $('wg-pagenav').getBoundingClientRect().height + 'px');
+  const navEl = $('wg-pagenav');
+  const h = (navEl && navEl.style.display !== 'none') ? navEl.getBoundingClientRect().height : 0;
+  document.documentElement.style.setProperty('--navh', h + 'px');
+}
+// Height budget for a pinned fullscreen canvas: real viewport height minus the
+// (possibly hidden) nav strip minus a little room so the exit-fullscreen bar
+// right below the canvas doesn't require a scroll to find.
+function fsAvailH() {
+  const navh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navh')) || 0;
+  return Math.max(160, window.innerHeight - navh - 64);
+}
+// Syncs the fixed wrap's own height and the document's compensating
+// padding-top to the size actually drawn, so content below never jumps and
+// nothing is reserved that isn't being used.
+function syncFSChrome(wrapEl, sizePx) {
+  const navh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navh')) || 0;
+  wrapEl.style.height = sizePx + 'px';
+  document.documentElement.style.setProperty('--fsh', (navh + sizePx) + 'px');
 }
 function toggleFS(id) {
+  const otherId = id === 'cv' ? 'cv2' : 'cv';
+  const otherWrap = $(otherId).parentElement;
+  if (otherWrap.classList.contains('fs-pin')) {
+    otherWrap.classList.remove('fs-pin');
+    setFSButtonState(otherId, false);
+  }
   const cv = $(id);
   const wrap = cv.parentElement;
-  const btn = $('fsbtn-' + id);
   const on = wrap.classList.toggle('fs-pin');
-  if (on) {
-    setNavH();
-    $('fslabel-' + id).textContent = id === 'cv' ? 'Strip / block view' : 'Goldbach comet';
-  }
+  // Fullscreen always hides the top toolbar (Explorer / P5 / P6 / P8 /
+  // Strip I) entirely — no button for it, it just comes back on exit.
+  document.body.classList.toggle('nav-collapsed', on);
+  setNavH();
   document.body.classList.toggle('fs-open', on);
-  btn.textContent = on ? '⤫ Exit fullscreen' : '⛶ Fullscreen';
-  if (id === 'cv') redraw(false); else drawComet();
+  setFSButtonState(id, on);
+  // Only one canvas can be fullscreen at once — hide the OTHER canvas's
+  // top-toolbar fullscreen button while this one is active, so the toolbar
+  // isn't offering a control that would just bump this view off screen.
+  document.querySelectorAll('.fsnavbtn[data-fs-target="' + otherId + '"]').forEach(b => {
+    b.style.display = on ? 'none' : '';
+  });
+  redraw(false); drawComet();
+}
+function setFSButtonState(id, on) {
+  const short = id === 'cv' ? 'Strip' : 'Comet';
+  document.querySelectorAll('[data-fs-target="' + id + '"]').forEach(b => {
+    b.classList.toggle('on', on);
+    b.textContent = b.classList.contains('fsnavbtn')
+      ? (on ? '⤫ ' + short : '⛶ ' + short)
+      : (on ? '⤫ Exit fullscreen' : '⛶ Fullscreen');
+  });
 }
 
 function boot() {
