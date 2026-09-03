@@ -185,6 +185,23 @@ canvas.main{display:block;width:100%;height:auto;cursor:crosshair;}
   padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-top:none;
   font-family:var(--mono);font-size:11px;color:var(--cream3);}
 .cvbar b{color:var(--teal);font-weight:500;}
+.fs-btn{margin-left:auto;background:none;border:1px solid var(--edge2);color:var(--cream3);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:3px 8px;
+  border-radius:3px;cursor:pointer;}
+.fs-btn:hover{border-color:var(--teal);color:var(--teal);}
+body.fs-open #content{padding-top:50vh;}
+.cvwrap.fs-pin{position:fixed;top:var(--navh,0px);left:0;right:0;width:100%;
+  height:calc(50vh - var(--navh,0px));z-index:800;
+  display:flex;align-items:center;justify-content:center;border-left:none;border-right:none;
+  border-top:none;}
+.cvwrap.fs-pin canvas.main{width:auto;height:100%;max-width:100%;image-rendering:pixelated;}
+.fs-toolbar{display:none;position:absolute;top:0;left:0;right:0;z-index:900;
+  justify-content:space-between;align-items:center;padding:6px 10px;
+  background:linear-gradient(rgba(4,4,13,.92),rgba(4,4,13,.6));
+  font-family:var(--mono);font-size:10.5px;color:var(--cream3);pointer-events:none;}
+.fs-toolbar *{pointer-events:auto;}
+.cvwrap.fs-pin .fs-toolbar{display:flex;}
+.fs-toolbar .fs-btn{margin-left:0;background:rgba(4,4,13,.7);}
 
 /* progress */
 #pre-wrap{margin:14px 0;display:none;}
@@ -215,11 +232,11 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 
 <div id="wg-pagenav">
   <span class="wm">WESSEN GETACHEW</span>
-  <a class="navbtn" href="index.html">← Page 1</a>
-  <a class="navbtn tealb" href="page2.html">Explorer</a>
-  <a class="navbtn" href="page5.html">P5 · Gap Diagonal</a>
-  <a class="navbtn" href="page6.html">P6 · Strip Correlations</a>
-  <a class="navbtn" href="page8.html">P8 · k-Tuples</a>
+  <a class="navbtn" href="https://wessengetachew.github.io/smith/page1.html">← Page 1</a>
+  <a class="navbtn tealb" href="https://wessengetachew.github.io/smith/page2.html">Explorer</a>
+  <a class="navbtn" href="https://wessengetachew.github.io/smith/page5.html">P5 · Gap Diagonal</a>
+  <a class="navbtn" href="https://wessengetachew.github.io/smith/page6.html">P6 · Strip Correlations</a>
+  <a class="navbtn" href="https://wessengetachew.github.io/smith/page8.html">P8 · k-Tuples</a>
   <a class="navbtn coralb" href="https://wessengetachew.github.io/Partition/"
      title="Strip Arithmetic I — The Goldbach Diagonal">← Strip I · Goldbach Diagonal</a>
 </div>
@@ -310,21 +327,7 @@ $$ \mathfrak{S}(N) \;=\; 2\,C_2 \prod_{\substack{p \mid N \\ p > 2}} \frac{p-1}{
 $\frac{p-1}{p-2}$. <b>Nothing was added</b> — the correction is the collision count, read off
 the same rule that gives $\min(n+1,p)$.</p>
 
-<div class="callout warn">
-<span class="ch">What this is not</span>
-<p>The lattice counts <b>coprime</b> pairs, not prime pairs. $\varphi(N)$ on the anti-diagonal is
-exact and elementary; the step from there to prime pairs is the singular series as a
-<b>heuristic density</b>, and the gap between that heuristic and the truth is the entire
-difficulty of Goldbach. Nothing on this page proves anything about Goldbach's conjecture.
-What it does show is that the correction factor is not an extra ingredient.</p>
-</div>
-
 <h2><span class="num">§2 · The lattice</span>Strips at any slope and width</h2>
-
-<p>Coprimality for the full $G \times G$ lattice is precomputed once into a bitset and reused
-for every redraw. At $G = 10{,}000$ that is $10^8$ cells in 12.5 MB, built by clearing
-$(r,M)$ for each prime $p$ — about $G^2\sum_p p^{-2} \approx 4.5\times10^7$ operations rather
-than $10^8$ gcds.</p>
 
 <div class="panel">
   <div class="ptitle">Lattice parameters</div>
@@ -344,17 +347,18 @@ than $10^8$ gcds.</p>
   <div class="prow">
     <span class="plabel">G</span>
     <div class="stepper">
-      <button class="sbtn pj" onclick="pj('g',-1)" title="Previous prime">&#9668;P</button>
-      <button class="sbtn" onclick="bump('g',-1)" title="&minus;1">&minus;</button>
-      <input class="sval" id="g-num" type="number" min="4" max="10000" value="109"
-             onchange="onG(+this.value)">
-      <button class="sbtn" onclick="bump('g',1)" title="+1">+</button>
-      <button class="sbtn pj" onclick="pj('g',1)" title="Next prime">P&#9658;</button>
+      <button class="sbtn pj" onclick="stopGPlay();pj('g',-1)" title="Previous prime">&#9668;P</button>
+      <button class="sbtn" onclick="stopGPlay();bump('g',-1)" title="&minus;1">&minus;</button>
+      <input class="sval" id="g-num" type="number" min="2" max="10000" value="31"
+             onchange="stopGPlay();onG(+this.value)">
+      <button class="sbtn" onclick="stopGPlay();bump('g',1)" title="+1">+</button>
+      <button class="sbtn pj" onclick="stopGPlay();pj('g',1)" title="Next prime">P&#9658;</button>
     </div>
     <span class="prime-tag" id="g-pt">prime</span>
-    <input type="range" id="g-sl" min="4" max="4096" step="1" value="109" oninput="onG(+this.value)">
-    <span class="val" id="g-v">109</span>
-    <button class="chip" onclick="onG(4)">4</button>
+    <input type="range" id="g-sl" min="2" max="4096" step="1" value="31" oninput="onG(+this.value)">
+    <span class="val" id="g-v">31</span>
+    <button class="chip tl" id="g-play" onclick="toggleGPlay()" title="Animate G: 2 up to current value and back, on loop">&#9654; Play</button>
+    <button class="chip" onclick="onG(2)">2</button>
     <button class="chip" onclick="onG(16)">16</button>
     <button class="chip" onclick="onG(64)">64</button>
     <button class="chip" onclick="onG(109)">109</button>
@@ -492,7 +496,7 @@ than $10^8$ gcds.</p>
     <select id="lens-lbl" onchange="lensRelabel()">
       <optgroup label="Lattice">
         <option value="rM">r/M</option>
-        <option value="r">r</option>
+        <option value="r" selected>r</option>
         <option value="M">M</option>
         <option value="dec">r/M decimal</option>
         <option value="gcd">gcd(r,M)</option>
@@ -507,10 +511,11 @@ than $10^8$ gcds.</p>
       </optgroup>
       <option value="off">off</option>
     </select>
-    <span class="lbl" style="color:var(--cream3);">labels appear once a magnified cell clears ~7&nbsp;px</span>
   </div>
 
   <div class="cvwrap">
+    <div class="fs-toolbar"><span id="fslabel-cv">—</span>
+      <button class="fs-btn" onclick="toggleFS('cv')">⤫ Exit fullscreen</button></div>
     <canvas id="cv" class="main"></canvas>
     <canvas id="lens"></canvas>
     <div id="lensinfo"></div>
@@ -518,6 +523,7 @@ than $10^8$ gcds.</p>
   <div class="cvbar">
     <span id="bar-l">—</span>
     <span id="bar-r">—</span>
+    <button class="fs-btn" onclick="toggleFS('cv')" id="fsbtn-cv">⛶ Fullscreen</button>
   </div>
 
   <div class="ctrls" style="margin-top:12px;">
@@ -540,8 +546,7 @@ than $10^8$ gcds.</p>
   Slope $+1$, width 1, offset $g$: the strip density must equal $\varphi(g)/g$.
   Slope $-1$, width 1, offset $N$: the point count must equal $\varphi(N)$ exactly &mdash;
   this is the count behind <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I</a>'s central claim, that the
-  sum strip is fully coprime iff $\varphi(N) = N-1$, i.e. iff $N$ is prime.
-  Both are walked from the same bitset.</p>
+  sum strip is fully coprime iff $\varphi(N) = N-1$, i.e. iff $N$ is prime.</p>
 </div>
 
 <div class="panel">
@@ -588,11 +593,6 @@ than $10^8$ gcds.</p>
   Nothing here is asserted on trust. Each row recomputes a stated result from scratch and
   compares it against an independent route &mdash; a bitset against direct gcd, a sieve against a
   closed form, a convolution against a published constant. Red is a real failure.</p>
-  <p style="font-size:13px;color:var(--cream3);margin-bottom:10px;">
-  Most rows read <b style="color:var(--lime);">X / X agree</b>: the left number is how many
-  comparisons held, the right is how many were made. So <i>11,881 / 11,881 agree</i> means every
-  cell was checked and every one matched. A few rows compare a single quantity instead and print
-  the two values side by side.</p>
   <div class="prow" style="border-bottom:none;padding-top:0;">
     <button class="chip tl" onclick="selfTest()">Run all tests</button>
     <span class="lbl" id="st-summary">not run</span>
@@ -646,11 +646,15 @@ them into a single curve. If the residue count were the wrong idea, that would n
   </div>
 
   <div class="cvwrap">
+    <div class="fs-toolbar"><span id="fslabel-cv2">—</span>
+      <button class="fs-btn" onclick="toggleFS('cv2')">⤫ Exit fullscreen</button></div>
     <canvas id="cv2" class="main"></canvas>
     <canvas id="lens2"></canvas>
     <div id="lensinfo2"></div>
   </div>
-  <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span></div>
+  <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span>
+    <button class="fs-btn" onclick="toggleFS('cv2')" id="fsbtn-cv2">⛶ Fullscreen</button>
+  </div>
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
@@ -708,9 +712,9 @@ the Euler factor.</p>
 <div class="foot">
 Strip Arithmetic II · Wessen Getachew · 2026<br>
 Part II of the strip series &mdash; <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I: The Goldbach Diagonal</a>.<br>
-Companion to <a href="page5.html">Page 5 — Gap Diagonal Identity</a>,
-<a href="page6.html">Page 6 — Strip Correlations</a> and
-<a href="page8.html">Page 8 — k-Block Density</a>.<br>
+Companion to <a href="https://wessengetachew.github.io/smith/page5.html">Page 5 — Gap Diagonal Identity</a>,
+<a href="https://wessengetachew.github.io/smith/page6.html">Page 6 — Strip Correlations</a> and
+<a href="https://wessengetachew.github.io/smith/page8.html">Page 8 — k-Block Density</a>.<br>
 Hardy &amp; Littlewood, <i>Partitio Numerorum III</i> (1923) for the singular series and the
 $\nu_p(\mathcal{H})$ formulation. $C_2$ is OEIS
 <a href="https://oeis.org/A005597" target="_blank" rel="noopener">A005597</a>.
@@ -1174,9 +1178,11 @@ function redraw(rebuildBase) {
 function doRedraw(rebuildBase) {
   if (!COP) return;
   const cv = $('cv');
-  const wrapW = cv.parentElement.clientWidth || 800;
+  const wrap = cv.parentElement;
+  const wrapW = wrap.clientWidth || 800;
   const dpr = Math.min(devicePixelRatio || 1, 2);
-  const S = Math.round(Math.min(wrapW, 900));
+  const cap = wrap.classList.contains('fs-pin') ? Math.min(900, Math.max(120, wrap.clientHeight - 8)) : 900;
+  const S = Math.round(Math.min(wrapW, cap));
   if (cv.width !== Math.round(S * dpr)) {
     cv.width = Math.round(S * dpr); cv.height = Math.round(S * dpr);
     cv.style.height = S + 'px';
@@ -1201,13 +1207,14 @@ function doRedraw(rebuildBase) {
     updateBar(st);
     updateIdentity(st);
   }
+  drawGridLabels(ctx, S);
 }
 function drawStripOverlay(ctx, S) {
   const g = COP_G, k = S / g, a = slopeA, b = slopeB;
   ctx.save();
   ctx.strokeStyle = 'rgba(224,80,96,.85)';
   ctx.fillStyle = 'rgba(224,80,96,.13)';
-  ctx.lineWidth = 1.2;
+  ctx.lineWidth = Math.max(1, 1.2 * (S / 900));
   // The strip is a band between two parallel lines; draw it as a polygon in
   // lattice coords, one clip per edge, rather than cell by cell.
   ctx.beginPath();
@@ -1376,12 +1383,35 @@ function markPrime(id, v) {
   if (el) el.classList.toggle('on', isPrime(Math.abs(v)));
 }
 
+let gPlayTimer = null, gPlayTarget = 0, gPlayDir = 1;
+function stopGPlay() {
+  if (gPlayTimer) { clearInterval(gPlayTimer); gPlayTimer = null; }
+  $('g-play').innerHTML = '&#9654; Play';
+  $('g-play').classList.remove('on');
+}
+function toggleGPlay() {
+  if (gPlayTimer) { stopGPlay(); return; }
+  gPlayTarget = Math.max(2, G);          // the value in the box when Play was pressed
+  gPlayDir = 1;
+  $('g-play').innerHTML = '&#9632; Stop';
+  $('g-play').classList.add('on');
+  const step = () => {
+    const range = gPlayTarget - 2;
+    const inc = Math.max(1, Math.round(range / 40));  // ~40 steps each way
+    let next = G + gPlayDir * inc;
+    if (next >= gPlayTarget) { next = gPlayTarget; gPlayDir = -1; }
+    else if (next <= 2) { next = 2; gPlayDir = 1; }
+    onG(next);
+  };
+  gPlayTimer = setInterval(step, 140);
+  step();
+}
 function onG(v) {
-  // Floor of 4, not 16: at G=4 the lattice is 16 cells and every one is
+  // Floor of 2, not 16: at G=2 the lattice is 4 cells and every one is
   // legible, which is where the strip equation is readable before any of this
   // is a picture. The clamp here was the real floor — the slider min was only
   // the visible one, so both had to move.
-  v = Math.max(4, Math.min(10000, Math.round(v)));
+  v = Math.max(2, Math.min(10000, Math.round(v)));
   G = v; $('g-v').textContent = v; $('g-num').value = v;
   if (+$('g-sl').value !== Math.min(v, 4096)) $('g-sl').value = Math.min(v, 4096);
   $('off-sl').min = -v; $('off-sl').max = v;
@@ -1597,6 +1627,7 @@ function paintPlate(ctx, x, y, side) {
   ctx.imageSmoothingEnabled = true;
   if (walkMode === 'band') drawBandOverlay(ctx, side);
   else if (showStrip) drawStripOverlay(ctx, side);
+  drawGridLabels(ctx, side);
   ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
   ctx.strokeRect(.5, .5, side - 1, side - 1);
   ctx.restore();
@@ -1790,9 +1821,12 @@ function buildComet() {
 function drawComet() {
   if (!RN) return;
   const cv = $('cv2');
-  const wrapW = cv.parentElement.clientWidth || 800;
+  const wrap = cv.parentElement;
+  const wrapW = wrap.clientWidth || 800;
   const dpr = Math.min(devicePixelRatio || 1, 2);
-  const W = Math.round(wrapW), H = Math.round(Math.min(460, wrapW * .55));
+  const W = Math.round(wrapW);
+  let H = Math.round(Math.min(460, wrapW * .55));
+  if (wrap.classList.contains('fs-pin')) H = Math.round(Math.min(H, Math.max(100, wrap.clientHeight - 8)));
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   cv.style.height = H + 'px';
   const ctx = cv.getContext('2d');
@@ -2039,7 +2073,7 @@ function setLensPin(v) {
   });
   if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
 }
-function lensRelabel() { if (typeof LENS_REDRAW === 'function') LENS_REDRAW(); }
+function lensRelabel() { if (typeof LENS_REDRAW === 'function') LENS_REDRAW(); redraw(false); }
 function setLensSize(v) {
   lensSize = Math.max(90, Math.min(420, Math.round(v) || 200));
   $('ls-num').value = lensSize;
@@ -2172,7 +2206,9 @@ function drawLens(px, py) {
       : '') +
     (slopeB * c.r - slopeA * c.M !== c.r - c.M && slopeB * c.r - slopeA * c.M !== c.r + c.M
       ? '<br>v = b·r−a·M <b>' + (slopeB * c.r - slopeA * c.M) + '</b>' : '');
-  placeLens(lens, info, cv.parentElement, px, py, html);
+  const wrapEl = cv.parentElement;
+  const wrapRect = wrapEl.getBoundingClientRect(), cvRect0 = cv.getBoundingClientRect();
+  placeLens(lens, info, wrapEl, px + (cvRect0.left - wrapRect.left), py + (cvRect0.top - wrapRect.top), html);
   lensAt = { px, py };
   LENS_REDRAW = () => { if (lensAt) drawLens(lensAt.px, lensAt.py); };
 }
@@ -2182,6 +2218,49 @@ function drawLens(px, py) {
    glyph edges hard over a busy backdrop — a shadow wide enough to separate
    them also softens them. */
 let LENS_LABELS_HIDDEN = false;
+function labelText(mode, r, m) {
+  return mode === 'M'     ? '' + m
+    : mode === 'r'     ? '' + r
+    : mode === 'dec'   ? (r / m).toFixed(2)
+    : mode === 'gcd'   ? '' + gcd(r, m)
+    : mode === 'v'     ? '' + (slopeB * r - slopeA * m)
+    : mode === 'ar'    ? '' + (slopeB * r)
+    : mode === 'am'    ? '' + (slopeA * m)
+    : mode === 'terms' ? (slopeB * r) + ',' + (slopeA * m)
+    : mode === 'gap'   ? '' + (r - m)
+    : mode === 'sum'   ? '' + (r + m)
+    :                    r + '/' + m;
+}
+/* Always-on cell labels for small grids — no magnifier needed. Same label
+   mode as the lens (#lens-lbl), same stroke-then-fill legibility trick, same
+   self-gating on font size so labels never overlap: below ~7 CSS px they are
+   skipped rather than crammed in. Capped at G=100 — past that, per-cell text
+   stops being the right tool and the lens takes over. */
+function drawGridLabels(ctx, S) {
+  const g = COP_G;
+  if (g > 100) return;
+  const mode = $('lens-lbl').value;
+  if (mode === 'off') return;
+  const cell = S / g;
+  const fs = Math.min(cell * 0.42, 12 * Math.max(1, S / 900));
+  if (fs < 7) return;
+  ctx.save();
+  ctx.font = fs + 'px "JetBrains Mono",monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(1.2, fs * 0.20); ctx.lineJoin = 'round';
+  for (let M = 1; M <= g; M++) {
+    for (let r = 1; r <= g; r++) {
+      const x = (r - 0.5) * cell, y = (M - 0.5) * cell;
+      const txt = labelText(mode, r, M);
+      const co = gcd(r, M) === 1;
+      ctx.strokeStyle = 'rgba(4,4,13,.92)';
+      ctx.strokeText(txt, x, y);
+      ctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
+      ctx.fillText(txt, x, y);
+    }
+  }
+  ctx.restore();
+}
 function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dprL) {
   LENS_LABELS_HIDDEN = false;
   const mode = $('lens-lbl').value;
@@ -2196,18 +2275,7 @@ function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dp
      names which strip line a cell sits on, and at slope +1 / −1 it degenerates
      to the gap r−M and the Goldbach sum r+M, which get their own modes so they
      stay readable when the slope is something else. */
-  const textOf = (r, m) =>
-      mode === 'M'     ? '' + m
-    : mode === 'r'     ? '' + r
-    : mode === 'dec'   ? (r / m).toFixed(2)
-    : mode === 'gcd'   ? '' + gcd(r, m)
-    : mode === 'v'     ? '' + (slopeB * r - slopeA * m)
-    : mode === 'ar'    ? '' + (slopeB * r)
-    : mode === 'am'    ? '' + (slopeA * m)
-    : mode === 'terms' ? (slopeB * r) + ',' + (slopeA * m)
-    : mode === 'gap'   ? '' + (r - m)
-    : mode === 'sum'   ? '' + (r + m)
-    :                    r + '/' + m;
+  const textOf = (r, m) => labelText(mode, r, m);
   lctx.font = fs + 'px "JetBrains Mono",monospace';
   lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
   let drawn = 0;
@@ -2270,7 +2338,9 @@ function drawCometLens(px, py) {
   const html = 'N <b>' + Nc + '</b> <span class="dim">rad</span> ' + rad(Nc, SPF) +
     '<br>r(N) <b>' + RN[Nc] + '</b> <span class="dim">·</span> 𝔖 <i>' + SIG[Nc].toFixed(4) + '</i>' +
     '<br>r/(𝔖·li₂) <u>' + (pred > 0 ? (RN[Nc] / pred).toFixed(4) : '—') + '</u>';
-  placeLens(lens, info, cv.parentElement, px, py, html);
+  const wrapEl2 = cv.parentElement;
+  const wrapRect2 = wrapEl2.getBoundingClientRect(), cvRect2 = cv.getBoundingClientRect();
+  placeLens(lens, info, wrapEl2, px + (cvRect2.left - wrapRect2.left), py + (cvRect2.top - wrapRect2.top), html);
   LENS_REDRAW = () => drawCometLens(px, py);
 }
 
@@ -2545,6 +2615,23 @@ function selfTest() {
 }
 
 /* ── boot ──────────────────────────────────────────────────────────────── */
+function setNavH() {
+  document.documentElement.style.setProperty('--navh', $('wg-pagenav').getBoundingClientRect().height + 'px');
+}
+function toggleFS(id) {
+  const cv = $(id);
+  const wrap = cv.parentElement;
+  const btn = $('fsbtn-' + id);
+  const on = wrap.classList.toggle('fs-pin');
+  if (on) {
+    setNavH();
+    $('fslabel-' + id).textContent = id === 'cv' ? 'Strip / block view' : 'Goldbach comet';
+  }
+  document.body.classList.toggle('fs-open', on);
+  btn.textContent = on ? '⤫ Exit fullscreen' : '⛶ Fullscreen';
+  if (id === 'cv') redraw(false); else drawComet();
+}
+
 function boot() {
   const top = 300000;
   SPF = buildSPF(top);
@@ -2554,7 +2641,7 @@ function boot() {
   wireLens();
   setLensZoom(3); setLensPin('auto');
   buildPhi(4096);
-  onG(109);
+  onG(31);
   onOff(0); onW(1); reslope();
   gcdTable();
   buildComet();
@@ -2564,7 +2651,10 @@ function boot() {
   let rt = null;
   window.addEventListener('resize', () => {
     clearTimeout(rt);
-    rt = setTimeout(() => { redraw(false); drawComet(); }, 160);
+    rt = setTimeout(() => {
+      if (document.body.classList.contains('fs-open')) setNavH();
+      redraw(false); drawComet();
+    }, 160);
   });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
