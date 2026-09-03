@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strip Correlations — Where Independence Breaks · Wessen Getachew — Page 6</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  startup: { ready() { MathJax.startup.defaultReady(); } }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04040d; --bg2:#080816; --edge:#ffffff21; --edge2:#ffffff14;
+  --cream:#e8e3db; --cream2:#a8a294; --cream3:#89837a;
+  --gold:#c8a84a; --teal:#3dc8b8; --violet:#9b7fe8; --red:#e05060; --lime:#7ec87a;
+  --mono:'JetBrains Mono',monospace; --disp:'Cinzel',serif; --body:'Spectral',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--cream);font-family:var(--body);line-height:1.65;}
+a{color:var(--teal);}
+#wrap{max-width:1060px;margin:0 auto;padding:0 18px 80px;}
+h1{font-family:var(--disp);font-weight:500;font-size:clamp(1.5rem,4vw,2.4rem);letter-spacing:.04em;color:var(--cream);margin:34px 0 6px;}
+h2{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:44px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--edge2);}
+p.lede{font-size:1.02rem;color:var(--cream2);max-width:70ch;}
+.card{background:var(--bg2);border:1px solid var(--edge2);padding:18px 20px;margin:14px 0;}
+.card p{color:var(--cream2);font-size:.95rem;max-width:72ch;margin:8px 0;}
+.card b{color:var(--cream);}
+.mono{font-family:var(--mono);}
+.hint{font-family:var(--mono);font-size:10px;color:var(--cream3);letter-spacing:.05em;}
+.ctl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0;font-family:var(--mono);font-size:10.5px;}
+.ctl-row label{color:var(--cream2);}
+.ctl-row input[type=range]{flex:1;min-width:100px;max-width:220px;}
+.ctl-row input[type=number]{width:52px;background:rgba(255,255,255,.05);border:1px solid var(--edge);color:var(--cream);font-family:var(--mono);font-size:10.5px;padding:3px 4px;text-align:center;}
+.tc-btn{background:none;border:1px solid rgba(200,168,74,.4);color:var(--gold);font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;cursor:pointer;}
+.tc-btn.on{background:rgba(200,168,74,.2);}
+.lock-btn.on{background:rgba(224,80,96,.22);border-color:var(--red);color:var(--red);}
+.ctl-row input:disabled{opacity:.35;cursor:not-allowed;}
+canvas{display:block;width:100%;background:#030310;border:1px solid var(--edge2);}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0;}
+.stat{background:var(--bg2);border:1px solid var(--edge2);padding:10px 12px;}
+.stat .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);}
+.stat .val{font-family:var(--mono);font-size:14px;margin-top:4px;}
+.stat .sub{font-family:var(--mono);font-size:10px;color:var(--cream3);margin-top:2px;}
+table.work{border-collapse:collapse;font-family:var(--mono);font-size:9.5px;margin:10px 0;width:100%;max-width:520px;}
+table.work th,table.work td{border:1px solid var(--edge2);padding:5px 10px;text-align:left;color:var(--cream2);}
+table.work th{color:var(--cream3);font-weight:400;letter-spacing:.08em;text-transform:uppercase;font-size:10px;}
+.gold{color:var(--gold);} .teal{color:var(--teal);} .violet{color:var(--violet);} .red{color:var(--red);} .lime{color:var(--lime);}
+blockquote{border-left:2px solid var(--gold);padding:10px 16px;margin:26px 0;color:var(--cream2);font-style:italic;}
+blockquote cite{display:block;font-style:normal;font-family:var(--mono);font-size:10px;color:var(--cream3);margin-top:8px;}
+#foot-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px;font-family:var(--mono);font-size:10.5px;}
+</style>
+
+<style id="wgc-hide-chips">
+/* Page chips and the in-bar Opener now live inside the Contents panel. */
+#wg-pagenav > a{display:none !important;}
+#wg-pagenav{gap:6px;}
+</style>
+</head>
+<body>
+
+<!-- ── PAGE NAV (same bar as index.html) ── -->
+<script>
+(function(){
+  var links=[
+   ['index.html','P1','How C(n) Works — Guided Walkthrough — Page 1','#c8a84a'],
+   ['page2.html','P2','C(n) — Block-Coprime Density Explorer — Page 2','#7ec87a'],
+   ['page3.html','P3','Color & Label Modes — The Mathematics — Page 3','#9b7fe8'],
+   ['page4.html','P4','The Prime Filter — Sieve View — Page 4','#4a9eff'],
+   ['page5.html','P5','Gap Diagonal Identity — Page 5','#3dc8b8'],
+   ['page6.html','P6','Strip Correlations — Where Independence Breaks — Page 6','#e05060'],
+   ['page7.html','P7','Multi-Block Coprime Density — Prime Gaps (Twin/Cousin/Sexy) — Page 7','#ff8c42'],
+   ['page8.html','P8','k-Block Coprime Density — Prime Constellations & k-Tuples — Page 8','#ff2fd0'],
+   ['page9.html','P9','Dirichlet Character-Twisted Density — Page 9','#d2691e'],
+   ['page10.html','P10','Farey & Unit Circle — Page 10','#a855f7'],
+   ['page11.html','P11','Farey Sequence Summatory Function — Page 11','#f2c14e'],
+   ['page12.html','P12','The Prime Spiral — Page 12','#ff6b9d'],
+   ['page13.html','P13','Gauss Circle ↔ Wessen Bridge — Page 13','#06b6d4'],
+   ['page14.html','½+it','ζ(½+it) — Critical-Line Spiral — Page 14','#ef4444'],
+   ['page15.html','P15','Sector-Graded Farey Discrepancy — Page 15','#4ade80'],
+   ['#opener','Opener','Open the Welcome / Opener Teaser','#f2a84a']
+  ];
+  var bar='<div id="wg-pagenav" style="position:sticky;top:0;z-index:9999;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 14px;background:#04040d;border-bottom:1px solid rgba(255,255,255,.13);font-family:\'JetBrains Mono\',monospace;">';
+  bar+='<span style="font-family:\'Cinzel\',serif;font-size:.7rem;color:#c8a84a;letter-spacing:.14em;margin-right:8px;flex-shrink:0;">WESSEN GETACHEW</span>';
+  links.forEach(function(L){var href=L[0],lab=L[1],ti=L[2],c=L[3];var cur=(href==='page6.html');
+    if(href==='#opener'){
+      bar+='<a href="#" onclick="openOpener();return false;" title="'+ti+'" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid '+c+'59;color:'+c+';text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background=\''+c+'14\';this.style.borderColor=\''+c+'\'" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\''+c+'59\'">'+lab+'</a>';
+    }
+    else if(cur){bar+='<a href="'+href+'" title="'+ti+' (current)" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:'+c+'22;border:1px solid '+c+';color:'+c+';text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;">'+lab+'</a>';}
+    else{bar+='<a href="'+href+'" title="'+ti+'" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid '+c+'59;color:'+c+';text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background=\''+c+'14\';this.style.borderColor=\''+c+'\'" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\''+c+'59\'">'+lab+'</a>';}
+  });
+  bar+='<button onclick="wgFS()" title="Toggle fullscreen" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid rgba(232,227,219,.3);color:rgba(232,227,219,.75);font-family:\'JetBrains Mono\',monospace;flex-shrink:0;white-space:nowrap;">\u26f6 Full</button>';
+  bar+='</div>';
+  document.write(bar);
+})();
+function wgFS(){var d=document;if(d.fullscreenElement){d.exitFullscreen();}else if(d.documentElement.requestFullscreen){d.documentElement.requestFullscreen().catch(function(){});}}
+function openOpener(){
+  sessionStorage.setItem('wg_open_opener','1');
+  window.open('page2.html','_blank');
+}
+</script>
+
+<div id="wrap">
+
+<h1>Strip Correlations</h1>
+<p class="lede">
+Page 5 reads the lattice as diagonal strips $|M-r|=g$, each with coprime density exactly
+$\varphi(g)/g$, and shows that averaging the strip densities recovers $D(n)$ exactly — an average
+needs no independence. Independence is needed for <b>joint</b> events, and there the strips genuinely
+fail to be independent, because they share prime factors. This page makes that dependence exact,
+visible, and measurable. The identities here are elementary (CRT / inclusion–exclusion); the point
+is watching independence break, and seeing that the same mechanism is what shapes $C(n)$'s Euler
+product on Page&nbsp;1.
+</p>
+
+<h2>01 · The exact correlation factor</h2>
+<div class="card">
+  <p>
+  A point of strip $g$ is $(r,\,r+g)$, and $\gcd(r,\,r+g)=\gcd(r,g)$ — so strip $g$'s coprimality is
+  the event "$r$ is coprime to $g$", with density $\varphi(g)/g=\prod_{p\mid g}(1-\tfrac1p)$.
+  Take two strips $g_1,g_2$ and ask for the <b>joint</b> event: the same $r$ coprime to both.
+  By periodicity mod $\mathrm{lcm}(g_1,g_2)$ (CRT), the joint density is
+  </p>
+  <p style="text-align:center;">$$J(g_1,g_2)\;=\;\prod_{p\,\mid\,g_1 g_2}\Bigl(1-\frac1p\Bigr).$$</p>
+  <p>
+  Independence would predict the product $\frac{\varphi(g_1)}{g_1}\cdot\frac{\varphi(g_2)}{g_2}$ — which
+  counts every <b>shared</b> prime twice. The ratio is the correlation factor:
+  </p>
+  <p style="text-align:center;">$$\rho(g_1,g_2)\;=\;\frac{J(g_1,g_2)}{\frac{\varphi(g_1)}{g_1}\frac{\varphi(g_2)}{g_2}}
+  \;=\;\prod_{p\,\mid\,\gcd(g_1,g_2)}\frac{p}{p-1}\;\;\ge\;1.$$</p>
+  <p>
+  So the correlation is <b>never negative</b> — $\rho \ge 1$ always — depends only on $\gcd(g_1,g_2)$, and equals $1$
+  exactly when the strips are coprime to each other. Two strips sharing a factor of 2 are already
+  $2\times$ more correlated than independence predicts; sharing $2\cdot3$ makes it $3\times$.
+  At $g_1=g_2=g$ the factor is $g/\varphi(g)$ — the strip is perfectly correlated with itself, as it must be.
+  </p>
+</div>
+
+<h2>02 · Two strips, live</h2>
+<div class="card">
+  <div class="ctl-row">
+    <label>G:</label>
+    <input type="range" id="sl-G" min="32" max="1024" step="1" value="256" oninput="setG(+this.value)">
+    <input type="number" id="inp-G" min="32" max="1024" value="256" oninput="setG(+this.value)">
+    <span class="hint">strip length is G−g — finite-size error shrinks as G grows</span>
+  </div>
+  <div class="ctl-row">
+    <label class="teal">g₁:</label>
+    <input type="range" id="sl-g1" min="1" max="255" step="1" value="6" oninput="setG1(+this.value)">
+    <input type="number" id="inp-g1" min="1" value="6" oninput="setG1(+this.value)">
+    <button class="tc-btn lock-btn" id="lock-g1" onclick="toggleLock(1)" title="Lock g₁ = G/2 — tracks G as it moves">🔒 g₁=G/2</button>
+    <label class="violet" style="margin-left:10px;">g₂:</label>
+    <input type="range" id="sl-g2" min="1" max="255" step="1" value="10" oninput="setG2(+this.value)">
+    <input type="number" id="inp-g2" min="1" value="10" oninput="setG2(+this.value)">
+    <button class="tc-btn lock-btn" id="lock-g2" onclick="toggleLock(2)" title="Lock g₂ = G/2 — tracks G as it moves">🔒 g₂=G/2</button>
+  </div>
+  <div class="ctl-row" id="row-g3" style="display:none;">
+    <label class="gold">g₃:</label>
+    <input type="range" id="sl-g3" min="1" max="255" step="1" value="15" oninput="setG3(+this.value)">
+    <input type="number" id="inp-g3" min="1" value="15" oninput="setG3(+this.value)">
+    <button class="tc-btn lock-btn" id="lock-g3" onclick="toggleLock(3)" title="Lock g₃ = G/2 — tracks G as it moves">🔒 g₃=G/2</button>
+    <button class="tc-btn" onclick="removeStrip(3)">✕ remove g₃</button>
+  </div>
+  <div class="ctl-row" id="row-g4" style="display:none;">
+    <label class="red">g₄:</label>
+    <input type="range" id="sl-g4" min="1" max="255" step="1" value="21" oninput="setG4(+this.value)">
+    <input type="number" id="inp-g4" min="1" value="21" oninput="setG4(+this.value)">
+    <button class="tc-btn lock-btn" id="lock-g4" onclick="toggleLock(4)" title="Lock g₄ = G/2 — tracks G as it moves">🔒 g₄=G/2</button>
+    <button class="tc-btn" onclick="removeStrip(4)">✕ remove g₄</button>
+  </div>
+  <div class="ctl-row">
+    <button class="tc-btn" id="btn-play" onclick="togglePlay()">▶ Play g₂</button>
+    <button class="tc-btn" onclick="var t=g1;setG1(g2);setG2(t);">⇄ Swap g₁,g₂</button>
+    <button class="tc-btn" onclick="setG2(g1)">g₂ = g₁</button>
+    <button class="tc-btn" onclick="setG2(2*g1)">g₂ = 2g₁</button>
+    <button class="tc-btn" id="btn-addg3" onclick="addStrip(3)">+ add g₃</button>
+    <button class="tc-btn" id="btn-addg4" onclick="addStrip(4)">+ add g₄</button>
+    <span id="gcd-lbl" class="hint"></span>
+  </div>
+
+  <canvas id="cv-strips" height="420"></canvas>
+  <p class="hint" style="margin-top:6px;">
+    Lattice triangle (dim) · strip g₁ <span class="teal">teal</span> · strip g₂ <span class="violet">violet</span> ·
+    optional strip g₃ <span class="gold">gold</span> · optional strip g₄ <span class="red">coral</span> ·
+    filled = coprime on that strip · a <span class="gold">gold column</span> spans (r,r+g₁)…(r,r+g_k) where r is coprime to <b>every active strip</b> —
+    the joint event. Columns are what independence would get wrong. Each g-slider's range adapts to
+    the current G (a strip can never reach or exceed G), and 🔒 pins a strip to exactly G/2, following G as it moves.
+  </p>
+
+  <div class="statgrid">
+    <div class="stat"><div class="lbl">measured joint (finite G)</div><div class="val gold" id="st-meas">—</div><div class="sub" id="st-meas-sub"></div></div>
+    <div class="stat"><div class="lbl">independent prediction</div><div class="val" id="st-ind">—</div><div class="sub">φ(g₁)/g₁ · φ(g₂)/g₂</div></div>
+    <div class="stat"><div class="lbl">exact joint J(g₁,g₂)</div><div class="val teal" id="st-exact">—</div><div class="sub">∏ over p | g₁g₂ of (1−1/p)</div></div>
+    <div class="stat"><div class="lbl">ρ — correlation factor</div><div class="val red" id="st-rho">—</div><div class="sub" id="st-rho-sub">exact vs measured</div></div>
+  </div>
+
+  <div id="work-wrap">
+    <table class="work" id="work-table"></table>
+  </div>
+</div>
+
+<h2>03 · The whole correlation landscape</h2>
+<div class="card">
+  <p>
+  Because $\rho$ depends only on $\gcd(g_1,g_2)$, the map of all strip pairs inherits the full
+  structure of the gcd function — bright rays along common multiples, brightest on the diagonal
+  where a strip meets itself. <b>Click any cell</b> to load that pair into the live view above.
+  </p>
+  <canvas id="cv-heat" height="520"></canvas>
+  <p class="hint" style="margin-top:6px;">
+    ρ(g₁,g₂) for g₁,g₂ = 1…96, log color scale · dark = ρ=1 (coprime strips, truly independent) ·
+    bright <span class="red">red-gold</span> = strong shared-prime correlation · current pair marked.
+    This picture is exact — no sampling.
+  </p>
+</div>
+
+<h2>04 · Why C(n) has min(n+1, p) in it</h2>
+<div class="card">
+  <p>
+  Page 1's constant is $C(n)=\zeta(2)\prod_p\bigl(1-\min(n{+}1,p)/p^2\bigr)$. The block event behind it —
+  $r$ coprime to all of $M, M{+}1,\dots,M{+}n$ — is a family of $n{+}1$ overlapping strip-type conditions.
+  If those conditions were independent, each prime would contribute $(1-1/p^2)^{\,n+1}$, i.e. the block density
+  would be $\zeta(2)^{-(n+1)}$-shaped. What actually happens, prime by prime:
+  </p>
+  <p>
+  <b class="teal">Large primes, $p &gt; n{+}1$:</b> the block of $n{+}1$ consecutive integers occupies $n{+}1$
+  distinct residues mod $p$, so the pair $(r,M)$ fails for $\min(n{+}1,p)=n{+}1$ of the $p^2$ residue pairs —
+  giving $1-(n{+}1)/p^2$, which is what near-independence looks like to first order:
+  $(1-1/p^2)^{n+1}\approx 1-(n{+}1)/p^2$. The strips barely feel each other.
+  </p>
+  <p>
+  <b class="red">Small primes, $p \le n{+}1$:</b> the block covers <b>every</b> residue class mod $p$ —
+  the conditions collapse into one: "$p \nmid r$". That is total correlation, and it is exactly where
+  $\min(n{+}1,p)$ saturates at $p$, contributing $1-p/p^2 = 1-\tfrac1p$ — the same factor as a
+  $\varphi(g)/g$ strip. The <b>saturation points</b> $n=p-1$ that Page 1's <span class="mono">sat−/sat+</span>
+  buttons jump between are precisely the depths where one more prime crosses from the
+  near-independent regime into the fully-correlated one.
+  </p>
+  <p>
+  So the two regimes of $\min(n{+}1,p)$ are not a formula quirk — they are the independence-to-correlation
+  transition of this page, happening once per prime as $n$ grows.
+  </p>
+</div>
+
+<h2>05 · Honest scope</h2>
+<div class="card">
+  <p>
+  The identities on this page — $\gcd(r,r{+}g)=\gcd(r,g)$, the joint density over
+  $p \mid g_1g_2$, and the correlation factor $\rho=\prod_{p\mid\gcd} p/(p{-}1)$ — are elementary and
+  classical in method (periodicity and CRT). No novelty is claimed for them. What this page contributes
+  is the reading: the strips of Pages 1 and 5 fail to be independent in an exactly computable way (their
+  mean still recovers $D(n)$ — dependence costs nothing there — but every joint event across strips
+  feels it), that failure is gcd-structured, and the $\min(n{+}1,p)$ kernel of $C(n)$ is the same
+  phenomenon seen prime-by-prime. Measured columns are finite-$G$ counts; the |Δ| shown is the
+  finite-size error, empirically $O(1/G)$, consistent with Page 1's reports.
+  </p>
+</div>
+
+<blockquote>
+  Independence between strips is the exception, not the rule — and its failure is not noise.
+  It is a product over the primes the strips share.
+  <cite>— Strip Correlations · wessengetachew.github.io · 2026</cite>
+</blockquote>
+
+<div id="foot-links">
+  <a href="page2.html">Page 2 · full explorer</a>
+  <a href="index.html">← Page 1 · Guided walkthrough</a>
+  <a href="page3.html">Page 3 · Color & label modes</a>
+  <a href="page5.html">Page 5 · Gap Diagonal Identity</a>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+'use strict';
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a;}
+function primeFactors(x){var ps=[],d=2;while(d*d<=x){if(x%d===0){ps.push(d);while(x%d===0)x=Math.floor(x/d);}d+=(d===2)?1:2;}if(x>1)ps.push(x);return ps;}
+function phiRatio(g){var r=1;primeFactors(g).forEach(function(p){r*=(1-1/p);});return r;}
+function jointExact(a,b){var r=1;
+  var seen={};[a,b].forEach(function(g){primeFactors(g).forEach(function(p){seen[p]=1;});});
+  Object.keys(seen).forEach(function(p){r*=(1-1/(+p));});return r;}
+function rhoExact(a,b){var r=1;primeFactors(gcd(a,b)).forEach(function(p){r*=p/(p-1);});return r;}
+
+var G=256,g1=6,g2=10,g3=15,g4=21,playId=null,playDir=1;
+var active=[1,2];                          // which strip indices are in play (1,2 always on; 3,4 optional)
+var lock={1:false,2:false,3:false,4:false}; // per-strip "pin to G/2" state
+var STRIP_COLOR={1:'rgba(61,200,184,0.9)',2:'rgba(155,127,232,0.9)',3:'rgba(200,168,74,0.9)',4:'rgba(224,80,96,0.9)'};
+var STRIP_SUB={1:'₁',2:'₂',3:'₃',4:'₄'};
+
+function fit(cv){
+  // The design height is captured ONCE from the height attribute. Setting
+  // cv.height rewrites that attribute, so re-reading it every call compounds
+  // by dpr each render (420→1260→3780→…) — the unbounded-canvas crash.
+  if(!cv._baseH)cv._baseH=(+cv.getAttribute('height'))||420;
+  var h=cv._baseH;
+  var w=Math.max(200,Math.min(1400,(cv.parentElement.clientWidth||600)-2));
+  var dpr=Math.min(2,window.devicePixelRatio||1); // cap backing store on high-dpr phones
+  var bw=Math.round(w*dpr),bh=Math.round(h*dpr);
+  if(cv.width!==bw||cv.height!==bh){cv.width=bw;cv.height=bh;} // reallocate only on real size change
+  cv.style.width=w+'px';cv.style.height=h+'px';
+  var c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  return {c:c,W:w,H:h};
+}
+
+function setG(v){G=Math.max(32,Math.min(1024,Math.round(v||256)));
+  document.getElementById('sl-G').value=G;document.getElementById('inp-G').value=G;
+  updateGRanges();applyLocks();clampG();renderAll();}
+// Every strip slider's range adapts live to the current G — a strip can
+// never reach or exceed G (strip length is G−g), so max is always G−1.
+function updateGRanges(){
+  var mx=Math.max(1,G-1);
+  [1,2,3,4].forEach(function(i){
+    var sl=document.getElementById('sl-g'+i),inp=document.getElementById('inp-g'+i);
+    if(sl)sl.max=mx; if(inp)inp.max=mx;
+  });
+}
+function setStrip(i,v){
+  var mx=Math.max(1,G-1);
+  var val=Math.max(1,Math.min(mx,Math.round(v||1)));
+  window['g'+i]=val;
+  var sl=document.getElementById('sl-g'+i),inp=document.getElementById('inp-g'+i);
+  if(sl)sl.value=val; if(inp)inp.value=val;
+  renderAll();
+}
+function setG1(v){lock[1]=false;syncLockBtn(1);setStrip(1,v);}
+function setG2(v){lock[2]=false;syncLockBtn(2);setStrip(2,v);}
+function setG3(v){lock[3]=false;syncLockBtn(3);setStrip(3,v);}
+function setG4(v){lock[4]=false;syncLockBtn(4);setStrip(4,v);}
+function clampG(){
+  active.forEach(function(i){
+    var mx=Math.max(1,G-1);
+    if(window['g'+i]>mx){
+      window['g'+i]=mx;
+      var sl=document.getElementById('sl-g'+i),inp=document.getElementById('inp-g'+i);
+      if(sl)sl.value=mx; if(inp)inp.value=mx;
+    }
+  });
+}
+// ── Lock a strip to exactly G/2; it then tracks every G move automatically ──
+function toggleLock(i){
+  lock[i]=!lock[i];
+  syncLockBtn(i);
+  if(lock[i])setStrip(i,Math.round(G/2));
+  else renderAll();
+}
+function syncLockBtn(i){
+  var b=document.getElementById('lock-g'+i),sl=document.getElementById('sl-g'+i),inp=document.getElementById('inp-g'+i);
+  if(b)b.classList.toggle('on',!!lock[i]);
+  if(sl)sl.disabled=!!lock[i]; if(inp)inp.disabled=!!lock[i];
+}
+function applyLocks(){[1,2,3,4].forEach(function(i){if(lock[i])setStrip(i,Math.round(G/2));});}
+// ── Optional third/fourth strip ──
+function addStrip(i){
+  if(active.indexOf(i)!==-1)return;
+  active.push(i);active.sort();
+  var row=document.getElementById('row-g'+i); if(row)row.style.display='';
+  var btn=document.getElementById('btn-addg'+i); if(btn)btn.style.display='none';
+  updateGRanges();renderAll();
+}
+function removeStrip(i){
+  var idx=active.indexOf(i); if(idx===-1)return;
+  active.splice(idx,1);
+  var row=document.getElementById('row-g'+i); if(row)row.style.display='none';
+  var btn=document.getElementById('btn-addg'+i); if(btn)btn.style.display='';
+  lock[i]=false;syncLockBtn(i);renderAll();
+}
+function togglePlay(){
+  var b=document.getElementById('btn-play');
+  if(playId){clearInterval(playId);playId=null;b.textContent='▶ Play g₂';b.classList.remove('on');return;}
+  b.textContent='■ Stop';b.classList.add('on');playDir=1;
+  playId=setInterval(function(){
+    var mx=Math.max(1,G-1);
+    var next=g2+playDir;
+    if(next>=mx){next=mx;playDir=-1;}
+    else if(next<=1){next=1;playDir=1;}
+    setG2(next);
+  },140);
+}
+
+// ── Live strips canvas ──
+function renderStrips(){
+  var F=fit(document.getElementById('cv-strips')),c=F.c,W=F.W,H=F.H;
+  c.fillStyle='#030310';c.fillRect(0,0,W,H);
+  var pad=14, side=Math.min(W,H)-pad*2;
+  var ox=(W-side)/2, oy=(H-side)/2, cell=side/G;
+  // triangle backdrop (r<M), sampled sparsely at large G to stay light
+  var step=G>320?Math.ceil(G/320):1;
+  c.fillStyle='rgba(232,227,219,.05)';
+  for(var M=2;M<=G;M+=step)for(var r=1;r<M;r+=step)
+    c.fillRect(ox+r*cell,oy+(M-1)*cell,Math.max(.5,cell*step*.7),Math.max(.5,cell*step*.7));
+  var gs=active.map(function(i){return window['g'+i];});
+  var gMax=Math.max.apply(null,gs);
+  // joint gold columns first (under the strip dots) — spans every active strip's y at this r
+  var Rmax=G-gMax, joint=0, counts={};
+  active.forEach(function(i){counts[i]=0;});
+  for(var r2=1;r2<=Rmax;r2++){
+    var allCop=true, ys=[];
+    for(var k=0;k<active.length;k++){
+      var idx=active[k], gv=gs[k], cop=gcd(r2,gv)===1;
+      if(cop)counts[idx]++; else allCop=false;
+      ys.push(oy+(r2+gv-1)*cell);
+    }
+    if(allCop){
+      joint++;
+      var x=ox+r2*cell, yMin=Math.min.apply(null,ys), yMax=Math.max.apply(null,ys);
+      c.strokeStyle='rgba(200,168,74,.35)';c.lineWidth=Math.max(.6,cell*.5);
+      c.beginPath();c.moveTo(x,yMin);c.lineTo(x,yMax);c.stroke();
+    }
+  }
+  // strips
+  function strip(g,col){
+    for(var r3=1;r3+g<=G;r3++){
+      var x=ox+r3*cell, y=oy+(r3+g-1)*cell;
+      var cop=gcd(r3,g)===1;
+      var rad=Math.max(.8,cell*(cop?.55:.3));
+      c.beginPath();c.arc(x,y,rad,0,6.2832);
+      if(cop){c.fillStyle=col;c.fill();}
+      else{c.strokeStyle=col.replace(/[\d.]+\)$/,'0.30)');c.lineWidth=.8;c.stroke();}
+    }
+  }
+  active.forEach(function(i){strip(window['g'+i],STRIP_COLOR[i]);});
+  // r=M seam
+  c.strokeStyle='rgba(224,80,96,.25)';c.setLineDash([3,4]);c.lineWidth=1;
+  c.beginPath();c.moveTo(ox+cell,oy);c.lineTo(ox+side,oy+side-cell);c.stroke();c.setLineDash([]);
+  return {joint:joint,counts:counts,Rmax:Rmax,gs:gs};
+}
+
+// ── Stats + per-prime working ──
+function jointExactMulti(gs){
+  var seen={};
+  gs.forEach(function(g){primeFactors(g).forEach(function(p){seen[p]=1;});});
+  var r=1;Object.keys(seen).forEach(function(p){r*=(1-1/(+p));});
+  return r;
+}
+function renderStats(counts){
+  var gs=active.map(function(i){return window['g'+i];});
+  var dens=gs.map(phiRatio);
+  var ind=dens.reduce(function(a,b){return a*b;},1);
+  var J=jointExactMulti(gs);
+  var meas=counts.joint/Math.max(1,counts.Rmax);
+  var rhoMeas=meas/Math.max(1e-12,ind);
+  var rho=J/Math.max(1e-300,ind);
+  // primes shared by 2+ active strips drive the correlation
+  var primeCount={};
+  gs.forEach(function(g){
+    var seen={};primeFactors(g).forEach(function(p){seen[p]=1;});
+    Object.keys(seen).forEach(function(p){primeCount[p]=(primeCount[p]||0)+1;});
+  });
+  var shared=Object.keys(primeCount).map(Number).filter(function(p){return primeCount[p]>=2;}).sort(function(a,b){return a-b;});
+  var densLbl=active.map(function(i,k){return 'φ(g'+STRIP_SUB[i]+')/g'+STRIP_SUB[i]+'='+dens[k].toFixed(4);}).join(', ');
+  document.getElementById('gcd-lbl').textContent=(shared.length?('shared primes {'+shared.join(',')+'}'):'no shared primes')+'  ·  '+densLbl;
+  document.getElementById('st-meas').textContent=meas.toFixed(6);
+  document.getElementById('st-meas-sub').textContent=counts.joint+'/'+counts.Rmax+'  ·  |Δ| vs exact = '+Math.abs(meas-J).toExponential(2);
+  document.getElementById('st-ind').textContent=ind.toFixed(6);
+  document.getElementById('st-exact').textContent=J.toFixed(6);
+  document.getElementById('st-rho').textContent=rho.toFixed(6);
+  document.getElementById('st-rho-sub').textContent='measured ρ = '+rhoMeas.toFixed(6)+'  ·  over '+active.length+' strip'+(active.length>1?'s':'');
+  // working table — generalizes gcd(g1,g2) to "primes shared by ≥2 active strips",
+  // each contributing (p/(p−1))^(c−1) where c = how many active strips it divides
+  var html='<tr><th>p shared by ≥2 strips</th><th>#strips ÷ p</th><th>factor (p/(p−1))^(c−1)</th><th>running ρ</th></tr>';
+  if(!shared.length) html+='<tr><td colspan="4">no shared primes across the active strips — ρ = 1, fully independent</td></tr>';
+  else{var run=1;shared.forEach(function(p){
+    var cnt=primeCount[p], f=Math.pow(p/(p-1),cnt-1); run*=f;
+    html+='<tr><td class="red">'+p+'</td><td>'+cnt+'</td><td>'+f.toFixed(6)+'</td><td class="gold">'+run.toFixed(6)+'</td></tr>';});}
+  document.getElementById('work-table').innerHTML=html;
+}
+
+// ── ρ heatmap (exact, gcd-structured) ──
+var HEAT_N=96, heatGeom=null, _heatCache=null, _heatCacheKey='';
+function renderHeat(){
+  var F=fit(document.getElementById('cv-heat')),c=F.c,W=F.W,H=F.H;
+  var key=W+'x'+H;
+  if(_heatCache&&_heatCacheKey===key){
+    c.clearRect(0,0,W,H);
+    c.drawImage(_heatCache,0,0,W,H);
+    _heatMarker(c);
+    return;
+  }
+  c.fillStyle='#030310';c.fillRect(0,0,W,H);
+  var pad=26, side=Math.min(W,H)-pad*2, cw=side/HEAT_N;
+  var ox=(W-side)/2, oy=(H-side)/2;
+  heatGeom={ox:ox,oy:oy,cw:cw};
+  // ρ ranges from 1 up to ~ (2/1)(3/2)(5/4)… — log scale vs max over the grid
+  var maxLog=Math.log(rhoExact(2*3*5*7, 2*3*5*7)); // primorial self-pair bounds the visible range
+  for(var a=1;a<=HEAT_N;a++)for(var b=1;b<=HEAT_N;b++){
+    var v=Math.log(rhoExact(a,b))/maxLog; // 0..~1
+    v=Math.max(0,Math.min(1,v));
+    var hue=45-35*v, li=8+60*v, sa=30+60*v;
+    c.fillStyle=v<=0?'rgba(232,227,219,.05)':'hsl('+hue.toFixed(0)+','+sa.toFixed(0)+'%,'+li.toFixed(0)+'%)';
+    c.fillRect(ox+(a-1)*cw,oy+(b-1)*cw,Math.ceil(cw),Math.ceil(cw));
+  }
+  // axes ticks every 12
+  c.fillStyle='rgba(168,162,148,.7)';c.font="8px 'JetBrains Mono',monospace";c.textAlign='center';
+  for(var t=12;t<=HEAT_N;t+=12){
+    c.fillText(t,ox+(t-.5)*cw,oy+side+12);
+    c.textAlign='right';c.fillText(t,ox-4,oy+(t-.5)*cw+3);c.textAlign='center';
+  }
+  c.textAlign='left';c.fillText('g₁ →',ox+side-24,oy+side+12);
+  c.save();c.translate(ox-16,oy+22);c.rotate(-Math.PI/2);c.fillText('g₂ →',0,0);c.restore();
+  // Cache the finished field (marker excluded) so slider moves are a blit
+  var cv=document.getElementById('cv-heat');
+  _heatCache=document.createElement('canvas');
+  _heatCache.width=cv.width;_heatCache.height=cv.height;
+  _heatCache.getContext('2d').drawImage(cv,0,0);
+  _heatCacheKey=key;
+  _heatMarker(c);
+}
+function _heatMarker(c){
+  if(!heatGeom||g1>HEAT_N||g2>HEAT_N)return;
+  c.strokeStyle='#3dc8b8';c.lineWidth=1.6;
+  c.strokeRect(heatGeom.ox+(g1-1)*heatGeom.cw-1,heatGeom.oy+(g2-1)*heatGeom.cw-1,heatGeom.cw+2,heatGeom.cw+2);
+}
+document.getElementById('cv-heat').addEventListener('click',function(e){
+  if(!heatGeom)return;
+  var rect=this.getBoundingClientRect();
+  var a=Math.floor((e.clientX-rect.left-heatGeom.ox)/heatGeom.cw)+1;
+  var b=Math.floor((e.clientY-rect.top-heatGeom.oy)/heatGeom.cw)+1;
+  if(a>=1&&a<=HEAT_N&&b>=1&&b<=HEAT_N){setG1(a);setG2(b);}
+});
+
+function renderAll(){
+  var counts=renderStrips();
+  renderStats(counts);
+  renderHeat();
+}
+var _rzT=null;
+window.addEventListener('resize',function(){
+  clearTimeout(_rzT);
+  _rzT=setTimeout(renderAll,150);
+});
+updateGRanges();
+[1,2,3,4].forEach(syncLockBtn);
+renderAll();
+</script>
+
+<!-- ── CONTENTS DIRECTORY ──────────────────────────────────────────────────
+     Reviewers asked for "a directory for what's in all the pages". The P1..P15
+     chip bar was already a directory, but the descriptive titles lived only in
+     title= tooltips, which do not exist on touch devices. This surfaces them. -->
+<script>
+(function(){
+  var CSS = '#wgc-btn{display:inline-flex;align-items:center;padding:4px 10px;height:28px;'
+    + 'font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;'
+    + 'background:transparent;border:1px solid rgba(200,168,74,.45);color:#c8a84a;'
+    + "font-family:'JetBrains Mono',monospace;flex-shrink:0;white-space:nowrap;}"
+    + '#wgc-btn:hover{background:rgba(200,168,74,.12);border-color:#c8a84a;}'
+    + '#wgc-panel{display:none;position:fixed;inset:0;z-index:100001;background:rgba(3,3,9,.9);'
+    + '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto;}'
+    + '#wgc-panel.open{display:block;}'
+    + '#wgc-inner{max-width:720px;margin:0 auto;background:#07071a;border:1px solid rgba(255,255,255,.14);padding:22px 20px 24px;}'
+    + '#wgc-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}'
+    + "#wgc-head h2{font-family:'Cinzel',serif;font-size:17px;color:#c8a84a;letter-spacing:.1em;font-weight:500;margin:0;}"
+    + '#wgc-close{margin-left:auto;background:none;border:1px solid rgba(255,255,255,.25);color:#b8b2a6;'
+    + 'font-size:15px;width:28px;height:28px;cursor:pointer;line-height:1;}'
+    + "#wgc-sub{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#89837a;margin:0 0 16px;line-height:1.6;}"
+    + '.wgc-row{display:flex;gap:12px;align-items:flex-start;padding:9px 8px;text-decoration:none;'
+    + 'border-bottom:1px solid rgba(255,255,255,.06);}'
+    + '.wgc-row:hover{background:rgba(255,255,255,.045);}'
+    + '.wgc-row.wgc-cur{background:rgba(200,168,74,.09);}'
+    + '.wgc-row.wgc-opener{margin-top:10px;border-top:1px solid rgba(255,255,255,.14);'
+    + 'border-bottom:none;background:rgba(242,168,74,.05);}'
+    + '.wgc-row.wgc-opener:hover{background:rgba(242,168,74,.11);}'
+    + ".wgc-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;"
+    + 'border:1px solid;padding:3px 7px;flex-shrink:0;min-width:38px;text-align:center;}'
+    + '.wgc-txt{display:flex;flex-direction:column;gap:2px;}'
+    + ".wgc-txt b{font-family:'Spectral',serif;font-size:14.5px;font-weight:500;line-height:1.3;}"
+    + ".wgc-txt i{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:11.5px;color:#89837a;line-height:1.5;}"
+    + '@media(max-width:600px){#wgc-inner{padding:18px 14px 20px;}.wgc-txt b{font-size:13.5px;}}';
+
+  function build(){
+    var bar = document.getElementById('wg-pagenav');
+    if(!bar || document.getElementById('wgc-btn')) return !!bar;
+
+    var st = document.createElement('style'); st.textContent = CSS;
+    document.head.appendChild(st);
+
+    var btn = document.createElement('button');
+    btn.id = 'wgc-btn'; btn.type = 'button';
+    btn.textContent = '\u2630 Contents';
+    btn.title = 'All 15 pages, with what each one covers';
+    // sit immediately after the WESSEN GETACHEW wordmark, before the chips
+    var first = bar.querySelector('span');
+    if(first && first.nextSibling) bar.insertBefore(btn, first.nextSibling);
+    else bar.appendChild(btn);
+
+    var p = document.createElement('div');
+    p.id = 'wgc-panel';
+    p.innerHTML = '<div id="wgc-inner">'
+      + '<div id="wgc-head"><h2>Contents</h2>'
+      + '<button id="wgc-close" type="button" aria-label="Close">\u00d7</button></div>'
+      + '<p id="wgc-sub">Fifteen pages. Page 1 is the guided walkthrough and the place to '
+      + 'start; page 2 is the full explorer. Everything after that is independent \u2014 '
+      + 'read in any order.</p>'
+      + '<a class="wgc-row" href="index.html"><span class="wgc-tag" style="color:#c8a84a;border-color:#c8a84a59;">P1</span><span class="wgc-txt"><b style="color:#c8a84a;">How C(n) Works</b><i>Guided walkthrough — start here</i></span></a><a class="wgc-row" href="page2.html"><span class="wgc-tag" style="color:#7ec87a;border-color:#7ec87a59;">P2</span><span class="wgc-txt"><b style="color:#7ec87a;">C(n) Block-Coprime Density</b><i>The full interactive explorer: six lattice views</i></span></a><a class="wgc-row" href="page3.html"><span class="wgc-tag" style="color:#9b7fe8;border-color:#9b7fe859;">P3</span><span class="wgc-txt"><b style="color:#9b7fe8;">Color &amp; Label Modes</b><i>What every pixel encodes</i></span></a><a class="wgc-row" href="page4.html"><span class="wgc-tag" style="color:#4a9eff;border-color:#4a9eff59;">P4</span><span class="wgc-txt"><b style="color:#4a9eff;">The Prime Filter</b><i>Sieve-of-Eratosthenes view of block-coprimality</i></span></a><a class="wgc-row" href="page5.html"><span class="wgc-tag" style="color:#3dc8b8;border-color:#3dc8b859;">P5</span><span class="wgc-txt"><b style="color:#3dc8b8;">Gap Diagonal Identity</b><i>Diagonal strips and the gap structure</i></span></a><a class="wgc-row wgc-cur" href="page6.html"><span class="wgc-tag" style="color:#e05060;border-color:#e0506059;">P6</span><span class="wgc-txt"><b style="color:#e05060;">Strip Correlations</b><i>Where independence breaks down</i></span></a><a class="wgc-row" href="page7.html"><span class="wgc-tag" style="color:#ff8c42;border-color:#ff8c4259;">P7</span><span class="wgc-txt"><b style="color:#ff8c42;">Multi-Block Density C(n₁,n₂)</b><i>Prime gaps: twin, cousin, sexy</i></span></a><a class="wgc-row" href="page8.html"><span class="wgc-tag" style="color:#ff2fd0;border-color:#ff2fd059;">P8</span><span class="wgc-txt"><b style="color:#ff2fd0;">k-Block Density C(n₁,…,nₖ)</b><i>Prime constellations and k-tuples</i></span></a><a class="wgc-row" href="page9.html"><span class="wgc-tag" style="color:#d2691e;border-color:#d2691e59;">P9</span><span class="wgc-txt"><b style="color:#d2691e;">Character-Twisted Density</b><i>Dirichlet characters C_χ(n)</i></span></a><a class="wgc-row" href="page10.html"><span class="wgc-tag" style="color:#a855f7;border-color:#a855f759;">P10</span><span class="wgc-txt"><b style="color:#a855f7;">Farey &amp; Unit Circle</b><i>Modular residue rings</i></span></a><a class="wgc-row" href="page11.html"><span class="wgc-tag" style="color:#f2c14e;border-color:#f2c14e59;">P11</span><span class="wgc-txt"><b style="color:#f2c14e;">Farey Summatory Function</b><i>Counting Farey fractions</i></span></a><a class="wgc-row" href="page12.html"><span class="wgc-tag" style="color:#ff6b9d;border-color:#ff6b9d59;">P12</span><span class="wgc-txt"><b style="color:#ff6b9d;">The Prime Spiral</b><i>Winding r ≡ ±p (mod M) — explains the radial view</i></span></a><a class="wgc-row" href="page13.html"><span class="wgc-tag" style="color:#06b6d4;border-color:#06b6d459;">P13</span><span class="wgc-txt"><b style="color:#06b6d4;">Gauss Circle ↔ Farey Bridge</b><i>Lattice point counting</i></span></a><a class="wgc-row" href="page14.html"><span class="wgc-tag" style="color:#ef4444;border-color:#ef444459;">P14</span><span class="wgc-txt"><b style="color:#ef4444;">ζ(½ + it) Critical-Line Spiral</b><i>The zeta function on the critical line</i></span></a><a class="wgc-row" href="page15.html"><span class="wgc-tag" style="color:#4ade80;border-color:#4ade8059;">P15</span><span class="wgc-txt"><b style="color:#4ade80;">Sector-Graded Discrepancy</b><i>Farey discrepancy by sector</i></span></a><a class="wgc-row wgc-opener" href="#" data-here="no"><span class="wgc-tag" style="color:#f2a84a;border-color:#f2a84a59;">▶</span><span class="wgc-txt"><b style="color:#f2a84a;">Opener</b><i>The animated welcome teaser — opens on Page 2</i></span></a>'
+      + '</div>';
+    document.body.appendChild(p);
+
+    function close(){ p.classList.remove('open'); }
+    btn.addEventListener('click', function(){ p.classList.toggle('open'); });
+    p.querySelector('#wgc-close').addEventListener('click', close);
+    p.addEventListener('click', function(e){ if(e.target === p) close(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && p.classList.contains('open')) close();
+    });
+
+    // Opener row: on the explorer just open the teaser; from any other page
+    // set the handshake flag the explorer already listens for and navigate in
+    // this tab (no new window).
+    var op = p.querySelector('.wgc-opener');
+    if(op) op.addEventListener('click', function(e){
+      e.preventDefault();
+      if(op.getAttribute('data-here') === 'yes'){
+        close();
+        if(typeof window.openWelcome === 'function') window.openWelcome();
+        return;
+      }
+      try{ sessionStorage.setItem('wg_open_opener','1'); }catch(err){}
+      window.location.href = 'page2.html';
+    });
+    return true;
+  }
+
+  // The nav bar is static markup on some pages and script-built on others,
+  // so poll briefly rather than assuming it exists at DOMContentLoaded.
+  function boot(){
+    if(build()) return;
+    var n = 0, t = setInterval(function(){
+      if(build() || ++n > 40) clearInterval(t);
+    }, 50);
+  }
+  if(document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+</body>
+</html>

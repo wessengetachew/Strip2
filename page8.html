@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C(n₁,…,n_k) — k-Block Coprime Density (Prime Constellations) · Wessen Getachew — Page 8</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+  startup: { ready() { MathJax.startup.defaultReady(); } }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #04040d;
+  --bg1:   #07071a;
+  --bg2:   #0c0c22;
+  --cream: #ddd8cc;
+  --cream2:#b8b2a6;
+  --cream3:#89837a;
+  --gold:  #c8a84a;
+  --gold2: rgba(200,168,74,.12);
+  --teal:  #3dc8b8;
+  --coral: #e05060;
+  --violet:#9b7fe8;
+  --lime:  #7ec87a;
+  --magenta:#ff2fd0;
+  --edge:  rgba(255,255,255,.07);
+  --edge2: rgba(255,255,255,.13);
+  --mono:  'JetBrains Mono', monospace;
+  --serif: 'Spectral', serif;
+  --disp:  'Cinzel', serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--cream);font-family:var(--serif);font-size:.95rem;line-height:1.75;}
+input[type="number"],input[type="range"],select,button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+input[type="number"]{font-size:16px;}
+canvas{touch-action:none;}
+
+#content{max-width:1000px;margin:0 auto;padding:0 20px 100px;}
+#hero{text-align:center;padding:48px 20px 34px;border-bottom:1px solid var(--edge);}
+.hero-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+h1.hero-title{font-family:var(--disp);font-size:clamp(1.2rem,4vw,1.9rem);letter-spacing:.06em;color:var(--cream);margin-bottom:18px;}
+.hero-formula{font-size:1.0rem;margin:14px 0;color:var(--gold);overflow-x:auto;}
+.hero-sub{max-width:70ch;margin:0 auto;color:var(--cream2);font-size:.86rem;}
+
+.card{background:var(--bg1);border:1px solid var(--edge);padding:22px 24px;border-radius:4px;margin:22px 0;}
+.card-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--edge);}
+.card-note{font-size:10px;color:var(--cream3);letter-spacing:.04em;margin-top:8px;line-height:1.7;}
+
+.ctrl-row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:14px;}
+.ctrl-block{flex:1;min-width:200px;}
+.ctrl-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);margin-bottom:6px;display:flex;justify-content:space-between;}
+.ctrl-label span.val{color:var(--teal);font-weight:600;}
+input[type="range"]{width:100%;accent-color:var(--violet);height:3px;}
+
+.stepctrl{display:flex;align-items:center;gap:6px;}
+.stepctrl input[type="range"]{flex:1;}
+.step-btn{
+  width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--edge2);color:var(--teal);cursor:pointer;
+  font-size:13px;font-family:var(--mono);transition:background .1s;
+}
+.step-btn:hover{background:rgba(61,200,184,.1);border-color:var(--teal);}
+.step-num{
+  width:52px;flex-shrink:0;background:var(--bg2);border:1px solid var(--edge2);
+  color:var(--violet);font-family:var(--mono);font-size:12px;font-weight:600;
+  padding:3px 4px;outline:none;text-align:center;
+}
+.step-num:focus{border-color:var(--violet);}
+
+.kblock{background:var(--bg2);border:1px solid var(--edge);border-left:3px solid var(--teal);padding:10px 12px;margin-bottom:8px;}
+.kblock .ctrl-label{margin-bottom:5px;}
+
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px;}
+.result-box{background:var(--bg2);border:1px solid var(--edge);border-left:3px solid var(--teal);padding:12px 14px;}
+.result-box.rho{border-left-color:var(--coral);}
+.result-box .rlabel{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream3);margin-bottom:5px;}
+.result-box .rval{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--cream);word-break:break-all;}
+
+table.dt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;}
+table.dt th{text-align:left;padding:6px 8px;color:var(--cream3);letter-spacing:.06em;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--edge2);}
+table.dt td{padding:5px 8px;border-bottom:1px solid var(--edge);color:var(--cream2);}
+table.dt td:first-child{color:var(--gold);}
+
+.ibox{background:var(--gold2);border-left:3px solid var(--gold);padding:12px 14px;font-size:.82rem;color:var(--cream2);margin:10px 0;}
+.vbox{background:rgba(126,200,122,.06);border-left:3px solid var(--lime);padding:12px 14px;font-size:.82rem;color:var(--cream2);margin:10px 0;}
+
+canvas.plot{width:100%;background:var(--bg2);border:1px solid var(--edge);display:block;}
+.legend{display:flex;gap:16px;font-family:var(--mono);font-size:10px;color:var(--cream3);margin-top:8px;flex-wrap:wrap;}
+.legend span.sw{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px;}
+
+.step{padding:10px 0;border-bottom:1px solid var(--edge);font-size:.85rem;color:var(--cream2);}
+.step:last-child{border-bottom:none;}
+.step .stepnum{font-family:var(--mono);font-size:10px;color:var(--violet);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+
+table.vtab{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10.5px;margin-top:8px;}
+table.vtab th{text-align:left;padding:5px 8px;color:var(--cream3);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--edge2);}
+table.vtab td{padding:5px 8px;border-bottom:1px solid var(--edge);color:var(--cream2);}
+table.vtab td.match{color:var(--lime);}
+
+/* Global decimal-precision bar */
+#decimalBar{
+  position:sticky;top:44px;z-index:500;
+  background:rgba(4,4,13,.96);border-bottom:1px solid var(--edge2);
+  display:flex;align-items:center;gap:10px;padding:7px 20px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cream3);
+}
+#decimalBar input[type="range"]{width:140px;accent-color:var(--gold);}
+#decimalBar .val{color:var(--gold);font-weight:600;min-width:16px;text-align:center;}
+
+/* Clickable table cells */
+table.dt td.clickable{cursor:pointer;transition:background .12s;}
+table.dt td.clickable:hover{background:rgba(200,168,74,.12);color:var(--gold);}
+
+button.wgbtn{background:transparent;border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:all .15s;}
+button.wgbtn:hover{border-color:var(--teal);color:var(--teal);background:rgba(61,200,184,.08);}
+button.wgbtn.playing{background:rgba(224,80,96,.12);border-color:rgba(224,80,96,.35);color:var(--coral);}
+
+.viewtoggle{display:flex;gap:0;}
+.viewtoggle button{background:transparent;border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;cursor:pointer;transition:all .15s;}
+.viewtoggle button:first-child{border-radius:3px 0 0 3px;}
+.viewtoggle button:last-child{border-radius:0 3px 3px 0;border-left:none;}
+.viewtoggle button.active{background:rgba(61,200,184,.14);border-color:var(--teal);color:var(--teal);}
+select.wgselect{background:var(--bg2);border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;padding:6px 8px;outline:none;}
+select.wgselect:focus{border-color:var(--violet);}
+
+/* Explain modal */
+#explainOverlay{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,4,.72);backdrop-filter:blur(2px);
+  align-items:center;justify-content:center;padding:20px;
+}
+#explainOverlay.open{display:flex;}
+#explainModal{
+  background:var(--bg1);border:1px solid var(--edge2);border-radius:6px;
+  max-width:520px;width:100%;max-height:80vh;overflow-y:auto;padding:22px 22px 18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+#explainModal .em-title{font-family:var(--disp);font-size:.95rem;color:var(--gold);letter-spacing:.04em;margin-bottom:4px;}
+#explainModal .em-sub{font-family:var(--mono);font-size:10.5px;color:var(--cream3);letter-spacing:.06em;margin-bottom:14px;}
+#explainModal .em-step{padding:9px 0;border-top:1px solid var(--edge);font-size:.82rem;color:var(--cream2);}
+#explainModal .em-step:first-of-type{border-top:none;}
+#explainModal .em-steplabel{font-family:var(--mono);font-size:10px;color:var(--violet);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+#explainModal .em-math{font-family:var(--mono);font-size:.86rem;color:var(--cream);word-break:break-all;}
+#explainModal .em-frac{display:inline-block;color:var(--teal);word-break:break-all;}
+#explainModal .em-close{
+  float:right;background:none;border:1px solid var(--edge2);color:var(--cream3);
+  width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;border-radius:3px;
+}
+#explainModal .em-close:hover{border-color:var(--coral);color:var(--coral);}
+#explainModal .em-result{
+  margin-top:6px;background:rgba(200,168,74,.08);border-left:3px solid var(--gold);
+  padding:10px 12px;font-family:var(--mono);font-size:.86rem;color:var(--gold);word-break:break-all;
+}
+</style>
+
+<style id="wgc-hide-chips">
+/* Page chips and the in-bar Opener now live inside the Contents panel. */
+#wg-pagenav > a{display:none !important;}
+#wg-pagenav{gap:6px;}
+</style>
+</head>
+<body>
+
+<div id="wg-pagenav" style="position:sticky;top:0;z-index:9999;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 14px;background:#04040d;border-bottom:1px solid rgba(255,255,255,.13);font-family:'JetBrains Mono',monospace;">
+<span style="font-family:'Cinzel',serif;font-size:.7rem;color:#c8a84a;letter-spacing:.14em;margin-right:8px;flex-shrink:0;">WESSEN GETACHEW</span>
+<a href="index.html" title="How C(n) Works — Guided Walkthrough — Page 1" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #c8a84a59;color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='#c8a84a59'">P1</a>
+<a href="page2.html" title="C(n) — Block-Coprime Density Explorer — Page 2" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #7ec87a59;color:#7ec87a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#7ec87a14';this.style.borderColor='#7ec87a'" onmouseout="this.style.background='transparent';this.style.borderColor='#7ec87a59'">P2</a>
+<a href="page3.html" title="Color &amp; Label Modes — The Mathematics — Page 3" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #9b7fe859;color:#9b7fe8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#9b7fe814';this.style.borderColor='#9b7fe8'" onmouseout="this.style.background='transparent';this.style.borderColor='#9b7fe859'">P3</a>
+<a href="page4.html" title="The Prime Filter — Sieve View — Page 4" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #4a9eff59;color:#4a9eff;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#4a9eff14';this.style.borderColor='#4a9eff'" onmouseout="this.style.background='transparent';this.style.borderColor='#4a9eff59'">P4</a>
+<a href="page5.html" title="Gap Diagonal Identity — Page 5" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #3dc8b859;color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='#3dc8b859'">P5</a>
+<a href="page6.html" title="Strip Correlations — Where Independence Breaks — Page 6" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">P6</a>
+<a href="page7.html" title="Multi-Block Coprime Density — Prime Gaps (Twin/Cousin/Sexy) — Page 7" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #ff8c4259;color:#ff8c42;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#ff8c4214';this.style.borderColor='#ff8c42'" onmouseout="this.style.background='transparent';this.style.borderColor='#ff8c4259'">P7</a>
+<a href="page8.html" title="k-Block Coprime Density — Prime Constellations &amp; k-Tuples — Page 8 (current)" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:#ff2fd022;border:1px solid #ff2fd0;color:#ff2fd0;text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;">P8</a>
+<a href="page9.html" title="Dirichlet Character-Twisted Density — Page 9" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #d2691e59;color:#d2691e;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#d2691e14';this.style.borderColor='#d2691e'" onmouseout="this.style.background='transparent';this.style.borderColor='#d2691e59'">P9</a>
+<a href="page10.html" title="Farey &amp; Unit Circle — Page 10" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #a855f759;color:#a855f7;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#a855f714';this.style.borderColor='#a855f7'" onmouseout="this.style.background='transparent';this.style.borderColor='#a855f759'">P10</a>
+<a href="page11.html" title="Farey Sequence Summatory Function — Page 11" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #f2c14e59;color:#f2c14e;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#f2c14e14';this.style.borderColor='#f2c14e'" onmouseout="this.style.background='transparent';this.style.borderColor='#f2c14e59'">P11</a>
+<a href="page12.html" title="The Prime Spiral — Page 12" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #ff6b9d59;color:#ff6b9d;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#ff6b9d14';this.style.borderColor='#ff6b9d'" onmouseout="this.style.background='transparent';this.style.borderColor='#ff6b9d59'">P12</a>
+<a href="page13.html" title="Gauss Circle ↔ Wessen Bridge — Page 13" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #06b6d459;color:#06b6d4;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#06b6d414';this.style.borderColor='#06b6d4'" onmouseout="this.style.background='transparent';this.style.borderColor='#06b6d459'">P13</a>
+<a href="page14.html" title="ζ(½+it) — Critical-Line Spiral — Page 14" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #ef444459;color:#ef4444;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#ef444414';this.style.borderColor='#ef4444'" onmouseout="this.style.background='transparent';this.style.borderColor='#ef444459'">½+it</a>
+<a href="page15.html" title="Sector-Graded Farey Discrepancy — Page 15" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #4ade8059;color:#4ade80;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#4ade8014';this.style.borderColor='#4ade80'" onmouseout="this.style.background='transparent';this.style.borderColor='#4ade8059'">P15</a>
+
+<button onclick="wgFS()" title="Toggle fullscreen" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid rgba(232,227,219,.3);color:rgba(232,227,219,.75);font-family:'JetBrains Mono',monospace;flex-shrink:0;white-space:nowrap;">⛶ Full</button>
+<a href="#" onclick="openOpener();return false;" title="Open the Welcome / Opener Teaser on the home page" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">Opener</a>
+</div>
+
+<div id="decimalBar">
+  <span>Decimal precision (whole page)</span>
+  <input type="range" id="decimalSl" min="2" max="15" value="6" oninput="setDecimals(+this.value)">
+  <span class="val" id="decimalVal">6</span>
+  <span style="color:var(--cream3);opacity:.6;">digits</span>
+</div>
+
+<div id="hero">
+  <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
+  <h1 class="hero-title">C(n₁,…,n_k) — k-Block Coprime Density</h1>
+  <div class="hero-formula">
+    $$C(n_1,\ldots,n_k)\;=\;\zeta(2)\cdot\prod_{p}\left(1-\frac{1}{p}\Big[1-\prod_{i=1}^{k}\Big(1-\tfrac{\min(n_i+1,p)}{p}\Big)\Big]\right)$$
+  </div>
+  <div class="hero-sub">
+    Page 7 built the k=2 case. The same derivation — independence of the M_i across blocks, CRT-independence
+    across primes — carries through for <em>any</em> k with zero modification, and it's exact: verified below
+    by direct combinatorial enumeration mod small primes, not just the asymptotic Euler product. The one new
+    phenomenon at k≥3 is that the correlation ratio ρ_k = D(n₁,…,n_k)/∏ᵢD(nᵢ) doesn't just exceed 1 — it grows
+    geometrically in k, for a clean structural reason (see the derivation card).
+    <strong style="color:var(--gold);">Set every nᵢ=0 and lock the anchors to Mᵢ = M₁+hᵢ</strong> (toggle in
+    the lattice canvas below) and this becomes the finite picture behind prime k-tuples / constellations
+    ℋ={0,h₂,…,h_k} — twins, triples like {0,2,6}, quadruplets like {0,2,6,8}. See "Reading this page as
+    k-tuples" for the exact statement.
+  </div>
+</div>
+
+<div id="content">
+
+  <!-- VERIFICATION -->
+  <div class="card">
+    <div class="card-title">Exact Verification — Brute-Force vs. Formula</div>
+    <div class="vbox">
+      For several (n₁,…,n_k, p), every (r, M₁,…,M_k) tuple mod p was enumerated directly and the survival
+      fraction compared against the closed-form local factor. All five test cases below match to full floating-point
+      precision — this isn't a numerical coincidence, the local-factor derivation is exact combinatorics mod p.
+    </div>
+    <table class="vtab">
+      <thead><tr><th>(n₁,…,n_k)</th><th>p</th><th>brute-force</th><th>formula</th></tr></thead>
+      <tbody>
+        <tr><td>(2, 3, 1)</td><td>7</td><td>0.88213244</td><td>0.88213244</td></tr>
+        <tr><td>(0, 0, 0)</td><td>5</td><td>0.90240000</td><td>0.90240000</td></tr>
+        <tr><td>(4, 1)</td><td>5</td><td>0.80000000</td><td>0.80000000</td></tr>
+        <tr><td>(1, 1, 1, 1)</td><td>5</td><td>0.82592000</td><td>0.82592000</td></tr>
+        <tr><td>(10, 2, 7)</td><td>11</td><td>0.90909091</td><td>0.90909091</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- LIVE CALCULATOR -->
+  <div class="card">
+    <div class="card-title">Live Calculator</div>
+    <div class="ctrl-row">
+      <div class="ctrl-block" style="max-width:260px;">
+        <div class="ctrl-label">k (number of blocks) <span class="val" id="kval">3</span></div>
+        <div class="stepctrl">
+          <button class="step-btn" onclick="stepK(-1)" title="k − 1">−</button>
+          <input type="range" id="ksl" min="1" max="8" value="3" oninput="onKChange()">
+          <button class="step-btn" onclick="stepK(1)" title="k + 1">+</button>
+          <input type="number" id="knum" class="step-num" min="1" max="8" value="3" oninput="onKNumInput()">
+        </div>
+      </div>
+    </div>
+    <div id="nBlocksWrap"></div>
+    <div class="ctrl-row" style="margin-bottom:14px;">
+      <button id="playBtn" class="wgbtn" onclick="togglePlay()" title="Animate n₁ from 0 upward, everything below updates live" style="min-width:110px;">▶ Play n₁</button>
+      <span class="card-note" style="margin-top:0;">Animates n₁ 0→60 (loops), driving the calculator, per-prime table, and lattice canvas together.</span>
+    </div>
+    <div class="result-grid">
+      <div class="result-box"><div class="rlabel">C(n₁,…,n_k)</div><div class="rval" id="rCk">—</div></div>
+      <div class="result-box"><div class="rlabel">∏ᵢ C(nᵢ)</div><div class="rval" id="rProd">—</div></div>
+      <div class="result-box rho"><div class="rlabel">ρ_k = D(n₁,…,n_k) / ∏ᵢD(nᵢ)</div><div class="rval" id="rRhoK">—</div></div>
+    </div>
+    <div class="card-note" id="calcNote">∞ asymptotic product truncated at primes ≤ 2,000,000 — reliable to ~7–8 dp.</div>
+
+    <div style="margin-top:18px;">
+      <div class="card-title" style="margin-bottom:8px;">Per-Prime Local Factors</div>
+      <div class="ctrl-row" style="margin-bottom:8px;align-items:center;">
+        <span class="card-note" style="margin:0;flex:1;">First 500 primes shown (scroll for more) — click any value for its exact step-by-step derivation as a fraction. CSV export covers all ≤2,000,000 (~148,933 rows) at the current k.</span>
+        <button class="wgbtn" id="csvBtn" onclick="exportPrimeCSV()" style="flex:0;white-space:nowrap;">↓ Export CSV</button>
+      </div>
+      <div class="tscroll" style="max-height:400px;overflow-y:auto;">
+        <table class="dt" id="primeTable">
+          <thead><tr><th>p</th><th>f_p(n₁,…,n_k)</th><th>∏ᵢf_p(nᵢ)</th><th title="f_p(n1,...,nk) / prod f_p(ni)">local ρ_p</th></tr></thead>
+          <tbody id="primeTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINITE LATTICE CANVAS (k-block generalization of Page 7's canvas) -->
+  <div class="card">
+    <div class="card-title">Finite Lattice Canvas — G×G, k Blocks</div>
+    <div class="hero-sub" style="max-width:none;margin-bottom:12px;font-size:.82rem;">
+      Same rendering as Page 7, generalized to k blocks: r runs along x, M₁ (block 1) runs along y, and
+      M₂,…,M_k are held at fixed anchors below. Color encodes how many of the k blocks a cell survives —
+      dark = 0, gold = all k. Use the filter to isolate cells surviving at least a chosen number of blocks.
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-block">
+        <div class="ctrl-label">G (grid size) <span class="val" id="gval">80</span></div>
+        <div class="stepctrl">
+          <button class="step-btn" onclick="stepLatVal('g',-1)" title="G − 1">−</button>
+          <input type="range" id="gsl" min="10" max="300" value="80" oninput="onGridChange()">
+          <button class="step-btn" onclick="stepLatVal('g',1)" title="G + 1">+</button>
+          <input type="number" id="gnum" class="step-num" min="10" max="300" value="80" oninput="onLatNumInput('g')">
+        </div>
+      </div>
+    </div>
+    <div class="ctrl-row" style="margin-bottom:10px;align-items:center;">
+      <label style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--cream2);cursor:pointer;">
+        <input type="checkbox" id="constLockChk" onchange="onConstLockToggle()" style="accent-color:var(--gold);"> Lock anchors to Mᵢ = M₁+hᵢ (constellation mode)
+      </label>
+    </div>
+    <div class="ctrl-row" id="constOffsetsRow" style="display:none;margin-bottom:10px;align-items:center;">
+      <div class="ctrl-block" style="min-width:260px;">
+        <div class="ctrl-label" style="justify-content:flex-start;gap:8px;">Offsets h₂,…,h_k (comma-separated, sets k automatically)</div>
+        <input type="text" id="constOffsetsInput" value="2,6" oninput="onConstOffsetsInput()"
+          style="width:100%;background:var(--bg2);border:1px solid var(--edge2);color:var(--cream);font-family:var(--mono);font-size:12px;padding:6px 8px;">
+      </div>
+    </div>
+    <div class="ctrl-row" id="constPresets" style="display:none;margin-bottom:10px;gap:6px;flex-wrap:wrap;">
+      <button class="wgbtn" onclick="setConstPreset('2')" title="k=2, ℋ={0,2} — also set n₁=…=0 for the exact correspondence">Twin {0,2}</button>
+      <button class="wgbtn" onclick="setConstPreset('4')" title="k=2, ℋ={0,4}">Cousin {0,4}</button>
+      <button class="wgbtn" onclick="setConstPreset('6')" title="k=2, ℋ={0,6}">Sexy {0,6}</button>
+      <button class="wgbtn" onclick="setConstPreset('2,6')" title="k=3, ℋ={0,2,6} — admissible prime triple">Triple {0,2,6}</button>
+      <button class="wgbtn" onclick="setConstPreset('4,6')" title="k=3, ℋ={0,4,6} — admissible prime triple">Triple {0,4,6}</button>
+      <button class="wgbtn" onclick="setConstPreset('2,6,8')" title="k=4, ℋ={0,2,6,8} — admissible prime quadruple">Quad {0,2,6,8}</button>
+    </div>
+    <div id="mAnchorsWrap"></div>
+    <div class="ctrl-row" style="margin-bottom:10px;">
+      <div class="ctrl-block" style="flex:0;min-width:auto;">
+        <div class="ctrl-label" style="justify-content:flex-start;gap:8px;">View</div>
+        <div class="viewtoggle">
+          <button id="viewBtnGrid" class="active" onclick="setLatticeView('grid')">Grid</button>
+          <button id="viewBtnRing" onclick="setLatticeView('ring')">Ring</button>
+          <button id="viewBtnRing3D" onclick="setLatticeView('ring3d')">3D Ring</button>
+        </div>
+      </div>
+      <div class="ctrl-block" style="flex:0;min-width:auto;">
+        <div class="ctrl-label" style="justify-content:flex-start;gap:8px;">Color</div>
+        <select id="colorModeSel" class="wgselect" onchange="renderLattice()">
+          <option value="count">Survival count (default)</option>
+          <option value="rainbow">Rainbow (hue by r)</option>
+          <option value="residue">Residue (r mod 6)</option>
+        </select>
+      </div>
+      <div class="ctrl-block">
+        <div class="ctrl-label">Filter — min blocks survived <span class="val" id="filtMinVal">0</span></div>
+        <input type="range" id="filtMinSl" min="0" max="8" value="0" oninput="onFilterChange()">
+      </div>
+    </div>
+    <div class="ctrl-row" id="ring3dCtrls" style="display:none;">
+      <div class="ctrl-block">
+        <div class="ctrl-label">Layers — n₁ depth (block-1 shift) <span class="val" id="r3dLayersVal">6</span></div>
+        <input type="range" id="r3dLayersSl" min="2" max="12" value="6" oninput="onRing3DChange()">
+      </div>
+      <div class="ctrl-block">
+        <div class="ctrl-label">Points / ring <span class="val" id="r3dPtsVal">90</span></div>
+        <input type="range" id="r3dPtsSl" min="24" max="200" value="90" oninput="onRing3DChange()">
+      </div>
+      <div class="ctrl-block" style="flex:0;min-width:auto;">
+        <div class="ctrl-label" style="justify-content:flex-start;">Rotation</div>
+        <button class="step-btn" id="r3dAutoBtn" onclick="toggleRing3DAuto()" style="width:auto;padding:0 12px;height:30px;">▶ Auto</button>
+      </div>
+    </div>
+    <canvas id="latticeCv" class="plot" style="height:420px;image-rendering:pixelated;"></canvas>
+    <div class="legend" id="latticeLegend"></div>
+    <div class="result-grid" id="ring3dReadout" style="display:none;">
+      <div class="result-box"><div class="rlabel">Azimuth / Elevation (rad)</div><div class="rval" id="r3dAzEl">—</div></div>
+      <div class="result-box"><div class="rlabel">Layers × rings × points</div><div class="rval" id="r3dCount">—</div></div>
+    </div>
+    <div class="result-grid">
+      <div class="result-box"><div class="rlabel">Finite fraction surviving all k (G×G count)</div><div class="rval" id="rFiniteFrac">—</div></div>
+      <div class="result-box rho"><div class="rlabel">Asymptotic D(n₁,…,n_k) = C(n₁,…,n_k)/ζ(2)</div><div class="rval" id="rAsympRef">—</div></div>
+    </div>
+    <div class="card-note" id="latticeNote">n capped inside this canvas for render speed — the asymptotic value above uses the true, uncapped n values.</div>
+    <div class="card-note" id="ring3dNote" style="display:none;">Each disk is a full Ring slice at a fixed n₁ (block-1 shift depth) — stacked along the vertical axis like sheets of a covering surface, with a slight angular twist per layer. 4 concentric rings sample M₁ at 38%/58%/78%/98% of G; angle = r. Drag the canvas to orbit, or press Auto.</div>
+  </div>
+
+  <!-- CONSTELLATION READING -->
+  <div class="card">
+    <div class="card-title">Reading This Page as Prime k-Tuples</div>
+    <div class="hero-sub" style="max-width:none;font-size:.85rem;">
+      Turn on <strong>constellation mode</strong> above and set every nᵢ=0, so every block shrinks to a single
+      point: block 1 = {M₁}, block i = {M₁+hᵢ}. As M₁ ranges — exactly what the y-axis of the lattice already
+      sweeps — "some block hits 0 mod p" happens iff M₁ mod p lands in one of the residues occupied by
+      ℋ = {0, h₂, …, h_k}. That set has size ν_p(ℋ), so the per-prime survival probability becomes
+    </div>
+    <div class="hero-formula" style="font-size:.95rem;">
+      $$f_p(\mathcal{H}) \;=\; 1-\frac{\nu_p(\mathcal{H})}{p^2},\qquad \nu_p(\mathcal{H})=\#\{h \bmod p : h\in\mathcal{H}\}$$
+    </div>
+    <div class="hero-sub" style="max-width:none;font-size:.85rem;">
+      ν_p(ℋ) is exactly the quantity that drives the Hardy–Littlewood singular series for the k-tuple
+      conjecture: an admissible ℋ is one with ν_p(ℋ)&lt;p for every prime p (so the pattern isn't ruled out
+      by some prime dividing every shift by 0,…,p−1). {0,2,6} and {0,4,6} are the two admissible prime
+      triples below 8; {0,2,6,8} is the smallest admissible quadruple.
+      <strong>As on Page 7, what's computed here is not the Hardy–Littlewood prime density itself</strong> —
+      that's a claim about M₁, M₁+h₂, …, M₁+h_k being simultaneously prime, which lives on Page 4's prime
+      filter. This page measures the structurally identical but elementary coprimality-density analogue: the
+      density, over random r, of surviving a random point and its k−1 fixed shifts at once. Same ν_p(ℋ),
+      same admissibility condition, fully elementary and exactly computable.
+    </div>
+    <div class="ibox">
+      The "Asymptotic D(n₁,…,n_k)" box in the lattice card above switches to the exact, closed-form value
+      C(ℋ) = ζ(2)·∏ₚ(1−ν_p(ℋ)/p²) automatically once constellation mode + all nᵢ=0 are on — compare it
+      against the live G×G finite fraction directly above it, and against ρ_k below to see how much the
+      shared-r correlation grows as the tuple gets denser.
+    </div>
+  </div>
+
+  <!-- GROWTH PLOT -->
+  <div class="card">
+    <div class="card-title">Correlation Growth — ρ_k(n) vs. k (symmetric case, n₁=⋯=n_k=n)</div>
+    <canvas id="growthCv" class="plot" style="height:340px;"></canvas>
+    <div class="legend" id="growthLegend"></div>
+    <div class="card-note">Log-scale y-axis (ρ spans orders of magnitude). k runs 1–12, computed at full precision (primes ≤ 2,000,000) for each point.</div>
+  </div>
+
+  <!-- DERIVATION -->
+  <div class="card">
+    <div class="card-title">Why ρ_k Grows Geometrically, Not Just &gt;1</div>
+    <div class="step">
+      <div class="stepnum">1 — The formula generalizes with no new assumptions</div>
+      Same setup as Page 7: k independent random starting points M₁,…,M_k, block i has length nᵢ+1. r survives
+      iff it survives every block. At a prime p, independence of the M_i gives
+      P(no block hits 0 mod p) = ∏ᵢ(1 − min(nᵢ+1,p)/p), exactly as before — nothing about the derivation depended on k=2.
+    </div>
+    <div class="step">
+      <div class="stepnum">2 — Per-prime behavior as k grows, n fixed</div>
+      Write q = min(n+1,p)/p ∈ (0,1]. The single-block factor is f_p(1) = 1 − q/p, so f_p(1)^k → 0
+      <em>exponentially</em> in k (it's a fixed number below 1, raised to the k-th power). But the true joint
+      factor is f_p(k) = 1 − (1/p)[1 − (1−q)^k], and (1−q)^k → 0 as k grows, so f_p(k) → 1 − 1/p — a fixed
+      positive limit, <strong>not</strong> decaying to 0.
+    </div>
+    <div class="step">
+      <div class="stepnum">3 — The gap is structural, not a rounding effect</div>
+      The naive independence model (∏C(nᵢ)) requires every one of the k blocks to individually survive — a
+      probability that compounds down geometrically. The true event only requires that not all k blocks hit
+      the same prime at once — a much weaker requirement that saturates near 1−1/p instead of vanishing.
+      Since this happens at essentially every prime simultaneously, the ratio ρ_k = D(n,…,n)/D(n)^k is a product
+      of per-prime terms that are each individually diverging, so ρ_k itself grows without bound as k→∞, for
+      <em>any</em> fixed n ≥ 0.
+    </div>
+    <div class="step">
+      <div class="stepnum">4 — Sanity checks against Pages 1 and 7</div>
+      k=1 collapses the bracket exactly to Page 1's C(n). k=2 is exactly Page 7's C(n₁,n₂) — same formula,
+      no relabeling needed. The brute-force table above confirms both the k=2 and general-k cases are exact,
+      not asymptotic approximations of a different true object.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Sieve of Eratosthenes ──
+const LIMIT = 2000000;
+function sievePrimes(limit){
+  const comp = new Uint8Array(limit+1);
+  const primes = [];
+  for(let i=2;i<=limit;i++){
+    if(!comp[i]){ primes.push(i); for(let j=i*i;j<=limit;j+=i) comp[j]=1; }
+  }
+  return primes;
+}
+let PRIMES_FULL = [];
+const ZETA2 = Math.PI*Math.PI/6;
+
+function localFactor(ns,p){
+  let inner = 1;
+  for(let i=0;i<ns.length;i++){
+    const m = Math.min(ns[i]+1,p);
+    inner *= (1 - m/p);
+  }
+  return 1 - (1/p)*(1-inner);
+}
+function computeC(ns, primes){
+  let prod = 1;
+  for(let i=0;i<primes.length;i++) prod *= localFactor(ns, primes[i]);
+  return ZETA2*prod;
+}
+let DECIMALS = 6;
+function setDecimals(v){
+  DECIMALS = v;
+  document.getElementById('decimalVal').textContent = v;
+  document.getElementById('decimalSl').value = v;
+  recompute();
+  if(window._wg10_latticeReady) renderLattice();
+}
+function fmt(x, d){ return x===undefined||x===null||!isFinite(x) ? '—' : x.toExponential(d===undefined?DECIMALS:d); }
+function fmtF(x, d){ return x===undefined||x===null||!isFinite(x) ? '—' : x.toFixed(d===undefined?DECIMALS:d); }
+
+// ── Dynamic k-block controls ──
+let K = 3;
+function buildBlocks(){
+  const wrap = document.getElementById('nBlocksWrap');
+  let html = '';
+  for(let i=0;i<K;i++){
+    const v = (window._wg10_vals && window._wg10_vals[i]!==undefined) ? window._wg10_vals[i] : 6;
+    html += '<div class="kblock">'
+      + '<div class="ctrl-label">n'+(i+1)+' (block '+(i+1)+' length − 1) <span class="val" id="nval'+i+'">'+v+'</span></div>'
+      + '<div class="stepctrl">'
+      + '<button class="step-btn" onclick="stepN('+i+',-1)" title="n'+(i+1)+' − 1">−</button>'
+      + '<input type="range" id="nsl'+i+'" min="0" max="150" value="'+v+'" oninput="onNChange('+i+')">'
+      + '<button class="step-btn" onclick="stepN('+i+',1)" title="n'+(i+1)+' + 1">+</button>'
+      + '<input type="number" id="nnum'+i+'" class="step-num" min="0" max="150" value="'+v+'" oninput="onNNumInput('+i+')">'
+      + '</div></div>';
+  }
+  wrap.innerHTML = html;
+}
+function currentNs(){
+  const ns = [];
+  for(let i=0;i<K;i++) ns.push(+document.getElementById('nsl'+i).value);
+  window._wg10_vals = ns.slice();
+  return ns;
+}
+function stepK(delta){
+  const sl = document.getElementById('ksl');
+  let v = Math.max(+sl.min, Math.min(+sl.max, K+delta));
+  sl.value = v; document.getElementById('knum').value = v;
+  onKChange();
+}
+function onKNumInput(){
+  const num = document.getElementById('knum');
+  let v = Math.round(+num.value||1);
+  v = Math.max(1, Math.min(8, v));
+  num.value = v; document.getElementById('ksl').value = v;
+  onKChange();
+}
+function onKChange(){
+  K = +document.getElementById('ksl').value;
+  document.getElementById('kval').textContent = K;
+  document.getElementById('knum').value = K;
+  buildBlocks();
+  recompute();
+  if(window._wg10_latticeReady){ buildMAnchors(); renderLattice(); }
+}
+
+// ── Constellation / k-tuple mode: Mi = M1 + hi, offsets parsed from a text field ──
+window._wg10_constOffsets = [2,6];
+function parseOffsets(){
+  const raw = document.getElementById('constOffsetsInput').value;
+  const parts = raw.split(',').map(function(s){ return parseInt(s.trim(),10); })
+    .filter(function(v){ return Number.isFinite(v) && v>0; });
+  return parts.length ? parts : [2];
+}
+function onConstLockToggle(){
+  const on = document.getElementById('constLockChk').checked;
+  document.getElementById('constOffsetsRow').style.display = on ? '' : 'none';
+  document.getElementById('constPresets').style.display = on ? 'flex' : 'none';
+  document.getElementById('mAnchorsWrap').style.display = on ? 'none' : '';
+  if(on) onConstOffsetsInput();
+  else renderLattice();
+}
+function onConstOffsetsInput(){
+  const offsets = parseOffsets();
+  window._wg10_constOffsets = offsets;
+  const kNeeded = Math.min(8, offsets.length+1);
+  if(kNeeded !== K){
+    document.getElementById('ksl').value = kNeeded;
+    document.getElementById('knum').value = kNeeded;
+    onKChange();
+  } else {
+    renderLattice();
+  }
+}
+function setConstPreset(offsetsStr){
+  document.getElementById('constLockChk').checked = true;
+  onConstLockToggle();
+  document.getElementById('constOffsetsInput').value = offsetsStr;
+  const offsets = offsetsStr.split(',').map(function(s){ return parseInt(s.trim(),10); });
+  window._wg10_constOffsets = offsets;
+  const kNeeded = Math.min(8, offsets.length+1);
+  document.getElementById('ksl').value = kNeeded;
+  document.getElementById('knum').value = kNeeded;
+  K = kNeeded;
+  document.getElementById('kval').textContent = K;
+  buildBlocks();
+  // zero every n_i for the exact constellation correspondence
+  for(let i=0;i<K;i++){
+    window._wg10_vals = window._wg10_vals || {};
+  }
+  setTimeout(function(){
+    for(let i=0;i<K;i++){
+      const sl = document.getElementById('nsl'+i), num = document.getElementById('nnum'+i);
+      if(sl){ sl.value = 0; num.value = 0; }
+    }
+    recompute();
+    if(window._wg10_latticeReady){ buildMAnchors(); renderLattice(); }
+  }, 0);
+}
+function stepN(i, delta){
+  const sl = document.getElementById('nsl'+i);
+  let v = Math.max(+sl.min, Math.min(+sl.max, (+sl.value)+delta));
+  sl.value = v; document.getElementById('nnum'+i).value = v;
+  onNChange(i);
+}
+function onNNumInput(i){
+  const num = document.getElementById('nnum'+i);
+  const sl = document.getElementById('nsl'+i);
+  let v = Math.round(+num.value||0);
+  v = Math.max(+sl.min, Math.min(+sl.max, v));
+  num.value = v; sl.value = v;
+  onNChange(i);
+}
+function onNChange(i){
+  document.getElementById('nval'+i).textContent = document.getElementById('nsl'+i).value;
+  document.getElementById('nnum'+i).value = document.getElementById('nsl'+i).value;
+  recompute();
+  if(window._wg10_latticeReady) renderLattice();
+}
+
+// ── Live calculator ──
+function recompute(){
+  const ns = currentNs();
+  const Ck = computeC(ns, PRIMES_FULL);
+  let prodC = 1;
+  const Ci = ns.map(function(n){ const c = computeC([n],PRIMES_FULL); prodC*=c; return c; });
+  // Density-level correlation D(n1..nk)/prod_i D(ni); each C carries one
+  // zeta(2), leaving zeta(2)^(k-1). Equals prod_p rho_p, and rho_1 = 1.
+  const rho = Math.pow(ZETA2, ns.length-1)*Ck/prodC;
+  document.getElementById('rCk').textContent = fmt(Ck);
+  document.getElementById('rProd').textContent = fmt(prodC);
+  document.getElementById('rRhoK').textContent = rho>1e6 ? fmt(rho) : fmtF(rho);
+  renderPrimeTable(ns);
+  const refEl = document.getElementById('rAsympRef');
+  if(refEl) refEl.textContent = fmt(Ck/ZETA2);
+}
+const PRIME_TABLE_ROWS = 500;
+function renderPrimeTable(ns){
+  window._wg10_lastNs = ns.slice();
+  const tb = document.getElementById('primeTbody');
+  let rows = '';
+  const count = Math.min(PRIME_TABLE_ROWS, PRIMES_FULL.length);
+  for(let idx=0; idx<count; idx++){
+    const p = PRIMES_FULL[idx];
+    const fk = localFactor(ns,p);
+    let prodFi = 1;
+    ns.forEach(function(n){ prodFi *= (1-Math.min(n+1,p)/(p*p)); });
+    const rp = fk/prodFi;
+    rows += '<tr>'
+      + '<td class="clickable" onclick="explainCellK('+p+',\'prime\')">'+p+'</td>'
+      + '<td class="clickable" onclick="explainCellK('+p+',\'fk\')">'+fmtF(fk)+'</td>'
+      + '<td class="clickable" onclick="explainCellK('+p+',\'prodf\')">'+fmtF(prodFi)+'</td>'
+      + '<td class="clickable" onclick="explainCellK('+p+',\'rho\')">'+fmtF(rp)+'</td>'
+      + '</tr>';
+  }
+  tb.innerHTML = rows;
+}
+
+// ── Exact-fraction step-by-step explainer (BigInt, since p^(k+1) can exceed safe-integer range for larger p,k) ──
+function bgcd(a,b){ a=a<0n?-a:a; b=b<0n?-b:b; while(b){ const t=b; b=a%b; a=t; } return a; }
+function bfracReduce(num, den){ const g = bgcd(num,den) || 1n; return { num: num/g, den: den/g }; }
+function bfracStr(f){ return f.num.toString()+'/'+f.den.toString(); }
+function bfracVal(f){ return Number(f.num)/Number(f.den); }
+function openExplain(title, sub, steps, resultVal){
+  document.getElementById('emTitle').textContent = title;
+  document.getElementById('emSub').textContent = sub;
+  document.getElementById('emSteps').innerHTML = steps.map(function(s,i){
+    return '<div class="em-step"><div class="em-steplabel">Step '+(i+1)+' — '+s.label+'</div><div class="em-math">'+s.math+'</div></div>';
+  }).join('');
+  document.getElementById('emResult').innerHTML = resultVal;
+  document.getElementById('explainOverlay').classList.add('open');
+}
+function closeExplain(){ document.getElementById('explainOverlay').classList.remove('open'); }
+function explainCellK(p, col){
+  const ns = window._wg10_lastNs || [6];
+  const k = ns.length;
+  const P = BigInt(p);
+  const as = ns.map(function(n){ return BigInt(Math.min(n+1,p)); });
+  const cs = as.map(function(a){ return P - a; });
+
+  if(col==='prime'){
+    const idx = PRIMES_FULL.indexOf(p);
+    openExplain('Prime p = '+p, 'Position #'+(idx+1)+' in the prime sequence used by this page\u2019s Euler product', [
+      { label:'Identity', math:'p = '+p+' is prime' },
+      { label:'Role here', math:'k = '+k+' blocks (n\u2081,\u2026,n_'+k+') = ('+ns.join(', ')+'). This row is prime p\u2019s local factor contribution to C(n\u2081,\u2026,n_k).' }
+    ], 'Next prime: '+(PRIMES_FULL[idx+1]||'—')+' · Previous: '+(idx>0?PRIMES_FULL[idx-1]:'—'));
+    return;
+  }
+
+  // Shared: f_p(n1,...,nk) = [p^(k+1) - p^k + \u220f c_i] / p^(k+1),  c_i = p - a_i
+  let prodC = 1n; cs.forEach(function(c){ prodC *= c; });
+  const fkNum = P**BigInt(k+1) - P**BigInt(k) + prodC;
+  const fkDen = P**BigInt(k+1);
+  const fkFrac = bfracReduce(fkNum, fkDen);
+  const fkDirect = localFactor(ns, p);
+
+  if(col==='fk'){
+    openExplain('f_p(n\u2081,\u2026,n_k) at p = '+p+', k = '+k, '(n\u2081,\u2026,n_k) = ('+ns.join(', ')+')', [
+      { label:'Formula', math:'f_p(n\u2081,\u2026,n_k) = [p^(k+1) \u2212 p^k + \u220f\u1d62(p\u2212a\u1d62)] / p^(k+1),  a\u1d62 = min(n\u1d62+1, p)' },
+      { label:'Substitute a\u1d62', math:'a = ('+as.map(function(a){return a.toString();}).join(', ')+')  \u2192  (p\u2212a\u1d62) = ('+cs.map(function(c){return c.toString();}).join(', ')+')' },
+      { label:'Product of (p\u2212a\u1d62)', math:'\u220f\u1d62(p\u2212a\u1d62) = '+prodC.toString() },
+      { label:'Assemble', math:'p^'+(k+1)+' \u2212 p^'+k+' + '+prodC.toString()+' = '+fkNum.toString()+',  over p^'+(k+1)+' = '+fkDen.toString() },
+      { label:'Exact fraction', math:'<span class="em-frac">'+bfracStr(fkFrac)+'</span>'+(fkFrac.den!==fkDen?' (reduced)':' (already in lowest terms)') }
+    ], bfracStr(fkFrac)+' \u2248 '+fkDirect.toFixed(DECIMALS));
+    return;
+  }
+
+  if(col==='prodf'){
+    // prod_i f_p(n_i) = prod_i (p^2 - a_i) / p^(2k)
+    let prodFNum = 1n; as.forEach(function(a){ prodFNum *= (P*P - a); });
+    const prodFDen = (P*P)**BigInt(k);
+    const prodFFrac = bfracReduce(prodFNum, prodFDen);
+    let prodFDirect = 1; ns.forEach(function(n){ prodFDirect *= (1-Math.min(n+1,p)/(p*p)); });
+    openExplain('\u220f\u1d62 f_p(n\u1d62) at p = '+p+', k = '+k, 'Product of the k single-block factors, as if independent', [
+      { label:'Formula', math:'f_p(n\u1d62) = (p\u00b2\u2212a\u1d62) / p\u00b2  for each block; multiply all k of them' },
+      { label:'Per-block numerators', math:'(p\u00b2\u2212a\u1d62) = ('+as.map(function(a){return (P*P-a).toString();}).join(', ')+')' },
+      { label:'Multiply numerators', math:'\u220f\u1d62(p\u00b2\u2212a\u1d62) = '+prodFNum.toString() },
+      { label:'Denominator', math:'p^(2k) = p^'+(2*k)+' = '+prodFDen.toString() },
+      { label:'Exact fraction', math:'<span class="em-frac">'+bfracStr(prodFFrac)+'</span>'+(prodFFrac.den!==prodFDen?' (reduced)':' (already in lowest terms)') }
+    ], bfracStr(prodFFrac)+' \u2248 '+prodFDirect.toFixed(DECIMALS));
+    return;
+  }
+
+  if(col==='rho'){
+    let prodFNum = 1n; as.forEach(function(a){ prodFNum *= (P*P - a); });
+    const prodFDen = (P*P)**BigInt(k);
+    // rho = (fkNum/fkDen) / (prodFNum/prodFDen) = fkNum*prodFDen / (fkDen*prodFNum)
+    const rNum = fkNum * prodFDen;
+    const rDen = fkDen * prodFNum;
+    const rFrac = bfracReduce(rNum, rDen);
+    let prodFDirect = 1; ns.forEach(function(n){ prodFDirect *= (1-Math.min(n+1,p)/(p*p)); });
+    const rDirect = fkDirect/prodFDirect;
+    openExplain('local \u03c1_p at p = '+p+', k = '+k, 'How far this prime is from independence across all k blocks', [
+      { label:'Formula', math:'\u03c1_p = f_p(n\u2081,\u2026,n_k) / \u220f\u1d62 f_p(n\u1d62)' },
+      { label:'f_p(n\u2081,\u2026,n_k) as a fraction', math:bfracStr({num:fkNum,den:fkDen}) },
+      { label:'\u220f\u1d62 f_p(n\u1d62) as a fraction', math:bfracStr({num:prodFNum,den:prodFDen}) },
+      { label:'Divide fractions', math:'('+fkNum.toString()+'/'+fkDen.toString()+') \u00f7 ('+prodFNum.toString()+'/'+prodFDen.toString()+') = '+rNum.toString()+' / '+rDen.toString() },
+      { label:'Exact fraction', math:'<span class="em-frac">'+bfracStr(rFrac)+'</span>'+(rFrac.den!==rDen?' (reduced)':' (already in lowest terms)') }
+    ], bfracStr(rFrac)+' \u2248 '+rDirect.toFixed(DECIMALS));
+    return;
+  }
+}
+
+function exportPrimeCSV(){
+  const btn = document.getElementById('csvBtn');
+  const orig = btn.textContent;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  setTimeout(function(){
+    const ns = window._wg10_lastNs || currentNs();
+    const parts = new Array(PRIMES_FULL.length+1);
+    parts[0] = 'p,f_p(n1..nk),prod_f_p(ni),local_rho_p';
+    for(let i=0;i<PRIMES_FULL.length;i++){
+      const p = PRIMES_FULL[i];
+      const fk = localFactor(ns,p);
+      let prodFi = 1;
+      ns.forEach(function(n){ prodFi *= (1-Math.min(n+1,p)/(p*p)); });
+      const rp = fk/prodFi;
+      parts[i+1] = p+','+fk.toFixed(10)+','+prodFi.toFixed(10)+','+rp.toFixed(10);
+    }
+    const csv = parts.join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'page8_local_factors_k'+ns.length+'_ns-'+ns.join('-')+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    btn.textContent = orig;
+    btn.disabled = false;
+  }, 30);
+}
+
+// ── Finite lattice canvas, generalized to k blocks (ported from Page 7, extended) ──
+function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ const t=b; b=a%b; a=t; } return a; }
+let _wg10_view = 'grid';
+function setLatticeView(v){
+  if(v==='ring3d' && document.getElementById('constLockChk') && document.getElementById('constLockChk').checked){
+    v = 'grid'; // constellation mode uses dynamic per-row anchors, not wired into the 3D renderer
+  }
+  _wg10_view = v;
+  document.getElementById('viewBtnGrid').classList.toggle('active', v==='grid');
+  document.getElementById('viewBtnRing').classList.toggle('active', v==='ring');
+  document.getElementById('viewBtnRing3D').classList.toggle('active', v==='ring3d');
+  document.getElementById('ring3dCtrls').style.display   = v==='ring3d' ? 'flex' : 'none';
+  document.getElementById('ring3dReadout').style.display = v==='ring3d' ? 'grid' : 'none';
+  document.getElementById('ring3dNote').style.display    = v==='ring3d' ? 'block' : 'none';
+  document.getElementById('latticeNote').style.display   = v==='ring3d' ? 'none' : 'block';
+  const cv = document.getElementById('latticeCv');
+  if(cv) cv.style.cursor = v==='ring3d' ? 'grab' : 'default';
+  renderLattice();
+}
+function buildMAnchors(){
+  const wrap = document.getElementById('mAnchorsWrap');
+  if(K<2){ wrap.innerHTML=''; return; }
+  let html = '<div class="ctrl-row">';
+  for(let i=2;i<=K;i++){
+    const dflt = 1 + (i-2)*23; // staggered defaults so blocks aren't degenerately identical (see card-note)
+    const v = (window._wg10_manc && window._wg10_manc[i]!==undefined) ? window._wg10_manc[i] : dflt;
+    html += '<div class="ctrl-block">'
+      + '<div class="ctrl-label">M'+i+' (block '+i+' anchor, fixed) <span class="val" id="manc'+i+'val">'+v+'</span></div>'
+      + '<div class="stepctrl">'
+      + '<button class="step-btn" onclick="stepLatVal(\'m'+i+'\',-1)" title="M'+i+' \u2212 1">\u2212</button>'
+      + '<input type="range" id="manc'+i+'sl" min="1" max="300" value="'+v+'" oninput="onGridChange()">'
+      + '<button class="step-btn" onclick="stepLatVal(\'m'+i+'\',1)" title="M'+i+' + 1">+</button>'
+      + '<input type="number" id="manc'+i+'num" class="step-num" min="1" max="300" value="'+v+'" oninput="onLatNumInput(\'m'+i+'\')">'
+      + '</div></div>';
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+function latIds(key){
+  if(key==='g') return {sl:'gsl', num:'gnum'};
+  const idx = key.slice(1);
+  return {sl:'manc'+idx+'sl', num:'manc'+idx+'num'};
+}
+function stepLatVal(key, delta){
+  const ids = latIds(key);
+  const sl = document.getElementById(ids.sl);
+  let v = Math.max(+sl.min, Math.min(+sl.max, (+sl.value)+delta));
+  sl.value = v; document.getElementById(ids.num).value = v;
+  onGridChange();
+}
+function onLatNumInput(key){
+  const ids = latIds(key);
+  const num = document.getElementById(ids.num);
+  const sl = document.getElementById(ids.sl);
+  let v = Math.round(+num.value||0);
+  v = Math.max(+sl.min, Math.min(+sl.max, v));
+  num.value = v; sl.value = v;
+  onGridChange();
+}
+function onGridChange(){
+  const G = +document.getElementById('gsl').value;
+  document.getElementById('gval').textContent = G;
+  document.getElementById('gnum').value = G;
+  window._wg10_manc = window._wg10_manc || {};
+  for(let i=2;i<=K;i++){
+    const sl = document.getElementById('manc'+i+'sl');
+    if(sl){
+      document.getElementById('manc'+i+'val').textContent = sl.value;
+      document.getElementById('manc'+i+'num').value = sl.value;
+      window._wg10_manc[i] = +sl.value;
+    }
+  }
+  renderLattice();
+}
+function onFilterChange(){
+  const v = +document.getElementById('filtMinSl').value;
+  document.getElementById('filtMinVal').textContent = v;
+  renderLattice();
+}
+// Color for a cell given how many of the k blocks it survives (0..K)
+function countColor(count, mode, r){
+  const t = K>0 ? count/K : 0;
+  if(mode==='rainbow'){
+    const h = Math.round((r%300)/300*300);
+    return 'hsl('+h+','+(45+t*35)+'%,'+(24+t*32)+'%)';
+  }
+  if(mode==='residue'){
+    const RES_HUES=[0,60,120,180,240,300];
+    const h = RES_HUES[r%6];
+    return 'hsl('+h+','+(40+t*35)+'%,'+(20+t*35)+'%)';
+  }
+  // 'count' (default): dim slate (#3a3f5c) \u2192 gold (#f2c44a) gradient — kept clearly brighter
+  // than the canvas background (#020204) even at count=0, so every cell reads as rendered.
+  const r0=0x3a,g0=0x3f,b0=0x5c, r1=0xf2,g1=0xc4,b1=0x4a;
+  const rr = Math.round(r0+(r1-r0)*t), gg = Math.round(g0+(g1-g0)*t), bb = Math.round(b0+(b1-b0)*t);
+  return 'rgb('+rr+','+gg+','+bb+')';
+}
+function updateLatticeLegendK(mode){
+  const lg = document.getElementById('latticeLegend');
+  lg.innerHTML =
+    '<span><span class="sw" style="background:#3a3f5c;border:1px solid var(--edge2);"></span>0 blocks survived</span>'+
+    '<span><span class="sw" style="background:#f2c44a;"></span>all '+K+' blocks survived</span>'+
+    '<span>color interpolates between them by survival count'+(mode!=='count'?' (hue = '+mode+')':'')+'</span>';
+}
+// Exact asymptotic for the constellation-locked, single-point-block case
+// (every n_i=0, M_i=M1+h_i, H={0,h2,...,hk}): f_p(H) = 1 - nu_p(H)/p^2,
+// nu_p(H) = number of distinct residues mod p among {0, h2, ..., hk}.
+function computeConstC(offsets, primes){
+  const H = [0].concat(offsets);
+  let prod = 1;
+  for(let i=0;i<primes.length;i++){
+    const p = primes[i];
+    const seen = {};
+    let nu = 0;
+    for(let j=0;j<H.length;j++){ const res = H[j]%p; if(!seen[res]){ seen[res]=1; nu++; } }
+    prod *= (1 - nu/(p*p));
+  }
+  return ZETA2*prod;
+}
+function renderLattice(){
+  window._wg10_latticeReady = true;
+  const G = +document.getElementById('gsl').value;
+  const ns = (window._wg10_lastNs || currentNs()).map(function(n){ return Math.min(n,200); });
+  const mode = document.getElementById('colorModeSel').value;
+  const filtMin = +document.getElementById('filtMinSl').value;
+  const constLock = document.getElementById('constLockChk').checked;
+  const offsets = window._wg10_constOffsets || [];
+  updateLatticeLegendK(mode);
+
+  const allZero = ns.every(function(n){ return n===0; });
+  if(constLock && allZero){
+    const Cconst = computeConstC(offsets, PRIMES_FULL);
+    document.getElementById('rAsympRef').textContent = fmt(Cconst/ZETA2)+' (exact, \u2130={0,'+offsets.join(',')+'})';
+  } else if(constLock){
+    document.getElementById('rAsympRef').textContent = '\u2014 (no closed form for n\u1d62>0 in constellation mode; compare against the finite fraction instead)';
+  } else {
+    const Ck = computeC(window._wg10_lastNs || currentNs(), PRIMES_FULL);
+    document.getElementById('rAsympRef').textContent = fmt(Ck/ZETA2);
+  }
+
+  const cv = document.getElementById('latticeCv');
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  const cssW = cv.clientWidth||600, cssH = 420;
+  cv.width = Math.round(cssW*dpr); cv.height = Math.round(cssH*dpr);
+  cv.style.height = cssH+'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle = '#020204';
+  ctx.fillRect(0,0,cssW,cssH);
+
+  if(constLock){
+    document.getElementById('latticeNote').textContent =
+      'Constellation mode: M\u1d62 = M\u2081+h\u1d62 for every row, H = {0,'+offsets.join(',')+'} \u2014 the exact finite picture behind '+
+      'this k-tuple. '+(allZero
+        ? 'With every n\u1d62=0 this matches the "Reading this page as k-tuples" card below exactly.'
+        : 'n\u1d62 are not all 0, so this is a windowed generalization, not the pure constellation statistic \u2014 zero every n\u1d62 above for the exact correspondence.');
+  } else {
+    document.getElementById('latticeNote').textContent =
+      'n\u2081...n_k capped at 200 each inside this canvas for render speed \u2014 the asymptotic value above uses the true, uncapped values. Note: with M\u2082,\u2026,M_k fixed (not averaged), the finite fraction converges to D(n\u2081,\u2026,n_k) as G grows, but converges faster for larger/more \u201cgeneric\u201d anchor values. Anchors default to staggered values (1, 24, 47, \u2026) rather than all 1 \u2014 identical anchors with identical n\u1d62 make those blocks perfectly correlated and collapse part of the survival-count spectrum, which was making most of the canvas render as near-black \u201cmissing\u201d cells at k\u22653.';
+  }
+
+  // Fixed-anchor blocks (2..K): in normal mode these are constants and can be
+  // hoisted out of the M1 loop; in constellation mode M_i = M1+h_i depends on
+  // M1, so the count has to be recomputed per row inside the M1 loop instead.
+  let fixedOkArr = null;
+  if(!constLock){
+    fixedOkArr = new Array(G+1);
+    for(let r=1;r<=G;r++){
+      let count = 0;
+      for(let i=2;i<=K;i++){
+        const Mi = window._wg10_manc && window._wg10_manc[i] ? window._wg10_manc[i] : 1;
+        const ni = ns[i-1];
+        let ok = true;
+        for(let j=0;j<=ni;j++){ if(gcd(r, Mi+j) > 1){ ok=false; break; } }
+        if(ok) count++;
+      }
+      fixedOkArr[r] = count;
+    }
+  }
+  function fixedCountFor(r, M1){
+    if(!constLock) return fixedOkArr[r];
+    let count = 0;
+    for(let i=2;i<=K;i++){
+      const h = offsets[i-2] || 0;
+      const Mi = M1 + h;
+      const ni = ns[i-1];
+      let ok = true;
+      for(let j=0;j<=ni;j++){ if(gcd(r, Mi+j) > 1){ ok=false; break; } }
+      if(ok) count++;
+    }
+    return count;
+  }
+
+  let allCount = 0;
+  const n1 = ns[0];
+
+  if(_wg10_view === 'grid'){
+    const cellW = cssW/G, cellH = cssH/G;
+    for(let r=1; r<=G; r++){
+      for(let M1=1; M1<=G; M1++){
+        let ok1 = true;
+        for(let j=0;j<=n1;j++){ if(gcd(r, M1+j) > 1){ ok1=false; break; } }
+        const total = fixedCountFor(r, M1) + (ok1?1:0);
+        if(total===K) allCount++;
+        if(total < filtMin) continue;
+        ctx.fillStyle = countColor(total, mode, r);
+        const px = (r-1)*cellW, py = cssH - M1*cellH;
+        ctx.fillRect(px, py, Math.max(1,cellW-.4), Math.max(1,cellH-.4));
+      }
+    }
+  } else if(_wg10_view === 'ring3d'){
+    // allCount / rFiniteFrac still reflects the true full G×G survival count
+    // at the current n1..nk (same statistic as Grid/Ring), even though the
+    // 3D render itself only samples a subset of points for speed.
+    // Constellation mode isn't wired into the 3D renderer (which assumes
+    // static anchors), so it's forced back to Grid — see setLatticeView.
+    const fixedForRing = fixedOkArr || (function(){
+      const arr = new Array(G+1);
+      for(let r=1;r<=G;r++) arr[r] = fixedCountFor(r, 1);
+      return arr;
+    })();
+    for(let r=1; r<=G; r++){
+      const fixedCount = fixedForRing[r];
+      for(let M1=1; M1<=G; M1++){
+        let ok1 = true;
+        for(let j=0;j<=n1;j++){ if(gcd(r, M1+j) > 1){ ok1=false; break; } }
+        if(fixedCount + (ok1?1:0) === K) allCount++;
+      }
+    }
+    renderRing3D(ctx, cssW, cssH, G, mode, filtMin, fixedForRing);
+  } else {
+    const cx = cssW/2, cy = cssH/2;
+    const R = Math.min(cssW,cssH)*0.47;
+    const dotR = Math.max(1, R/G*0.9);
+    for(let r=1; r<=G; r++){
+      const theta = 2*Math.PI*(r-1)/G;
+      const cosT = Math.cos(theta), sinT = Math.sin(theta);
+      for(let M1=1; M1<=G; M1++){
+        let ok1 = true;
+        for(let j=0;j<=n1;j++){ if(gcd(r, M1+j) > 1){ ok1=false; break; } }
+        const total = fixedCountFor(r, M1) + (ok1?1:0);
+        if(total===K) allCount++;
+        if(total < filtMin) continue;
+        const rho = (M1/G)*R;
+        const x = cx + rho*cosT, y = cy - rho*sinT;
+        ctx.fillStyle = countColor(total, mode, r);
+        ctx.fillRect(x-dotR/2, y-dotR/2, dotR, dotR);
+      }
+    }
+  }
+  document.getElementById('rFiniteFrac').textContent = fmt(allCount/(G*G));
+}
+
+// ── 3D Ring — stacks the flat Ring view into layers along a vertical axis,
+// one disk per n1 depth (0..layers-1), each disk sampling 4 concentric M1
+// radii × `pts` angular r-positions. A slight per-layer angular twist gives
+// the helicoid/covering-surface look; drag or Auto-rotate to orbit. ──
+let _r3dAz = 0.55, _r3dEl = 0.45, _r3dAuto = false, _r3dAutoId = null;
+let _r3dDragging = false, _r3dLastX = 0, _r3dLastY = 0;
+const _R3D_RING_FRACS = [0.38, 0.58, 0.78, 0.98];
+const _R3D_LAYER_COLORS = ['#e05060','#ff8c42','#f2c14e','#7ec87a','#3dc8b8','#4a9eff','#9b7fe8','#ff2fd0','#00d9ff','#c8a84a','#a855f7','#e05060'];
+function renderRing3D(ctx, cssW, cssH, G, mode, filtMin, fixedOkArr){
+  const layers = +document.getElementById('r3dLayersSl').value;
+  const pts = +document.getElementById('r3dPtsSl').value;
+  document.getElementById('r3dLayersVal').textContent = layers;
+  document.getElementById('r3dPtsVal').textContent = pts;
+  document.getElementById('r3dAzEl').textContent = _r3dAz.toFixed(2)+' / '+_r3dEl.toFixed(2);
+  document.getElementById('r3dCount').textContent = layers+' × '+_R3D_RING_FRACS.length+' × '+pts+' = '+(layers*_R3D_RING_FRACS.length*pts).toLocaleString();
+
+  const cx = cssW/2, cy = cssH*0.54;
+  const R = Math.min(cssW,cssH)*0.34;
+  const spacing = Math.min(cssW,cssH)*0.11;
+  const az=_r3dAz, el=_r3dEl;
+  const cosA=Math.cos(az), sinA=Math.sin(az), cosE=Math.cos(el), sinE=Math.sin(el);
+  function proj(x,y,z){
+    const x1 = x*cosA - z*sinA, z1 = x*sinA + z*cosA;
+    const y1 = y*cosE - z1*sinE, z2 = y*sinE + z1*cosE;
+    const persp = 420/(420+z2);
+    return {sx: cx+x1*persp, sy: cy-y1*persp, z: z2, persp: persp};
+  }
+
+  const items = [];
+  const spineTop = proj(0, (layers-1)/2*spacing + spacing*0.7, 0);
+  const spineBot = proj(0, -((layers-1)/2*spacing + spacing*0.7), 0);
+  items.push({type:'spine', a:spineTop, b:spineBot, z:(spineTop.z+spineBot.z)/2});
+
+  for(let L=0; L<layers; L++){
+    const n1L = L; // this layer's block-1 shift depth
+    const y3 = (L-(layers-1)/2)*spacing;
+    const twist = L*0.14;
+    const col = _R3D_LAYER_COLORS[L%_R3D_LAYER_COLORS.length];
+    // layer outline (outermost ring) — helps the eye read each disk
+    const N=48; let prevEdge=null;
+    for(let i=0;i<=N;i++){
+      const th=2*Math.PI*i/N + twist;
+      const x3=R*Math.cos(th), z3=R*Math.sin(th);
+      const p=proj(x3,y3,z3);
+      if(prevEdge) items.push({type:'edge', a:prevEdge, b:p, z:(prevEdge.z+p.z)/2, color:col});
+      prevEdge=p;
+    }
+    for(let ri=0; ri<_R3D_RING_FRACS.length; ri++){
+      const M1 = Math.max(1, Math.round(_R3D_RING_FRACS[ri]*G));
+      const rad = _R3D_RING_FRACS[ri]*R;
+      for(let i=0;i<pts;i++){
+        const r = 1 + Math.round(i*(G-1)/Math.max(1,pts-1));
+        if(r<1||r>=Math.max(2,G+1)) continue;
+        let ok1=true;
+        for(let j=0;j<=n1L;j++){ if(gcd(r, M1+j) > 1){ ok1=false; break; } }
+        const total = fixedOkArr[r] + (ok1?1:0);
+        if(total < filtMin) continue;
+        const theta = 2*Math.PI*(r-1)/G + twist;
+        const x3 = rad*Math.cos(theta), z3 = rad*Math.sin(theta);
+        const p = proj(x3, y3, z3);
+        items.push({type:'pt', p:p, z:p.z, color: mode==='count' ? countColor(total, mode, r) : col});
+      }
+    }
+  }
+
+  items.sort(function(a,b){ return a.z-b.z; });
+  ctx.save();
+  for(let i=0;i<items.length;i++){
+    const it = items[i];
+    if(it.type==='spine'){
+      ctx.strokeStyle='rgba(200,168,74,.55)'; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(it.a.sx,it.a.sy); ctx.lineTo(it.b.sx,it.b.sy); ctx.stroke();
+    } else if(it.type==='edge'){
+      ctx.strokeStyle=it.color+'35'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(it.a.sx,it.a.sy); ctx.lineTo(it.b.sx,it.b.sy); ctx.stroke();
+    } else {
+      const rad = Math.max(1, 2.3*it.p.persp);
+      ctx.fillStyle = it.color;
+      ctx.beginPath(); ctx.arc(it.p.sx,it.p.sy,rad,0,6.2832); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+function onRing3DChange(){ renderLattice(); }
+function toggleRing3DAuto(){
+  _r3dAuto = !_r3dAuto;
+  const btn = document.getElementById('r3dAutoBtn');
+  if(_r3dAuto){
+    btn.textContent='■ Stop'; btn.style.color='rgba(224,80,96,.9)'; btn.style.borderColor='rgba(224,80,96,.5)';
+    _r3dAutoId = setInterval(function(){ _r3dAz += 0.012; renderLattice(); }, 40);
+  } else {
+    btn.textContent='▶ Auto'; btn.style.color=''; btn.style.borderColor='';
+    if(_r3dAutoId){ clearInterval(_r3dAutoId); _r3dAutoId=null; }
+  }
+}
+function _r3dEventXY(e){ const p=e.touches?e.touches[0]:e; return {x:p.clientX,y:p.clientY}; }
+function _r3dPointerDown(e){
+  if(_wg10_view!=='ring3d') return;
+  _r3dDragging=true; const p=_r3dEventXY(e); _r3dLastX=p.x; _r3dLastY=p.y;
+  const cv=document.getElementById('latticeCv'); if(cv) cv.style.cursor='grabbing';
+}
+function _r3dPointerMove(e){
+  if(!_r3dDragging||_wg10_view!=='ring3d') return;
+  const p=_r3dEventXY(e);
+  const dx=p.x-_r3dLastX, dy=p.y-_r3dLastY;
+  _r3dLastX=p.x; _r3dLastY=p.y;
+  _r3dAz += dx*0.008;
+  _r3dEl = Math.max(-1.4, Math.min(1.4, _r3dEl + dy*0.008));
+  renderLattice();
+  if(e.cancelable) e.preventDefault();
+}
+function _r3dPointerUp(){
+  _r3dDragging=false;
+  const cv=document.getElementById('latticeCv'); if(cv) cv.style.cursor=(_wg10_view==='ring3d'?'grab':'default');
+}
+
+// ── Play button: animates n\u2081, driving the whole page ──
+let _wg10_playId = null;
+function togglePlay(){
+  const btn = document.getElementById('playBtn');
+  if(_wg10_playId){
+    clearInterval(_wg10_playId); _wg10_playId = null;
+    btn.textContent = '\u25b6 Play n\u2081'; btn.classList.remove('playing');
+    return;
+  }
+  btn.textContent = '\u25a0 Stop'; btn.classList.add('playing');
+  _wg10_playId = setInterval(function(){
+    const sl = document.getElementById('nsl0');
+    let v = (+sl.value) + 1;
+    if(v > 60) v = 0;
+    sl.value = v;
+    document.getElementById('nnum0').value = v;
+    onNChange(0);
+  }, 350);
+}
+
+// ── Growth plot: rho_k(n) vs k, symmetric case ──
+const GROWTH_NS = [1,5,10,20];
+const GROWTH_COLORS = ['#3dc8b8','#9b7fe8','#f2c14e','#e05060'];
+function computeGrowthData(){
+  const KMAX = 12;
+  const series = GROWTH_NS.map(function(n){
+    const Cn = computeC([n],PRIMES_FULL);
+    const vals = [];
+    for(let k=1;k<=KMAX;k++){
+      const ns = new Array(k).fill(n);
+      const Ck = computeC(ns,PRIMES_FULL);
+      vals.push(Math.pow(ZETA2,k-1)*Ck/Math.pow(Cn,k));
+    }
+    return {n:n, vals:vals};
+  });
+  return {series:series, KMAX:KMAX};
+}
+function renderGrowth(){
+  const data = computeGrowthData();
+  const cv = document.getElementById('growthCv');
+  const dpr = window.devicePixelRatio||1;
+  const w = cv.clientWidth||900, h = 340;
+  cv.width = w*dpr; cv.height = h*dpr;
+  cv.style.height = h+'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  const pad = {l:56,r:16,t:14,b:28};
+  const pw = w-pad.l-pad.r, ph = h-pad.t-pad.b;
+  let ymin=Infinity, ymax=-Infinity;
+  data.series.forEach(function(s){ s.vals.forEach(function(v){ ymin=Math.min(ymin,v); ymax=Math.max(ymax,v); }); });
+  const logMin = Math.log10(Math.max(ymin,1e-9)), logMax = Math.log10(ymax);
+  function X(k){ return pad.l + ((k-1)/(data.KMAX-1))*pw; }
+  function Y(v){ const lv=Math.log10(Math.max(v,1e-9)); return pad.t + (1-(lv-logMin)/(logMax-logMin))*ph; }
+  ctx.strokeStyle='rgba(255,255,255,.13)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+  ctx.fillStyle='#6a6560'; ctx.font='9px JetBrains Mono, monospace';
+  const decades = Math.ceil(logMax)-Math.floor(logMin);
+  for(let d=Math.floor(logMin); d<=Math.ceil(logMax); d++){
+    const y = pad.t + (1-(d-logMin)/(logMax-logMin))*ph;
+    ctx.fillText('1e'+d, 4, y+3);
+    ctx.strokeStyle='rgba(255,255,255,.06)';
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
+  }
+  for(let k=1;k<=data.KMAX;k++){
+    ctx.fillStyle='#6a6560';
+    ctx.fillText(k, X(k)-3, pad.t+ph+16);
+  }
+  ctx.fillStyle='#8a8378'; ctx.fillText('k \u2192', pad.l+pw-14, pad.t+ph+16);
+  data.series.forEach(function(s, si){
+    ctx.strokeStyle = GROWTH_COLORS[si%GROWTH_COLORS.length]; ctx.lineWidth=1.8;
+    ctx.beginPath();
+    s.vals.forEach(function(v,ki){ const x=X(ki+1), y=Y(v); if(ki===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+    ctx.stroke();
+    ctx.fillStyle = GROWTH_COLORS[si%GROWTH_COLORS.length];
+    s.vals.forEach(function(v,ki){ ctx.beginPath(); ctx.arc(X(ki+1),Y(v),2,0,7); ctx.fill(); });
+  });
+  const lg = document.getElementById('growthLegend');
+  lg.innerHTML = data.series.map(function(s,si){
+    return '<span><span class="sw" style="background:'+GROWTH_COLORS[si%GROWTH_COLORS.length]+';"></span>n = '+s.n+'</span>';
+  }).join('');
+}
+
+// ── Init ──
+window.addEventListener('load', function(){
+  PRIMES_FULL = sievePrimes(LIMIT);
+  document.getElementById('calcNote').textContent =
+    '∞ asymptotic product truncated at primes ≤ 2,000,000 (' + PRIMES_FULL.length.toLocaleString() + ' primes) — reliable to ~7–8 dp.';
+  buildBlocks();
+  recompute();
+  buildMAnchors();
+  renderLattice();
+  renderGrowth();
+  const cv3d = document.getElementById('latticeCv');
+  if(cv3d){
+    cv3d.addEventListener('mousedown', _r3dPointerDown);
+    window.addEventListener('mousemove', _r3dPointerMove);
+    window.addEventListener('mouseup', _r3dPointerUp);
+    cv3d.addEventListener('touchstart', _r3dPointerDown, {passive:true});
+    cv3d.addEventListener('touchmove', _r3dPointerMove, {passive:false});
+    cv3d.addEventListener('touchend', _r3dPointerUp);
+  }
+});
+window.addEventListener('resize', function(){
+  if(PRIMES_FULL.length){ renderGrowth(); renderLattice(); }
+});
+
+function openOpener(){
+  sessionStorage.setItem('wg_open_opener','1');
+  window.open('page2.html','_blank');
+}
+function wgFS(){var d=document;if(d.fullscreenElement){d.exitFullscreen();}else if(d.documentElement.requestFullscreen){d.documentElement.requestFullscreen().catch(function(){});}}
+</script>
+<div id="explainOverlay" onclick="if(event.target===this) closeExplain()">
+  <div id="explainModal">
+    <button class="em-close" onclick="closeExplain()">×</button>
+    <div class="em-title" id="emTitle">—</div>
+    <div class="em-sub" id="emSub">—</div>
+    <div id="emSteps"></div>
+    <div class="em-result" id="emResult">—</div>
+  </div>
+</div>
+
+
+<!-- ── CONTENTS DIRECTORY ──────────────────────────────────────────────────
+     Reviewers asked for "a directory for what's in all the pages". The P1..P15
+     chip bar was already a directory, but the descriptive titles lived only in
+     title= tooltips, which do not exist on touch devices. This surfaces them. -->
+<script>
+(function(){
+  var CSS = '#wgc-btn{display:inline-flex;align-items:center;padding:4px 10px;height:28px;'
+    + 'font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;'
+    + 'background:transparent;border:1px solid rgba(200,168,74,.45);color:#c8a84a;'
+    + "font-family:'JetBrains Mono',monospace;flex-shrink:0;white-space:nowrap;}"
+    + '#wgc-btn:hover{background:rgba(200,168,74,.12);border-color:#c8a84a;}'
+    + '#wgc-panel{display:none;position:fixed;inset:0;z-index:100001;background:rgba(3,3,9,.9);'
+    + '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto;}'
+    + '#wgc-panel.open{display:block;}'
+    + '#wgc-inner{max-width:720px;margin:0 auto;background:#07071a;border:1px solid rgba(255,255,255,.14);padding:22px 20px 24px;}'
+    + '#wgc-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}'
+    + "#wgc-head h2{font-family:'Cinzel',serif;font-size:17px;color:#c8a84a;letter-spacing:.1em;font-weight:500;margin:0;}"
+    + '#wgc-close{margin-left:auto;background:none;border:1px solid rgba(255,255,255,.25);color:#b8b2a6;'
+    + 'font-size:15px;width:28px;height:28px;cursor:pointer;line-height:1;}'
+    + "#wgc-sub{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#89837a;margin:0 0 16px;line-height:1.6;}"
+    + '.wgc-row{display:flex;gap:12px;align-items:flex-start;padding:9px 8px;text-decoration:none;'
+    + 'border-bottom:1px solid rgba(255,255,255,.06);}'
+    + '.wgc-row:hover{background:rgba(255,255,255,.045);}'
+    + '.wgc-row.wgc-cur{background:rgba(200,168,74,.09);}'
+    + '.wgc-row.wgc-opener{margin-top:10px;border-top:1px solid rgba(255,255,255,.14);'
+    + 'border-bottom:none;background:rgba(242,168,74,.05);}'
+    + '.wgc-row.wgc-opener:hover{background:rgba(242,168,74,.11);}'
+    + ".wgc-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;"
+    + 'border:1px solid;padding:3px 7px;flex-shrink:0;min-width:38px;text-align:center;}'
+    + '.wgc-txt{display:flex;flex-direction:column;gap:2px;}'
+    + ".wgc-txt b{font-family:'Spectral',serif;font-size:14.5px;font-weight:500;line-height:1.3;}"
+    + ".wgc-txt i{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:11.5px;color:#89837a;line-height:1.5;}"
+    + '@media(max-width:600px){#wgc-inner{padding:18px 14px 20px;}.wgc-txt b{font-size:13.5px;}}';
+
+  function build(){
+    var bar = document.getElementById('wg-pagenav');
+    if(!bar || document.getElementById('wgc-btn')) return !!bar;
+
+    var st = document.createElement('style'); st.textContent = CSS;
+    document.head.appendChild(st);
+
+    var btn = document.createElement('button');
+    btn.id = 'wgc-btn'; btn.type = 'button';
+    btn.textContent = '\u2630 Contents';
+    btn.title = 'All 15 pages, with what each one covers';
+    // sit immediately after the WESSEN GETACHEW wordmark, before the chips
+    var first = bar.querySelector('span');
+    if(first && first.nextSibling) bar.insertBefore(btn, first.nextSibling);
+    else bar.appendChild(btn);
+
+    var p = document.createElement('div');
+    p.id = 'wgc-panel';
+    p.innerHTML = '<div id="wgc-inner">'
+      + '<div id="wgc-head"><h2>Contents</h2>'
+      + '<button id="wgc-close" type="button" aria-label="Close">\u00d7</button></div>'
+      + '<p id="wgc-sub">Fifteen pages. Page 1 is the guided walkthrough and the place to '
+      + 'start; page 2 is the full explorer. Everything after that is independent \u2014 '
+      + 'read in any order.</p>'
+      + '<a class="wgc-row" href="index.html"><span class="wgc-tag" style="color:#c8a84a;border-color:#c8a84a59;">P1</span><span class="wgc-txt"><b style="color:#c8a84a;">How C(n) Works</b><i>Guided walkthrough — start here</i></span></a><a class="wgc-row" href="page2.html"><span class="wgc-tag" style="color:#7ec87a;border-color:#7ec87a59;">P2</span><span class="wgc-txt"><b style="color:#7ec87a;">C(n) Block-Coprime Density</b><i>The full interactive explorer: six lattice views</i></span></a><a class="wgc-row" href="page3.html"><span class="wgc-tag" style="color:#9b7fe8;border-color:#9b7fe859;">P3</span><span class="wgc-txt"><b style="color:#9b7fe8;">Color &amp; Label Modes</b><i>What every pixel encodes</i></span></a><a class="wgc-row" href="page4.html"><span class="wgc-tag" style="color:#4a9eff;border-color:#4a9eff59;">P4</span><span class="wgc-txt"><b style="color:#4a9eff;">The Prime Filter</b><i>Sieve-of-Eratosthenes view of block-coprimality</i></span></a><a class="wgc-row" href="page5.html"><span class="wgc-tag" style="color:#3dc8b8;border-color:#3dc8b859;">P5</span><span class="wgc-txt"><b style="color:#3dc8b8;">Gap Diagonal Identity</b><i>Diagonal strips and the gap structure</i></span></a><a class="wgc-row" href="page6.html"><span class="wgc-tag" style="color:#e05060;border-color:#e0506059;">P6</span><span class="wgc-txt"><b style="color:#e05060;">Strip Correlations</b><i>Where independence breaks down</i></span></a><a class="wgc-row" href="page7.html"><span class="wgc-tag" style="color:#ff8c42;border-color:#ff8c4259;">P7</span><span class="wgc-txt"><b style="color:#ff8c42;">Multi-Block Density C(n₁,n₂)</b><i>Prime gaps: twin, cousin, sexy</i></span></a><a class="wgc-row wgc-cur" href="page8.html"><span class="wgc-tag" style="color:#ff2fd0;border-color:#ff2fd059;">P8</span><span class="wgc-txt"><b style="color:#ff2fd0;">k-Block Density C(n₁,…,nₖ)</b><i>Prime constellations and k-tuples</i></span></a><a class="wgc-row" href="page9.html"><span class="wgc-tag" style="color:#d2691e;border-color:#d2691e59;">P9</span><span class="wgc-txt"><b style="color:#d2691e;">Character-Twisted Density</b><i>Dirichlet characters C_χ(n)</i></span></a><a class="wgc-row" href="page10.html"><span class="wgc-tag" style="color:#a855f7;border-color:#a855f759;">P10</span><span class="wgc-txt"><b style="color:#a855f7;">Farey &amp; Unit Circle</b><i>Modular residue rings</i></span></a><a class="wgc-row" href="page11.html"><span class="wgc-tag" style="color:#f2c14e;border-color:#f2c14e59;">P11</span><span class="wgc-txt"><b style="color:#f2c14e;">Farey Summatory Function</b><i>Counting Farey fractions</i></span></a><a class="wgc-row" href="page12.html"><span class="wgc-tag" style="color:#ff6b9d;border-color:#ff6b9d59;">P12</span><span class="wgc-txt"><b style="color:#ff6b9d;">The Prime Spiral</b><i>Winding r ≡ ±p (mod M) — explains the radial view</i></span></a><a class="wgc-row" href="page13.html"><span class="wgc-tag" style="color:#06b6d4;border-color:#06b6d459;">P13</span><span class="wgc-txt"><b style="color:#06b6d4;">Gauss Circle ↔ Farey Bridge</b><i>Lattice point counting</i></span></a><a class="wgc-row" href="page14.html"><span class="wgc-tag" style="color:#ef4444;border-color:#ef444459;">P14</span><span class="wgc-txt"><b style="color:#ef4444;">ζ(½ + it) Critical-Line Spiral</b><i>The zeta function on the critical line</i></span></a><a class="wgc-row" href="page15.html"><span class="wgc-tag" style="color:#4ade80;border-color:#4ade8059;">P15</span><span class="wgc-txt"><b style="color:#4ade80;">Sector-Graded Discrepancy</b><i>Farey discrepancy by sector</i></span></a><a class="wgc-row wgc-opener" href="#" data-here="no"><span class="wgc-tag" style="color:#f2a84a;border-color:#f2a84a59;">▶</span><span class="wgc-txt"><b style="color:#f2a84a;">Opener</b><i>The animated welcome teaser — opens on Page 2</i></span></a>'
+      + '</div>';
+    document.body.appendChild(p);
+
+    function close(){ p.classList.remove('open'); }
+    btn.addEventListener('click', function(){ p.classList.toggle('open'); });
+    p.querySelector('#wgc-close').addEventListener('click', close);
+    p.addEventListener('click', function(e){ if(e.target === p) close(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && p.classList.contains('open')) close();
+    });
+
+    // Opener row: on the explorer just open the teaser; from any other page
+    // set the handshake flag the explorer already listens for and navigate in
+    // this tab (no new window).
+    var op = p.querySelector('.wgc-opener');
+    if(op) op.addEventListener('click', function(e){
+      e.preventDefault();
+      if(op.getAttribute('data-here') === 'yes'){
+        close();
+        if(typeof window.openWelcome === 'function') window.openWelcome();
+        return;
+      }
+      try{ sessionStorage.setItem('wg_open_opener','1'); }catch(err){}
+      window.location.href = 'page2.html';
+    });
+    return true;
+  }
+
+  // The nav bar is static markup on some pages and script-built on others,
+  // so poll briefly rather than assuming it exists at DOMContentLoaded.
+  function boot(){
+    if(build()) return;
+    var n = 0, t = setInterval(function(){
+      if(build() || ++n > 40) clearInterval(t);
+    }, 50);
+  }
+  if(document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+</body>
+</html>
