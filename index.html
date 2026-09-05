@@ -485,6 +485,10 @@ the same rule that gives $\min(n+1,p)$.</p>
     <span class="lbl">rotate</span>
     <input type="range" id="cay-rot" min="0" max="360" step="1" value="0" oninput="setCayleyRot(+this.value)">
     <span class="val" id="cay-rot-v">0&deg;</span>
+    <button class="chip crchip" id="cr-0"   onclick="setCayleyRot(0)">0&deg;</button>
+    <button class="chip crchip" id="cr-90"  onclick="setCayleyRot(90)">90&deg;</button>
+    <button class="chip crchip" id="cr-180" onclick="setCayleyRot(180)">180&deg;</button>
+    <button class="chip crchip" id="cr-270" onclick="setCayleyRot(270)">270&deg;</button>
   </div>
   <div class="prow vrow" id="row-cay-zoom">
     <span class="plabel">Zoom out</span>
@@ -500,12 +504,6 @@ the same rule that gives $\min(n+1,p)$.</p>
 
   <div class="prow">
     <span class="plabel">Presets</span>
-    <button class="chip tl" id="ps-gap6"  onclick="preset('gap6')">Gap diagonal · g=6</button>
-    <button class="chip tl" id="ps-gap30" onclick="preset('gap30')">Gap diagonal · g=30</button>
-    <button class="chip"    id="ps-blk5"  onclick="preset('blk5')">C(n) block · n=5</button>
-    <button class="chip"    id="ps-blk29" onclick="preset('blk29')">C(n) block · n=29</button>
-    <button class="chip cr" id="ps-gsm"   onclick="preset('gsm')">Goldbach · N=210 smooth</button>
-    <button class="chip cr" id="ps-grg"   onclick="preset('grg')">Goldbach · N=206 rough</button>
     <button class="chip"    id="ps-f12"   onclick="preset('f12')">Farey ray · 1/2</button>
     <button class="chip"    id="ps-f23"   onclick="preset('f23')">Farey ray · 2/3</button>
   </div>
@@ -597,7 +595,7 @@ the same rule that gives $\min(n+1,p)$.</p>
 
   <div class="prow">
     <span class="plabel">Render</span>
-    <select id="cmode" onchange="redraw(true)">
+    <select id="cmode" onchange="onCModeChange()">
       <optgroup label="Coprimality">
         <option value="binary">Coprime / not</option>
         <option value="density">Block density (grey)</option>
@@ -609,8 +607,14 @@ the same rule that gives $\min(n+1,p)$.</p>
         <option value="omega">gcd &mdash; &omega;(g), distinct primes</option>
         <option value="bomega">gcd &mdash; &Omega;(g), with multiplicity</option>
         <option value="gcdband">gcd &mdash; banded (1 / 2 / 3 / 4-6 / 7+)</option>
+        <option value="depth" selected>block survival depth (C(n))</option>
+        <option value="resmod">residue mod m (r mod M)</option>
+        <option value="moddist">modular distance (min(r,M&minus;r))</option>
+        <option value="phipos">&phi;(M) progression</option>
       </optgroup>
     </select>
+    <button class="chip" id="depth-dir-btn" onclick="toggleDepthDir()"
+      title="Block-survival depth can walk two directions. Horizontal: r fixed, M, M+1, M+2… increasing — the C(n) block direction, per cell. Diagonal: every cell on a sum-diagonal g=r+M shares one value — the survival run starting at that diagonal's own left column and stepping rightward at 45°, gcd-tested against g. Reads full exactly when g is prime. Short diagonals near the grid's corners are capped by their own on-grid length, not always 16, so a genuinely complete short strip still reads full.">Depth dir: Horizontal</button>
     <button class="chip" id="b-strip" onclick="toggleStrip()">Strip: on</button>
     <button class="chip" onclick="resetView()">Reset</button>
   </div>
@@ -748,6 +752,14 @@ the same rule that gives $\min(n+1,p)$.</p>
       <span class="lbl">off-gcd</span>
       <input type="range" id="part-offgcd" min="0" max="100" value="22" oninput="setPartOff(+this.value)" style="width:100px">
       <span class="lbl" id="part-offgcd-v">22%</span>
+      <div class="sep"></div>
+      <span class="lbl" title="Ring/Cayley only: how much brighter the non-strip backdrop is drawn while a partition overlay is active, so the lattice stays visible under all the strip colours instead of reading as dimmed.">backdrop</span>
+      <input type="range" id="part-bgboost" min="100" max="400" value="180" oninput="setPartBgBoost(+this.value)" style="width:100px">
+      <span class="lbl" id="part-bgboost-v">1.8&times;</span>
+      <div class="sep"></div>
+      <span class="lbl" title="All views: a flat dark wash over everything except the strip points themselves, so partitions stick out against the backdrop. Same knob Strip I had.">dim</span>
+      <input type="range" id="part-dim" min="0" max="90" value="50" oninput="setPartDim(+this.value)" style="width:100px">
+      <span class="lbl" id="part-dim-v">50%</span>
       <div class="sep"></div>
       <span class="lbl">batch</span>
       <button class="chip" data-bs="10" onclick="setPartBatch(10)">10</button>
@@ -1055,6 +1067,26 @@ let partHidden = new Set(); // collapsed out of the overlay from the legend
 let partBatch = 40, partPage = 0, partRunIdx = 0;
 let partShow = { sum: true, diff: true };
 let partOff = 0.22;         // alpha multiplier for a strip point with gcd ≠ 1
+// Ring/Cayley's non-strip backdrop is drawn quiet (COPRIME_RGBA and low-alpha
+// dots) so a single strip pops against it — but with Partition mode drawing
+// dozens of strips at once, that same quiet backdrop reads as "everything but
+// the strips went dark". This boosts the backdrop's alpha specifically while
+// a partition overlay is live, independent of the strip colours themselves.
+let partBgBoost = 1.8;
+// The Strip I mechanic you're asking for: a flat darkening wash over the
+// WHOLE plate — base layer, every view — drawn after the backdrop and before
+// the strips, so nothing but the strips themselves is exempt from it. This is
+// independent of partBgBoost above (that one lifts the backdrop's own alpha;
+// this one darkens everything indiscriminately on top, strips included until
+// they're redrawn over it) — the two can be combined or used alone.
+let partDim = 0.5;
+function dimPlateIfPartition(ctx, S) {
+  if (partMode === 'off' || partDim <= 0) return;
+  ctx.save();
+  ctx.fillStyle = 'rgba(4,4,13,' + partDim.toFixed(3) + ')';
+  ctx.fillRect(0, 0, S, S);
+  ctx.restore();
+}
 let PICK = true;            // Strip I's Pick chip: does a click select, or jump?
 /* Strip I's own four strip colours, used whenever a single gap is on screen:
    a teal, b violet, c gold, d coral. In the multi-gap modes these give way to
@@ -1258,7 +1290,105 @@ function cellRGBA(mode, frac, r0, M0) {
     return [GOLD_RGB[0], GOLD_RGB[1], GOLD_RGB[2],
             frac > 0 ? Math.round(255 * Math.min(1, frac * 1.6)) : 0];
   if (mode === 'density') { const v = Math.round(255 * frac); return [v, v, v, 255]; }
+  if (mode === 'depth') return depthRGBA(r0, M0);
+  if (mode === 'resmod') return resmodRGBA(r0, M0);
+  if (mode === 'moddist') return modDistRGBA(r0, M0);
+  if (mode === 'phipos') return phiPositionRGBA(r0, M0);
   return gcdColor(mode, gcd(r0, M0));
+}
+/* Block-coprime survival depth — how many consecutive columns M, M+1, … stay
+   coprime to r before the first miss. This is the per-cell quantity C(n)
+   itself counts: (r,M) survives the block of width n+1 iff depth(r,M) > n.
+   Capped at DEPTH_CAP since the colour only needs to distinguish "shallow"
+   from "deep", not the exact count for depths nobody will dial to. */
+const DEPTH_CAP = 16;
+function blockDepth(r, M) {
+  let n = 0;
+  while (n < DEPTH_CAP && gcd(r, M + n) === 1) n++;
+  return n;
+}
+/* General survival-run length along ANY of the four partition strips
+   (a/b/c/d), not just c. Every strip descriptor is {rLo, rHi, sign, c} with
+   M = sign·r + c, and gcd(r, M) = gcd(r, sign·r+c) reduces to gcd(r, c) no
+   matter the sign (adding/subtracting a multiple of r never changes its gcd
+   with r) — the same reduction partColorAtCell's membership test relies on.
+   So one walk, anchored at the strip's own left column rLo and stepping
+   rightward, covers c's slope −1 sum line, d's mirror, and a/b's slope +1
+   difference lines alike. Capped at whichever is smaller, DEPTH_CAP or the
+   strip's actual on-grid length, so a short strip that survives end to end
+   still reads full instead of shallow for lack of room to walk. */
+function stripSurvivalDepth(rLo, rHi, c) {
+  const cap = Math.min(DEPTH_CAP, rHi - rLo + 1);
+  let n = 0;
+  while (n < cap && gcd(rLo + n, c) === 1) n++;
+  return n;
+}
+function depthGradientRGB(d) {
+  if (d === 0) return [92, 46, 52];
+  const t = d / DEPTH_CAP;                             // 0 shallow -> 1 deep
+  return hsl2rgb(4 + t * 132, 0.62, 0.36 + t * 0.30);   // red -> green
+}
+function blockDepthDiag(r, M) {
+  const g = r + M, G = COP_G || Math.max(r, M);
+  return stripSurvivalDepth(Math.max(1, g - G), Math.min(G, g - 1), g);
+}
+let depthDir = 'h';   // 'h' horizontal (C(n) block direction) | 'd' diagonal (strip c, slope −1)
+function depthRGBA(r, M) {
+  const d = depthDir === 'd' ? blockDepthDiag(r, M) : blockDepth(r, M);
+  const [rr, gg, bb] = depthGradientRGB(d);
+  return [rr, gg, bb, d === 0 ? 210 : 220];
+}
+function toggleDepthDir() {
+  depthDir = depthDir === 'h' ? 'd' : 'h';
+  const btn = $('depth-dir-btn');
+  btn.textContent = 'Depth dir: ' + (depthDir === 'h' ? 'Horizontal' : 'Diagonal (c)');
+  btn.classList.toggle('on', depthDir === 'd');
+  redraw(true);
+}
+function onCModeChange() {
+  $('depth-dir-btn').style.display = ($('cmode').value === 'depth') ? '' : 'none';
+  redraw(true);
+}
+/* Residue of r mod M, as a hue — the same quantity Ring's own angle is built
+   from (θ = 2π·r/M), made visible on Grid and Cayley too. */
+function resmodRGBA(r, M) {
+  if (gcd(r, M) !== 1) return COPRIME_RGBA;
+  const frac = M > 0 ? (r % M) / M : 0;
+  const rgb = hsl2rgb(frac * 300, 0.6, 0.55);
+  return [rgb[0], rgb[1], rgb[2], 215];
+}
+/* Distance from r's residue to the nearer end of the ring, min(rr, M-rr) —
+   symmetric about M/2. Kept in a narrow steel-blue band so it never collides
+   with the strip palette; distance reads via lightness/saturation instead. */
+function modDistRGBA(r, M) {
+  if (gcd(r, M) !== 1) return COPRIME_RGBA;
+  const rr = M > 1 ? (r % M || M) : 1;
+  const half = Math.max(1, Math.floor(M / 2));
+  const ratio = Math.min(rr, M - rr) / half;
+  const rgb = hsl2rgb(216 - ratio * 12, 0.55 + ratio * 0.20, 0.28 + ratio * 0.38);
+  return [rgb[0], rgb[1], rgb[2], 215];
+}
+/* r's position in the ORDERED list of residues coprime to M — spreads each
+   ring's coprime residues evenly across the hue wheel regardless of φ(M),
+   rather than compressing small-M rings and stretching large ones the way a
+   raw residue value would. The rank table is rebuilt once per M and reused
+   for every r sharing that row, since callers sweep r within a fixed M. */
+let _phiPosM = -1, _phiPosArr = null, _phiPosCount = 0;
+function phiPositionRGBA(r, M) {
+  if (gcd(r, M) !== 1) return COPRIME_RGBA;
+  if (_phiPosM !== M) {
+    _phiPosM = M;
+    _phiPosArr = new Int32Array(M + 1).fill(-1);
+    let idx = 0;
+    for (let x = 1; x <= M; x++) if (gcd(x, M) === 1) _phiPosArr[x] = idx++;
+    _phiPosCount = idx;
+  }
+  const rr = M > 1 ? (r % M || M) : 1;
+  const p = _phiPosArr[rr];
+  if (p < 0) return COPRIME_RGBA;
+  const t = _phiPosCount > 0 ? p / _phiPosCount : 0;
+  const rgb = hsl2rgb((t * 360 + M * 7) % 360, 0.82, 0.66);
+  return [rgb[0], rgb[1], rgb[2], 215];
 }
 function hsl2rgb(h, s, l) {
   h /= 360;
@@ -1543,6 +1673,7 @@ function paintView(ctx, S, cap) {
   if (viewMode === 'cayley') { drawCayley(ctx, S); return; }
   if (viewMode === 'ring') {
     drawRingBase(ctx, S, cap);
+    dimPlateIfPartition(ctx, S);
     if (walkMode === 'band') drawRingBand(ctx, S);
     else if (showStrip) drawRingStrip(ctx, S);
     if (ringGuides) drawRingGuides(ctx, S);
@@ -1553,6 +1684,7 @@ function paintView(ctx, S, cap) {
   ctx.imageSmoothingEnabled = COP_G > cap;
   ctx.drawImage(base, 0, 0, S, S);
   ctx.imageSmoothingEnabled = true;
+  dimPlateIfPartition(ctx, S);
   if (walkMode === 'band') drawBandOverlay(ctx, S);
   else if (showStrip) drawStripOverlay(ctx, S);
   drawGridLabels(ctx, S);
@@ -1729,10 +1861,22 @@ function partStripList() {
    is visible at 20× before you commit to it. Membership is arithmetic, not a
    lookup: a strip descriptor holds a cell iff r is in range and M = sign·r+c,
    so this stays cheap over the lens's few hundred cells. */
+/* When the main render is set to diagonal depth, the partition strips pick
+   up that same gradient instead of their fixed a/b/c/d hue — the strip's
+   own survival run (stripSurvivalDepth, anchored at its rLo like the field
+   already is) decides its color, so a highlighted strip that's actually
+   fully coprime (g prime) reads full green, and one that breaks early
+   reads red at the same depth the field underneath would already show. */
+function stripDisplayRGB(st) {
+  if ($('cmode').value === 'depth' && depthDir === 'd') {
+    return depthGradientRGB(stripSurvivalDepth(st.rLo, st.rHi, st.c));
+  }
+  return st.rgb;
+}
 function partColorAtCell(list, r, M) {
   for (const st of list) {
     if (r < st.rLo || r > st.rHi) continue;
-    if (st.sign * r + st.c === M) return st.rgb;
+    if (st.sign * r + st.c === M) return stripDisplayRGB(st);
   }
   return null;
 }
@@ -1750,11 +1894,12 @@ function drawPartitionsOverlay(ctx, S) {
   const budget = 420000;
   ctx.save();
   for (const st of list) {
+    const rgb = stripDisplayRGB(st);
     for (let pass = 0; pass < 2; pass++) {
       const wantCop = pass === 1;
       const a = wantCop ? st.alpha : st.alpha * partOff;
       if (a <= 0.012) continue;
-      ctx.fillStyle = rgbCss(st.rgb, a.toFixed(3));
+      ctx.fillStyle = rgbCss(rgb, a.toFixed(3));
       for (let r = st.rLo; r <= st.rHi; r++) {
         const M = st.sign * r + st.c;
         if (M < 1 || M > G) continue;
@@ -1896,6 +2041,16 @@ function togglePartShow(k) {
 function setPartOff(v) {
   partOff = Math.max(0, Math.min(1, v / 100));
   $('part-offgcd-v').textContent = Math.round(partOff * 100) + '%';
+  redraw(false);
+}
+function setPartBgBoost(v) {
+  partBgBoost = Math.max(1, Math.min(4, v / 100));
+  $('part-bgboost-v').textContent = partBgBoost.toFixed(1) + '\u00d7';
+  redraw(false);
+}
+function setPartDim(v) {
+  partDim = Math.max(0, Math.min(1, v / 100));
+  $('part-dim-v').textContent = Math.round(partDim * 100) + '%';
   redraw(false);
 }
 /* The focused gap. Setting it drops into 'single' unless an overlay mode is
@@ -2209,14 +2364,18 @@ function drawStripOverlay(ctx, S) {
 function drawBandOverlay(ctx, S) {
   // The band is anchored at each M, so there is no single region to outline —
   // mark the surviving cells instead, which is what the AND actually selects.
-  const g = COP_G, k = S / g, w = widthW, cap = Math.min(g, 600);
+  // Sample the full 1..g square via a step rather than truncating to a fixed
+  // 600×600 corner — at G well above 600 that corner is a small fraction of
+  // the lattice, so most of the grid showed nothing at all.
+  const g = COP_G, k = S / g, w = widthW;
+  const step = Math.max(1, Math.ceil(g / 600));
   ctx.save();
   ctx.fillStyle = 'rgba(224,80,96,.85)';
-  const sz = Math.max(1, k);
+  const sz = Math.max(1, k * step);
   let drawn = 0;
-  for (let r = 1; r <= cap && drawn < 400000; r++)
-    for (let M = 1; M + w - 1 <= cap; M++)
-      if (inBand(r, M, w, cap)) { ctx.fillRect((r - 1) * k, (M - 1) * k, sz, sz); drawn++; }
+  for (let r = 1; r <= g && drawn < 400000; r += step)
+    for (let M = 1; M + w - 1 <= g; M += step)
+      if (inBand(r, M, w, g)) { ctx.fillRect((r - 1) * k, (M - 1) * k, sz, sz); drawn++; }
   ctx.restore();
 }
 /* ══════════════════════════════════════════════════════════════════════════
@@ -2313,27 +2472,30 @@ function ringCellAt(dx, dy, S) {
   return ringCellAtRaw(dx * c + dy * sn, -dx * sn + dy * c, S);
 }
 /* Forward-plotted, point by point — the same style Cayley draws in, since
-   Ring IS that same picture (Blaschke at a=0 reproduces it exactly). Capped
-   at 900×900 cells like Cayley's field, so past that G it under-samples
-   rather than lying about density — the bar above still comes from the
-   exact walk, never from these dots. */
+   Ring IS that same picture (Blaschke at a=0 reproduces it exactly). Sampled
+   at a fixed ~900x900 density regardless of G, stepping across the FULL
+   1..g range rather than truncating to the first 900 rows/cols — a fixed
+   cap left everything past M=900 (or r=900) undrawn, an empty void rather
+   than the honest under-sampling the old comment claimed. Past 900 it
+   under-samples, but every part of the lattice gets *some* representation. */
 function ringBase(mode, S) {
-  const key = COP_G + '|' + S + '|' + mode + '|' + ringHole.toFixed(4) + '|' + thetaMode;
+  const boost = partMode !== 'off' ? partBgBoost : 1;
+  const key = COP_G + '|' + S + '|' + mode + '|' + ringHole.toFixed(4) + '|' + thetaMode + '|' + boost;
   if (ringCv && ringKey === key) return ringCv;
   const cv = document.createElement('canvas');
   cv.width = S; cv.height = S;
   const ctx = cv.getContext('2d');
   ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, S, S);
-  const g = COP_G, cap = Math.min(g, 900), step = Math.max(1, Math.floor(cap / 900));
+  const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const C = S / 2;
   const dot = Math.max(1, S * 0.0026);
-  for (let M = 1; M <= cap; M += step) {
+  for (let M = 1; M <= g; M += step) {
     const rad = ringRad(M, S);
-    for (let r = 1; r <= cap; r += step) {
+    for (let r = 1; r <= g; r += step) {
       const cop = isCop(r, M);
       const th = thetaOf(r, M);                 // rotation applied by drawRingBase's transform
       const x = C + rad * Math.cos(th), y = C + rad * Math.sin(th);
-      ctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M) : 'rgba(255,255,255,.05)';
+      ctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M, boost) : 'rgba(255,255,255,' + Math.min(1, .05 * boost).toFixed(3) + ')';
       ctx.fillRect(x - dot / 2, y - dot / 2, dot, dot);
     }
   }
@@ -2377,14 +2539,15 @@ function drawRingStripAt(ctx, S, s, color) {
 }
 function drawRingStrip(ctx, S) { drawRingStripAt(ctx, S, offS, 'rgba(224,80,96,.85)'); }
 function drawRingBand(ctx, S) {
-  const g = COP_G, w = widthW, cap = Math.min(g, 600), C = S / 2;
-  const sz = Math.max(1, ringOuter(S) * (1 - ringHole) / g);
+  const g = COP_G, w = widthW, C = S / 2;
+  const step = Math.max(1, Math.ceil(g / 600));
+  const sz = Math.max(1, ringOuter(S) * (1 - ringHole) / g * step);
   ctx.save();
   ctx.fillStyle = 'rgba(224,80,96,.85)';
   let drawn = 0;
-  for (let r = 1; r <= cap && drawn < 200000; r++)
-    for (let M = 1; M + w - 1 <= cap; M++)
-      if (inBand(r, M, w, cap)) {
+  for (let r = 1; r <= g && drawn < 200000; r += step)
+    for (let M = 1; M + w - 1 <= g; M += step)
+      if (inBand(r, M, w, g)) {
         const rad = ringRad(M, S), th = ringRot + thetaOf(r, M);
         ctx.fillRect(C + rad * Math.cos(th) - sz / 2, C + rad * Math.sin(th) - sz / 2, sz, sz);
         drawn++;
@@ -2480,21 +2643,25 @@ function cayleyBaseKey(S) {
    G² passes the point budget — stated here rather than hidden, same as
    Strip I's own caption for this view. */
 function drawCayleyField(ctx, S) {
-  const key = cayleyBaseKey(S);
+  const boost = partMode !== 'off' ? partBgBoost : 1;
+  const key = cayleyBaseKey(S) + '|' + boost;
   if (cayCv && cayKey === key) { ctx.drawImage(cayCv, 0, 0); return; }
   const cv = document.createElement('canvas');
   cv.width = S; cv.height = S;
   const cctx = cv.getContext('2d');
   cctx.fillStyle = '#04040d'; cctx.fillRect(0, 0, S, S);
-  const g = COP_G, cap = Math.min(g, 900), step = Math.max(1, Math.floor(cap / 900));
+  // Same fix as ringBase: sample the FULL 1..g range at a fixed density
+  // instead of truncating to the first 900 rows/cols, which left everything
+  // past r or M = 900 as an undrawn void once g exceeded that.
+  const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const mode = $('cmode').value;
   const dot = Math.max(1, S * 0.0026 * Math.min(2.4, Math.sqrt(Math.max(1, cayleyZoomIn))));
-  for (let M = 1; M <= cap; M += step) {
-    for (let r = 1; r <= cap; r += step) {
+  for (let M = 1; M <= g; M += step) {
+    for (let r = 1; r <= g; r += step) {
       const cop = isCop(r, M);
       const p = cayleyXY(r, M, S);
       if (!p) continue;
-      cctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M) : 'rgba(255,255,255,.05)';
+      cctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M, boost) : 'rgba(255,255,255,' + Math.min(1, .05 * boost).toFixed(3) + ')';
       cctx.fillRect(p[0] - dot / 2, p[1] - dot / 2, dot, dot);
     }
   }
@@ -2502,10 +2669,13 @@ function drawCayleyField(ctx, S) {
   ctx.drawImage(cv, 0, 0);
 }
 /* cellRGBA returns a Uint8 tuple; the field wants a css string, so wrap it
-   rather than duplicate the colour-mode switch that buildBase already owns. */
-function cellRGBAstr(mode, frac, r, M) {
+   rather than duplicate the colour-mode switch that buildBase already owns.
+   boost (>1) multiplies the alpha channel — used only to lift the Ring/Cayley
+   backdrop while Partition mode is drawing strips over it. */
+function cellRGBAstr(mode, frac, r, M, boost) {
   const c = cellRGBA(mode, frac, r, M);
-  return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (c[3] / 255).toFixed(3) + ')';
+  const a = boost && boost !== 1 ? Math.min(255, Math.round(c[3] * boost)) : c[3];
+  return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (a / 255).toFixed(3) + ')';
 }
 function drawCayleyStripAt(ctx, S, s, color) {
   const g = COP_G, a = slopeA, b = slopeB;
@@ -2513,9 +2683,12 @@ function drawCayleyStripAt(ctx, S, s, color) {
   ctx.save();
   ctx.strokeStyle = color; ctx.fillStyle = color;
   ctx.lineWidth = Math.max(1, S / 500);
-  const cap = Math.min(g, 1400), step = Math.max(1, Math.floor(cap / 1400));
+  // Sample the full 1..g range rather than truncating at M=1400 — the strip
+  // itself was going dark past that M for any g above it, not just the
+  // backdrop cloud.
+  const step = Math.max(1, Math.ceil(g / 1400));
   let n = 0;
-  for (let M = 1; M <= cap; M += step) {
+  for (let M = 1; M <= g; M += step) {
     const lo = Math.max(1, Math.ceil((s + a * M) / b));
     const hi = Math.min(g, Math.ceil((s + widthW + a * M) / b) - 1);
     for (let r = lo; r <= hi; r++) {
@@ -2544,10 +2717,29 @@ function drawCayleyGuides(ctx, S) {
   });
   ctx.restore();
 }
+function drawCayleyBand(ctx, S) {
+  const g = COP_G, w = widthW;
+  const step = Math.max(1, Math.ceil(g / 600));
+  const dot = Math.max(1.4, S * 0.0026 * step);
+  ctx.save();
+  ctx.fillStyle = 'rgba(224,80,96,.85)';
+  let drawn = 0;
+  for (let r = 1; r <= g && drawn < 200000; r += step)
+    for (let M = 1; M + w - 1 <= g; M += step)
+      if (inBand(r, M, w, g)) {
+        const p = cayleyXY(r, M, S);
+        if (!p) continue;
+        ctx.fillRect(p[0] - dot / 2, p[1] - dot / 2, dot, dot);
+        drawn++;
+      }
+  ctx.restore();
+}
 function drawCayley(ctx, S) {
   drawCayleyField(ctx, S);
+  dimPlateIfPartition(ctx, S);
   if (ringGuides) drawCayleyGuides(ctx, S);
-  if (walkMode !== 'band' && showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(224,80,96,.9)');
+  if (walkMode === 'band') drawCayleyBand(ctx, S);
+  else if (showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(224,80,96,.9)');
   drawPartitionsOverlay(ctx, S);
 }
 
@@ -2851,6 +3043,7 @@ function setCayleyRot(deg) {
   deg = ((Math.round(deg) % 360) + 360) % 360;
   cayleyRot = deg;
   $('cay-rot').value = deg; $('cay-rot-v').textContent = deg + '\u00b0';
+  [0, 90, 180, 270].forEach(k => { const b = $('cr-' + k); if (b) b.classList.toggle('on', k === deg); });
   cayKey = ''; redraw(false);
 }
 /* Zoom out (÷1/2/4/8) only does anything for map A: Γ is unbounded, so its
@@ -3187,6 +3380,15 @@ async function exportPNG(px) {
     m, fy + 27 * S);
   ctx.fillText('C(n) block-coprime density   ·   Strip Arithmetic II   ·   part II of the strip series',
     m, fy + 54 * S);
+  if (partMode !== 'off') {
+    const shown = partMode === 'single' ? [partG] : currentPartBatch().filter(it => !partHidden.has(it.g)).map(it => it.g);
+    ctx.fillStyle = PAL.coral;
+    ctx.fillText('partitions ' + partMode + '   ·   E = ' + partE() +
+      '   ·   ' + goldbachGaps().length + ' Goldbach pairs   ·   drawn ' + shown.length +
+      ' {' + shown.slice(0, 24).join(',') + (shown.length > 24 ? ',…' : '') + '}',
+      m, fy + 81 * S);
+    ctx.fillStyle = PAL.cream3;
+  }
   ctx.textAlign = 'right'; ctx.fillStyle = PAL.cream3;
   ctx.fillText('wessengetachew.github.io', px - m, fy);
   ctx.fillStyle = PAL.coral;
@@ -3851,7 +4053,11 @@ function drawLens(px, py) {
       if (mode === 'binary' || mode === 'density') {
         col = isCop(r, M) ? [200, 168, 74, 255] : [22, 24, 44, 255];
       } else {
-        col = gcdColor(mode, gcd(r, M));
+        // Route through cellRGBA rather than gcdColor directly — gcdColor only
+        // knows the gcd-valued modes, so depth/resmod/moddist/phipos (which
+        // need r and M separately, not just gcd(r,M)) were silently falling
+        // through to the wrong branch and drawing gcdband's colours instead.
+        col = cellRGBA(mode, 1, r, M);
       }
       lctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (col[3] / 255) + ')';
       lctx.fillRect(lx, ly, w + .5, w + .5);
@@ -3859,12 +4065,21 @@ function drawLens(px, py) {
         lctx.fillStyle = 'rgba(224,80,96,.32)';
         lctx.fillRect(lx, ly, w + .5, w + .5);
       }
+      let onPartition = false;
       if (plist.length) {
         const pc = partColorAtCell(plist, r, M);
         if (pc) {
+          onPartition = true;
           lctx.fillStyle = rgbCss(pc, isCop(r, M) ? 0.88 : Math.max(0.12, partOff));
           lctx.fillRect(lx, ly, w + .5, w + .5);
         }
+      }
+      // Same flat dim the plate itself draws under Partition mode — the lens
+      // was skipping it entirely, since it paints its own cells from scratch
+      // rather than blitting the canvas the way Ring/Cayley's lens does.
+      if (partMode !== 'off' && partDim > 0 && !onPartition) {
+        lctx.fillStyle = 'rgba(4,4,13,' + partDim.toFixed(3) + ')';
+        lctx.fillRect(lx, ly, w + .5, w + .5);
       }
     }
   }
