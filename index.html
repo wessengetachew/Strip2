@@ -100,6 +100,71 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
 .subtoggle.collapsed .car{transform:rotate(-90deg);}
 .subtoggle.collapsed + .subbody{display:none;}
 
+/* ── COLLAPSED BARS ADVERTISE THEMSELVES ──────────────────────────────────
+   The rows that open the controls read as captions: dim mono text, no plate,
+   no edge. On a phone they get scrolled straight past and the page looks like
+   it has no controls at all. While a bar is COLLAPSED it now carries a tinted
+   plate, a gold edge, an OPEN tag and a slow breathing glow; the caret nudges
+   toward the text it will reveal. Opening any one bar teaches the pattern, so
+   the first open puts .hint-off on <html> and every pulse stops for good. The
+   plate, the edge and the tag stay — only the motion is spent. Expanded bars
+   are untouched, so an open panel never wears a border it doesn't need. */
+@keyframes wgHintGlow{
+  0%,100%{border-color:rgba(200,168,74,.26);box-shadow:0 0 0 0 rgba(200,168,74,0);}
+  50%    {border-color:rgba(200,168,74,.85);box-shadow:0 0 15px -3px rgba(200,168,74,.42);}
+}
+@keyframes wgHintCar{
+  0%,100%{transform:rotate(-90deg) translateX(0);opacity:.6;}
+  50%    {transform:rotate(-90deg) translateX(3px);opacity:1;}
+}
+
+.panel.collapsed > .ptitle,
+.subtoggle.collapsed{
+  background:var(--gold2);
+  border:1px solid rgba(200,168,74,.26);
+  padding:10px 12px;
+  animation:wgHintGlow 2.6s ease-in-out infinite;
+}
+/* The label takes the slack so the caret and the OPEN tag pack to the right. */
+.panel.collapsed > .ptitle > span:first-child{flex:1 1 auto;}
+.subtoggle.collapsed > span:not(.car){flex:1 1 auto;}
+.panel.collapsed > .ptitle .car,
+.subtoggle.collapsed .car{animation:wgHintCar 2.6s ease-in-out infinite;}
+
+.panel.collapsed > .ptitle::after,
+.subtoggle.collapsed::after{
+  content:'OPEN';flex:none;order:1;
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  color:var(--gold);border:1px solid rgba(200,168,74,.42);
+  padding:2px 7px;line-height:1.4;
+}
+.panel.collapsed > .ptitle .car{order:2;}
+
+.panel.collapsed > .ptitle:hover,
+.subtoggle.collapsed:hover{
+  animation:none;background:rgba(200,168,74,.2);border-color:var(--gold);
+  color:var(--cream);box-shadow:none;
+}
+.panel.collapsed > .ptitle:hover .car,
+.subtoggle.collapsed:hover .car{animation:none;opacity:1;}
+
+/* Spent hint: keep the affordance, drop the motion. */
+html.hint-off .panel.collapsed > .ptitle,
+html.hint-off .subtoggle.collapsed{
+  animation:none;border-color:rgba(200,168,74,.3);box-shadow:none;
+}
+html.hint-off .panel.collapsed > .ptitle .car,
+html.hint-off .subtoggle.collapsed .car{animation:none;}
+
+@media (prefers-reduced-motion:reduce){
+  .panel.collapsed > .ptitle,
+  .subtoggle.collapsed,
+  .panel.collapsed > .ptitle .car,
+  .subtoggle.collapsed .car{animation:none !important;}
+  .panel.collapsed > .ptitle,
+  .subtoggle.collapsed{border-color:rgba(200,168,74,.5);}
+}
+
 .ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px;}
 .cg{display:flex;align-items:center;gap:6px;}
 .lbl{font-family:var(--mono);font-size:11px;color:var(--cream3);white-space:nowrap;}
@@ -251,6 +316,11 @@ h2.dsec-h .car{font-family:var(--mono);font-size:12px;color:var(--cream3);margin
 
 .cvwrap{position:relative;background:#04040d;border:1px solid var(--edge);overflow:hidden;}
 canvas.main{display:block;width:100%;height:auto;cursor:crosshair;}
+/* Sits directly over cv2, same box, same backing resolution — it only ever
+   holds the lens's zoom-window outline, so redrawing it on every pointer
+   move is cheap even though the plot underneath (150k points at N=300k)
+   is not something we want to repaint that often. */
+#cv2-hl{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:5;}
 .cvbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
   padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-top:none;
   font-family:var(--mono);font-size:11px;color:var(--cream3);
@@ -303,12 +373,45 @@ th{text-align:left;padding:7px 8px;border-bottom:1px solid var(--edge2);color:va
 td{padding:6px 8px;border-bottom:1px solid var(--edge);color:var(--cream2);}
 td.n{text-align:right;font-variant-numeric:tabular-nums;}
 tr.good td{color:var(--lime);}
+/* Numbered derivation steps inside a fold. Each step is one move in the
+   algebra, so the marker is doing real work and gets the gold; the body sits
+   in the serif face the rest of the prose uses, not the control mono. */
+ol.steps{margin:2px 0 12px;padding-left:0;list-style:none;counter-reset:stp;}
+ol.steps>li{counter-increment:stp;position:relative;padding:0 0 14px 34px;
+  font-family:var(--serif);font-size:14.5px;line-height:1.72;color:var(--cream);}
+ol.steps>li::before{content:counter(stp);position:absolute;left:0;top:2px;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10.5px;color:var(--gold);
+  border:1px solid rgba(200,168,74,.4);}
+ol.steps>li:last-child{padding-bottom:4px;}
+p.stepnote{font-family:var(--serif);font-size:13.5px;line-height:1.7;
+  color:var(--cream2);border-left:2px solid rgba(200,168,74,.35);
+  padding:2px 0 2px 12px;margin:6px 0 4px;}
+/* The centre of the neighbour window. It has to stay findable whether or not
+   it is also a row the corrected prediction lands on, so it is marked by a
+   rule and a tint rather than by recolouring the text, which .good owns. */
+tr.nbr-mid td{background:rgba(200,168,74,.10);
+  border-top:1px solid rgba(200,168,74,.45);border-bottom:1px solid rgba(200,168,74,.45);}
+tr.nbr-mid td:first-child{font-weight:500;color:var(--gold);}
 tr.bad td{color:var(--coral);}
 .scroll{overflow-x:auto;}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media(max-width:760px){.grid2{grid-template-columns:1fr;}
   input[type=range]{width:96px;} #content{padding:0 14px 70px;}}
+
+/* On a phone the plate IS the page, and the gutters were expensive: 14px of
+   #content padding plus 18px of .panel padding on each side cost the lattice
+   64px of width. At G=31 that is the difference between a 13px cell and a
+   10px one — the difference between per-cell labels fitting and being
+   dropped. The canvas breaks out of both gutters and runs edge to edge;
+   everything else in the panel keeps its padding. The side borders go with
+   it, since a border on the screen edge is just a seam. */
+@media(max-width:640px){
+  .panel > .cvwrap{margin-left:-32px;margin-right:-32px;
+    border-left:0;border-right:0;}
+  .panel > .cvwrap.fs-pin{margin-left:0;margin-right:0;}
+}
 
 .foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--edge);
   font-family:var(--mono);font-size:11px;color:var(--cream3);line-height:1.8;}
@@ -319,11 +422,8 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 
 <div id="wg-pagenav">
   <span class="wm">WESSEN GETACHEW</span>
-  <a class="navbtn" href="https://wessengetachew.github.io/smith/page1.html">← Page 1</a>
   <a class="navbtn tealb" href="https://wessengetachew.github.io/smith/page2.html">Explorer</a>
   <a class="navbtn" href="https://wessengetachew.github.io/smith/page5.html">P5 · Gap Diagonal</a>
-  <a class="navbtn" href="https://wessengetachew.github.io/smith/page6.html">P6 · Strip Correlations</a>
-  <a class="navbtn" href="https://wessengetachew.github.io/smith/page8.html">P8 · k-Tuples</a>
   <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
      title="Fullscreen: Strip / block view">⛶ Strip</button>
 </div>
@@ -388,9 +488,9 @@ the whole lattice here instead of along a single strip.</p>
 
 $$ \nu_p(\mathcal{H}) \;=\; \#\{\, h \bmod p \;:\; h \in \mathcal{H} \,\} $$
 
-<p>be the number of <b>distinct residue classes</b> $\mathcal{H}$ occupies mod $p$. That single
-count drives everything. Where two offsets collide mod $p$, $\nu_p$ drops, and the local
-factor relaxes.</p>
+<p>be the number of <b>distinct residue classes</b> $\mathcal{H}$ occupies mod $p$. Every local
+factor on this page is a function of $\nu_p$ and nothing else. Where two offsets collide mod
+$p$, $\nu_p$ drops by one and the local factor relaxes by a corresponding amount.</p>
 
 <div class="grid2">
 <div class="callout">
@@ -402,8 +502,8 @@ $\nu_p = \min(n+1, p)$ — every class is hit once $p \le n+1$. That is exactly 
 <div class="callout">
 <span class="ch">Slope −1 — Goldbach</span>
 <p>$\mathcal{H} = \{0, N\}$, since $r$ and $N-r$ must both be prime. So $\nu_p = 2$ —
-unless $p \mid N$, when the two offsets collide and $\nu_p = 1$. A collision, again,
-just a different cause.</p>
+unless $p \mid N$, when the two offsets fall in the same class and $\nu_p = 1$. The same
+collision as the block case, arrived at by division rather than by pigeonhole.</p>
 </div>
 </div>
 
@@ -414,8 +514,95 @@ $$ \mathfrak{S}(N) \;=\; 2\,C_2 \prod_{\substack{p \mid N \\ p > 2}} \frac{p-1}{
 \qquad C_2 = \prod_{p>2}\left(1 - \frac{1}{(p-1)^2}\right) \approx 0.6601618158 $$
 
 <p>The $p = 2$ collision supplies the leading $2$. Every odd prime dividing $N$ supplies one
-$\frac{p-1}{p-2}$. <b>Nothing was added</b> — the correction is the collision count, read off
-the same rule that gives $\min(n+1,p)$.</p>
+$\frac{p-1}{p-2}$. The correction is not an extra ingredient: it is the collision count,
+read off the same $\nu_p$ that gives $\min(n+1,p)$ in the block case. The algebra is nine
+lines and is worth following once.</p>
+
+<div class="subtoggle collapsed" onclick="toggleSub(this)">
+  <span class="car">&#9662;</span><span>Derivation &mdash; how the product collapses, step by step</span>
+</div>
+<div class="subbody">
+<ol class="steps">
+<li><b>Fix the residue count.</b> With $\mathcal{H}=\{0,N\}$: the two offsets are distinct mod
+$p$ unless $p \mid N$. So $\nu_p = 2$ for $p \nmid N$, and $\nu_p = 1$ for $p \mid N$.</li>
+
+<li><b>Split the product on that dichotomy.</b>
+$$\mathfrak{S}(N) = \prod_{p \mid N} \frac{1 - 1/p}{(1-1/p)^2}
+\;\cdot\; \prod_{p \nmid N} \frac{1 - 2/p}{(1-1/p)^2}$$</li>
+
+<li><b>The divisor factors cancel down.</b> One power of $(1-1/p)$ divides out:
+$$\frac{1-1/p}{(1-1/p)^2} = \frac{1}{1-1/p} = \frac{p}{p-1}$$</li>
+
+<li><b>Handle $p=2$ first, because it is the only factor that could vanish.</b> For the
+non-divisor factor at $p=2$, $1 - 2/p = 0$. That factor never appears: $N$ is even, so
+$2 \mid N$ always, and $p=2$ sits in the divisor branch, contributing
+$\frac{2}{2-1} = 2$. <b>This is where the leading $2$ comes from</b> — not from a convention,
+but from the fact that a Goldbach $N$ is even.</li>
+
+<li><b>Rewrite the non-divisor factor for odd $p$.</b>
+$$\frac{1-2/p}{(1-1/p)^2} = \frac{p(p-2)}{(p-1)^2} = \frac{p^2-2p+1-1}{(p-1)^2}
+= 1 - \frac{1}{(p-1)^2}$$
+which is exactly the factor in Hardy and Littlewood's $C_2$.</li>
+
+<li><b>Complete the product over all odd $p$.</b> The product over $p \nmid N$ is the product
+over <i>all</i> odd $p$ divided by the terms for $p \mid N$:
+$$\prod_{\substack{p \nmid N \\ p>2}}\!\left(1 - \tfrac{1}{(p-1)^2}\right)
+= C_2 \Big/ \prod_{\substack{p \mid N \\ p>2}}\!\left(1 - \tfrac{1}{(p-1)^2}\right)$$
+This is the step that produces $C_2$: it is what is left when the divisors are removed from
+a product that is otherwise over every odd prime.</li>
+
+<li><b>Recombine the two branches, prime by prime.</b> Each odd $p \mid N$ now carries the
+divisor factor from step 3 <i>and</i> the reciprocal from step 6:
+$$\frac{p}{p-1} \cdot \frac{(p-1)^2}{p(p-2)} = \frac{p-1}{p-2}$$</li>
+
+<li><b>Collect.</b> The $p=2$ branch gives $2$, the completed odd product gives $C_2$, and each
+odd $p \mid N$ gives $\frac{p-1}{p-2}$:
+$$\mathfrak{S}(N) = 2\,C_2 \prod_{\substack{p \mid N \\ p>2}} \frac{p-1}{p-2}$$</li>
+
+<li><b>Read the result.</b> $\frac{p-1}{p-2} > 1$ for every odd $p$, so $\mathfrak{S}$ is
+<i>raised</i> by every odd prime factor, and raised most by the small ones ($p=3$ gives
+$2$; $p=97$ gives $1.011$). An $N$ divisible by $3$, $5$ and $7$ carries
+$2 \cdot \tfrac{4}{3} \cdot \tfrac{6}{5} = 3.2$ against a prime-poor neighbour's $2$. That
+ratio, not the size of $N$, is what splits the comet into bands.</li>
+</ol>
+<p class="stepnote">Every equality above is finite algebra on a convergent product. Nothing in
+this derivation is conjectural; what <i>is</i> conjectural is that $\mathfrak{S}(N)\,\mathrm{li}_2(N)$
+predicts $r(N)$ at all, which is stated separately in &sect;4.</p>
+</div>
+
+<div class="subtoggle collapsed" onclick="toggleSub(this)">
+  <span class="car">&#9662;</span><span>Derivation &mdash; where $D(n) = \prod_p (1 - \nu_p/p^2)$ comes from</span>
+</div>
+<div class="subbody">
+<ol class="steps">
+<li><b>State the event.</b> A cell $(r,M)$ survives when $\gcd(r, M+j) = 1$ for every
+$j = 0,\dots,n$. It fails when some prime $p$ divides $r$ <i>and</i> divides at least one
+member of the block.</li>
+
+<li><b>Work one prime at a time.</b> Fix $p$ and treat $r$ and $M$ as uniform and independent
+mod $p$. Then $p \mid r$ with probability $1/p$.</li>
+
+<li><b>Count how much of the block $p$ can hit.</b> Given $p \mid r$, the failure needs
+$M + j \equiv 0$ for some $j \le n$, i.e. $-M$ must land in the set $\mathcal{H} = \{0,\dots,n\}$
+reduced mod $p$. That set occupies $\nu_p = \min(n+1, p)$ classes, so this happens with
+probability $\nu_p/p$.</li>
+
+<li><b>Multiply for the local failure rate.</b> The two conditions are independent, so $p$
+spoils the cell with probability $\tfrac{1}{p}\cdot\tfrac{\nu_p}{p} = \nu_p/p^2$, and the local
+survival factor is $1 - \nu_p/p^2$.</li>
+
+<li><b>Multiply across primes.</b> Conditions at distinct primes are independent by CRT, giving
+$$D(n) = \prod_p \left(1 - \frac{\nu_p}{p^2}\right)$$</li>
+
+<li><b>Read the saturation.</b> Once $p \le n+1$ the block covers every class, $\nu_p = p$, and
+the factor becomes $1 - p/p^2 = 1 - 1/p$. It cannot fall further no matter how much $n$ grows.
+That is why $C(n)$ flattens: the small primes are already fully committed, and only primes
+above $n+1$ are still contributing anything new.</li>
+</ol>
+<p class="stepnote">Steps 2 and 5 are the heuristic ones &mdash; uniformity mod $p$ and
+independence across $p$. The <i>identity</i> $\nu_p = \min(n+1,p)$ in step 3 is exact, and the
+self-test panel below measures $D(n)$ against a direct walk rather than assuming the product.</p>
+</div>
 
 </div>
 </section>
@@ -436,6 +623,15 @@ the same rule that gives $\min(n+1,p)$.</p>
     <button class="chip viewchip" data-view="ring" onclick="setView('ring')">Ring &mdash; polar, M outward</button>
     <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')">Cayley &mdash; residues mod m</button>
     <span class="lbl" id="view-lbl"></span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Turn</span>
+    <button class="chip rotchip on" data-q="0" onclick="setViewQuarter(0)" title="No turn. Ring &theta;=0 sits on the right and the grid origin in the top-left corner — the raster's own frame.">0</button>
+    <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
+    <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
+    <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
+    <span class="lbl">one turn, all three views</span>
   </div>
 
   <div class="prow vrow" id="row-ring">
@@ -612,6 +808,17 @@ the same rule that gives $\min(n+1,p)$.</p>
         <option value="moddist">modular distance (min(r,M&minus;r))</option>
         <option value="phipos">&phi;(M) progression</option>
       </optgroup>
+      <optgroup label="The block &mdash; reads the width slider as n = w&minus;1">
+        <option value="sat">saturation &mdash; smallest prime p &le; n+1 dividing r</option>
+        <option value="failp">first failing prime in the block</option>
+        <option value="jstar">j* &mdash; which slot in the block kills it</option>
+      </optgroup>
+      <optgroup label="Gaussian integers &mdash; z = r + iM">
+        <option value="gprime">Gaussian prime / composite / imprimitive</option>
+        <option value="gsplit">splitting of N(z) &mdash; ramified / split / inert</option>
+        <option value="gomega">&Omega;(z) in Z[i] &mdash; Gaussian factor count</option>
+        <option value="qres">quadratic residues mod M</option>
+      </optgroup>
     </select>
     <button class="chip" id="depth-dir-btn" onclick="toggleDepthDir()"
       title="Block-survival depth can walk two directions. Horizontal: r fixed, M, M+1, M+2… increasing — the C(n) block direction, per cell. Diagonal: every cell on a sum-diagonal g=r+M shares one value — the survival run starting at that diagonal's own left column and stepping rightward at 45°, gcd-tested against g. Reads full exactly when g is prime. Short diagonals near the grid's corners are capped by their own on-grid length, not always 16, so a genuinely complete short strip still reads full.">Depth dir: Horizontal</button>
@@ -683,6 +890,12 @@ the same rule that gives $\min(n+1,p)$.</p>
       </optgroup>
       <option value="off">off</option>
     </select>
+    <span class="lbl">size</span>
+    <input type="range" id="lbl-sc" min="0.4" max="3" step="0.05" value="1"
+           oninput="setLabelScale(+this.value)"
+           title="How large labels want to be. The cell is a hard ceiling — past the point where a label fills its cell this stops growing it, so nothing ever crosses a block edge.">
+    <span class="val" id="lbl-sc-v">1.00&times;</span>
+    <button class="chip" onclick="setLabelScale(1);$('lbl-sc').value=1;">reset</button>
   </div>
 
   </div>
@@ -712,6 +925,29 @@ the same rule that gives $\min(n+1,p)$.</p>
 
     <div id="part-hud">&mdash;</div>
     <div id="part-legend"><span class="lg">overlay off</span></div>
+
+    <!-- G, mirrored from §2's lattice controls. Every number in this panel is
+         downstream of E = 2(G+1), so changing G is a partitions move as much
+         as a lattice one — and G lived a full panel and a scroll away. Same
+         handlers, same G: no presets and no Play, just prime jumps, +-1, the
+         box, and the slider. onG remains the only writer, so this and the
+         original can never disagree. -->
+    <div class="ctrls" id="part-g-row">
+      <span class="lbl">lattice G</span>
+      <div class="stepper">
+        <button class="sbtn pj" onclick="stopGPlay();pj('g',-1)" title="Previous prime">&#9668;P</button>
+        <button class="sbtn" onclick="stopGPlay();bump('g',-1)" title="&minus;1">&minus;</button>
+        <input class="sval" id="pg-num" type="number" min="2" max="10000" value="31"
+               onchange="stopGPlay();onG(+this.value)">
+        <button class="sbtn" onclick="stopGPlay();bump('g',1)" title="+1">+</button>
+        <button class="sbtn pj" onclick="stopGPlay();pj('g',1)" title="Next prime">P&#9658;</button>
+      </div>
+      <span class="prime-tag" id="pg-pt">prime</span>
+      <input type="range" id="pg-sl" min="2" max="4096" step="1" value="31"
+             oninput="stopGPlay();onG(+this.value)">
+      <span class="val" id="pg-v">31</span>
+      <span class="lbl" id="pg-e">&mdash;</span>
+    </div>
 
     <div class="ctrls">
       <span class="lbl">Overlay</span>
@@ -868,8 +1104,33 @@ the same rule that gives $\min(n+1,p)$.</p>
 <h2><span class="num">§3 · The comet</span>Does ν<sub>p</sub> actually predict anything?</h2>
 
 <p>The Goldbach comet plots $r(N)$, the number of ordered prime pairs summing to $N$, against
-$N$. It famously splits into bands. The bands are $\mathfrak{S}(N)$ — dividing by it collapses
-them into a single curve. If the residue count were the wrong idea, that would not happen.</p>
+$N$. It does not form a single curve: it separates into distinct bands. Those bands are
+$\mathfrak{S}(N)$, and dividing by it merges them. That is evidence the residue count is
+tracking something real, and it is only evidence &mdash; a collapse this clean would be hard to
+produce by accident, but agreement is not proof, and &sect;4 says so plainly.</p>
+
+<div class="subtoggle collapsed" onclick="toggleSub(this)">
+  <span class="car">&#9662;</span><span>What $\mathrm{li}_2(N)$ is, and one caveat about the tables below</span>
+</div>
+<div class="subbody">
+<p>The tables report $r(N)$ divided by a prediction, so the prediction needs stating. Under the
+heuristic that an integer near $t$ is prime with density $1/\log t$, the expected number of
+ordered pairs summing to $N$ is $\mathfrak{S}(N)\,\mathrm{li}_2(N)$, where</p>
+
+$$ \mathrm{li}_2(N) \;=\; \int_2^{N} \frac{dt}{(\log t)^2} $$
+
+<p>computed here by composite Simpson, split at $t=100$ because the integrand falls from about
+$2.08$ to $0.047$ across that interval and one panel width cannot serve both ends. The routine
+is checked against a 400,000-step reference at two points.</p>
+
+<p class="stepnote"><b>The caveat.</b> The pair really being counted is $(a, N-a)$, whose natural
+density is $\frac{1}{\log a \log (N-a)}$, giving $\int_2^N \frac{dt}{\log t \,\log(N-t)}$. The
+single-log form used here is the standard stand-in and agrees with it asymptotically, but the
+two differ at relative order $1/\log N$. That is the most likely reason the <b>with $\mathfrak{S}$</b>
+column sits near $0.95$&ndash;$0.97$ rather than $1.00$ &mdash; a systematic, size-dependent
+deficit, not a failure of $\mathfrak{S}$. The column to read for whether $\mathfrak{S}$ works is
+the <i>spread</i> across neighbouring $N$, not the distance of any single row from $1$.</p>
+</div>
 
 <div class="panel">
   <div class="ptitle" style="cursor:default;">Comet parameters</div>
@@ -884,12 +1145,12 @@ them into a single curve. If the residue count were the wrong idea, that would n
     <div class="stepper">
       <button class="sbtn" onclick="bump('n',-10000)" title="&minus;10000">&laquo;</button>
       <button class="sbtn" onclick="bump('n',-2000)" title="&minus;2000">&minus;</button>
-      <input class="sval" id="n-num" type="number" min="5000" max="300000" step="2000"
+      <input class="sval" id="n-num" type="number" min="4" max="300000" step="2000"
              value="60000" onchange="onN(+this.value)">
       <button class="sbtn" onclick="bump('n',2000)" title="+2000">+</button>
       <button class="sbtn" onclick="bump('n',10000)" title="+10000">&raquo;</button>
     </div>
-    <input type="range" id="n-sl" min="5000" max="300000" step="5000" value="60000"
+    <input type="range" id="n-sl" min="4" max="300000" step="5000" value="60000"
            oninput="onN(+this.value)">
     <span class="val" id="n-v">60000</span>
     <button class="chip" onclick="onN(20000);buildComet()">20k</button>
@@ -920,12 +1181,11 @@ them into a single curve. If the residue count were the wrong idea, that would n
 
   <div class="cvwrap">
     <canvas id="cv2" class="main"></canvas>
+    <canvas id="cv2-hl"></canvas>
     <canvas id="lens2"></canvas>
     <div id="lensinfo2"></div>
   </div>
-  <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span>
-    <button class="fs-btn" onclick="toggleFS('cv2')" id="fsbtn-cv2" data-fs-target="cv2">⛶ Fullscreen</button>
-  </div>
+  <div class="cvbar"><span id="bar2-l">—</span><span id="bar2-r">—</span></div>
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
@@ -952,8 +1212,36 @@ them into a single curve. If the residue count were the wrong idea, that would n
 <div class="panel collapsed">
   <div class="ptitle" onclick="togglePanel(this)"><span>Neighbouring N, very different radicals</span><span class="car">&#9662;</span></div>
   <div class="pbody">
-  <p style="font-size:13.5px;margin-bottom:10px;">Six even numbers of nearly identical size.
-  Without the correction the prediction is wrong by a factor of ~2.7 on the smooth ones.</p>
+  <p style="font-size:13.5px;margin-bottom:10px;">A window of even $N$ centred on the one you
+  choose. All of them are within a few dozen of each other, so any size-dependent effect is
+  constant across the window &mdash; what is left is the radical, which varies by orders of
+  magnitude from row to row. The <b>without</b> column moves with it; the <b>with $\mathfrak{S}$</b>
+  column does not. The live spread figure beside the controls is the ratio of largest to smallest
+  <b>without</b> value across the window, which is the number the correction has to remove.</p>
+
+  <div class="ctrls" id="nbr-ctrls">
+    <span class="lbl">centre N</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="stepNbr(-1)" title="down one even N">&minus;</button>
+      <input class="sval" id="nbr-n" type="number" min="4" step="2" value="59970"
+             onchange="setNbrN(+this.value)">
+      <button class="sbtn" onclick="stepNbr(1)" title="up one even N">+</button>
+    </div>
+    <span class="lbl">&plusmn;</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="setNbrK(nbrK-1)" title="one fewer row each side">&minus;</button>
+      <input class="sval" id="nbr-k" type="number" min="0" max="60" step="1" value="3"
+             style="width:50px" onchange="setNbrK(+this.value)">
+      <button class="sbtn" onclick="setNbrK(nbrK+1)" title="one more row each side">+</button>
+    </div>
+    <span class="lbl">rows either side</span>
+    <div class="sep"></div>
+    <button class="chip" onclick="nbrSmoothest()" title="The N in range with the smallest rad(N)/N — the case the correction has to work hardest on.">smoothest</button>
+    <button class="chip" onclick="nbrRoughest()" title="The N in range with the largest rad(N)/N — squarefree and prime-poor, where the correction barely moves anything.">roughest</button>
+    <button class="chip" onclick="nbrCSV()" title="Download the window exactly as shown.">CSV</button>
+    <span class="lbl" id="nbr-note">&mdash;</span>
+  </div>
+
   <div class="scroll"><table id="nbr">
     <tr><th>N</th><th>rad(N)</th><th>r(N)</th><th>𝔖(N)</th><th>with 𝔖</th><th>without</th></tr>
   </table></div>
@@ -1246,7 +1534,7 @@ function isCop(r, M) {                       // 1-indexed
    (G/S)×(G/S) block and shades by how many of its cells are coprime, so the
    cost is bounded by canvas area, not by G². */
 function buildBase(S, mode) {
-  const key = COP_G + '|' + S + '|' + mode;
+  const key = COP_G + '|' + S + '|' + mode + (isBlockMode(mode) ? '|n' + blockN() : '');
   if (baseCv && baseKey === key) return baseCv;
 
   const cv = document.createElement('canvas');
@@ -1294,6 +1582,13 @@ function cellRGBA(mode, frac, r0, M0) {
   if (mode === 'resmod') return resmodRGBA(r0, M0);
   if (mode === 'moddist') return modDistRGBA(r0, M0);
   if (mode === 'phipos') return phiPositionRGBA(r0, M0);
+  if (mode === 'gprime') return gaussPrimeRGBA(r0, M0);
+  if (mode === 'gsplit') return gaussSplitRGBA(r0, M0);
+  if (mode === 'gomega') return gaussOmegaRGBA(r0, M0);
+  if (mode === 'sat') return satRGBA(r0, M0);
+  if (mode === 'failp') return failPrimeRGBA(r0, M0);
+  if (mode === 'jstar') return jStarRGBA(r0, M0);
+  if (mode === 'qres') return qresRGBA(r0, M0);
   return gcdColor(mode, gcd(r0, M0));
 }
 /* Block-coprime survival depth — how many consecutive columns M, M+1, … stay
@@ -1438,6 +1733,208 @@ function smallestFactor(n) {
   return n;
 }
 const COPRIME_RGBA = [26, 30, 52, 190];        // gcd = 1, deliberately quiet
+
+/* ══════════════════════════════════════════════════════════════════════════
+   GAUSSIAN MODES — the lattice read as Z[i] instead of as a pair
+   ─────────────────────────────────────────────────────────────────────────
+   Every other mode on this page asks about gcd(r, M): the ordinary integer
+   gcd of the two COORDINATES. These modes ask about the single Gaussian
+   integer z = r + iM instead, which is a different object on the same points.
+
+   The two are not unrelated — gcd(r, M) is exactly the largest RATIONAL
+   integer dividing z in Z[i], so the coprime plate is precisely the set of z
+   that are primitive there. But primitive is not prime: 1+3i has gcd(1,3)=1
+   and still factors, as (1+i)(2+i), because its Gaussian factors are not
+   rational integers. The gcd modes are structurally blind to those.
+
+   Everything below is read off the norm N(z) = r² + M², because for z with
+   both parts non-zero the factorisation of z in Z[i] is determined by the
+   factorisation of N(z) in Z:
+     p = 2        ramifies:  2 = -i(1+i)²,  so 2^a in N gives (1+i)^a in z
+     p ≡ 1 mod 4  splits:    p = ππ̄, N(π) = p, so p^a in N gives a factors
+     p ≡ 3 mod 4  is inert:  N(p) = p², so p^a in N gives p^(a/2) in z
+   That p mod 4 trichotomy is the structure these modes exist to show, and it
+   is the thing the rational-gcd view cannot see at all. */
+let GN_SPF = null, GN_LIM = 0;
+const GAUSS_MAX_NORM = 3.2e6;                  // ~12 MB of Int32 — G up to 1264
+/* Smallest-prime-factor sieve over the norms. Built once per G and reused by
+   every cell, since factoring 10⁶ norms by trial division would not survive a
+   drag. Returns null when the lattice is too large to sieve, so callers can
+   say so rather than stalling. */
+function gaussSieve(G) {
+  const lim = 2 * G * G + 1;
+  if (lim > GAUSS_MAX_NORM) return null;
+  if (GN_SPF && GN_LIM >= lim) return GN_SPF;
+  const spf = new Int32Array(lim + 1);
+  for (let i = 2; i <= lim; i++) {
+    if (spf[i]) continue;
+    for (let j = i; j <= lim; j += i) if (!spf[j]) spf[j] = i;
+  }
+  GN_SPF = spf; GN_LIM = lim;
+  return spf;
+}
+function gaussReady() { return gaussSieve(COP_G) !== null; }
+/* Number of Gaussian prime factors of z, with multiplicity — the Z[i]
+   analogue of the Ω(g) mode, counted through the splitting rules above. */
+function gaussOmega(r, M) {
+  const spf = gaussSieve(COP_G);
+  let n = r * r + M * M, w = 0;
+  if (!spf || n <= 1 || n > GN_LIM) return -1;
+  while (n > 1) {
+    const p = spf[n]; let a = 0;
+    while (n % p === 0) { n /= p; a++; }
+    w += (p % 4 === 3) ? (a >> 1) : a;          // inert primes pair up
+  }
+  return w;
+}
+/* 0 z is a Gaussian prime · 1 ramified · 2 split · 3 inert · -1 unavailable.
+   Classified on the SMALLEST rational prime dividing the norm, so the colour
+   names the first thing that happens when you try to factor z. */
+function gaussClass(r, M) {
+  const spf = gaussSieve(COP_G);
+  const n = r * r + M * M;
+  if (!spf || n <= 1 || n > GN_LIM) return -1;
+  if (spf[n] === n) return 0;                   // norm is prime => z is prime
+  const p = spf[n];
+  return p === 2 ? 1 : (p % 4 === 1 ? 2 : 3);
+}
+/* ══════════════════════════════════════════════════════════════════════════
+   BLOCK MODES — the ν_p mechanism, drawn instead of described
+   ─────────────────────────────────────────────────────────────────────────
+   §1 argues that everything follows from ν_p = min(n+1, p): once a prime is
+   SATURATED (p ≤ n+1) the block covers every class mod p, so that prime kills
+   a cell purely on whether it divides r. Until now that argument was stated in
+   prose and measured in a table, but never drawn. These three modes draw it.
+
+   The width slider IS the block: inBand() tests gcd(r, M+j) = 1 for j < w, so
+   n = w - 1, exactly as the w-blk readout already says. Widen the strip and
+   you watch saturation set in.
+
+   Scanning a block per cell is O(G²·n), so n is capped here at the same order
+   as the existing depth mode's budget rather than following w without limit.
+   The cap is reported in the view note, not hidden. */
+const BLOCK_COLOR_CAP = 32;
+function blockN() { return Math.min(Math.max(0, widthW - 1), BLOCK_COLOR_CAP); }
+function isBlockMode(m) { return m === 'sat' || m === 'failp' || m === 'jstar'; }
+/* Smallest prime factor by trial division. The arguments here are gcds, so
+   they never exceed G and the sqrt loop is a few dozen steps at worst. */
+function spfOf(n) {
+  if (n < 2) return 0;
+  if (!(n & 1)) return 2;
+  for (let d = 3; d * d <= n; d += 2) if (n % d === 0) return d;
+  return n;
+}
+/* Hue for a prime, stable across modes so the same prime reads as the same
+   colour whichever of these you are looking at. */
+function primeHueRGBA(p, a) {
+  if (!p) return COPRIME_RGBA;
+  const rgb = hsl2rgb((p * 47) % 360, 0.62, 0.58);
+  return [rgb[0], rgb[1], rgb[2], a || 225];
+}
+/* SATURATION — the certain-death set. For a saturated p (p ≤ n+1) the block
+   already meets every class mod p, so some M+j is divisible by p no matter
+   what M is; the cell then lives or dies on p | r alone. Colouring by the
+   smallest saturated prime dividing r therefore paints exactly the cells that
+   are doomed by saturation regardless of where the block sits — and because
+   the test involves only r, they come out as clean stripes of constant r.
+   That stripe pattern IS min(n+1, p) becoming p. */
+function satRGBA(r, M) {
+  const lim = blockN() + 1;
+  for (let p = 2; p <= lim; p++) {
+    if (r % p) continue;
+    if (spfOf(p) !== p) continue;                 // primes only
+    return primeHueRGBA(p, 235);
+  }
+  return gcd(r, M) === 1 ? [30, 40, 62, 195] : [22, 24, 40, 180];
+}
+/* First j in the block where the gcd breaks, and the prime that broke it. */
+function firstFail(r, M, n, g) {
+  for (let j = 0; j <= n; j++) {
+    const q = gcd(r, M + j);
+    if (q !== 1) return [j, spfOf(q)];
+  }
+  return [-1, 0];
+}
+/* FAIL PRIME — which prime does the killing. Same picture as the gcd modes
+   for n = 0, but as n grows the small primes take over the plate, because a
+   wider block gives them more chances to land. Watching red (2) and then the
+   next hue swallow the field as w rises is the saturation story cell by cell. */
+function failPrimeRGBA(r, M) {
+  const f = firstFail(r, M, blockN(), COP_G);
+  if (f[0] < 0) return [242, 200, 96, 235];       // whole block survives
+  return primeHueRGBA(f[1], 225);
+}
+/* BLOCK WINDOW — WHICH SLOT kills it. §1 says the block condition is a
+   conjunction over j; this shows which conjunct fails first. Survivors gold,
+   then a ramp from the near end of the block to the far end. */
+function jStarRGBA(r, M) {
+  const n = blockN();
+  const f = firstFail(r, M, n, COP_G);
+  if (f[0] < 0) return [242, 200, 96, 235];
+  const t = n > 0 ? f[0] / n : 0;
+  const rgb = hsl2rgb(200 - t * 200, 0.66, 0.60);
+  return [rgb[0], rgb[1], rgb[2], 225];
+}
+/* QUADRATIC RESIDUES mod M. Cached per M, and the base raster iterates M in
+   the outer loop, so the O(M) table is built once a row rather than once a
+   cell. Sits next to the Gaussian modes deliberately: Z[i] = Z[x]/(x²+1), so
+   an odd prime p splits in Z[i] exactly when x²+1 has a root mod p, which is
+   exactly when -1 is a quadratic residue, which is exactly when p ≡ 1 mod 4.
+   Put this mode beside the splitting mode on a prime ring and they are the
+   same dichotomy reached from two directions. */
+let _qrM = -1, _qrTab = null;
+function isQR(r, M) {
+  if (M < 2) return true;
+  if (_qrM !== M) {
+    _qrTab = new Uint8Array(M);
+    for (let a = 0; a < M; a++) _qrTab[(a * a) % M] = 1;
+    _qrM = M;
+  }
+  return !!_qrTab[r % M];
+}
+function qresRGBA(r, M) {
+  if (gcd(r, M) !== 1) return [34, 26, 40, 205];  // not a unit — no symbol
+  return isQR(r, M) ? [61, 200, 184, 228]         // square
+                    : [224, 110, 96, 220];        // non-residue
+}
+
+const GAUSS_PAL = {
+  prime:   [242, 200, 96, 240],   // norm prime — z is a Gaussian prime
+  ramify:  [155, 127, 232, 225],  // 2 | N — the (1+i) factor
+  split:   [61, 200, 184, 225],   // smallest factor p ≡ 1 mod 4
+  inert:   [224, 80, 96, 225],    // smallest factor p ≡ 3 mod 4
+  imprim:  [40, 26, 34, 235]      // gcd(r,M) > 1 — not even primitive
+};
+/* Gaussian prime / primitive-composite / imprimitive. The point of this one
+   is the NESTING: every Gaussian prime sits on a gcd = 1 cell (if d divided
+   both parts then d² would divide the norm), so the bright points are a
+   sparse subset of the coprime plate the other modes already draw — never
+   outside it. */
+function gaussPrimeRGBA(r, M) {
+  const c = gaussClass(r, M);
+  if (c < 0) return COPRIME_RGBA;
+  if (gcd(r, M) !== 1) return GAUSS_PAL.imprim;
+  if (c === 0) return GAUSS_PAL.prime;
+  return [48, 74, 92, 205];                     // primitive but composite in Z[i]
+}
+function gaussSplitRGBA(r, M) {
+  const c = gaussClass(r, M);
+  if (c < 0) return COPRIME_RGBA;
+  if (gcd(r, M) !== 1) return GAUSS_PAL.imprim;
+  return c === 0 ? GAUSS_PAL.prime
+       : c === 1 ? GAUSS_PAL.ramify
+       : c === 2 ? GAUSS_PAL.split
+       :           GAUSS_PAL.inert;
+}
+function gaussOmegaRGBA(r, M) {
+  const w = gaussOmega(r, M);
+  if (w < 0) return COPRIME_RGBA;
+  if (w === 0) return [30, 34, 56, 200];        // units only
+  if (w === 1) return GAUSS_PAL.prime;
+  const t = Math.min(1, (w - 1) / 6);
+  const rgb = hsl2rgb(190 - t * 190, 0.72, 0.62 - t * 0.18);
+  return [rgb[0], rgb[1], rgb[2], 225];
+}
 function gcdColor(mode, g) {
   if (g === 1) return COPRIME_RGBA;
   let h, sat = 0.64, lig = 0.56, a = 215;
@@ -1670,6 +2167,14 @@ function doRedraw(rebuildBase) {
 /* One painter for screen and export, so a 4K plate is the same picture as the
    canvas rather than a second implementation that can drift from it. */
 function paintView(ctx, S, cap) {
+  // The global quarter turn is applied once, here, so Grid, Ring, Cayley and
+  // every export inherit it from one place and cannot drift apart.
+  ctx.save();
+  applyViewRot(ctx, S);
+  paintViewInner(ctx, S, cap);
+  ctx.restore();
+}
+function paintViewInner(ctx, S, cap) {
   if (viewMode === 'cayley') { drawCayley(ctx, S); return; }
   if (viewMode === 'ring') {
     drawRingBase(ctx, S, cap);
@@ -1909,7 +2414,8 @@ function drawPartitionsOverlay(ctx, S) {
           ctx.fillRect((r - 1) * k, (M - 1) * k, sz, sz);
         } else if (viewMode === 'ring') {
           const rad = ringRad(M, S), th = ringRot + thetaOf(r, M);
-          ctx.fillRect(C + rad * Math.cos(th) - ringT / 2, C + rad * Math.sin(th) - ringT / 2, ringT, ringT);
+          const q = ringPt(rad, th, S);
+          ctx.fillRect(q[0] - ringT / 2, q[1] - ringT / 2, ringT, ringT);
         } else {
           const p = cayleyXY(r, M, S);
           if (p) ctx.fillRect(p[0] - 1.4, p[1] - 1.4, 2.8, 2.8);
@@ -2238,6 +2744,85 @@ function renderPartHud() {
   }
   el.innerHTML = h;
 }
+/* Coprime density along ONE partition strip. The four strips a-d are lines,
+   so each has its own population and its own density, and those densities are
+   not decoration — they are the identity the page is about:
+
+     M - r = g  and  r - M = g   have cells (r, r+g), and gcd(r, r+g) = gcd(r, g),
+                                 so the density is φ(g)/g exactly.
+     r + M = N                   has cells (r, N-r), and gcd(r, N-r) = gcd(r, N),
+                                 so the density is φ(N)/N over the full line.
+
+   Reporting them per strip is what makes an exported plate self-checking: the
+   a/b figure should land on φ(g)/g and the c/d figure on φ(N)/N, and if one
+   does not, the picture and the arithmetic have come apart. */
+function partStripStats(type, k) {
+  const G = COP_G;
+  let cells = 0, cop = 0;
+  if (type === 'diff') {
+    // M - r = k  (and by the r <-> M symmetry, r - M = k has identical counts)
+    for (let r = 1; r + k <= G; r++) { cells++; if (gcd(r, r + k) === 1) cop++; }
+  } else {
+    // r + M = k, clipped to the plate on both ends
+    for (let r = Math.max(1, k - G); r <= Math.min(G, k - 1); r++) {
+      cells++; if (gcd(r, k - r) === 1) cop++;
+    }
+  }
+  return { cells, cop, d: cells ? cop / cells : 0, exp: expectedStrip(type, k) };
+}
+/* What the strip SHOULD give, from the arithmetic rather than the walk — and
+   under exactly which condition, because neither case is unconditional.
+
+   diff, M - r = g:  gcd(r, r+g) = gcd(r, g), so coprime r are φ(g) out of
+     every g. The walk covers r = 1 … G-g, so the density is φ(g)/g EXACTLY
+     when that range is a whole number of periods, and a partial period
+     otherwise. Not "approximately" — exactly, on the nose, or not.
+
+   sum, r + M = N:  gcd(r, N-r) = gcd(r, N), and the line carries r = 1 … N-1,
+     so the coprime COUNT is φ(N) exactly. The density is therefore
+     φ(N)/(N-1), NOT φ(N)/N — the r = N cell would be the missing one and it
+     is not on the line. The header's "φ(N) at slope −1" is a claim about the
+     count and is right; it is the density that carries the off-by-one. */
+function expectedStrip(type, k) {
+  if (k < 1) return null;
+  const G = COP_G;
+  if (type === 'diff') {
+    const span = G - k;
+    if (span < 1) return null;
+    return { d: phiOf(k) / k, form: '\u03c6(g)/g',
+             tight: span % k === 0, why: 'partial period' };
+  }
+  if (k - 1 > G || k < 2) return null;             // line runs off the plate
+  return { d: phiOf(k) / (k - 1), form: '\u03c6(N)/(N\u22121)',
+           tight: true, why: '' };
+}
+function phiOf(n) {
+  let r = n, x = n;
+  for (let p = 2; p * p <= x; p++) {
+    if (x % p) continue;
+    while (x % p === 0) x /= p;
+    r -= r / p;
+  }
+  if (x > 1) r -= r / x;
+  return r;
+}
+/* The four strips of the single-partition overlay, with colour, equation and
+   measured density — the same list the on-screen legend shows, in a form the
+   export can draw. One source, so the two cannot disagree. */
+function partStripRows() {
+  if (partMode !== 'single') return [];
+  const g = Math.max(1, Math.min(COP_G + 1, partG)), sVal = partE() - g;
+  const out = [];
+  if (partShow.diff) {
+    out.push({ rgb: BR.a, tag: 'a', eq: 'M \u2212 r = ' + g, st: partStripStats('diff', g) });
+    out.push({ rgb: BR.b, tag: 'b', eq: 'r \u2212 M = ' + g, st: partStripStats('diff', g) });
+  }
+  if (partShow.sum) {
+    out.push({ rgb: BR.c, tag: 'c', eq: 'r + M = ' + g, st: partStripStats('sum', g) });
+    if (sVal !== g) out.push({ rgb: BR.d, tag: 'd', eq: 'r + M = ' + sVal, st: partStripStats('sum', sVal) });
+  }
+  return out;
+}
 function renderPartLegend() {
   const el = $('part-legend'); if (!el) return;
   if (partMode === 'off') { el.innerHTML = '<span class="lg msg">overlay off &mdash; only the main slope/offset strip is drawn</span>'; return; }
@@ -2420,6 +3005,81 @@ function thetaOf(r, M) {
    about where the rim is. */
 const RING_INSET = 0.965;
 function ringOuter(S) { return (S / 2) * RING_INSET; }
+/* ── RING HANDEDNESS ───────────────────────────────────────────────────────
+   Canvas y runs downward. Plotting (cos θ, +sin θ) therefore sends increasing
+   θ CLOCKWISE across the screen, while Cayley's cayleyXY writes `cy - w[1]`,
+   flips its imaginary axis back, and renders counter-clockwise. The two views
+   were mirror images of one another: the same lattice point at θ = π/2 landed
+   at the bottom of the Ring plate and the top of the Cayley plate, and walking
+   r upward advanced the two pictures in opposite directions.
+
+   Nothing was ever mismeasured — the inverse used the same convention as the
+   forward map, so clicks, the lens and every count agreed. It was orientation
+   alone. RING_H = -1 negates the y component so Ring winds the way Cayley
+   does, and the way e^{2πir/M} does on paper. Set it to +1 to restore the old
+   picture; every angle-bearing ring site goes through ringPt or ringCellAt, so
+   this is the only line that decides it. */
+const RING_H = -1;
+
+/* ── GLOBAL PLATE ROTATION ─────────────────────────────────────────────────
+   One quarter-turn control over all three views. Modular arithmetic is read
+   off a clock face with 0 at the top, but a raster plate hands you 0 on the
+   right (ring θ=0 points east) and the grid origin in the top-left corner.
+   A single quarter turn fixes both at once, which is why this is one global
+   setting rather than three per-view ones.
+
+   viewQuarter counts quarter turns in CANVAS convention, where y runs down
+   and a positive angle turns clockwise on screen. So -1 is a quarter turn
+   COUNTER-clockwise as seen — the default — and it puts ring θ=0 at the top
+   and the grid's (r=1, M=1) corner at the bottom-left.
+
+   rotPt and unrotPt are written as exact coordinate swaps rather than as
+   cos/sin, so a lattice point round-trips bit-exactly through the hit test
+   instead of drifting by a float epsilon and landing one cell over. */
+let viewQuarter = 0;
+function viewQ() { return ((viewQuarter % 4) + 4) % 4; }
+function viewRotRad() { return viewQuarter * Math.PI / 2; }
+function rotPt(x, y, S) {            // plate -> screen
+  const q = viewQ(), c = S / 2, dx = x - c, dy = y - c;
+  if (q === 1) return [c - dy, c + dx];
+  if (q === 2) return [c - dx, c - dy];
+  if (q === 3) return [c + dy, c - dx];
+  return [x, y];
+}
+function unrotPt(x, y, S) {          // screen -> plate
+  const q = viewQ(), c = S / 2, dx = x - c, dy = y - c;
+  if (q === 1) return [c + dy, c - dx];
+  if (q === 2) return [c - dx, c - dy];
+  if (q === 3) return [c - dy, c + dx];
+  return [x, y];
+}
+function applyViewRot(ctx, S) {
+  if (!viewQ()) return;
+  ctx.translate(S / 2, S / 2); ctx.rotate(viewRotRad()); ctx.translate(-S / 2, -S / 2);
+}
+/* Type has to stay upright under the turn, or every label reads sideways.
+   Draw at the origin inside a local frame that undoes the global rotation. */
+function upright(ctx, x, y, draw) {
+  // Two frames, two coordinate systems, and they are NOT the same. In the
+  // rotated branch the context is translated to (x, y) first, so the callback
+  // draws at the local origin. In the no-turn branch there is no translate,
+  // so it must draw at (x, y) itself. Passing (0, 0) in both stacked every
+  // label on the canvas corner at turn 0 — which read as labels vanishing.
+  if (!viewQ()) { draw(x, y); return; }
+  ctx.save(); ctx.translate(x, y); ctx.rotate(-viewRotRad()); draw(0, 0); ctx.restore();
+}
+function setViewQuarter(q) {
+  viewQuarter = ((Math.round(q) % 4) + 4) % 4;
+  if (viewQuarter > 2) viewQuarter -= 4;          // keep it in -1..2 for display
+  document.querySelectorAll('.rotchip').forEach(b =>
+    b.classList.toggle('on', +b.dataset.q === viewQuarter));
+  if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
+  redraw(false);          // the comet is a different plate and does not turn
+}
+function ringPt(rad, th, S) {
+  const C = S / 2;
+  return [C + rad * Math.cos(th), C + RING_H * rad * Math.sin(th)];
+}
 function ringRad(M, S) { return ringOuter(S) * (ringHole + (1 - ringHole) * ((M - 0.5) / COP_G)); }
 /* True once the annulus has no width left — the radius no longer separates
    the rings, so anything that reads M off a distance has to say so instead of
@@ -2468,6 +3128,9 @@ function ringCellAtRaw(dx, dy, S) {
    modulo to get wrong near the seam. This is the exact inverse of the
    (ringRad, ringAng) pair, and the self test holds the two together. */
 function ringCellAt(dx, dy, S) {
+  // Undo the handedness flip first, then the rotation, so what reaches
+  // ringCellAtRaw is the unrotated math-frame point its atan2 expects.
+  dy *= RING_H;
   const c = Math.cos(ringRot), sn = Math.sin(ringRot);
   return ringCellAtRaw(dx * c + dy * sn, -dx * sn + dy * c, S);
 }
@@ -2494,7 +3157,7 @@ function ringBase(mode, S) {
     for (let r = 1; r <= g; r += step) {
       const cop = isCop(r, M);
       const th = thetaOf(r, M);                 // rotation applied by drawRingBase's transform
-      const x = C + rad * Math.cos(th), y = C + rad * Math.sin(th);
+      const q = ringPt(rad, th, S), x = q[0], y = q[1];
       ctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M, boost) : 'rgba(255,255,255,' + Math.min(1, .05 * boost).toFixed(3) + ')';
       ctx.fillRect(x - dot / 2, y - dot / 2, dot, dot);
     }
@@ -2506,7 +3169,7 @@ function drawRingBase(ctx, S, cap) {
   const buf = ringBase($('cmode').value, Math.min(cap, S));
   ctx.save();
   ctx.translate(S / 2, S / 2);
-  ctx.rotate(ringRot);
+  ctx.rotate(RING_H * ringRot);   // same handedness as the points inside the buffer
   ctx.imageSmoothingEnabled = true;
   ctx.drawImage(buf, -S / 2, -S / 2, S, S);
   ctx.restore();
@@ -2533,7 +3196,12 @@ function drawRingStripAt(ctx, S, s, color) {
     if (a1 < a0) { const t = a0; a0 = a1; a1 = t; }   // clamp/unit can invert lo/hi ordering
     const minA = 1.6 / rad;
     if (a1 - a0 < minA) { const c = (a0 + a1) / 2; a0 = c - minA / 2; a1 = c + minA / 2; }
-    ctx.beginPath(); ctx.arc(C, C, rad, a0, a1); ctx.stroke();
+    // Screen angles are RING_H·θ, and negating an interval reverses it, so the
+    // anticlockwise flag has to flip with the handedness or the arc draws the
+    // complement of the strip instead of the strip.
+    ctx.beginPath();
+    ctx.arc(C, C, rad, RING_H * a0, RING_H * a1, RING_H < 0);
+    ctx.stroke();
   }
   ctx.restore();
 }
@@ -2549,7 +3217,8 @@ function drawRingBand(ctx, S) {
     for (let M = 1; M + w - 1 <= g; M += step)
       if (inBand(r, M, w, g)) {
         const rad = ringRad(M, S), th = ringRot + thetaOf(r, M);
-        ctx.fillRect(C + rad * Math.cos(th) - sz / 2, C + rad * Math.sin(th) - sz / 2, sz, sz);
+        const q = ringPt(rad, th, S);
+        ctx.fillRect(q[0] - sz / 2, q[1] - sz / 2, sz, sz);
         drawn++;
       }
   ctx.restore();
@@ -2561,11 +3230,11 @@ function drawRingGuides(ctx, S) {
   ctx.beginPath(); ctx.arc(C, C, R * ringHole, 0, TAU); ctx.stroke();
   ctx.beginPath(); ctx.arc(C, C, R - 0.5, 0, TAU); ctx.stroke();
   // the seam at r = 1, where the lattice row wraps back on itself
-  const cs = Math.cos(ringRot), sn = Math.sin(ringRot);
+  const seam0 = ringPt(R * ringHole, ringRot, S), seam1 = ringPt(R, ringRot, S);
   ctx.strokeStyle = 'rgba(200,168,74,.45)';
   ctx.beginPath();
-  ctx.moveTo(C + R * ringHole * cs, C + R * ringHole * sn);
-  ctx.lineTo(C + R * cs, C + R * sn);
+  ctx.moveTo(seam0[0], seam0[1]);
+  ctx.lineTo(seam1[0], seam1[1]);
   ctx.stroke();
   const fs = Math.max(9, Math.round(S / 78));
   ctx.font = fs + 'px "JetBrains Mono",monospace';
@@ -2573,9 +3242,11 @@ function drawRingGuides(ctx, S) {
   ctx.lineWidth = Math.max(1.4, fs * 0.22); ctx.lineJoin = 'round';
   const tag = (txt, frac, col) => {
     const rad = R * (ringHole + (1 - ringHole) * frac);
-    const x = C + rad * Math.cos(ringRot + 0.10), y = C + rad * Math.sin(ringRot + 0.10);
-    ctx.strokeStyle = 'rgba(4,4,13,.92)'; ctx.strokeText(txt, x, y);
-    ctx.fillStyle = col; ctx.fillText(txt, x, y);
+    const q = ringPt(rad, ringRot + 0.10, S), x = q[0], y = q[1];
+    upright(ctx, x, y, (ux, uy) => {
+      ctx.strokeStyle = 'rgba(4,4,13,.92)'; ctx.strokeText(txt, ux, uy);
+      ctx.fillStyle = col; ctx.fillText(txt, ux, uy);
+    });
   };
   tag('M = 1', 0.03, 'rgba(200,168,74,.95)');
   tag('M = ' + g, 0.955, 'rgba(200,168,74,.95)');
@@ -2863,7 +3534,7 @@ function bump(which, d) {
   if (which === 'g') return onG(G + d);
   if (which === 'off') return onOff(offS + d);
   if (which === 'w') return onW(widthW + d);
-  if (which === 'n') { onN(Math.max(5000, Math.min(300000, NMAX + d))); return; }
+  if (which === 'n') { onN(Math.max(4, Math.min(300000, NMAX + d))); return; }
   if (which === 'lz') return setLensZoom(LENS_ZOOM + d);
   if (which === 'ls') return setLensSize(lensSize + d);
   if (which === 'gn') return setGN(gcdN + d);
@@ -2877,6 +3548,25 @@ function bump(which, d) {
 function markPrime(id, v) {
   const el = $(id);
   if (el) el.classList.toggle('on', isPrime(Math.abs(v)));
+}
+
+/* The partitions panel carries a second face of the G control, so E = 2(G+1)
+   can be moved from where its consequences are showing. It is a view of one
+   value, not a second value: onG is the only writer, and it calls this on
+   every path into G — slider, prime jump, +-1, a preset chip, Play G, a
+   preset load — so the two faces cannot drift apart. The number box is left
+   alone while it has focus, or retyping a value would fight the caret. */
+function syncGMirror(v) {
+  const num = $('pg-num');
+  if (!num) return;                       // panel not in the DOM yet, during boot
+  if (document.activeElement !== num) num.value = v;
+  const sl = $('pg-sl'), capped = Math.min(v, 4096);
+  if (sl && +sl.value !== capped) sl.value = capped;
+  const vv = $('pg-v'); if (vv) vv.textContent = v;
+  // The one number the panel is really about, live under the thumb while you
+  // drag, instead of only in the HUD above.
+  const ee = $('pg-e'); if (ee) ee.textContent = 'E = ' + (2 * (v + 1));
+  markPrime('pg-pt', v);
 }
 
 let gPlayTimer = null, gPlayTarget = 0, gPlayDir = 1;
@@ -2910,6 +3600,7 @@ function onG(v) {
   v = Math.max(2, Math.min(10000, Math.round(v)));
   G = v; $('g-v').textContent = v; $('g-num').value = v;
   if (+$('g-sl').value !== Math.min(v, 4096)) $('g-sl').value = Math.min(v, 4096);
+  syncGMirror(v);
   $('off-sl').min = -v; $('off-sl').max = v;
   // The old ceiling was min(256, G/4), which is why the band could never be
   // widened to cover the plate. The honest ceiling is the full span of
@@ -2960,6 +3651,8 @@ function onW(v) {
   // width w is a block of w consecutive integers, i.e. C(n) with n = w-1
   $('w-blk').textContent = 'block n = ' + (widthW - 1);
   syncPresetChips();
+  // the block modes paint from the width, so they need the raster rebuilt
+  if (isBlockMode($('cmode').value)) redraw(true);
   redraw(false);
 }
 /* ── view switching ────────────────────────────────────────────────────── */
@@ -3100,11 +3793,67 @@ function updateViewNote() {
     return;
   }
   const mode = $('cmode').value;
-  el.innerHTML = 'Grid \u00b7 (r, M) as drawn, r across and M down.' +
+  // The axis directions are a property of the turn, so the caption has to be
+  // read off viewQuarter rather than stated once and left to go stale.
+  const AX = { 0: ['r across', 'M down'], 3: ['r up', 'M across'],
+               2: ['r right-to-left', 'M up'], 1: ['r down', 'M right-to-left'] }[viewQ()];
+  const BLK = {
+    sat: 'A prime is <b>saturated</b> once p &le; n+1: the block then meets every class mod p, ' +
+         'so some M+j is divisible by p wherever the block sits, and the cell lives or dies on ' +
+         'p&thinsp;|&thinsp;r alone. Colour is the smallest saturated prime dividing r \u2014 which ' +
+         'is why these come out as clean stripes of constant r. The stripes ARE ' +
+         '\u03bd<sub>p</sub> = min(n+1, p) having reached p.',
+    failp: 'Colour is the smallest prime dividing the first broken gcd in the block. Gold survives ' +
+           'the whole block. Raise the width and watch the small primes swallow the plate \u2014 a ' +
+           'wider block gives each of them more chances to land.',
+    jstar: 'The block condition is a conjunction over j; this is <b>which conjunct fails first</b>. ' +
+           'Gold survives all of it, then cool-to-warm from the near end of the block to the far end.'
+  }[mode];
+  const QR = mode === 'qres'
+    ? ' <b style="color:#3dc8b8">teal</b> r is a square mod M \u00b7 ' +
+      '<b style="color:#e06e60">coral</b> non-residue \u00b7 <b>dark</b> not a unit. ' +
+      'Compare against the splitting mode on a prime ring: Z[i] = Z[x]/(x\u00b2+1), so p splits ' +
+      'exactly when x\u00b2+1 has a root mod p, i.e. when \u22121 is a square mod p, i.e. when ' +
+      'p \u2261 1 mod 4. Same dichotomy, two directions.'
+    : '';
+  const GA = {
+    gprime: '<b style="color:#f2c860">gold</b> z is a Gaussian prime (N(z)=r\u00b2+M\u00b2 is prime) \u00b7 ' +
+            '<b style="color:#6a93b0">slate</b> primitive but composite in Z[i] \u00b7 ' +
+            '<b style="color:#8a6070">dark</b> gcd(r,M)&gt;1, not primitive. Every gold cell lies inside ' +
+            'the coprime set the other modes draw \u2014 Gaussian primes are a sparse subset of it, ' +
+            'never outside it.',
+    gsplit: 'Classified on the smallest rational prime dividing N(z). ' +
+            '<b style="color:#f2c860">gold</b> N prime \u00b7 ' +
+            '<b style="color:#9b7fe8">violet</b> 2\u2223N, ramified (2 = \u2212i(1+i)\u00b2) \u00b7 ' +
+            '<b style="color:#3dc8b8">teal</b> p \u2261 1 mod 4, splits \u00b7 ' +
+            '<b style="color:#e05060">coral</b> p \u2261 3 mod 4, inert. This trichotomy is what the ' +
+            'rational-gcd modes cannot see.',
+    gomega: '\u03a9 counted in Z[i]: split and ramified primes contribute their exponent, inert ' +
+            'primes contribute half of theirs, since N(p) = p\u00b2. Gold is one factor \u2014 a ' +
+            'Gaussian prime \u2014 shading toward warm as the factor count rises.'
+  }[mode];
+  el.innerHTML = 'Grid \u00b7 (r, M) as drawn, ' + AX[0] + ' and ' + AX[1] + '.' + QR +
+    (BLK ? ' <b style="color:var(--gold)">Block n = ' + blockN() + '</b> (from width w = ' +
+           widthW + ').' + (widthW - 1 > BLOCK_COLOR_CAP
+             ? ' <b style="color:var(--coral)">Capped at n = ' + BLOCK_COLOR_CAP +
+               '</b> \u2014 scanning a block per cell is O(G\u00b2\u00b7n), so the colour stops ' +
+               'following w past here even though the strip walk does not.' : '') +
+           ' ' + BLK : '') +
+    (GA ? ' <b style="color:var(--gold)">z = r + iM.</b> ' + GA +
+          (gaussReady() ? ''
+            : ' <b style="color:var(--coral)">Lattice too large to sieve the norms at this G</b> \u2014 ' +
+              'N(z) reaches ' + (2 * COP_G * COP_G).toLocaleString() +
+              ', past the sieve ceiling, so the plate falls back to the quiet coprime fill. ' +
+              'Drop G below about 1264.') : '') +
     (COP_G > 1200
       ? (mode === 'binary' || mode === 'density'
           ? ' G exceeds the 1200-pixel buffer, so each pixel aggregates its block and shades by density.'
           : ' G exceeds the 1200-pixel buffer, and a gcd cannot be averaged \u2014 this mode samples one cell per pixel.')
+      : '') +
+    // A label mode that is switched on and draws nothing looks broken. Say why.
+    (GRID_LABELS_HIDDEN
+      ? ' <b style="color:var(--gold)">Cell labels hidden:</b> ' + GRID_LABELS_HIDDEN +
+        '. Try a shorter label mode (<b>M</b>, <b>r</b> or <b>gcd</b>), fullscreen, or the lens.'
       : '');
 }
 
@@ -3283,6 +4032,10 @@ function exportCards() {
 
 /* Draw the plate exactly as it appears on screen, at export resolution. */
 function paintPlate(ctx, x, y, side) {
+  // An 8K plate has cells wide enough for labels the on-screen canvas cannot
+  // fit, so painting it must not rewrite what the view note says about the
+  // screen. Snapshot the flag and put it back.
+  const hiddenWas = GRID_LABELS_HIDDEN;
   ctx.save();
   ctx.translate(x, y);
   ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, side, side);
@@ -3290,15 +4043,86 @@ function paintPlate(ctx, x, y, side) {
   ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
   ctx.strokeRect(.5, .5, side - 1, side - 1);
   ctx.restore();
+  GRID_LABELS_HIDDEN = hiddenWas;
 }
 
+/* The partition band. Each row carries the swatch actually used on the plate,
+   the line it marks, its cell count, its measured coprime density, and the
+   closed form that density is supposed to equal. A reader can check the plate
+   against the arithmetic without the page open, which is the whole point of
+   putting it above the picture rather than below it. */
+function drawPartBand(ctx, x, y, w, S, rows) {
+  const E = partE(), g = Math.max(1, Math.min(COP_G + 1, partG)), sVal = E - g;
+  const pair = isPrime(g) && isPrime(sVal);
+  ctx.save();
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const h = 44 * S + 30 * S * Math.max(1, rows.length);
+  ctx.fillStyle = 'rgba(224,80,96,.055)';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = 'rgba(224,80,96,.32)'; ctx.lineWidth = Math.max(1, S);
+  ctx.strokeRect(x + .5, y + .5, w - 1, h - 1);
+
+  ctx.font = (16 * S) + 'px ' + MONO; ctx.fillStyle = PAL.coral;
+  ctx.fillText('PARTITION OVERLAY \u00b7 ' + partMode.toUpperCase() +
+    '   \u00b7   E = ' + E + ' = 2(G+1)   \u00b7   ' + g + ' + ' + sVal +
+    (pair ? '   \u00b7   BOTH PRIME' : '   \u00b7   ' + (isPrime(g) ? 'g prime only'
+      : isPrime(sVal) ? 's prime only' : 'neither prime')) +
+    '   \u00b7   ' + goldbachGaps().length + ' Goldbach pairs at this E',
+    x + 18 * S, y + 24 * S);
+
+  if (!rows.length) {
+    ctx.font = (15 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+    ctx.fillText(partMode === 'single'
+      ? 'both strip families are switched off \u2014 nothing drawn'
+      : 'batch mode \u2014 per-strip densities are listed for the single-partition overlay',
+      x + 18 * S, y + 58 * S);
+    ctx.restore(); return;
+  }
+  rows.forEach((rw, i) => {
+    const ry = y + 58 * S + i * 30 * S;
+    ctx.fillStyle = 'rgb(' + rw.rgb.join(',') + ')';
+    ctx.fillRect(x + 18 * S, ry - 8 * S, 16 * S, 16 * S);
+    ctx.font = (15.5 * S) + 'px ' + MONO;
+    ctx.fillStyle = 'rgb(' + rw.rgb.join(',') + ')';
+    ctx.fillText(rw.tag, x + 44 * S, ry);
+    ctx.fillStyle = PAL.cream;
+    ctx.fillText(rw.eq.padEnd(14, ' '), x + 68 * S, ry);
+    ctx.fillStyle = PAL.cream3;
+    ctx.fillText(rw.st.cells + ' cells \u00b7 ' + rw.st.cop + ' coprime', x + 250 * S, ry);
+    ctx.fillStyle = PAL.cream;
+    ctx.fillText('density ' + fmt(rw.st.d, 6), x + 470 * S, ry);
+    const e = rw.st.exp;
+    if (e) {
+      const off = Math.abs(rw.st.d - e.d);
+      const hit = off < 1e-12;
+      // A miss here is not a bug — it means the line does not carry a whole
+      // number of periods on a plate this size. Saying which it is keeps the
+      // exported figure honest instead of merely reassuring.
+      ctx.fillStyle = hit ? PAL.lime : PAL.gold;
+      ctx.fillText(e.form + ' = ' + fmt(e.d, 6) +
+        (hit ? '   exact' : '   \u0394 ' + fmt(off, 6) + ' (' + (e.why || 'clipped by G') + ')'),
+        x + 640 * S, ry);
+    } else {
+      ctx.fillStyle = PAL.cream3;
+      ctx.fillText('line runs off the plate at G = ' + COP_G, x + 640 * S, ry);
+    }
+  });
+  ctx.restore();
+}
 async function exportPNG(px) {
   if (!COP) return;
   if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
   const S = px / 1920;                       // every dimension below is at 1920
   const m = 84 * S;
   const plateSide = px - 2 * m;
-  const headerH = 560 * S, footerH = 172 * S;
+  // The partition overlay was reduced to one grey line in the footer, below
+  // the plate, while its four strips are the most conspicuous thing ON the
+  // plate. It gets a band of its own directly under the stat cards instead —
+  // colour, equation and measured density per strip — and the header grows to
+  // fit it rather than the band being squeezed into space meant for prose.
+  const pRows = partStripRows();
+  const pBandH = (partMode === 'off') ? 0 : (52 + 30 * Math.max(1, pRows.length)) * S;
+  const headerH = 560 * S + pBandH, footerH = 172 * S;
   const H = Math.round(headerH + plateSide + footerH);
 
   const cv = document.createElement('canvas');
@@ -3361,6 +4185,8 @@ async function exportPNG(px) {
     ? 'Block band — the C(n) condition, measured as a conjunction over n+1 columns, not as a strip average'
     : 'Strip — coprime density inside the band, exact against φ(g)/g at slope +1 and φ(N) at slope −1',
     m, 500 * S);
+
+  if (partMode !== 'off') drawPartBand(ctx, m, 528 * S, px - 2 * m, S, pRows);
 
   paintPlate(ctx, m, headerH, plateSide);
 
@@ -3529,6 +4355,11 @@ function drawComet() {
   else wrap.style.height = '';
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   cv.style.height = H + 'px';
+  const hl = $('cv2-hl');
+  if (hl) {
+    hl.width = cv.width; hl.height = cv.height; hl.style.height = H + 'px';
+    hl.getContext('2d').clearRect(0, 0, hl.width, hl.height);
+  }
   const ctx = cv.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, W, H);
@@ -3599,10 +4430,19 @@ function paintComet(ctx, W, H, k) {
     : 'r(N) / (𝔖(N)·li₂(N)) — should sit at 1';
   ctx.fillText(t, PAD + 6 * k, 20 * k);
   // Publish the plate geometry in CSS px so the lens can re-render points as
-  // vectors at any magnification instead of blitting the rendered scatter.
-  if (k === 1) COMET_GEO = { x, y, inv: X => (X - PAD) / (W - PAD - 14) * n, vmin, vmax, PAD, W, H, n };
+  // vectors at any magnification instead of blitting the rendered scatter,
+  // and so any other caller (the export renderer, at its own k) can place a
+  // marker in exactly the spot the on-screen version would.
+  const geo = {
+    x, y,
+    inv: X => (X - PAD) / (W - PAD - 14 * k) * n,
+    invY: Y => vmin + (vmax - vmin || 1) * (H - PAD + 6 * k - Y) / (H - PAD - 22 * k),
+    vmin, vmax, PAD, W, H, n
+  };
+  if (k === 1) COMET_GEO = geo;
   $('bar2-l').innerHTML = 'even N ≤ <b>' + NMAX.toLocaleString() + '</b> · colour = # distinct odd prime factors';
   $('bar2-r').innerHTML = 'mode <b>' + cometMode + '</b>';
+  return geo;
 }
 function setComet(m) {
   cometMode = m;
@@ -3611,7 +4451,7 @@ function setComet(m) {
   drawComet();
 }
 function onN(v) {
-  NMAX = Math.max(5000, Math.min(300000, Math.round(v)));
+  NMAX = Math.max(4, Math.min(300000, Math.round(v)));
   $('n-v').textContent = NMAX;
   $('n-num').value = NMAX;
   $('n-sl').value = NMAX;
@@ -3620,14 +4460,20 @@ function onAlpha(v) { ptAlpha = v / 100; $('a-v').textContent = ptAlpha.toFixed(
 
 function stats(f) {
   let s = 0, s2 = 0, n = 0, mn = Infinity, mx = -Infinity;
-  for (let N = 1000; N <= NMAX; N += 2) {
+  // At large NMAX this skips the noisy very-small-N region, same as before.
+  // But NMAX can now go as low as 4 (comet N-max floor), where "well inside
+  // the range starting at 1000" is past the end of the range entirely — so
+  // scale the start down too, and use whatever's there is nothing to skip.
+  let start = Math.min(1000, Math.max(4, Math.floor(NMAX / 4)));
+  start -= start % 2;
+  for (let N = start; N <= NMAX; N += 2) {
     const v = f(N);
     if (!isFinite(v) || v <= 0) continue;
     s += v; s2 += v * v; n++;
     if (v < mn) mn = v; if (v > mx) mx = v;
   }
-  const mean = s / n, sd = Math.sqrt(Math.max(0, s2 / n - mean * mean));
-  return { mean, sd, mn, mx, n };
+  const mean = n ? s / n : 0, sd = n ? Math.sqrt(Math.max(0, s2 / n - mean * mean)) : 0;
+  return { mean, sd, mn: n ? mn : 0, mx: n ? mx : 0, n };
 }
 function fillSpread() {
   const t = $('spread');
@@ -3646,33 +4492,149 @@ function fillSpread() {
       '</td><td class="n">' + fmt(s.mx / s.mn, 2) + '</td></tr>');
   });
 }
+/* The neighbour window. The panel's point is that N's radical, not N's size,
+   decides how far the uncorrected prediction lands from 1 — so the table has
+   to be a window you can move, not one hard-coded sextet. Centre N and the
+   half-width k are both live; the table renders N-2k … N … N+2k.
+
+   The step is 2, not 1. r(N) here counts ordered pairs of primes summing to N,
+   and 𝔖 and li₂ are only built on even N, because for odd N the count is 0 or
+   1 (2 plus a prime) and the singular series has nothing to correct. A ±3
+   window over the integers would therefore be one real row between six empty
+   ones; ±3 over the even numbers is six real neighbours, which is what the
+   comparison needs. */
+let nbrN = 0, nbrK = 3, nbrClamped = 0;
+function nbrRange() {
+  // The stats window elsewhere on the page skips the noisy small-N region the
+  // same way; keep the two agreeing so "in range" means one thing.
+  let lo = Math.min(1000, Math.max(4, Math.floor(NMAX / 4)));
+  lo -= lo % 2;
+  return { lo: Math.max(4, lo), hi: NMAX - (NMAX % 2) };
+}
+function nbrDefaultN() {
+  // 30 back from the top, rounded to a multiple of 30, so the default window
+  // straddles a highly composite N and a nearby prime-poor one — the contrast
+  // the panel exists to show.
+  const r = nbrRange();
+  return Math.max(r.lo, Math.min(r.hi, NMAX - (NMAX % 30) - 30));
+}
+function setNbrN(v) {
+  v = Math.round(v);
+  if (!isFinite(v)) return;
+  const r = nbrRange();
+  v -= v & 1;                                  // snap odd input down to even
+  const clamped = Math.max(4, Math.min(r.hi, v));
+  // r(N) only exists for N the comet has actually convolved, so a request past
+  // N-max is answered with the nearest N that has data — and said out loud,
+  // rather than silently showing a different number than the one typed.
+  nbrClamped = (clamped !== v) ? v : 0;
+  nbrN = clamped;
+  fillNeighbours();
+}
+function stepNbr(d) { setNbrN(nbrN + 2 * d); }
+function setNbrK(v) {
+  nbrK = Math.max(0, Math.min(60, Math.round(v) || 0));
+  fillNeighbours();
+}
+/* Smoothest = smallest rad(N)/N, the N carrying the most repeated and small
+   prime factors, where 𝔖 is furthest from 2C₂ and the uncorrected prediction
+   is worst. Roughest is the opposite end. Both scan the same range the spread
+   table summarises, so the two panels are talking about the same population. */
+function nbrExtreme(wantMin) {
+  if (!SPF) return;
+  const r = nbrRange();
+  let best = 0, bestV = wantMin ? Infinity : -Infinity;
+  for (let N = r.lo; N <= r.hi; N += 2) {
+    const v = rad(N, SPF) / N;
+    if (wantMin ? v < bestV : v > bestV) { bestV = v; best = N; }
+  }
+  if (best) setNbrN(best);
+}
+function nbrSmoothest() { nbrExtreme(true); }
+function nbrRoughest() { nbrExtreme(false); }
+
+function nbrRows() {
+  const out = [];
+  if (!RN || !SPF) return out;
+  for (let i = -nbrK; i <= nbrK; i++) {
+    const N = nbrN + 2 * i;
+    if (N < 4 || N > NMAX) continue;           // window clipped at the ends
+    const li = LI2[N], s = SIG[N];
+    out.push({
+      N, centre: i === 0,
+      radN: rad(N, SPF),
+      rN: RN[N],
+      sig: s,
+      withS: s * li > 0 ? RN[N] / (s * li) : 0,
+      without: li > 0 ? RN[N] / (2 * C2 * li) : 0
+    });
+  }
+  return out;
+}
 function fillNeighbours() {
   const t = $('nbr');
-  t.innerHTML = '<tr><th>N</th><th>rad(N)</th><th>r(N)</th><th>𝔖(N)</th><th>with 𝔖</th><th>without</th></tr>';
-  // Anchor well inside the range: every probe must have RN/SIG/LI2 computed,
-  // and the anchor is chosen divisible by 30 so the smooth/rough contrast is
-  // actually visible.
-  const mid = Math.max(10020, Math.min(NMAX - 30, NMAX - (NMAX % 30) - 30));
-  const cands = [mid - 2, mid, mid + 2, mid + 6, mid - 10, mid - 12]
-    .filter(N => N >= 4 && N <= NMAX && !(N & 1));
-  for (const N of cands) {
-    const li = LI2[N], s = SIG[N];
-    const withS = s * li > 0 ? RN[N] / (s * li) : 0;
-    const without = li > 0 ? RN[N] / (2 * C2 * li) : 0;
-    const ok = Math.abs(withS - 1) < 0.12;
+  if (!t) return;
+  const r = nbrRange();
+  if (!nbrN || nbrN < 4 || nbrN > r.hi) nbrN = nbrDefaultN();
+  const box = $('nbr-n');
+  if (box && document.activeElement !== box) box.value = nbrN;
+  const kbox = $('nbr-k');
+  if (kbox && document.activeElement !== kbox) kbox.value = nbrK;
+
+  t.innerHTML = '<tr><th>N</th><th>rad(N)</th><th>r(N)</th><th>𝔖(N)</th>' +
+                '<th>with 𝔖</th><th>without</th></tr>';
+  const rows = nbrRows();
+  for (const d of rows) {
+    // "good" marks a row the corrected prediction lands on; the centre row is
+    // marked separately so you can still find it when it is not one of them.
+    const ok = Math.abs(d.withS - 1) < 0.12;
     t.insertAdjacentHTML('beforeend',
-      '<tr class="' + (ok ? 'good' : '') + '"><td class="n">' + N +
-      '</td><td class="n">' + rad(N, SPF) + '</td><td class="n">' + RN[N] +
-      '</td><td class="n">' + fmt(s, 4) + '</td><td class="n">' + fmt(withS, 4) +
-      '</td><td class="n">' + fmt(without, 4) + '</td></tr>');
+      '<tr class="' + (ok ? 'good' : '') + (d.centre ? ' nbr-mid' : '') +
+      '"><td class="n">' + d.N +
+      '</td><td class="n">' + d.radN +
+      '</td><td class="n">' + d.rN +
+      '</td><td class="n">' + fmt(d.sig, 4) +
+      '</td><td class="n">' + fmt(d.withS, 4) +
+      '</td><td class="n">' + fmt(d.without, 4) + '</td></tr>');
   }
+  const note = $('nbr-note');
+  if (note) {
+    const want = 2 * nbrK + 1;
+    // Say when the window is clipped rather than quietly returning fewer rows.
+    const spread = rows.length
+      ? rows.reduce((a, d) => Math.max(a, d.without), 0) /
+        Math.max(1e-9, rows.reduce((a, d) => Math.min(a, d.without), Infinity))
+      : 0;
+    note.innerHTML = (rows.length
+      ? rows.length + ' of ' + want + ' rows' +
+        (rows.length < want ? ' (window runs past N-max)' : '') +
+        ' &nbsp;·&nbsp; uncorrected spread across the window ' +
+        '<b style="color:var(--gold)">' + fmt(spread, 2) + '&times;</b>'
+      : 'no data — raise N-max') +
+      (nbrClamped
+        ? ' &nbsp;·&nbsp; <b style="color:var(--coral)">' + nbrClamped +
+          ' is past N-max</b>, showing ' + nbrN + ' instead'
+        : '');
+  }
+}
+function nbrCSV() {
+  const rows = nbrRows();
+  if (!rows.length) return;
+  let s = 'N,rad(N),r(N),sigma(N),r/(sigma*li2),r/(2C2*li2)\n';
+  for (const d of rows) {
+    s += [d.N, d.radN, d.rN, d.sig.toFixed(6),
+          d.withS.toFixed(6), d.without.toFixed(6)].join(',') + '\n';
+  }
+  dlText(s, 'neighbours-N' + nbrN + '-pm' + nbrK + '.csv');
 }
 async function exportComet(px) {
   if (!RN) return;
   if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
   const S = px / 1920, m = 84 * S;
   const plotW = px - 2 * m, plotH = plotW * 0.42;
-  const headerH = 480 * S, footerH = 118 * S;
+  const hoverN = (cometHoverN && RN && RN[cometHoverN] !== undefined)
+    ? Math.max(4, Math.min(NMAX, cometHoverN)) : null;
+  const headerH = 480 * S, footerH = 118 * S + (hoverN ? 26 * S : 0);
   const H = Math.round(headerH + plotH + footerH);
 
   const cv = document.createElement('canvas');
@@ -3721,13 +4683,48 @@ async function exportComet(px) {
   ctx.save();
   ctx.translate(m, headerH);
   ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, plotW, plotH);
-  paintComet(ctx, plotW, plotH, plotW / 900);
+  const geo = paintComet(ctx, plotW, plotH, plotW / 900);
+  // Both of these are placed in DATA terms (N, value), not screen pixels —
+  // that's what cometZoomBox and hoverN store — so they land in the right
+  // spot on this plot even though it's a different size than the one on
+  // screen when the lens was open.
+  if (cometZoomBox) {
+    const zLo = Math.max(4, Math.min(NMAX, cometZoomBox.nLo));
+    const zHi = Math.max(4, Math.min(NMAX, cometZoomBox.nHi));
+    const vLo = Math.max(geo.vmin, cometZoomBox.vLo);
+    const vHi = Math.min(geo.vmax, cometZoomBox.vHi);
+    const bx1 = geo.x(zLo), bx2 = geo.x(zHi), by1 = geo.y(vHi), by2 = geo.y(vLo);
+    ctx.strokeStyle = '#e5c15a'; ctx.lineWidth = Math.max(1, 2 * S);
+    ctx.strokeRect(Math.min(bx1, bx2), Math.min(by1, by2), Math.abs(bx2 - bx1), Math.abs(by2 - by1));
+  }
+  if (hoverN !== null) {
+    const hx = geo.x(hoverN), hy = geo.y(valAt(hoverN));
+    ctx.strokeStyle = '#3dc8b8'; ctx.lineWidth = Math.max(1.5, 2.5 * S);
+    ctx.beginPath(); ctx.arc(hx, hy, 8 * S, 0, 6.284); ctx.stroke();
+  }
   ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = 1;
   ctx.strokeRect(.5, .5, plotW - 1, plotH - 1);
   ctx.restore();
 
+  // whichever point the lens was last resting on when Export was clicked —
+  // the export is otherwise just the aggregate plot, with no way to point
+  // back at the one N a reader was actually looking at on screen
+  if (hoverN !== null) {
+    const predH = SIG[hoverN] * LI2[hoverN];
+    const wOddH = pfac(hoverN, SPF).filter(q => q > 2).length;
+    const relErrH = predH > 0 ? (RN[hoverN] - predH) / predH : null;
+    ctx.textAlign = 'left'; ctx.font = (15.5 * S) + 'px ' + MONO; ctx.fillStyle = PAL.gold;
+    ctx.fillText('Marked point — N ' + hoverN + '   ·   rad ' + rad(hoverN, SPF) +
+      '   ·   ω_odd ' + wOddH + '   ·   r(N) ' + RN[hoverN] +
+      '   ·   𝔖 ' + SIG[hoverN].toFixed(4) + '   ·   li₂ ' + LI2[hoverN].toFixed(1) +
+      '   ·   predicted ' + (predH > 0 ? predH.toFixed(1) : '—') +
+      '   ·   Δ ' + (relErrH !== null ? (relErrH >= 0 ? '+' : '') + (relErrH * 100).toFixed(2) + '%' : '—') +
+      '   ·   r/(𝔖·li₂) ' + (predH > 0 ? (RN[hoverN] / predH).toFixed(4) : '—'),
+      m, headerH + plotH + 16 * S);
+  }
+
   // footer — every control this plot's numbers depend on
-  const fy = headerH + plotH + 40 * S;
+  const fy = headerH + plotH + (hoverN !== null ? 66 : 40) * S;
   ctx.font = (15.5 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3; ctx.textAlign = 'left';
   ctx.fillText('r(N) = ordered prime pairs summing to N   ·   li₂ by composite Simpson   ·   ' +
                'N max ' + NMAX.toLocaleString() + '   ·   view ' + cometMode, m, fy);
@@ -3798,6 +4795,8 @@ function hideLens() {
   for (const id of ['lens', 'lensinfo', 'lens2', 'lensinfo2']) {
     const el = $(id); if (el) el.classList.remove('on');
   }
+  const hl = $('cv2-hl');
+  if (hl) hl.getContext('2d').clearRect(0, 0, hl.width, hl.height);
   lensAt = null; LENS_REDRAW = null;
 }
 
@@ -3912,23 +4911,33 @@ function cayleyCellAt(sx, sy, S) {
 /* Where a lattice point lands, under whichever projection is live. One place,
    so the lens, the click target and the marker can never disagree. */
 function projectCell(r, M, S) {
+  const p = projectCellRaw(r, M, S);
+  return p ? rotPt(p[0], p[1], S) : p;
+}
+/* Plate frame, before the global turn. Anything that has to reason in the
+   projection's own coordinates uses this; anything that touches the screen
+   uses projectCell above. */
+function projectCellRaw(r, M, S) {
   if (viewMode === 'grid') { const c = S / COP_G; return [(r - 0.5) * c, (M - 0.5) * c]; }
   if (viewMode === 'ring') {
     const rad = ringRad(M, S), th = ringRot + thetaOf(r, M);
-    return [S / 2 + rad * Math.cos(th), S / 2 + rad * Math.sin(th)];
+    return ringPt(rad, th, S);
   }
   return cayleyXY(r, M, S);
 }
 /* The cell a pointer resolves to, in any view. Returns {r,M} or null. */
 function latticeHitAt(cx, cy, S) {
   if (!COP_G) return null;
+  // Back to the plate frame first. cellAt, ringCellAt and cayleyCellAt all
+  // reason in the projection's own coordinates and know nothing of the turn.
+  const u = unrotPt(cx, cy, S); cx = u[0]; cy = u[1];
   if (viewMode === 'grid') return cellAt(cx, cy, S, COP_G);
   if (viewMode === 'ring') {
     // Collapsed annulus: every ring is on one circle, so the distance from
     // the centre says nothing about M and the angle has to do all the work.
     if (ringCollapsed()) {
-      const th = Math.atan2(cy - S / 2, cx - S / 2) - ringRot;
-      return nearestByAngle(th, 1, COP_G, projectCell, cx, cy, S);
+      const th = RING_H * Math.atan2(cy - S / 2, cx - S / 2) - ringRot;
+      return nearestByAngle(th, 1, COP_G, projectCellRaw, cx, cy, S);
     }
     return ringCellAt(cx - S / 2, cy - S / 2, S);
   }
@@ -3946,8 +4955,6 @@ function polarLensLabels(lctx, lens, sX, sY, srcSize, k, S, dprL) {
   const mode = $('lens-lbl').value;
   if (mode === 'off') return;
   const G = COP_G;
-  const fs = Math.max(0, Math.min(26 * dprL, (S / G) * k * 0.40));
-  if (fs / dprL < 7) { LENS_LABELS_HIDDEN = true; return; }
   // ring range from the window's corners and centre
   const pts = [[sX, sY], [sX + srcSize, sY], [sX, sY + srcSize],
                [sX + srcSize, sY + srcSize], [sX + srcSize / 2, sY + srcSize / 2]];
@@ -3961,7 +4968,8 @@ function polarLensLabels(lctx, lens, sX, sY, srcSize, k, S, dprL) {
         m = ((d - ringHole) / (1 - ringHole)) * G + 0.5;
       }
     } else {
-      const e = cayleyMEstAt(p[0], p[1], S);
+      const q = unrotPt(p[0], p[1], S);
+      const e = cayleyMEstAt(q[0], q[1], S);
       if (e) m = e.mEst;
     }
     if (m == null || !isFinite(m)) continue;
@@ -3970,10 +4978,19 @@ function polarLensLabels(lctx, lens, sX, sY, srcSize, k, S, dprL) {
   if (!isFinite(lo) || !isFinite(hi)) { LENS_LABELS_HIDDEN = true; return; }
   const mLo = Math.max(1, Math.floor(lo) - 2), mHi = Math.min(G, Math.ceil(hi) + 2);
   if ((mHi - mLo + 1) * G > 90000) { LENS_LABELS_HIDDEN = true; return; }
+  // Fit AFTER the visible M range is known. Sizing off a guessed range would
+  // under-fit whenever the window sits high in M — an 'M' label reads three
+  // digits at M=900 and two at M=90, and the wrong one sets the type size.
+  // On Ring and Cayley there is no uniform pitch, so S/G·k is the best
+  // available stand-in for the local cell size; the ink budget is the same as
+  // everywhere else, so the halo sits inside the allowance rather than on top.
+  const widest = widestLabel(mode, 1, G, mLo, mHi);
+  const fs = labelFit(lctx, widest, (S / G) * k, 26 * dprL * labelScale);
+  if (fs / dprL < 7) { LENS_LABELS_HIDDEN = true; return; }
   const c = lens.width / 2, R = c - 2;
   lctx.font = fs + 'px "JetBrains Mono",monospace';
   lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
-  lctx.lineWidth = Math.max(1.5, fs * 0.20); lctx.lineJoin = 'round';
+  lctx.lineWidth = fs * LABEL_STROKE; lctx.lineJoin = 'round';
   let drawn = 0;
   for (let M = mLo; M <= mHi; M++) {
     for (let r = 1; r <= G; r++) {
@@ -4010,7 +5027,13 @@ function drawLens(px, py) {
   lens.style.width = lensSize + 'px'; lens.style.height = lensSize + 'px';
 
   const srcSize = Math.max(0.02, (lensSize / LENS_ZOOM) * canvasPerCss);
-  const gx = px * canvasPerCss, gy = py * canvasPerCss;
+  // The lens re-renders Grid from the lattice, in the plate's own frame, so
+  // its window has to be centred on the plate-frame pointer rather than the
+  // screen one. Ring and Cayley blit the finished canvas, which already
+  // carries the turn, so those keep the screen-frame window.
+  const gs = unrotPt(px * canvasPerCss, py * canvasPerCss, cv.width);
+  const gx = isGrid ? gs[0] : px * canvasPerCss;
+  const gy = isGrid ? gs[1] : py * canvasPerCss;
   const sX = gx - srcSize / 2, sY = gy - srcSize / 2;
   const k = lens.width / srcSize;               // source px -> lens px
 
@@ -4039,6 +5062,10 @@ function drawLens(px, py) {
     return;
   }
 
+  // Everything below is drawn in the plate frame; turning the lens canvas by
+  // the same quarter turn is what makes the magnified patch agree with the
+  // picture underneath it.
+  applyViewRot(lctx, lens.width);
   const r0 = Math.max(1, Math.floor(sX / cell)), r1 = Math.min(g, Math.ceil((sX + srcSize) / cell) + 1);
   const m0 = Math.max(1, Math.floor(sY / cell)), m1 = Math.min(g, Math.ceil((sY + srcSize) / cell) + 1);
   const w = cell * k;
@@ -4164,6 +5191,59 @@ function lensMarkAndReadout(lctx, lens, info, cv, hit, sX, sY, k, cssW, px, py, 
    glyph edges hard over a busy backdrop — a shadow wide enough to separate
    them also softens them. */
 let LENS_LABELS_HIDDEN = false;
+
+/* ── LABEL FITTING ─────────────────────────────────────────────────────────
+   One fitter for every label the page draws, so Grid, the Grid lens and the
+   polar lens cannot disagree about what fits.
+
+   Two things push ink outside a cell and the old sizing accounted for neither
+   exactly. The first is the glyph advance, which was assumed at 0.6 em — right
+   for JetBrains Mono, wrong the moment the font falls back before it loads.
+   This measures the actual widest string in the font actually in use. The
+   second is the halo: labels are stroked before they are filled, and a stroke
+   of width L lays L/2 of ink OUTSIDE the glyph on every side, so a label that
+   fits exactly by advance still bleeds half a stroke into its neighbours.
+   Both are in the budget below, which is why nothing crosses a cell boundary
+   however the size control is set.
+
+   labelScale is the user's control. It multiplies the size the label WANTS;
+   the geometric fit is a hard ceiling over that, so the slider can shrink type
+   freely and can only grow it until the cell says stop. */
+const LABEL_STROKE = 0.20;   // stroke width as a fraction of font size
+const LABEL_PAD    = 0.94;   // fraction of the cell the ink is allowed
+const LABEL_CAPH   = 0.74;   // cap height + descender as a fraction of the em
+let labelScale = 1;
+function labelFit(ctx, widest, cell, want) {
+  const probe = 100;
+  const prev = ctx.font;
+  ctx.font = probe + 'px "JetBrains Mono",monospace';
+  const emW = Math.max(0.05, ctx.measureText(widest || '0').width / probe);
+  ctx.font = prev;
+  // ink width  = fs·emW  + fs·STROKE      ink height = fs·CAPH + fs·STROKE
+  const byW = cell * LABEL_PAD / (emW + LABEL_STROKE);
+  const byH = cell * LABEL_PAD / (LABEL_CAPH + LABEL_STROKE);
+  return Math.min(byW, byH, want);
+}
+/* The widest label a mode produces over a range. Monospace makes length a
+   proxy for width, but the string itself is what gets measured, so a fallback
+   font with uneven advances is still fitted correctly. */
+function widestLabel(mode, r0, r1, m0, m1) {
+  let best = '', bl = -1;
+  for (let M = m0; M <= m1; M++) {
+    for (let r = r0; r <= r1; r++) {
+      const t = labelText(mode, r, M);
+      if (t.length > bl) { bl = t.length; best = t; }
+    }
+  }
+  return best;
+}
+function setLabelScale(v) {
+  labelScale = Math.max(0.4, Math.min(3, +v || 1));
+  const el = $('lbl-sc-v');
+  if (el) el.textContent = labelScale.toFixed(2) + '\u00d7';
+  if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
+  redraw(false);
+}
 function labelText(mode, r, m) {
   return mode === 'M'     ? '' + m
     : mode === 'r'     ? '' + r
@@ -4178,31 +5258,60 @@ function labelText(mode, r, m) {
     :                    r + '/' + m;
 }
 /* Always-on cell labels for small grids — no magnifier needed. Same label
-   mode as the lens (#lens-lbl), same stroke-then-fill legibility trick, same
-   self-gating on font size so labels never overlap: below ~7 CSS px they are
-   skipped rather than crammed in. Capped at G=100 — past that, per-cell text
-   stops being the right tool and the lens takes over. */
+   mode as the lens (#lens-lbl), same stroke-then-fill legibility trick.
+
+   Sizing is by the WIDEST label the current mode actually produces, not by a
+   fixed fraction of the cell. The old rule was fs = cell·0.42, chosen so that
+   'r/M' (five glyphs at G=31) would fit; but 'M' is two glyphs and was being
+   sized as if it were five. On a phone that put the default mode under the
+   legibility floor at about G=24 and the labels silently vanished, while the
+   same page on a desktop-width canvas kept them. Measuring the mode's own
+   longest string fixes both: two glyphs now get the room two glyphs need.
+
+   Capped at G=100 — past that, per-cell text stops being the right tool and
+   the lens takes over. When labels are dropped, the reason is recorded and
+   the view note says so, rather than the mode appearing broken. */
+let GRID_LABELS_HIDDEN = '';
 function drawGridLabels(ctx, S) {
+  GRID_LABELS_HIDDEN = '';
   const g = COP_G;
-  if (g > 100) return;
   const mode = $('lens-lbl').value;
   if (mode === 'off') return;
+  if (g > 100) { GRID_LABELS_HIDDEN = 'G is past 100 — use the lens'; return; }
   const cell = S / g;
-  const fs = Math.min(cell * 0.42, 12 * Math.max(1, S / 900));
-  if (fs < 7) return;
+
+  // The widest string this mode actually produces, measured rather than
+  // estimated from a character count.
+  const widest = widestLabel(mode, 1, g, 1, g);
+  // What the label would like to be: the old absolute cap, scaled by the
+  // control. labelFit clamps it to what the cell can hold.
+  const want = 12 * Math.max(1, S / 900) * labelScale;
+  const fs = labelFit(ctx, widest, cell, want);
+  // Legibility floor. On a 2× screen a 6 CSS px glyph still lands on 12 device
+  // pixels and reads cleanly; on a 1× screen it does not, so 1× keeps 7.
+  const floor = (Math.min(devicePixelRatio || 1, 3) >= 2) ? 6 : 7;
+  if (fs < floor) {
+    GRID_LABELS_HIDDEN = 'cells are ' + cell.toFixed(1) + 'px at G=' + g +
+      ' — too small for "' + widest + '"';
+    return;
+  }
   ctx.save();
   ctx.font = fs + 'px "JetBrains Mono",monospace';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.lineWidth = Math.max(1.2, fs * 0.20); ctx.lineJoin = 'round';
+  // Exactly the stroke the fit budgeted for. The old Math.max(1.2, …) floor
+  // could exceed the budget at small sizes and was itself the overflow.
+  ctx.lineWidth = fs * LABEL_STROKE; ctx.lineJoin = 'round';
   for (let M = 1; M <= g; M++) {
     for (let r = 1; r <= g; r++) {
       const x = (r - 0.5) * cell, y = (M - 0.5) * cell;
       const txt = labelText(mode, r, M);
       const co = gcd(r, M) === 1;
-      ctx.strokeStyle = 'rgba(4,4,13,.92)';
-      ctx.strokeText(txt, x, y);
-      ctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
-      ctx.fillText(txt, x, y);
+      upright(ctx, x, y, (ux, uy) => {
+        ctx.strokeStyle = 'rgba(4,4,13,.92)';
+        ctx.strokeText(txt, ux, uy);
+        ctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
+        ctx.fillText(txt, ux, uy);
+      });
     }
   }
   ctx.restore();
@@ -4211,7 +5320,10 @@ function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dp
   LENS_LABELS_HIDDEN = false;
   const mode = $('lens-lbl').value;
   if (mode === 'off') return;
-  const fs = Math.max(0, Math.min(26 * dprL, cell * k * 0.40));
+  // cell·k is the cell's size on the lens canvas. Same ink budget as the
+  // plate, so a label cannot cross a cell edge under magnification either.
+  const widest = widestLabel(mode, r0, r1, m0, m1);
+  const fs = labelFit(lctx, widest, cell * k, 26 * dprL * labelScale);
   // Below ~7 CSS px the type would overlap. Say so in the readout instead of
   // silently doing nothing — a label mode that appears broken is worse than
   // one that explains it needs more zoom.
@@ -4230,11 +5342,13 @@ function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dp
     if (lx < 2 || ly < 2 || lx > lens.width - 2 || ly > lens.height - 2) continue;
     if (drawn++ > 600) return;
     const co = gcd(r, M) === 1;
-    lctx.lineWidth = Math.max(1.5, fs * 0.20); lctx.lineJoin = 'round';
-    lctx.strokeStyle = 'rgba(4,4,13,.92)';
-    lctx.strokeText(textOf(r, M), lx, ly);
-    lctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
-    lctx.fillText(textOf(r, M), lx, ly);
+    lctx.lineWidth = fs * LABEL_STROKE; lctx.lineJoin = 'round';
+    upright(lctx, lx, ly, (ux, uy) => {
+      lctx.strokeStyle = 'rgba(4,4,13,.92)';
+      lctx.strokeText(textOf(r, M), ux, uy);
+      lctx.fillStyle = co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.5)';
+      lctx.fillText(textOf(r, M), ux, uy);
+    });
   }
 }
 
@@ -4242,6 +5356,8 @@ function drawLensLabels(lctx, lens, sX, sY, srcSize, k, cell, r0, r1, m0, m1, dp
 /* Same zoom semantics on a different plate: at N max = 300,000 there are
    150,000 points in ~800 px, roughly 190 even N per column. */
 let COMET_GEO = null;
+let cometHoverN = null;   // last point the comet lens resolved to — exports pick it up
+let cometZoomBox = null;  // last lens window, in data terms — {nLo,nHi,vLo,vHi}
 function drawCometLens(px, py) {
   if (!LENS_ON || !RN || !COMET_GEO) return;
   const cv = $('cv2'), lens = $('lens2'), info = $('lensinfo2');
@@ -4253,6 +5369,28 @@ function drawCometLens(px, py) {
   const src = Math.max(2, lensSize / LENS_ZOOM);      // CSS px window
   const k = lens.width / src;
   const sX = px - src / 2, sY = py - src / 2;
+
+  // In data terms, not screen pixels — the export plot is a different size
+  // and scale, so only N-range and value-range survive the trip; a raw pixel
+  // rectangle would land in the wrong place.
+  cometZoomBox = {
+    nLo: G0.inv(sX), nHi: G0.inv(sX + src),
+    vHi: G0.invY(sY), vLo: G0.invY(sY + src)
+  };
+
+  // Mark that same window back on the full plot — at 300k points a reader
+  // has no other way to tell which sliver of the comet the lens is actually
+  // showing, especially once LENS_ZOOM is pushed high and src shrinks to a
+  // few CSS px.
+  const hl = $('cv2-hl');
+  if (hl) {
+    const dprH = Math.min(devicePixelRatio || 1, 2);
+    const hctx = hl.getContext('2d');
+    hctx.setTransform(dprH, 0, 0, dprH, 0, 0);
+    hctx.clearRect(0, 0, hl.width / dprH, hl.height / dprH);
+    hctx.strokeStyle = '#e5c15a'; hctx.lineWidth = 1.5;
+    hctx.strokeRect(sX + 0.75, sY + 0.75, src - 1.5, src - 1.5);
+  }
 
   const lctx = lens.getContext('2d');
   lctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -4276,6 +5414,7 @@ function drawCometLens(px, py) {
   }
   const Nc = Math.max(4, Math.min(NMAX, Math.round(G0.inv(px) / 2) * 2));
   const vc = valAt(Nc);
+  cometHoverN = Nc;
   if (vc) {
     lctx.strokeStyle = '#3dc8b8'; lctx.lineWidth = Math.max(1.5, dprL);
     lctx.beginPath(); lctx.arc((G0.x(Nc) - sX) * k, (G0.y(vc) - sY) * k, dot * 2.6, 0, 6.284); lctx.stroke();
@@ -4594,7 +5733,7 @@ function selfTest() {
       for (let M = 1; M <= g; M += stp) {
         for (let r = 1; r <= g; r += stp) {
           const rad = ringRad(M, S), th = ringAng(r, M);
-          const c = ringCellAt(rad * Math.cos(th), rad * Math.sin(th), S);
+          const c = ringCellAt(rad * Math.cos(th), RING_H * rad * Math.sin(th), S);
           tot++;
           // clamp folds every r≥M onto the M cell; wrap folds r>M back around
           // the ring every M steps (documented above), so both need r reduced
@@ -4609,6 +5748,186 @@ function selfTest() {
     }
     thetaMode = savedTM;
     addCount('ring polar map inverts (3 θ modes)', agree, tot, 'cell centres at G = ' + g, bad || 'exact');
+  }
+
+  /* — 17b. the global turn is a bijection the hit test undoes exactly — */
+  {
+    // projectCell reports screen coordinates and latticeHitAt reads them back;
+    // the two are written independently, so if the turn ever drifts, a click
+    // silently resolves to the wrong cell and nothing else on the page would
+    // notice. Every quarter is checked, in all three views, because the three
+    // take the turn by different routes: Grid re-projects, Ring goes through
+    // ringCellAt, Cayley through the inverse Möbius.
+    const S = 900, g = COP_G, stp = Math.max(1, g >> 3);
+    const savedQ = viewQuarter, savedVM = viewMode;
+    let agree = 0, tot = 0, bad = '';
+    for (const vm of ['grid', 'ring', 'cayley']) {
+      viewMode = vm;
+      for (const q of [0, -1, 1, 2]) {
+        viewQuarter = q;
+        for (let M = 1; M <= g; M += stp) {
+          for (let r = 1; r <= g; r += stp) {
+            const p = projectCell(r, M, S);
+            if (!p) continue;                       // off-plate (Cayley pole)
+            tot++;
+            const c = latticeHitAt(p[0], p[1], S);
+            if (c && c.r === r && c.M === M) agree++;
+            else if (!bad) bad = vm + ' q=' + q + ': (' + r + ',' + M + ') \u2192 ' +
+                                 (c ? c.r + ',' + c.M : 'outside');
+          }
+        }
+      }
+    }
+    viewQuarter = savedQ; viewMode = savedVM;
+    addCount('quarter turn: project \u2192 hit test round-trips', agree, tot,
+             'grid/ring/cayley \u00d7 0, \u2212i, +i, \u22121', bad || 'exact');
+  }
+
+  /* — 17bb. the Gaussian splitting rules, against direct division in Z[i] — */
+  {
+    // gaussOmega reads the factorisation of z off the factorisation of its
+    // NORM, using the p mod 4 rules. That is a theorem, not an implementation
+    // detail, so it is checked against the only route that shares nothing with
+    // it: dividing z by actual Gaussian primes until it runs out.
+    const G0 = Math.min(COP_G, 40);
+    const gdiv = (a, b) => {
+      const d = b[0] * b[0] + b[1] * b[1];
+      const nr = a[0] * b[0] + a[1] * b[1], ni = a[1] * b[0] - a[0] * b[1];
+      return (nr % d || ni % d) ? null : [nr / d, ni / d];
+    };
+    const cands = [];
+    for (let x = -70; x <= 70; x++) for (let y = 0; y <= 70; y++) {
+      const nn = x * x + y * y;
+      if (nn < 2) continue;
+      if (isPrime(nn) || (y === 0 && isPrime(Math.abs(x)) && Math.abs(x) % 4 === 3)) cands.push([x, y]);
+    }
+    cands.sort((a, b) => (a[0] * a[0] + a[1] * a[1]) - (b[0] * b[0] + b[1] * b[1]));
+    const brute = (r, M) => {
+      let z = [r, M], w = 0, guard = 0;
+      while (z[0] * z[0] + z[1] * z[1] > 1 && guard++ < 200) {
+        let hit = false;
+        for (const c of cands) { const q = gdiv(z, c); if (q) { z = q; w++; hit = true; break; } }
+        if (!hit) break;
+      }
+      return w;
+    };
+    let agree = 0, tot = 0, bad = '';
+    if (gaussReady()) {
+      for (let r = 1; r <= G0; r++) for (let M = 1; M <= G0; M++) {
+        tot++;
+        if (gaussOmega(r, M) === brute(r, M)) agree++;
+        else if (!bad) bad = 'z = ' + r + '+' + M + 'i';
+      }
+    }
+    addCount('\u03a9 in Z[i] from N(z) vs direct Gaussian division', agree, tot,
+             'z = r+iM, r,M \u2264 ' + G0, bad || 'exact');
+  }
+
+  /* — 17bc. Gaussian primes are contained in the coprime plate — */
+  {
+    // If d divided both r and M then d² would divide N(z), so no Gaussian
+    // prime can sit on a gcd>1 cell. The plate the other modes draw is the
+    // ambient set these live in; a violation would mean one of the two
+    // pictures is lying about the same lattice.
+    const G0 = Math.min(COP_G, 120);
+    let ok = 0, tot = 0;
+    if (gaussReady()) {
+      for (let r = 1; r <= G0; r++) for (let M = 1; M <= G0; M++) {
+        if (gaussClass(r, M) !== 0) continue;
+        tot++; if (gcd(r, M) === 1) ok++;
+      }
+    }
+    addCount('every Gaussian prime lies on a gcd = 1 cell', ok, tot,
+             'r, M \u2264 ' + G0, 'containment, not coincidence');
+  }
+
+  /* — 17bd. a saturated prime really is certain death — */
+  {
+    // The saturation mode paints a cell doomed if any prime p <= n+1 divides r,
+    // on the argument that the block then meets every class mod p. That is the
+    // whole of section 1 in one sentence, so it is checked against the block
+    // itself rather than trusted: for every such cell, walk the actual block.
+    const g = Math.min(COP_G, 300);
+    let ok = 0, tot = 0, bad = '';
+    for (const n of [0, 3, 7, Math.min(15, BLOCK_COLOR_CAP)]) {
+      for (let r = 1; r <= g; r++) {
+        let sp = 0;
+        for (let p = 2; p <= n + 1; p++) if (r % p === 0 && spfOf(p) === p) { sp = p; break; }
+        if (!sp) continue;
+        for (let M = 1; M + n <= g; M += 7) {
+          tot++;
+          let alive = true;
+          for (let j = 0; j <= n; j++) if (gcd(r, M + j) !== 1) { alive = false; break; }
+          if (!alive) ok++;
+          else if (!bad) bad = 'r=' + r + ' M=' + M + ' n=' + n + ' survived despite p=' + sp;
+        }
+      }
+    }
+    addCount('saturated prime p \u2264 n+1 dividing r \u21d2 the block dies', ok, tot,
+             'walked directly, n = 0, 3, 7, 15', bad || 'no survivors');
+  }
+
+  /* — 17be. quadratic residues and Gaussian splitting are one dichotomy — */
+  {
+    // Z[i] = Z[x]/(x²+1), so p splits iff x²+1 has a root mod p iff -1 is a
+    // square mod p. The QR mode and the splitting mode therefore have to agree
+    // on every odd prime. Three independent routes are compared: the residue
+    // table, p mod 4, and whether p is actually a sum of two squares.
+    let ok = 0, tot = 0, bad = '';
+    for (let p = 3; p < Math.max(300, Math.min(COP_G, 2000)); p += 2) {
+      if (!isPrime(p)) continue;
+      tot++;
+      _qrM = -1;                                   // don't read a stale row cache
+      const minus1IsSquare = isQR(p - 1, p);
+      const oneModFour = (p % 4 === 1);
+      let sumOfTwoSquares = false;
+      for (let a = 1; a * a < p; a++) {
+        const b2 = p - a * a, b = Math.round(Math.sqrt(b2));
+        if (b * b === b2) { sumOfTwoSquares = true; break; }
+      }
+      if (minus1IsSquare === oneModFour && oneModFour === sumOfTwoSquares) ok++;
+      else if (!bad) bad = 'p = ' + p;
+    }
+    _qrM = -1;
+    addCount('(\u22121 is a square mod p) = (p \u2261 1 mod 4) = (p splits)', ok, tot,
+             'QR table vs p mod 4 vs sum of two squares', bad || 'three routes, one answer');
+  }
+
+  /* — 17bf. the per-strip closed forms in the export band — */
+  {
+    // The export band prints a closed form beside each measured strip density,
+    // which is only useful if the closed form is right. Both identities are
+    // checked against the walk: the sum line's coprime count against φ(N) and
+    // its density against φ(N)/(N−1) — NOT φ(N)/N, since the r = N cell is not
+    // on the line — and the diff line against φ(g)/g on whole periods.
+    const savedG = COP_G;
+    let ok = 0, tot = 0, bad = '';
+    for (let N = 2; N <= Math.min(savedG + 1, 220); N++) {
+      const st = partStripStats('sum', N); tot++;
+      if (st.cop === phiOf(N) && Math.abs(st.d - phiOf(N) / (N - 1)) < 1e-12) ok++;
+      else if (!bad) bad = 'r+M=' + N + ': ' + st.cop + ' vs \u03c6=' + phiOf(N);
+    }
+    addCount('sum strip: count = \u03c6(N), density = \u03c6(N)/(N\u22121)', ok, tot,
+             'walked against the closed form, N \u2264 G+1', bad || 'exact');
+  }
+
+  /* — 17c. the turn cannot change a single count — */
+  {
+    // Multiplication by a unit of Z[i] is a ring automorphism, so associates
+    // share their divisors and no measurement can depend on the quarter. That
+    // is an argument, not a check; this is the check.
+    const savedQ = viewQuarter;
+    const base = JSON.stringify(walkStrip(0));
+    let agree = 0, tot = 0, bad = '';
+    for (const q of [-1, 1, 2]) {
+      viewQuarter = q; tot++;
+      const now = JSON.stringify(walkStrip(0));
+      if (now === base) agree++; else if (!bad) bad = 'q=' + q + ' changed the strip walk';
+    }
+    viewQuarter = savedQ;
+    addCount('strip walk is invariant under the turn', agree, tot,
+             'slope ' + slopeA + '/' + slopeB + ', offset ' + offS + ', width ' + widthW,
+             bad || 'identical');
   }
 
   /* — 18. Cayley map B at a=0 is the identity: φ₀(z) ≡ z, so the Blaschke
@@ -4668,10 +5987,19 @@ function selfTest() {
 }
 
 /* ── collapsible panels ───────────────────────────────────────────────── */
+// The first bar the reader opens is the one that teaches what a bar is. After
+// that the pulse is noise, so it is retired for the rest of the session — the
+// plate, the gold edge and the OPEN tag carry the affordance on their own.
+function hintSpent() {
+  document.documentElement.classList.add('hint-off');
+  try { sessionStorage.setItem('wg-hint-off', '1'); } catch (e) {}
+}
 function togglePanel(titleEl) {
+  hintSpent();
   titleEl.parentElement.classList.toggle('collapsed');
 }
 function toggleSub(el) {
+  hintSpent();
   el.classList.toggle('collapsed');
 }
 /* Prose sections fold from their own heading. §1 is the one above the canvas,
@@ -4751,6 +6079,12 @@ function toggleFS(id) {
   // get out of the way too, not just our own pinned overlay.
   fsProse(on, id);
   if (on) requestBrowserFS(); else exitBrowserFS();
+  // Pinning the canvas only lines it up with the controls if the page is
+  // scrolled to the top — #content's fs-open padding-top is sized to match
+  // the pinned canvas exactly, so scrollY=0 is what puts the drawer right
+  // below it. Without this, opening fullscreen mid-scroll leaves whatever
+  // was at the old scroll position peeking out from under the canvas.
+  if (on) requestAnimationFrame(() => window.scrollTo(0, 0));
   redraw(false); drawComet();
 }
 function requestBrowserFS() {
@@ -4798,6 +6132,11 @@ function setFSButtonState(id, on) {
 }
 
 function boot() {
+  // A reader who already learned what the bars do this session doesn't need
+  // to be taught again on the next page load.
+  try {
+    if (sessionStorage.getItem('wg-hint-off')) document.documentElement.classList.add('hint-off');
+  } catch (e) {}
   const top = 300000;
   SPF = buildSPF(top);
   PRIMES = primesUpTo(10000);
@@ -4806,6 +6145,7 @@ function boot() {
   wireLens();
   setLensZoom(3); setLensPin('auto');
   buildPhi(4096);
+  setViewQuarter(0);            // the raster's own frame by default; the turn is opt-in
   setView('grid'); setRingRot(0); setRingHole(18); setThetaMode('clamp'); setCmap('A');
   computePartItems(); syncPartUI(); renderPartTable();
   onG(31);
