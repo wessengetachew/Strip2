@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Strip Arithmetic II — slope and width unify the gap diagonal, block-coprime density C(n), and the Goldbach singular series under one residue count nu_p.">
+<meta name="description" content="Strip Arithmetic II — slope and width place three classical local densities - the gap diagonal, block-coprime density C(n), and the Hardy-Littlewood singular series - in one lattice, where they are computed by the same residue count nu_p(H).">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Strip Arithmetic II — Slope, Width, and the Singular Series">
-<meta property="og:description" content="One residue count produces min(n+1,p) in C(n) and the Goldbach correction prod (p-1)/(p-2). Interactive, exact, verified.">
+<meta property="og:description" content="One residue count nu_p(H) produces min(n+1,p) in C(n) and the Goldbach factor prod (p-1)/(p-2). An exposition of classical results, recomputed live in the browser.">
 <title>Strip Arithmetic II — Slope, Width &amp; the Singular Series · Wessen Getachew</title>
 
 <script>
@@ -88,6 +88,20 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
   display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .ptitle:hover{color:var(--cream1);}
 .ptitle .car{font-size:9px;opacity:.6;transition:transform .15s;flex:none;}
+/* Credits advanced mode. The attribution list reads as prose first; the wiring
+   that jumps to the control each credit is responsible for is opt-in, because
+   showing seventeen rows of buttons by default turns a courtesy into a machine. */
+#credits .cgo{display:none;margin-top:9px;gap:6px;flex-wrap:wrap;}
+#credits.adv .cgo{display:flex;}
+#credits .cgo .chip{font-size:9.5px;padding:3px 8px;}
+#credits #cadv-view-row{display:none;}
+#credits.adv #cadv-view-row{display:flex;}
+#credits .cnone{display:none;font-family:var(--mono);font-size:9.5px;
+  color:var(--cream3);margin-top:9px;opacity:.7;}
+#credits.adv .cnone{display:block;}
+.cflash{outline:1px solid var(--gold);outline-offset:4px;
+  animation:cflashK 1.7s ease-out;}
+@keyframes cflashK{0%{outline-color:var(--gold);}100%{outline-color:transparent;}}
 .panel.collapsed .ptitle{margin-bottom:0;}
 .panel.collapsed .ptitle .car{transform:rotate(-90deg);}
 .panel.collapsed > .pbody{display:none;}
@@ -440,18 +454,27 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   </div>
   <div class="sub">One residue count runs the whole family. It produces
   <span style="color:var(--gold);font-style:normal;">min(n+1, p)</span> in C(n), and it produces the
-  Goldbach correction <span style="color:var(--gold);font-style:normal;">∏(p−1)/(p−2)</span>.
-  Same rule, two slopes.</div>
+  Goldbach factor <span style="color:var(--gold);font-style:normal;">∏(p−1)/(p−2)</span>.
+  Same rule, two slopes &mdash; and where it saturates, the two normalisations built on it
+  part company completely.</div>
+  <div class="sub" style="font-size:13.5px;margin-top:14px;color:var(--cream3);">
+  The number theory below is classical &mdash; reduced residues, Euler products, and the
+  Hardy–Littlewood singular series. Nothing here is claimed as new. What is offered is a
+  single geometric setting in which these familiar densities are one computation, and a
+  browser that recomputes each of them from scratch.</div>
 </div>
 
 <section id="sec1" class="dsec">
-<h2 class="dsec-h" onclick="toggleSec('sec1')"><span class="num">§1 · The claim</span>C(n) is a strip width<span class="car">&#9662;</span></h2>
+<h2 class="dsec-h" onclick="toggleSec('sec1')"><span class="num">§1 · Setup</span>Blocks, strips, and the residue count<span class="car">&#9662;</span></h2>
 <div class="dsec-b">
 
 <div class="lead">
 <p>A block $\{M, M+1, \dots, M+n\}$ is $n+1$ adjacent diagonals of the coprimality lattice.
-The gap diagonal identity is the width-1 case. Block-coprime density $C(n)$ is the general
-width case. Turn the slope from $+1$ to $-1$ and the same machinery lands on Goldbach.</p>
+Read that way, the gap diagonal identity is the width-1 case, block-coprime density $C(n)$
+is the general width case, and turning the slope from $+1$ to $-1$ gives the configuration
+Hardy and Littlewood treat for Goldbach. Each of the three is a standard piece of
+elementary or classical analytic number theory. What the lattice adds is that they are
+visibly the same local computation, run at different slopes and widths.</p>
 </div>
 
 <p>Most of what follows is one walk over a <b>strip</b>: the set of lattice points
@@ -480,6 +503,7 @@ the whole lattice here instead of along a single strip.</p>
 <tr><td><code>vertical</code></td><td><code>n+1</code></td><td>Block of $n{+}1$ consecutive integers, <b>AND</b> across the band</td><td>$D(n) = \prod_p\!\left(1 - \tfrac{\min(n+1,p)}{p^2}\right)$</td></tr>
 <tr><td><code>−1</code></td><td><code>1</code></td><td>Goldbach anti-diagonal $r + M = N$ &mdash; <a href="https://wessengetachew.github.io/Partition/">Strip I</a></td><td>$\varphi(N)$ points exactly</td></tr>
 <tr><td><code>a/b</code></td><td><code>1</code></td><td>Farey sector ray</td><td>Stern–Brocot mediant structure</td></tr>
+<tr><td><code>+1</code> or <code>−1</code></td><td><code>1</code></td><td>The same strip read <i>along its index</i> $k$ rather than along the lattice</td><td>first zero at $\mathrm{spf}(k)$ &mdash; so $\pi(x)$ exactly, over a finite range</td></tr>
 </table></div>
 
 <h3>The rule underneath</h3>
@@ -507,8 +531,45 @@ collision as the block case, arrived at by division rather than by pigeonhole.</
 </div>
 </div>
 
-<p>Feed $\nu_p$ into the Hardy–Littlewood singular series
-$\mathfrak{S} = \prod_p \frac{1 - \nu_p/p}{(1 - 1/p)^2}$ and the $\{0,N\}$ case collapses:</p>
+<h3>Two normalisations, and where they part company</h3>
+
+<p>One count, but two ways of turning it into a density &mdash; and the difference between them
+is the single most useful thing on this page.</p>
+
+$$ D(n) \;=\; \prod_p \left(1 - \frac{\nu_p}{p^2}\right)
+\qquad\qquad
+\mathfrak{S}(\mathcal{H}) \;=\; \prod_p \frac{1 - \nu_p(\mathcal{H})/p}{(1 - 1/p)^{k}} $$
+
+<p>$D$ asks how often <i>one</i> integer is coprime to the whole of $\mathcal{H}$, against no
+baseline at all. $\mathfrak{S}$ asks how often <i>every</i> member of $\mathcal{H}$ is prime at
+once, measured against what the prime density alone would predict &mdash; hence the
+$(1-1/p)^{k}$ in the denominator, $k = |\mathcal{H}|$. Same $\nu_p$ on the way in, two
+different questions on the way out.</p>
+
+<div class="callout">
+<span class="ch">Admissibility &mdash; one event, two meanings</span>
+<p>Classically $\mathcal{H}$ is <b>admissible</b> when $\nu_p(\mathcal{H}) &lt; p$ for every
+prime $p$. Otherwise $\mathcal{H}$ covers a full residue class system mod $p$, the factor
+$1 - \nu_p/p$ vanishes, and $\mathfrak{S}(\mathcal{H}) = 0$. The consecutive block
+$\mathcal{H} = \{0,\dots,n\}$ fails this for every $p \le n+1$ &mdash; precisely the range
+where $\nu_p = \min(n+1,p) = p$.</p>
+<p>So <b>saturation and inadmissibility are the same event.</b> It is fatal for
+$\mathfrak{S}$: that product asks whether the whole tuple can be prime at once, and a covered
+prime forbids it outright. It is harmless for $D(n)$, whose factor merely settles at
+$1 - 1/p$, because coprimality of one number to a block stays perfectly possible. Two
+normalisations, two meanings of $\nu_p = p$ &mdash; which is why a block and a prime pair,
+indistinguishable as strips in the lattice, behave nothing alike.</p>
+</div>
+
+<p>The rest of this section follows the two branches in turn, and &sect;4 keeps their
+statuses apart.</p>
+
+<h3>The $\mathfrak{S}$ branch &mdash; slope &minus;1</h3>
+
+<p>The singular series was introduced in <i>Partitio Numerorum III</i> (1923). Everything on
+this page sits at $k=2$, since the Goldbach condition is the pair $\mathcal{H}=\{0,N\}$, which
+is admissible for every $p$. Evaluating the product there is finite algebra and the classical
+closed form follows:</p>
 
 $$ \mathfrak{S}(N) \;=\; 2\,C_2 \prod_{\substack{p \mid N \\ p > 2}} \frac{p-1}{p-2},
 \qquad C_2 = \prod_{p>2}\left(1 - \frac{1}{(p-1)^2}\right) \approx 0.6601618158 $$
@@ -565,10 +626,17 @@ $2$; $p=97$ gives $1.011$). An $N$ divisible by $3$, $5$ and $7$ carries
 $2 \cdot \tfrac{4}{3} \cdot \tfrac{6}{5} = 3.2$ against a prime-poor neighbour's $2$. That
 ratio, not the size of $N$, is what splits the comet into bands.</li>
 </ol>
-<p class="stepnote">Every equality above is finite algebra on a convergent product. Nothing in
-this derivation is conjectural; what <i>is</i> conjectural is that $\mathfrak{S}(N)\,\mathrm{li}_2(N)$
-predicts $r(N)$ at all, which is stated separately in &sect;4.</p>
+<p class="stepnote">This is the standard evaluation, reproduced here rather than asserted;
+every equality is finite algebra on a convergent product. What is conjectural is not the
+closed form but the asymptotic that uses it &mdash; that $\mathfrak{S}(N)\,\mathrm{li}_2(N)$
+approximates $r(N)$ at all. &sect;4 separates the two.</p>
 </div>
+
+<h3>The $D$ branch &mdash; the block</h3>
+
+<p>The other normalisation, on the tuple that is maximally inadmissible. Nothing here is
+conjectural: the local count is exact, the combination across primes is CRT, and the density
+statement is M&ouml;bius inversion.</p>
 
 <div class="subtoggle collapsed" onclick="toggleSub(this)">
   <span class="car">&#9662;</span><span>Derivation &mdash; where $D(n) = \prod_p (1 - \nu_p/p^2)$ comes from</span>
@@ -599,15 +667,21 @@ the factor becomes $1 - p/p^2 = 1 - 1/p$. It cannot fall further no matter how m
 That is why $C(n)$ flattens: the small primes are already fully committed, and only primes
 above $n+1$ are still contributing anything new.</li>
 </ol>
-<p class="stepnote">Steps 2 and 5 are the heuristic ones &mdash; uniformity mod $p$ and
-independence across $p$. The <i>identity</i> $\nu_p = \min(n+1,p)$ in step 3 is exact, and the
-self-test panel below measures $D(n)$ against a direct walk rather than assuming the product.</p>
+<p class="stepnote">The probabilistic wording in steps 2–4 is shorthand for an exact count:
+mod $p$ there are $p^2$ residue pairs $(r,M)$ and exactly $\nu_p$ of them fail, and the
+combination across finitely many primes in step 5 is the Chinese Remainder Theorem, not an
+assumption. Made formal, the statement is the usual Möbius inversion over squarefree $d$,
+$$\#\{(r,M)\in[1,X]^2 : \gcd(r,M+j)=1\ \forall j\} \;=\; D(n)\,X^2 + o(X^2),$$
+with the tail of the Euler product supplying the error &mdash; the same argument that gives
+$6/\pi^2$ for the density of coprime pairs when $\mathcal{H}=\{0\}$. So $D(n)$ is a theorem of
+the elementary kind, not a heuristic; the self-test panel below measures it against a direct
+walk anyway.</p>
 </div>
 
 </div>
 </section>
 
-<h2><span class="num">§2 · The lattice</span>Strips at any slope and width</h2>
+<h2 id="sec2"><span class="num">§2 · The lattice</span>Strips at any slope and width</h2>
 
 <div class="panel">
   <div class="ptitle" style="cursor:default;">Lattice parameters</div>
@@ -631,7 +705,8 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
     <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
     <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
     <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
-    <span class="lbl">one turn, all three views</span>
+    <span class="lbl">per view &mdash; Grid and Ring open at &minus;i, Cayley at 0</span>
+
   </div>
 
   <div class="prow vrow" id="row-ring">
@@ -696,6 +771,57 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
     <input type="range" id="cay-zin" min="1" max="10" step="0.1" value="1" oninput="setCayleyZoomIn(+this.value)">
     <span class="val" id="cay-zin-v">1.0&times;</span>
     <button class="chip" onclick="setCayleyZoomIn(1)" title="Back to 1&times;">&#8634;</button>
+  </div>
+
+  <div class="subtoggle collapsed" onclick="toggleSub(this)">
+    <span class="car">&#9662;</span><span>Does the turn change the slope? &mdash; no, and the near-miss is worth naming</span>
+  </div>
+  <div class="subbody">
+  <p style="font-size:13.5px;">
+  <b>Not at all.</b> The turn is applied once to the finished raster, after every count is
+  taken. The strip is still $b\,r - a\,M \in [s,\,s+w)$ with the same $a/b$, and the self test
+  reruns the whole walk at each quarter and requires byte-identical results.</p>
+
+  <p style="font-size:13.5px;">
+  <b>On screen it certainly looks like it does.</b> A drawn line of screen-slope $m$ turns into
+  one of slope $-1/m$, so a $+1$ diagonal comes out looking like a $-1$ anti-diagonal. But the
+  axes turned with it. It is the same strip photographed from the side.</p>
+
+  <p style="font-size:13.5px;">
+  <b>The tempting version.</b> Rotate the <i>lattice</i> instead of the picture:
+  $(r,M) \mapsto (M,\, G{+}1{-}r)$. That really does carry $r - M = g$ onto
+  $r + M = G{+}1{-}g$ &mdash; a gap diagonal onto an anti-diagonal, exactly. It looks like a
+  unification of the two slopes, and it is not one: <b>coprimality is not preserved.</b> At
+  $G = 60$ the map flips 2062 of the 3600 cells. You would land on an anti-diagonal sitting in
+  a lattice that is no longer the coprimality lattice, where $\varphi(N)$ counts nothing.</p>
+
+  <p style="font-size:13.5px;">
+  <b>The symmetry that is real</b> is the reflection $r \leftrightarrow M$. Since
+  $\gcd$ is symmetric the transpose preserves everything exactly; it sends slope $a/b$ to
+  $b/a$ and $g$ to $-g$. That is precisely the strip pair the partition table already tallies
+  once rather than twice.</p>
+
+  <p class="stepnote">So the $+1$ and $-1$ slopes are not related by any rotation. What does
+  relate them is in the prime counter panel: both strips are $\gcd(k,\cdot)$ read along the
+  strip index. Rotation acts on where the points sit; that acts on what they mean.</p>
+  </div>
+
+  <div class="prow vrow" id="row-pts">
+    <span class="plabel">Points</span>
+    <span class="lbl">size</span>
+    <input type="range" id="pt-sz" min="0.5" max="8" step="0.1" value="2"
+           oninput="setPtScale(+this.value)"
+           title="Dot size for the forward-plotted views. Ring and Cayley stamp one dot per sampled cell; the right size depends on G and on how far the map spreads them.">
+    <span class="val" id="pt-sz-v">2.0&times;</span>
+    <button class="chip" onclick="setPtScale(1)">1&times;</button>
+    <button class="chip" onclick="setPtScale(2)">2&times;</button>
+    <button class="chip" onclick="setPtScale(4)">4&times;</button>
+    <span class="lbl">guides</span>
+    <button class="chip on" id="cay-gd" onclick="toggleCayGuides()"
+            title="The four constant-M curves. At small G they render as polygons, because that is genuinely how few lattice points sit on those rings.">Cayley: on</button>
+    <input type="range" id="cay-gd-a" min="0" max="100" step="1" value="100"
+           oninput="setCayGuideAlpha(+this.value)" title="Guide opacity" style="max-width:110px;">
+    <span class="val" id="cay-gd-a-v">100%</span>
   </div>
 
   <div class="prow">
@@ -813,7 +939,7 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
         <option value="failp">first failing prime in the block</option>
         <option value="jstar">j* &mdash; which slot in the block kills it</option>
       </optgroup>
-      <optgroup label="Gaussian integers &mdash; z = r + iM">
+      <optgroup label="Outside the &nu;_p argument &mdash; Z[i] and quadratic residues">
         <option value="gprime">Gaussian prime / composite / imprimitive</option>
         <option value="gsplit">splitting of N(z) &mdash; ramified / split / inert</option>
         <option value="gomega">&Omega;(z) in Z[i] &mdash; Gaussian factor count</option>
@@ -837,7 +963,7 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
 
   <div class="prow">
     <span class="plabel">Lens</span>
-    <button class="chip tl on" id="lens-on" onclick="toggleLens()">Lens: on</button>
+    <button class="chip tl" id="lens-on" onclick="toggleLens()">Lens: off</button>
     <span class="lbl">zoom</span>
     <button class="chip" id="lz-2" onclick="setLensZoom(2)">2&times;</button>
     <button class="chip on" id="lz-3" onclick="setLensZoom(3)">3&times;</button>
@@ -1041,8 +1167,68 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
   <p style="font-size:13px;color:var(--cream3);margin:8px 0 0;">
   Slope $+1$, width 1, offset $g$: the strip density must equal $\varphi(g)/g$.
   Slope $-1$, width 1, offset $N$: the point count must equal $\varphi(N)$ exactly &mdash;
-  this is the count behind <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I</a>'s central claim, that the
-  sum strip is fully coprime iff $\varphi(N) = N-1$, i.e. iff $N$ is prime.</p>
+  this is the count behind <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I</a>, where the
+  anti-diagonal is fully coprime iff $\varphi(N) = N-1$ &mdash; a restatement of the elementary
+  criterion that $\varphi(N) = N-1$ characterises the primes.</p>
+  </div>
+</div>
+
+<div class="panel collapsed">
+  <div class="ptitle" onclick="togglePanel(this)"><span>Prime counter &mdash; the first zero on a strip</span><span class="car">&#9662;</span></div>
+  <div class="pbody">
+  <p style="font-size:13.5px;margin-bottom:10px;">
+  A strip carries an index. For the gap diagonal it is $g$ and the cell at depth $M$ is
+  $\gcd(g, M)$; for the Goldbach anti-diagonal it is $N$ and the cell at $r$ is
+  $\gcd(N, r)$. <b>Those are the same scan</b> &mdash; coprimality to a fixed integer $k$ &mdash;
+  so both slopes give one picture, and two exact facts fall out of it:</p>
+
+  <ul style="font-size:13.5px;margin:0 0 12px 18px;">
+  <li>The <b>first zero</b> along the strip sits at $\mathrm{spf}(k)$, the smallest prime
+  factor. Not approximately: exactly, every time.</li>
+  <li>Below it the zeros repeat with <b>period $\mathrm{rad}(k)$</b>, which is the periodic
+  block structure the plate shows. Their count to depth $K$ is
+  $K - \sum_{d \mid \mathrm{rad}(k)} \mu(d)\lfloor K/d \rfloor$.</li>
+  </ul>
+
+  <p style="font-size:13.5px;margin-bottom:12px;">
+  So a strip clean to depth $K$ means $k$ has no prime factor $\le K$, and for $k \le K^2$
+  that forces $k$ prime. Counting clean strips to depth $K = \lfloor\sqrt{x}\rfloor$ gives
+  $\pi(x) - \pi(K)$ &mdash; the sieve of Eratosthenes in strip coordinates, with Legendre's
+  inclusion&ndash;exclusion as the same M&ouml;bius argument &sect;1 already uses. Three routes
+  are computed below by three different implementations and must agree.</p>
+
+  <div class="prow">
+    <span class="plabel">Range x</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="pcBump(-1000)" title="&minus;1000">&laquo;</button>
+      <button class="sbtn" onclick="pcBump(-100)" title="&minus;100">&minus;</button>
+      <input class="sval" id="pc-num" type="number" min="100" max="50000" value="5000"
+             onchange="setPcX(+this.value)">
+      <button class="sbtn" onclick="pcBump(100)" title="+100">+</button>
+      <button class="sbtn" onclick="pcBump(1000)" title="+1000">&raquo;</button>
+    </div>
+    <button class="chip" onclick="setPcX(1000)">1k</button>
+    <button class="chip" onclick="setPcX(5000)">5k</button>
+    <button class="chip" onclick="setPcX(10000)">10k</button>
+    <button class="chip" onclick="setPcX(50000)">50k</button>
+    <span class="lbl" id="pc-depth-lbl">depth K = 70</span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Window</span>
+    <input type="range" id="pc-win" min="0" max="100" value="0" step="1"
+           oninput="setPcWin(+this.value)" style="flex:1 1 160px;">
+    <span class="lbl" id="pc-win-lbl">k = 2 …</span>
+    <button class="chip" onclick="pcClearPick()">Clear pick</button>
+    <span class="lbl">click a column to pick a strip &mdash; the rest dim</span>
+  </div>
+
+  <div class="cvwrap"><canvas id="cv3" class="main"></canvas></div>
+  <p class="stepnote" id="pc-note">The picture is a window at one column per strip, so it is
+  exact rather than aggregated. The counts below cover the whole range.</p>
+
+  <div class="scroll"><table id="pc-tab"></table></div>
+  <div id="pc-pick"></div>
   </div>
 </div>
 
@@ -1087,10 +1273,10 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
 </div>
 
 <div class="panel collapsed">
-  <div class="ptitle" onclick="togglePanel(this)"><span>Self test &mdash; every claim on this page, checked in the browser</span><span class="car">&#9662;</span></div>
+  <div class="ptitle" onclick="togglePanel(this)"><span>Self test &mdash; every stated identity, recomputed in the browser</span><span class="car">&#9662;</span></div>
   <div class="pbody">
   <p style="font-size:13.5px;margin-bottom:10px;">
-  Nothing here is asserted on trust. Each row recomputes a stated result from scratch and
+  Nothing above is taken on trust. Each row recomputes a stated identity from scratch and
   compares it against an independent route &mdash; a bitset against direct gcd, a sieve against a
   closed form, a convolution against a published constant. Red is a real failure.</p>
   <div class="prow" style="border-bottom:none;padding-top:0;">
@@ -1101,13 +1287,14 @@ self-test panel below measures $D(n)$ against a direct walk rather than assuming
   </div>
 </div>
 
-<h2><span class="num">§3 · The comet</span>Does ν<sub>p</sub> actually predict anything?</h2>
+<h2 id="sec3"><span class="num">§3 · The comet</span>The singular series as the comet’s band structure</h2>
 
 <p>The Goldbach comet plots $r(N)$, the number of ordered prime pairs summing to $N$, against
-$N$. It does not form a single curve: it separates into distinct bands. Those bands are
-$\mathfrak{S}(N)$, and dividing by it merges them. That is evidence the residue count is
-tracking something real, and it is only evidence &mdash; a collapse this clean would be hard to
-produce by accident, but agreement is not proof, and &sect;4 says so plainly.</p>
+$N$. It does not form a single curve: it separates into distinct bands. That the bands are
+indexed by $\mathfrak{S}(N)$, and that dividing by $\mathfrak{S}(N)$ merges them, is the
+standard reading of the comet and dates to the same 1923 paper. The panels below reproduce
+that normalisation on data computed in the browser. They illustrate a classical prediction;
+they are not an argument for it, and &sect;4 keeps the two apart.</p>
 
 <div class="subtoggle collapsed" onclick="toggleSub(this)">
   <span class="car">&#9662;</span><span>What $\mathrm{li}_2(N)$ is, and one caveat about the tables below</span>
@@ -1248,19 +1435,49 @@ the <i>spread</i> across neighbouring $N$, not the distance of any single row fr
   </div>
 </div>
 
-<h2><span class="num">§4 · Limits</span>What is and isn't established</h2>
+<h2 id="sec4"><span class="num">§4 · Status</span>Provenance of each statement</h2>
+
+<p>Nothing on this page is offered as a new theorem. The material divides into three
+classical registers, and the point of the section is to say which register each statement
+belongs to.</p>
 
 <ul>
-<li><b>Exact.</b> $\varphi(g)/g$ on the $+1$ diagonal and $\varphi(N)$ on the $-1$ anti-diagonal
-are elementary identities, checked here by direct enumeration, not asymptotics.</li>
-<li><b>Exact.</b> $\nu_p = \min(n+1,p)$ for consecutive blocks, and $\nu_p \in \{1,2\}$ for
-$\{0,N\}$. Both are finite residue counts and both are verified above.</li>
-<li><b>Exact.</b> The algebraic collapse of $\prod_p \frac{1-\nu_p/p}{(1-1/p)^2}$ to
-$2C_2\prod_{p\mid N,\,p>2}\frac{p-1}{p-2}$.</li>
-<li><b>Heuristic.</b> That $\mathfrak{S}(N)\,\mathrm{li}_2(N)$ approximates $r(N)$. This is the
-Hardy–Littlewood conjecture. It is unproven. The comet shows it fits; fitting is not proof.</li>
-<li><b>Not claimed.</b> Any progress on Goldbach. The lattice sees coprimality; primality is
-strictly harder and nothing here bridges that.</li>
+<li><b>Elementary, classical.</b> $\varphi(g)/g$ on the $+1$ diagonal and $\varphi(N)$ on the
+$-1$ anti-diagonal. Both are counts of reduced residues; they are checked here by direct
+enumeration rather than derived again.</li>
+
+<li><b>Elementary, classical.</b> $\nu_p(\mathcal{H}) = \min(n+1,p)$ for a consecutive block
+(pigeonhole) and $\nu_p \in \{1,2\}$ for $\mathcal{H} = \{0,N\}$ (whether $p \mid N$). Finite
+residue counts, verified above.</li>
+
+<li><b>Classical theorem.</b> $D(n) = \prod_p (1 - \nu_p/p^2)$ as the natural density of the
+surviving pairs $(r,M)$, by Möbius inversion and CRT &mdash; the $\mathcal{H}=\{0\}$ case is the familiar
+$6/\pi^2$. The $C(n) = \zeta(2)\,D(n)$ normalisation is bookkeeping, not content.</li>
+
+<li><b>Classical evaluation.</b> The collapse of
+$\prod_p \frac{1-\nu_p/p}{(1-1/p)^2}$ to $2C_2\prod_{p\mid N,\,p>2}\frac{p-1}{p-2}$ is
+Hardy and Littlewood's, <i>Partitio Numerorum III</i> (1923). Reproduced here for legibility.</li>
+
+<li><b>Elementary, classical &mdash; and exact over a finite range.</b> The first zero on the
+strip indexed by $k$ is at $\mathrm{spf}(k)$, so counting strips clean to depth
+$\lfloor\sqrt{x}\rfloor$ gives $\pi(x) - \pi(\lfloor\sqrt{x}\rfloor)$ with no error term and
+no conjecture. This is the sieve of Eratosthenes in strip coordinates; the
+inclusion&ndash;exclusion form is Legendre's. <b>No claim of novelty or of speed:</b> Meissel,
+Lehmer, and Lagarias&ndash;Miller&ndash;Odlyzko compute $\pi(x)$ far faster, and Legendre's
+$2^{\pi(y)}$ term is exactly why. It counts a finite range and says nothing as
+$x \to \infty$.</li>
+
+<li><b>Conjectural.</b> That $\mathfrak{S}(N)\,\mathrm{li}_2(N)$ approximates $r(N)$. This is
+the Hardy–Littlewood asymptotic, open since 1923. The comet panels display it; display is
+not support.</li>
+
+<li><b>Outside the scope entirely.</b> Goldbach itself. The lattice resolves coprimality;
+primality is a strictly harder condition and nothing here approaches it.</li>
+
+<li><b>What the page supplies.</b> A presentation, not a result: one geometric setting
+(slope, width, offset) and one parameter ($\nu_p$) under which the four rows of the table in
+&sect;1 are the same computation, together with browser-side arithmetic that recomputes each
+of them independently.</li>
 </ul>
 
 <div class="callout">
@@ -1278,9 +1495,157 @@ Part II of the strip series &mdash; <a href="https://wessengetachew.github.io/Pa
 Companion to <a href="https://wessengetachew.github.io/smith/page5.html">Page 5 — Gap Diagonal Identity</a>,
 <a href="https://wessengetachew.github.io/smith/page6.html">Page 6 — Strip Correlations</a> and
 <a href="https://wessengetachew.github.io/smith/page8.html">Page 8 — k-Block Density</a>.<br>
-Hardy &amp; Littlewood, <i>Partitio Numerorum III</i> (1923) for the singular series and the
-$\nu_p(\mathcal{H})$ formulation. $C_2$ is OEIS
-<a href="https://oeis.org/A005597" target="_blank" rel="noopener">A005597</a>.
+The strip framing and the interactive arithmetic are this page's; the number theory is not.
+Full attribution is in the credits panel below.
+</div>
+
+
+<div class="panel collapsed" id="credits">
+  <div class="ptitle" onclick="togglePanel(this)"><span>Credits &mdash; whose mathematics this is</span><span class="car">&#9662;</span></div>
+  <div class="pbody">
+
+  <p style="font-size:13.5px;margin:0 0 14px;">
+  Almost nothing on this page originates here. What follows records who each result belongs
+  to and how it enters, including the pieces that are load-bearing without being visible.
+  Names appear because their work is used, not because they have any connection to this page:
+  no one listed has reviewed it, and nothing here should be read as carrying their
+  endorsement. Errors of attribution are mine and I would rather be told than left alone
+  with them.</p>
+
+  <div class="prow" style="border-bottom:none;padding-top:0;">
+    <button class="chip tl" id="cadv-btn" onclick="toggleCreditsAdv()">Advanced &mdash; wire each credit to its control</button>
+    <span class="lbl" id="cadv-note">off &mdash; the list reads as prose</span>
+  </div>
+
+  <div class="prow cvrow" id="cadv-view-row" style="border-bottom:none;">
+    <span class="plabel">Open lattice credits in</span>
+    <button class="chip cvchip on" data-cv="grid"   onclick="setCreditView('grid')">Grid</button>
+    <button class="chip cvchip"    data-cv="ring"   onclick="setCreditView('ring')">Ring</button>
+    <button class="chip cvchip"    data-cv="cayley" onclick="setCreditView('cayley')">Cayley</button>
+    <button class="chip cvchip"    data-cv="keep"   onclick="setCreditView('keep')">Leave as is</button>
+    <span class="lbl">Grid is the default because it is the view the identities are stated in.
+    Rows about a projection set their own view and ignore this.</span>
+  </div>
+
+  <h3>Directly used &mdash; results this page states, restates, or recomputes</h3>
+  <div class="scroll"><table>
+  <tr><th>Whose</th><th>What it is doing here</th></tr>
+
+  <tr><td><b>Christian Goldbach</b> &amp; <b>Leonhard Euler</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">1742 correspondence</span></td>
+  <td>The conjecture the slope $-1$ anti-diagonal encodes. Euler's reply is the reason the
+  even-$N$ form is the one everyone states.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'anti',panel:'Live identity',scroll:'cv'})">slope −1, N = 210</button></div></td></tr>
+
+  <tr><td><b>Leonhard Euler</b></td>
+  <td>$\varphi(n)$; the Euler product over primes; and $\zeta(2) = \pi^2/6$, which is the
+  entire content of the $C(n) = \zeta(2)\,D(n)$ normalisation.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'gap30',panel:'Live identity',scroll:'cv'})">φ(g)/g at g = 30</button><button class="chip" onclick="cgo({panel:'gcd distribution',gn:1024})">ζ(2) as the limit</button></div></td></tr>
+
+  <tr><td><b>August Ferdinand M&ouml;bius</b></td>
+  <td>$\mu(d)$ and M&ouml;bius inversion &mdash; the step that turns the local counts
+  $1-\nu_p/p^2$ into a density statement about $D(n)$ rather than a heuristic.
+  Separately, the Cayley view's disk map is a M&ouml;bius transformation: same name,
+  unrelated object, and worth not confusing.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',walk:'band',preset:'blk29',scroll:'cv'})">band walk, n = 29</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'cayley',scroll:'cv'})">the other Möbius — disk map</button></div></td></tr>
+
+  <tr><td><b>Sunzi Suanjing</b> and the classical Chinese remainder tradition</td>
+  <td>CRT is what licenses multiplying local factors across distinct primes. It is the
+  quietest assumption in the derivation and the one doing the most work.<div class="cgo"><button class="chip" onclick="cgo({sec:'sec1',sub:'comes from'})">the step it licenses</button></div></td></tr>
+
+  <tr><td><b>Franz Mertens</b> (1874), <b>Ernesto Ces&agrave;ro</b> (1881&ndash;83),
+  <b>P. G. L. Dirichlet</b> (1849)</td>
+  <td>The density of coprime pairs is $1/\zeta(2)$ &mdash; the $\mathcal{H}=\{0\}$ case of
+  everything in &sect;1, and the target the $\Phi(n)/n^2$ panel converges to. Mertens gave the
+  M&ouml;bius proof; Ces&agrave;ro reached it independently; Dirichlet's mean-value work is
+  usually named as the origin. <b>Chebyshev</b> popularised the question in its
+  &ldquo;is a random fraction already in lowest terms?&rdquo; form.<div class="cgo"><button class="chip" onclick="cgo({panel:'gcd distribution',gn:512})">Φ(n)/n² at n = 512</button><button class="chip" onclick="cgo({panel:'gcd distribution',gn:4096})">at n = 4096</button></div></td></tr>
+
+  <tr><td><b>G. H. Hardy</b> &amp; <b>J. E. Littlewood</b><br>
+  <span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">Partitio Numerorum III, Acta Math. 44 (1923)</span></td>
+  <td>The residue count $\nu_p(\mathcal{H})$, the singular series
+  $\mathfrak{S}(\mathcal{H})$, admissibility, the constant $C_2$, and the conjectural
+  asymptotic for $r(N)$. &sect;1's collapse is their calculation and &sect;3's normalisation is
+  their prediction. This page is largely a rendering of that one paper.<div class="cgo"><button class="chip" onclick="cgo({sec:'sec1',sub:'collapses'})">the 𝔖 collapse</button><button class="chip" onclick="cgo({comet:'norm',scroll:'cv2'})">comet ÷ 𝔖</button><button class="chip" onclick="cgo({comet:'ratio',panel:'Spread of',scroll:'cv2'})">spread of the ratio</button></div></td></tr>
+
+  <tr><td><b>Henry F. Fliegel</b> &amp; <b>Douglas S. Robertson</b><br>
+  <span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">&ldquo;Goldbach's Comet&rdquo;, J. Recreational Math. 21(1), 1989</span></td>
+  <td>The comet plot itself, and the first published account of why it bands &mdash; a modular
+  argument, i.e. the same observation &sect;3 makes. The comet panel is a re-rendering of their
+  figure with live data.<div class="cgo"><button class="chip" onclick="cgo({comet:'raw',scroll:'cv2'})">the raw comet</button><button class="chip" onclick="cgo({panel:'Neighbouring N'})">smooth vs rough N</button></div></td></tr>
+
+  <tr><td><b>Carl Friedrich Gauss</b></td>
+  <td>The logarithmic integral and the $1/\log t$ density heuristic, which is what
+  $\mathrm{li}_2(N)$ is built from.<div class="cgo"><button class="chip" onclick="cgo({sub:'one caveat'})">what li₂ is</button></div></td></tr>
+
+  <tr><td><b>Thomas Simpson</b></td>
+  <td>Composite Simpson's rule &mdash; how $\mathrm{li}_2(N)$ is actually evaluated in the
+  browser, split at $t=100$.<div class="cgo"><button class="chip" onclick="cgo({panel:'Self test',run:'selftest'})">check li₂ against 400k steps</button></div></td></tr>
+
+  <tr><td><b>Adrien-Marie Legendre</b>;<br><b>Meissel</b>, <b>Lehmer</b>,
+  <b>Lagarias</b>&ndash;<b>Miller</b>&ndash;<b>Odlyzko</b></td>
+  <td>Legendre's $\Phi(x,y)$ and the inclusion&ndash;exclusion that turns clean strips into
+  $\pi(x)$; the counter panel runs it as an independent cross-check. The others are the
+  modern combinatorial $\pi(x)$ algorithms, named in &sect;4 as the reason this page makes no
+  speed claim.<div class="cgo"><button class="chip" onclick="cgo({panel:'Prime counter'})">the counter</button></div></td></tr>
+
+  <tr><td><b>Eratosthenes</b></td>
+  <td>Sieving by clearing multiples rather than testing. The lattice bitset is built exactly
+  this way, and that choice is the reason $G$ can reach $10^4$ on a phone.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',G:2048,scroll:'cv'})">rebuild the sieve at G = 2048</button></div></td></tr>
+
+  <tr><td><b>John Farey</b>, <b>Charles Haros</b>, <b>Moritz Stern</b>, <b>Achille Brocot</b></td>
+  <td>Mediants and the Stern&ndash;Brocot structure, cited in the slope $a/b$ row of the
+  &sect;1 table &mdash; the general-slope case the other three rows are special cases of.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'f12',scroll:'cv'})">ray 1/2</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'f23',scroll:'cv'})">ray 2/3</button></div></td></tr>
+  </table></div>
+
+  <h3>Indirectly &mdash; the shape of the argument, borrowed</h3>
+  <div class="scroll"><table>
+  <tr><th>Whose</th><th>Relationship</th></tr>
+
+  <tr><td><b>Viggo Brun</b> and the sieve tradition after him;<br>
+  <b>Halberstam</b> &amp; <b>Richert</b>, <i>Sieve Methods</i></td>
+  <td>Admissible tuples and local densities in the form used here. The habit of separating an
+  exact local count from a conjectural global asymptotic &mdash; which is the organising idea of
+  &sect;4 &mdash; is sieve-theoretic and not original.<div class="cgo"><button class="chip" onclick="cgo({scroll:'sec4'})">§4 — what is claimed where</button></div></td></tr>
+
+  <tr><td><b>Montgomery</b> &amp; <b>Vaughan</b>, <i>Multiplicative Number Theory I</i>;<br>
+  <b>Hardy</b> &amp; <b>Wright</b>, <i>An Introduction to the Theory of Numbers</i></td>
+  <td>The modern statements this page's notation follows, and where the coprime-density
+  theorems are found in their standard form.<div class="cgo"><button class="chip" onclick="cgo({sec:'sec1',scroll:'sec1'})">§1 — the notation followed</button></div></td></tr>
+
+  <tr><td><b>J. Bureaux</b> &amp; <b>N. Enriquez</b><br>
+  <span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">&ldquo;The probability that two random integers are coprime&rdquo; (2016)</span></td>
+  <td>The error term behind the $\Phi(n)/n^2 \to 6/\pi^2$ panel. This page only displays the
+  convergence; the size of the remainder is their subject, not one this page addresses.<div class="cgo"><button class="chip" onclick="cgo({panel:'gcd distribution',gn:256})">the small-n remainder</button></div></td></tr>
+
+  <tr><td><b>Arthur Cayley</b>; <b>Henri Poincar&eacute;</b></td>
+  <td>The half-plane-to-disk transform and the disk model behind the Cayley/ring projection.
+  Presentational here rather than arithmetical &mdash; the mathematics does not depend on the
+  view.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'cayley',cmap:'A',scroll:'cv'})">map A</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'cayley',cmap:'B',scroll:'cv'})">map B</button></div></td></tr>
+
+  <tr><td><b>Tom&aacute;s Oliveira e Silva</b></td>
+  <td>Large-scale numerical verification of Goldbach. <i>Not used here</i> and no computation on
+  this page approaches that range; listed because anyone reading a comet plot should know where
+  the real verification effort lives.<div class="cnone">no control — nothing on this page computes at that scale</div></td></tr>
+
+  <tr><td><b>N. J. A. Sloane</b> and OEIS contributors</td>
+  <td>$C_2$ as <a href="https://oeis.org/A005597" target="_blank" rel="noopener">A005597</a>,
+  and the cross-checking of every constant quoted on this page against a published value.<div class="cgo"><button class="chip" onclick="cgo({panel:'Self test',run:'selftest'})">self-test the constants</button></div></td></tr>
+  </table></div>
+
+  <h3>Tools</h3>
+  <p style="font-size:13.5px;margin:0 0 8px;">
+  MathJax for typesetting. Typefaces via Google Fonts: Cinzel (Natanael Gama), Spectral
+  (Production Type), JetBrains Mono (JetBrains). Everything else &mdash; lattice, sieve,
+  projections, comet, self-tests &mdash; is hand-written vanilla JavaScript and Canvas with no
+  framework or plotting library.</p>
+
+  <h3>Same author</h3>
+  <p style="font-size:13.5px;margin:0 0 8px;">
+  <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I &mdash; The Goldbach Diagonal</a>,
+  and the C(n) suite: <a href="https://wessengetachew.github.io/smith/page5.html">Page 5</a>,
+  <a href="https://wessengetachew.github.io/smith/page6.html">Page 6</a>,
+  <a href="https://wessengetachew.github.io/smith/page8.html">Page 8</a>. The strip framing, the
+  slope/width parametrisation, and the browser arithmetic are the parts of this page that are
+  mine; they are a way of looking, not a result.</p>
+
+  </div>
 </div>
 
 </div>
@@ -1324,6 +1689,16 @@ let viewMode = 'grid';             // 'grid' | 'ring' | 'cayley'
 let ringRot = 0;                   // radians, applied as a draw transform
 let ringHole = 0.18;               // inner radius as a fraction of R
 let ringGuides = true;
+/* Point size for the two forward-plotted views. Ring and Cayley stamp one
+   dot per sampled cell, and the old fixed S*0.0026 was tuned on a desktop
+   plate — on a phone it renders as dust. Default 2x that, and exposed,
+   because the right size depends on G and on how far the map spreads the
+   points, which is not something one constant can know. */
+let ptScale = 2;
+/* Cayley's guides are a separate flag from Ring's. They were sharing one,
+   and the toggle lived in the Ring control row — which is hidden in Cayley
+   view, so the lines were drawn by a control the reader could not reach. */
+let cayGuides = true, cayGuideAlpha = 1;
 /* clamp is the default: theta = 2*pi*min(r/M,1) keeps every ring inside one
    turn, so ring M carries its M points at the Mth roots of unity and nothing
    laps anything. wrap lets r > M wind round again, which is the honest
@@ -1981,6 +2356,226 @@ function buildPhi(n) {
   PHI = ph; PHIC = cum; PHI_N = n;
 }
 function Phi(m) { return m < 1 ? 0 : PHIC[m]; }
+
+/* ── prime counter ─────────────────────────────────────────
+
+   The strip index k, read as a scan of gcd(k, ·). Both slopes give the same
+   scan, which is the whole reason this belongs on this page rather than on a
+   sieve page: +1 indexed by g and −1 indexed by N are one object.
+
+   Three independent routes to pi(x), and they must agree:
+     A  measured  — scan each strip for its first zero, count the clean ones
+     B  Legendre  — inclusion–exclusion over squarefree products of p ≤ K
+     C  reference — a plain Eratosthenes sieve, sharing nothing with A or B
+   A and C disagreeing means the strip reading is wrong. A and B disagreeing
+   means the Möbius bookkeeping is wrong. Both matter, so both are shown.
+
+   The scan is cheap despite looking quadratic: it breaks at the first zero,
+   and only the primes cost a full K steps. At x = 50000 that is ~1.1M gcds. */
+
+let pcX = 5000;          // range counted
+let pcWin = 0;           // first k of the drawn window
+let pcPick = 0;          // picked strip index, 0 = none
+let PCFZ = null;         // measured first zero per k (0 = clean to depth K)
+let pcStats = null;
+
+function pcK() { return Math.max(2, Math.floor(Math.sqrt(pcX))); }
+function pcCols() {
+  const cv = $('cv3');
+  const w = (cv && cv.parentElement.clientWidth) || 760;
+  return Math.max(60, Math.min(pcX - 1, Math.floor(w / 2)));
+}
+
+/* Route A. Deliberately gcd, not the SPF table: the panel's own claim is that
+   the strip reading finds spf, and reading spf from a table to prove it would
+   be the two sides sharing an implementation. */
+function pcScan() {
+  const x = pcX, K = pcK(), fz = new Int32Array(x + 1);
+  for (let k = 2; k <= x; k++) {
+    let f = 0;
+    for (let M = 2; M <= K; M++) { if (gcd(k, M) > 1) { f = M; break; } }
+    fz[k] = f;
+  }
+  return fz;
+}
+/* Route B. Recursion over squarefree d | P(K), pruned at d > x. */
+function pcLegendre(x, primes) {
+  let tot = 0;
+  const n = primes.length;
+  (function rec(i, d, sign) {
+    tot += sign * Math.floor(x / d);
+    for (let j = i; j < n; j++) {
+      const nd = d * primes[j];
+      if (nd > x) break;
+      rec(j + 1, nd, -sign);
+    }
+  })(0, 1, 1);
+  return tot;
+}
+/* Route C. Its own sieve, touching neither the bitset nor SPF. */
+function pcSieve(x) {
+  const c = new Uint8Array(x + 1), ps = [];
+  for (let i = 2; i <= x; i++) {
+    if (!c[i]) { ps.push(i); for (let j = i * i; j <= x; j += i) c[j] = 1; }
+  }
+  return ps;
+}
+
+function pcCompute() {
+  const x = pcX, K = pcK();
+  PCFZ = pcScan();
+  let surv = 0;
+  for (let k = 2; k <= x; k++) if (!PCFZ[k]) surv++;
+  const ps = pcSieve(x);
+  const piX = ps.length;
+  let piK = 0;
+  while (piK < ps.length && ps[piK] <= K) piK++;
+  const phi = pcLegendre(x, ps.slice(0, piK));
+  pcStats = {
+    x, K, surv, piX, piK,
+    viaStrip: surv + piK,
+    viaLegendre: phi + piK - 1,
+    phi
+  };
+}
+
+function pcRow(t, label, val, ref, note) {
+  const ok = val === ref;
+  t.innerHTML += '<tr><td>' + label + '</td><td><b style="color:' +
+    (ok ? 'var(--teal)' : 'var(--coral)') + '">' + val.toLocaleString() + '</b></td><td>' +
+    ref.toLocaleString() + '</td><td>' + (ok ? 'agrees' : 'DISAGREES') + '</td>' +
+    '<td class="note">' + note + '</td></tr>';
+}
+function pcTable() {
+  const t = $('pc-tab'), S = pcStats;
+  if (!t || !S) return;
+  t.innerHTML = '<tr><th>Route</th><th>&pi;(' + S.x.toLocaleString() +
+    ')</th><th>Reference</th><th></th><th>How it got there</th></tr>';
+  pcRow(t, 'A · clean strips + &pi;(K)', S.viaStrip, S.piX,
+    S.surv.toLocaleString() + ' strips clean to depth K = ' + S.K + ', plus the ' +
+    S.piK + ' primes at or below K');
+  pcRow(t, 'B · Legendre &Phi;(x,K) + &pi;(K) &minus; 1', S.viaLegendre, S.piX,
+    'inclusion&ndash;exclusion over ' + S.piK + ' primes; &Phi; = ' + S.phi.toLocaleString());
+  pcRow(t, 'C · Eratosthenes', S.piX, S.piX, 'the reference the other two are checked against');
+}
+
+function pcWinMax() { return Math.max(0, (pcX - 1) - pcCols()); }
+function pcSync() {
+  $('pc-num').value = pcX;
+  $('pc-depth-lbl').textContent = 'depth K = ' + pcK();
+  const sl = $('pc-win');
+  sl.max = pcWinMax(); sl.value = Math.min(pcWin, pcWinMax());
+  const k0 = 2 + pcWin;
+  $('pc-win-lbl').textContent = 'k = ' + k0.toLocaleString() + ' … ' +
+    Math.min(pcX, k0 + pcCols() - 1).toLocaleString();
+}
+function setPcX(v) {
+  pcX = Math.max(100, Math.min(50000, Math.round(+v) || 5000));
+  pcWin = 0; pcPick = 0;
+  pcCompute(); pcSync(); pcTable(); pcDraw(); pcPickInfo();
+}
+function pcBump(d) { setPcX(pcX + d); }
+function setPcWin(v) { pcWin = Math.max(0, Math.min(pcWinMax(), v | 0)); pcSync(); pcDraw(); }
+function pcClearPick() { pcPick = 0; pcDraw(); pcPickInfo(); }
+
+function pcDraw() {
+  const cv = $('cv3');
+  if (!cv || !PCFZ) return;
+  const W = Math.round(cv.parentElement.clientWidth || 760);
+  const K = pcK(), cols = pcCols();
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const rowH = Math.max(2, Math.min(7, Math.floor(360 / (K - 1))));
+  const H = Math.max(120, (K - 1) * rowH + 26);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  cv.style.height = H + 'px';
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = '#04040d'; c.fillRect(0, 0, W, H);
+
+  const k0 = 2 + pcWin, cw = W / cols;
+  for (let i = 0; i < cols; i++) {
+    const k = k0 + i;
+    if (k > pcX) break;
+    const x0 = i * cw;
+    const dim = pcPick && k !== pcPick;
+    const clean = !PCFZ[k];
+    // The clean columns are the answer, so they get the gold; everything else
+    // is the zero pattern that disqualified it.
+    if (clean) {
+      c.fillStyle = dim ? 'rgba(242,200,96,.13)' : 'rgba(242,200,96,.30)';
+      c.fillRect(x0, 0, Math.max(1, cw - .4), (K - 1) * rowH);
+    }
+    for (let M = 2; M <= K; M++) {
+      if (gcd(k, M) === 1) continue;
+      const first = (M === PCFZ[k]);
+      c.fillStyle = dim ? (first ? 'rgba(232,106,90,.22)' : 'rgba(120,130,160,.10)')
+                        : (first ? 'rgba(232,106,90,.95)' : 'rgba(120,130,160,.34)');
+      c.fillRect(x0, (M - 2) * rowH, Math.max(1, cw - .4), Math.max(1, rowH - .4));
+    }
+    if (pcPick && k === pcPick) {
+      c.strokeStyle = 'rgba(61,200,184,.9)'; c.lineWidth = 1;
+      c.strokeRect(x0 - .5, -.5, Math.max(1, cw - .4) + 1, (K - 1) * rowH + 1);
+    }
+  }
+  c.fillStyle = 'rgba(238,232,220,.42)';
+  c.font = '10px ui-monospace,monospace';
+  c.fillText('depth M = 2 … ' + K + '   ·   coral = first zero, at spf(k)   ·   ' +
+             'gold column = no prime factor ≤ K', 6, H - 8);
+}
+
+function pcPickInfo() {
+  const el = $('pc-pick');
+  if (!el) return;
+  if (!pcPick || !PCFZ) { el.innerHTML = ''; return; }
+  const k = pcPick, K = pcK();
+  const measured = PCFZ[k];                       // from the strip scan
+  // pfac returns the DISTINCT primes of k, so one entry equal to k means prime.
+  const f = pfac(k, SPF), spf = f.length ? f[0] : k;   // from the SPF table
+  const zeros = [];
+  for (let M = 2; M <= K && zeros.length < 14; M++) if (gcd(k, M) > 1) zeros.push(M);
+  const R = rad(k, SPF);
+  const isP = f.length === 1 && f[0] === k;
+  el.innerHTML =
+    '<div class="callout" style="margin-top:14px;">' +
+    '<span class="ch">Strip k = ' + k.toLocaleString() + (isP ? ' — prime' : ' — composite') + '</span>' +
+    '<p style="font-size:13px;">First zero measured on the strip: <b style="color:var(--coral)">M = ' +
+    (measured || '— none to depth ' + K) + '</b>. Smallest prime factor from the factor table: <b>' +
+    spf + '</b>. ' + ((measured || spf) === spf || (!measured && spf > K)
+      ? '<span style="color:var(--teal)">Agree.</span>'
+      : '<span style="color:var(--coral)">Disagree.</span>') +
+    '</p>' +
+    '<p style="font-size:13px;">rad(k) = <b>' + R + '</b>, so the zeros repeat with that period. ' +
+    'Zeros to depth ' + K + ': ' + (zeros.length ? zeros.join(', ') + (zeros.length === 14 ? ' …' : '') : 'none — the strip is clean') + '.</p>' +
+    '<div class="prow" style="border-bottom:none;padding-bottom:0;">' +
+    '<span class="plabel">Show on the plate</span>' +
+    '<button class="chip tl" onclick="pcToPlate(1)">as +1 diagonal, g = ' + k + '</button>' +
+    '<button class="chip cr" onclick="pcToPlate(-1)">as −1 anti-diagonal, N = ' + k + '</button>' +
+    '</div></div>';
+}
+/* The payoff of picking: the same k, seen as an actual strip on the lattice.
+   The anti-diagonal needs the lattice to reach N, the diagonal does not. */
+function pcToPlate(sign) {
+  const k = pcPick;
+  if (!k) return;
+  const need = sign < 0 ? Math.min(4096, k) : 0;
+  applyStrip({ a: sign, b: 1, s: k, w: 1, minG: need });
+  const el = $('ctl-toggle'); if (el) el.classList.remove('collapsed');
+  setTimeout(() => {
+    const cv = $('cv');
+    if (cv) { cv.scrollIntoView({ behavior: 'smooth', block: 'center' }); _cFlash(cv.parentElement); }
+  }, need ? 260 : 90);
+}
+
+function pcHit(ev) {
+  if (!PCFZ) return;
+  const cv = $('cv3'), r = cv.getBoundingClientRect();
+  const cols = pcCols(), cw = r.width / cols;
+  const i = Math.floor((ev.clientX - r.left) / cw);
+  const k = 2 + pcWin + i;
+  if (k < 2 || k > pcX) return;
+  pcPick = (pcPick === k) ? 0 : k;
+  pcDraw(); pcPickInfo();
+}
 
 /* ── gcd distribution ──────────────────────────────────────────────────── */
 let gcdN = 512, gcdRows = 16, GCD_LAST = null;
@@ -2781,7 +3376,7 @@ function partStripStats(type, k) {
    sum, r + M = N:  gcd(r, N-r) = gcd(r, N), and the line carries r = 1 … N-1,
      so the coprime COUNT is φ(N) exactly. The density is therefore
      φ(N)/(N-1), NOT φ(N)/N — the r = N cell would be the missing one and it
-     is not on the line. The header's "φ(N) at slope −1" is a claim about the
+     is not on the line. The header's "φ(N) at slope −1" is a statement about the
      count and is right; it is the density that carries the off-by-one. */
 function expectedStrip(type, k) {
   if (k < 1) return null;
@@ -3068,11 +3663,21 @@ function upright(ctx, x, y, draw) {
   if (!viewQ()) { draw(x, y); return; }
   ctx.save(); ctx.translate(x, y); ctx.rotate(-viewRotRad()); draw(0, 0); ctx.restore();
 }
+/* The turn is still applied once, in paintView, so exports and hit tests read
+   a single viewQuarter. What is per-view is the DEFAULT and the memory: Grid
+   and Ring open at -i, Cayley at 0, because the three views want different
+   framings out of the box and switching view should not silently re-orient
+   the one you just set. VQ holds the last quarter each view was left at. */
+const VQ = { grid: -1, ring: -1, cayley: 0 };
+function syncRotChips() {
+  document.querySelectorAll('.rotchip').forEach(b =>
+    b.classList.toggle('on', +b.dataset.q === viewQuarter));
+}
 function setViewQuarter(q) {
   viewQuarter = ((Math.round(q) % 4) + 4) % 4;
   if (viewQuarter > 2) viewQuarter -= 4;          // keep it in -1..2 for display
-  document.querySelectorAll('.rotchip').forEach(b =>
-    b.classList.toggle('on', +b.dataset.q === viewQuarter));
+  VQ[viewMode] = viewQuarter;
+  syncRotChips();
   if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
   redraw(false);          // the comet is a different plate and does not turn
 }
@@ -3139,11 +3744,11 @@ function ringCellAt(dx, dy, S) {
    at a fixed ~900x900 density regardless of G, stepping across the FULL
    1..g range rather than truncating to the first 900 rows/cols — a fixed
    cap left everything past M=900 (or r=900) undrawn, an empty void rather
-   than the honest under-sampling the old comment claimed. Past 900 it
+   than the honest under-sampling the old comment advertised. Past 900 it
    under-samples, but every part of the lattice gets *some* representation. */
 function ringBase(mode, S) {
   const boost = partMode !== 'off' ? partBgBoost : 1;
-  const key = COP_G + '|' + S + '|' + mode + '|' + ringHole.toFixed(4) + '|' + thetaMode + '|' + boost;
+  const key = COP_G + '|' + S + '|' + mode + '|' + ringHole.toFixed(4) + '|' + thetaMode + '|' + boost + '|' + ptScale;
   if (ringCv && ringKey === key) return ringCv;
   const cv = document.createElement('canvas');
   cv.width = S; cv.height = S;
@@ -3151,7 +3756,7 @@ function ringBase(mode, S) {
   ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, S, S);
   const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const C = S / 2;
-  const dot = Math.max(1, S * 0.0026);
+  const dot = Math.max(1, S * 0.0026 * ptScale);
   for (let M = 1; M <= g; M += step) {
     const rad = ringRad(M, S);
     for (let r = 1; r <= g; r += step) {
@@ -3226,12 +3831,15 @@ function drawRingBand(ctx, S) {
 function drawRingGuides(ctx, S) {
   const C = S / 2, R = ringOuter(S), g = COP_G;
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.lineWidth = 1;
+  // Same plate-scaling as the Cayley guides — a fixed 1px stroke disappears
+  // on the 2048px export.
+  ctx.strokeStyle = 'rgba(255,255,255,' + (0.15 * cayGuideAlpha).toFixed(3) + ')';
+  ctx.lineWidth = Math.max(0.8, 1.1 * (S / 900));
   ctx.beginPath(); ctx.arc(C, C, R * ringHole, 0, TAU); ctx.stroke();
   ctx.beginPath(); ctx.arc(C, C, R - 0.5, 0, TAU); ctx.stroke();
   // the seam at r = 1, where the lattice row wraps back on itself
   const seam0 = ringPt(R * ringHole, ringRot, S), seam1 = ringPt(R, ringRot, S);
-  ctx.strokeStyle = 'rgba(200,168,74,.45)';
+  ctx.strokeStyle = 'rgba(200,168,74,' + (0.45 * cayGuideAlpha).toFixed(3) + ')';
   ctx.beginPath();
   ctx.moveTo(seam0[0], seam0[1]);
   ctx.lineTo(seam1[0], seam1[1]);
@@ -3307,7 +3915,7 @@ function cayleyXY(r, M, S) {
 }
 let cayCv = null, cayKey = '';
 function cayleyBaseKey(S) {
-  return [COP_G, S, cmap, rho0, rhoD, ba, baAng, cayleyRot, cayleyZoomOut, cayleyZoomIn, thetaMode, $('cmode').value].join('|');
+  return [COP_G, S, cmap, rho0, rhoD, ba, baAng, cayleyRot, cayleyZoomOut, cayleyZoomIn, thetaMode, ptScale, $('cmode').value].join('|');
 }
 /* Forward-plotted field: loop the lattice (capped, like Strip I) and stamp
    each coprime cell's Möbius image. Forward scatter can under-sample once
@@ -3326,7 +3934,7 @@ function drawCayleyField(ctx, S) {
   // past r or M = 900 as an undrawn void once g exceeded that.
   const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const mode = $('cmode').value;
-  const dot = Math.max(1, S * 0.0026 * Math.min(2.4, Math.sqrt(Math.max(1, cayleyZoomIn))));
+  const dot = Math.max(1, S * 0.0026 * ptScale * Math.min(2.4, Math.sqrt(Math.max(1, cayleyZoomIn))));
   for (let M = 1; M <= g; M += step) {
     for (let r = 1; r <= g; r += step) {
       const cop = isCop(r, M);
@@ -3371,10 +3979,21 @@ function drawCayleyStripAt(ctx, S, s, color) {
   }
   ctx.restore();
 }
+/* The four constant-M curves at M = G/4, G/2, 3G/4, G. They are sampled at
+   240 points and each sample is rounded to an integer r, so at small G the
+   distinct samples are few and the curve renders as a polygon — which is
+   honest (there really are only that many lattice points on that ring) but
+   reads as stray straight lines if you did not expect it. Hence its own
+   control, and its own opacity, rather than sharing Ring's toggle: in Cayley
+   these are the most prominent thing on the plate. */
 function drawCayleyGuides(ctx, S) {
   const cx = S / 2, cy = S / 2, g = COP_G;
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,' + (0.12 * cayGuideAlpha).toFixed(3) + ')';
+  // Scale with the plate. A fixed lineWidth of 1 is a visible hairline at the
+  // ~760px screen size and an invisible one on the 2048px export, which is
+  // why the guides appeared to be missing from saved plates.
+  ctx.lineWidth = Math.max(0.8, 1.1 * (S / 900));
   [0.25, 0.5, 0.75, 1].forEach(f => {
     const M = Math.max(1, Math.round(g * f));
     ctx.beginPath();
@@ -3408,7 +4027,7 @@ function drawCayleyBand(ctx, S) {
 function drawCayley(ctx, S) {
   drawCayleyField(ctx, S);
   dimPlateIfPartition(ctx, S);
-  if (ringGuides) drawCayleyGuides(ctx, S);
+  if (cayGuides) drawCayleyGuides(ctx, S);
   if (walkMode === 'band') drawCayleyBand(ctx, S);
   else if (showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(224,80,96,.9)');
   drawPartitionsOverlay(ctx, S);
@@ -3431,8 +4050,8 @@ function updateIdentityBand(bs) {
   // Finite-G bias, not noise: a band of n+1 columns loses its last n columns at
   // the edge, so the deficit scales as (n+1)/cap. Measured offline at cap =
   // 200/400/800/1600 for n = 0,1,2,5,9 the relative error stays under
-  // 4(n+1)/cap throughout, so that is the tolerance. Claiming tighter would
-  // just paint a converging number red.
+  // 4(n+1)/cap throughout, so that is the tolerance. A tighter one would just
+  // paint a converging number red.
   const tol = 0.005 + 4 * (n + 1) / bs.cap;
   t.insertAdjacentHTML('beforeend',
     '<tr class="' + (rel < tol ? 'good' : 'bad') + '"><td>Band density, n=' + n +
@@ -3658,6 +4277,8 @@ function onW(v) {
 /* ── view switching ────────────────────────────────────────────────────── */
 function setView(v) {
   viewMode = v;
+  viewQuarter = VQ[v] !== undefined ? VQ[v] : 0;
+  syncRotChips();
   document.querySelectorAll('.viewchip').forEach(b =>
     b.classList.toggle('on', b.dataset.view === v));
   $('row-ring').classList.toggle('on', v === 'ring');
@@ -3666,12 +4287,20 @@ function setView(v) {
   $('row-cay-b').classList.toggle('on', v === 'cayley');
   $('row-cay-c').classList.toggle('on', v === 'cayley');
   $('row-cay-zoom').classList.toggle('on', v === 'cayley');
+  // Point size and guide opacity apply to both forward-plotted views, so the
+  // row lives outside the per-map rows and shows for either one.
+  $('row-pts').classList.toggle('on', v === 'ring' || v === 'cayley');
+  $('cay-gd').style.display = v === 'cayley' ? '' : 'none';
+  $('cay-gd-a').style.display = v === 'cayley' ? '' : 'none';
+  $('cay-gd-a-v').style.display = v === 'cayley' ? '' : 'none';
   // The lens follows the plate now rather than standing down off Grid: Ring
   // and Cayley both invert, so it magnifies them too — as a disk, since a
   // square window over a polar map frames cells that are not neighbours, and
   // by blitting rather than re-rendering, since neither has a uniform pitch.
+  // Don't advertise the lens as a property of the view when it is switched off.
   $('view-lbl').textContent = v === 'grid' ? ''
-    : v === 'ring' ? 'lens reads this as a disk — rings and angles, not rows'
+    : v === 'ring' ? (LENS_ON ? 'lens reads this as a disk — rings and angles, not rows'
+                              : 'rings and angles, not rows')
     : 'the whole lattice folded onto one m × m table';
   hideLens();
   redraw(false);
@@ -3695,6 +4324,25 @@ function setRingHole(pct) {
   ringHole = pct / 100;
   $('ring-hole').value = pct; $('ring-hole-v').textContent = ringHole.toFixed(2);
   ringKey = '';                      // the radial map moved — buffer is stale
+  redraw(false);
+}
+/* Point size invalidates both cached plates, so it goes through redraw with
+   a rebuild — the caches key on ptScale, so a stale buffer cannot survive. */
+function setPtScale(v) {
+  ptScale = Math.max(0.5, Math.min(8, +v || 2));
+  $('pt-sz').value = ptScale;
+  $('pt-sz-v').textContent = ptScale.toFixed(1) + '\u00d7';
+  redraw(true);
+}
+function toggleCayGuides() {
+  cayGuides = !cayGuides;
+  $('cay-gd').textContent = 'Cayley: ' + (cayGuides ? 'on' : 'off');
+  $('cay-gd').classList.toggle('on', cayGuides);
+  redraw(false);
+}
+function setCayGuideAlpha(v) {
+  cayGuideAlpha = Math.max(0, Math.min(1, v / 100));
+  $('cay-gd-a-v').textContent = Math.round(cayGuideAlpha * 100) + '%';
   redraw(false);
 }
 function toggleRingGuides() {
@@ -3758,8 +4406,8 @@ function setCayleyZoomIn(v) {
   redraw(false);
 }
 /* The caption states what the current projection can and cannot be read for.
-   In Cayley it also carries the live ν_m comparison, which is the one number
-   on this page that the picture is actually evidence for. */
+   In Cayley it also carries the live ν_m comparison — the one number here that
+   the picture itself measures rather than illustrates. */
 function updateViewNote() {
   const el = $('view-note');
   if (!el) return;
@@ -3850,6 +4498,15 @@ function updateViewNote() {
           ? ' G exceeds the 1200-pixel buffer, so each pixel aggregates its block and shades by density.'
           : ' G exceeds the 1200-pixel buffer, and a gcd cannot be averaged \u2014 this mode samples one cell per pixel.')
       : '') +
+    // These modes are on a different subject: Z[i] factorisation and the QR
+    // symbol are properties of a cell, not of a strip, and nothing in §1
+    // depends on them. Better to say so on the plate than to let a reader
+    // assume the colours are part of the ν_p argument.
+    (mode === 'gprime' || mode === 'gsplit' || mode === 'gomega' || mode === 'qres'
+      ? ' <b style="color:var(--cream3)">Outside the ν_p argument</b> — this mode colours a ' +
+        'property of the cell itself, not of the strip. Nothing in §1 rests on it; ' +
+        'it is here because the same plate happens to carry it.'
+      : '') +
     // A label mode that is switched on and draws nothing looks broken. Say why.
     (GRID_LABELS_HIDDEN
       ? ' <b style="color:var(--gold)">Cell labels hidden:</b> ' + GRID_LABELS_HIDDEN +
@@ -3881,9 +4538,9 @@ const PRESETS = {
   f12:   { a: 1,  b: 2, s: 1,   w: 1 },
   f23:   { a: 2,  b: 3, s: 1,   w: 1 }
 };
-function preset(k) {
-  const P = PRESETS[k];
-  if (!P) return;
+/* Extracted from preset() so anything holding a strip spec — a preset chip, a
+   credit chip, or a picked column in the counter — lands the same way. */
+function applyStrip(P) {
   const go = () => {
     $('sl-a').value = P.a; $('sl-b').value = P.b;
     slopeA = P.a; slopeB = P.b;
@@ -3900,6 +4557,10 @@ function preset(k) {
   if (P.minG && G < P.minG) onG(P.minG);      // needs a big enough lattice
   // onG is async through the bitset build, so re-apply once it lands
   if (P.minG && COP_G < P.minG) setTimeout(go, 40); else go();
+}
+function preset(k) {
+  const P = PRESETS[k];
+  if (P) applyStrip(P);
 }
 /* Light up whichever preset the current state actually matches, including
    after the user arrives there by stepping rather than clicking. */
@@ -3944,7 +4605,7 @@ function onKey(e) {
    no G, no slope, no counts and no verdict, and cannot tell a strip from a band
    or a pass from a failure. These compose the same way Strip Arithmetic I's
    exports do: eyebrow, title, measured stats, a row of stat cards carrying the
-   numbers that decide the claim, the plate, then a footer stating the strip
+   numbers the verdict rests on, the plate, then a footer stating the strip
    equation and the render settings so the image is reproducible from itself. */
 
 const PAL = { bg: '#04040d', gold: '#c8a84a', teal: '#3dc8b8', coral: '#e05060',
@@ -3985,7 +4646,7 @@ function cardRow(ctx, cards, x, y, totalW, h, S) {
   cards.forEach((c, i) => drawCard(ctx, x + i * (w + gap), y, w, h, c[0], c[1], c[2], S));
 }
 
-/* Which numbers decide the claim depends on which walk is live, so the card
+/* Which numbers decide the verdict depends on which walk is live, so the card
    row is built from the state rather than fixed. */
 function exportCards() {
   const g = COP_G;
@@ -4666,7 +5327,7 @@ async function exportComet(px) {
   ctx.font = (22 * S) + 'px ' + MONO; ctx.fillStyle = PAL.teal;
   ctx.fillText('r(N) ~ 𝔖(N)·li₂(N)   ·   ν_p{0,N} = 1 if p|N else 2', m, 258 * S);
 
-  // the spread comparison is the whole claim, so it goes in the cards
+  // the spread comparison is the whole point of the plate, so it goes in the cards
   cardRow(ctx, [
     [fmt(st1.sd, 4), 'σ without 𝔖', PAL.coral],
     [fmt(st2.sd, 4), 'σ with 𝔖', PAL.lime],
@@ -4729,7 +5390,7 @@ async function exportComet(px) {
   ctx.fillText('r(N) = ordered prime pairs summing to N   ·   li₂ by composite Simpson   ·   ' +
                'N max ' + NMAX.toLocaleString() + '   ·   view ' + cometMode, m, fy);
   ctx.fillText('point α = ' + ptAlpha.toFixed(2) + '   ·   even N sampled ' + (NMAX / 2).toLocaleString() +
-               '   ·   Hardy–Littlewood is a heuristic — the fit below is evidence, not proof', m, fy + 27 * S);
+               '   ·   The Hardy–Littlewood asymptotic is conjectural — this is illustration, not evidence', m, fy + 27 * S);
   ctx.textAlign = 'right';
   ctx.fillText('wessengetachew.github.io', px - m, fy);
   ctx.fillStyle = PAL.coral;
@@ -4760,7 +5421,11 @@ function exportCometCSV() {
    true cells as vectors at the magnified pitch, which makes it the only exact
    view of the lattice at large G.
    ══════════════════════════════════════════════════════════════════════════ */
-let LENS_ON = true, LENS_ZOOM = 3, LENS_PIN = 'auto', LENS_REDRAW = null;
+/* Off by default. The lens follows the pointer, so on a first visit it fires
+   on every incidental move across the plate and reads as the page grabbing at
+   you. It is the only exact view of the lattice past G = canvas size, so it
+   stays one keypress (L) or one chip away — just not uninvited. */
+let LENS_ON = false, LENS_ZOOM = 3, LENS_PIN = 'auto', LENS_REDRAW = null;
 let lensSize = 200, lensAt = null;
 const LENS_PRESETS = [2, 3, 4, 6, 10, 20, 30, 40, 50, 100];
 
@@ -5495,7 +6160,7 @@ function clickAddPartition(e) {
 
 /* ══════════════════════════════════════════════════════════════════════════
    SELF TEST
-   Each row recomputes a claim by an independent route. The rule is that the
+   Each row recomputes a stated identity by an independent route. The rule is that the
    two sides must not share an implementation: the bitset is checked against
    direct gcd, the Phi formula against direct enumeration, the singular series
    product against its closed form, the prime convolution against published
@@ -5911,6 +6576,89 @@ function selfTest() {
              'walked against the closed form, N \u2264 G+1', bad || 'exact');
   }
 
+  /* — 17bg. the first zero on a strip is spf(k) — */
+  {
+    // The counter panel's whole reading. The strip side scans gcd(k, M) upward;
+    // the reference side reads the smallest prime factor off the SPF table.
+    // Nothing is shared: one walks, the other looks up.
+    let ok = 0, tot = 0, bad = '';
+    const K = 200;
+    for (let k = 2; k <= 4000; k++) {
+      let first = 0;
+      for (let M = 2; M <= K; M++) { if (gcd(k, M) > 1) { first = M; break; } }
+      const f = pfac(k, SPF), spf = f.length ? f[0] : k;
+      const want = spf <= K ? spf : 0;
+      tot++;
+      if (first === want) ok++; else if (!bad) bad = 'k=' + k + ': ' + first + ' vs spf ' + spf;
+    }
+    addCount('first zero on strip k = spf(k)', ok, tot,
+             'strip scan vs the factor table, k \u2264 4000, depth 200', bad || 'exact');
+  }
+
+  /* — 17bh. clean strips to depth √x count the primes — */
+  {
+    // π(x) three ways, none sharing an implementation: the strip scan, Legendre's
+    // inclusion–exclusion, and a plain sieve. If the geometry were wrong this is
+    // the row that would say so.
+    const savedX = pcX;
+    let ok = 0, tot = 0, bad = '';
+    for (const x of [1000, 5000, 10000]) {
+      pcX = x; pcCompute();
+      const S = pcStats;
+      tot += 2;
+      if (S.viaStrip === S.piX) ok++; else if (!bad) bad = 'strip ' + S.viaStrip + ' vs ' + S.piX + ' at x=' + x;
+      if (S.viaLegendre === S.piX) ok++; else if (!bad) bad = 'Legendre ' + S.viaLegendre + ' vs ' + S.piX + ' at x=' + x;
+    }
+    pcX = savedX; pcCompute();
+    addCount('clean strips and Legendre both give \u03c0(x)', ok, tot,
+             'x = 1000, 5000, 10000 against an independent sieve', bad || 'exact');
+  }
+
+  /* — 17bi. the zeros below the first one are periodic mod rad(k) — */
+  {
+    // The "repeated blocks" claim, stated as periodicity: whether M is a zero on
+    // strip k depends only on M mod rad(k).
+    let ok = 0, tot = 0, bad = '';
+    for (let k = 2; k <= 600; k++) {
+      const R = rad(k, SPF);
+      let good = true;
+      for (let M = 2; M <= 400; M++) {
+        const a = gcd(k, M) > 1, b = gcd(k, ((M % R) || R)) > 1;
+        if (a !== b) { good = false; break; }
+      }
+      tot++;
+      if (good) ok++; else if (!bad) bad = 'k=' + k + ' not periodic mod ' + R;
+    }
+    addCount('strip zeros are periodic mod rad(k)', ok, tot,
+             'M vs M mod rad(k), k \u2264 600, M \u2264 400', bad || 'exact');
+  }
+
+  /* — 17bj. the turn is not an arithmetic symmetry; the transpose is — */
+  {
+    // The §2 note claims three things and quotes a number. All three are
+    // recomputed here rather than trusted, including the count, so the prose
+    // cannot drift away from the arithmetic it describes.
+    const g60 = 60;
+    let tBad = 0, qFlip = 0, tot = 0, mapOK = true;
+    for (let r = 1; r <= g60; r++) {
+      for (let M = 1; M <= g60; M++) {
+        tot++;
+        if (gcd(r, M) !== gcd(M, r)) tBad++;                       // reflection
+        const r2 = M, M2 = g60 + 1 - r;                            // quarter turn
+        if ((gcd(r, M) === 1) !== (gcd(r2, M2) === 1)) qFlip++;
+      }
+    }
+    for (let gg = 1; gg < 10 && mapOK; gg++)
+      for (let M = 1; M + gg <= g60; M++) {
+        const r = M + gg;
+        if (M + (g60 + 1 - r) !== g60 + 1 - gg) { mapOK = false; break; }
+      }
+    const ok = (tBad === 0) && (qFlip === 2062) && mapOK;
+    addCount('turn is not a gcd symmetry, transpose is', ok ? 3 : 0, 3,
+             'G = 60: reflection exact, turn flips 2062 of 3600, r\u2212M=g \u2192 r+M=G+1\u2212g',
+             ok ? 'as stated in \u00a72' : 'reflection bad ' + tBad + ', flips ' + qFlip + ', map ' + mapOK);
+  }
+
   /* — 17c. the turn cannot change a single count — */
   {
     // Multiplication by a unit of Z[i] is a ring automorphism, so associates
@@ -5970,7 +6718,7 @@ function selfTest() {
 
   /* — render — */
   const t = $('stt');
-  t.innerHTML = '<tr><th>#</th><th>Claim</th><th>Result</th><th>Should be</th><th>Scope</th><th></th></tr>';
+  t.innerHTML = '<tr><th>#</th><th>Identity</th><th>Result</th><th>Should be</th><th>Scope</th><th></th></tr>';
   let pass = 0, failn = 0, skip = 0;
   rows.forEach((r, i) => {
     const cls = r.ok === true ? 'good' : r.ok === false ? 'bad' : '';
@@ -6007,6 +6755,93 @@ function toggleSub(el) {
 function toggleSec(id) {
   const el = $(id);
   if (el) el.classList.toggle('collapsed');
+}
+
+/* ── credits ──────────────────────────────────────────────
+
+   A credit line that names a result but leaves the reader hunting for the
+   control that uses it is only half an attribution. Advanced mode adds one or
+   two chips per row that put the page into the state where that person's work
+   is visibly doing something, then scrolls there and marks the target.
+
+   Panels and derivations are matched by their TEXT, not by id, because MathJax
+   rewrites the maths inside those titles at load: the match strings below are
+   deliberately chosen from the prose part of each title, which survives
+   typesetting. Every call is wrapped, so a chip that points at a control which
+   has been renamed degrades to a scroll rather than a broken page.           */
+
+let creditsAdv = false;
+/* Which view a credit chip lands in. Grid by default: every identity in §1 is
+   stated in (r, M) coordinates, and Ring or Cayley re-project the same data in
+   a way that is beautiful but harder to read a strip off. 'keep' leaves the
+   current view alone for a reader who has settled on one. Rows whose subject
+   IS a projection pass an explicit view and override this. */
+let creditView = 'grid';
+function setCreditView(v) {
+  creditView = v;
+  document.querySelectorAll('.cvchip').forEach(b =>
+    b.classList.toggle('on', b.dataset.cv === v));
+}
+function toggleCreditsAdv() {
+  creditsAdv = !creditsAdv;
+  $('credits').classList.toggle('adv', creditsAdv);
+  $('cadv-btn').classList.toggle('on', creditsAdv);
+  $('cadv-note').textContent = creditsAdv
+    ? 'on — each row jumps to the control it is responsible for'
+    : 'off — the list reads as prose';
+}
+
+function _cFlash(el) {
+  if (!el) return;
+  el.classList.add('cflash');
+  setTimeout(() => el.classList.remove('cflash'), 1700);
+}
+function _cPanel(txt) {
+  const t = [...document.querySelectorAll('.panel > .ptitle')]
+    .find(e => e.textContent.includes(txt));
+  if (!t) return null;
+  t.parentElement.classList.remove('collapsed');
+  return t.parentElement;
+}
+function _cSub(txt) {
+  const t = [...document.querySelectorAll('.subtoggle')]
+    .find(e => e.textContent.includes(txt));
+  if (!t) return null;
+  t.classList.remove('collapsed');
+  return t;
+}
+function _cTry(fn) { try { fn(); } catch (e) { /* a renamed control must not break the tour */ } }
+
+function cgo(o) {
+  o = o || {};
+  let target = null;
+  hintSpent();
+  // Containers first: a control inside a collapsed section cannot be scrolled to.
+  if (o.sec) { const el = $(o.sec); if (el) el.classList.remove('collapsed'); }
+  if (o.ctl) { const el = $('ctl-toggle'); if (el) el.classList.remove('collapsed'); }
+  if (o.sub) target = _cSub(o.sub) || target;
+  if (o.panel) target = _cPanel(o.panel) || target;
+  // Then state.
+  if (o.G && G < o.G)  _cTry(() => onG(o.G));
+  // A chip that moves the lattice needs a view to move it in. An explicit view
+  // on the spec is the subject of that credit and wins outright; otherwise the
+  // reader's pick applies, and 'keep' means touch nothing.
+  const touchesLattice = o.preset || o.walk || o.G || o.scroll === 'cv';
+  const wantView = o.view || (touchesLattice && creditView !== 'keep' ? creditView : null);
+  if (wantView)        _cTry(() => setView(wantView));
+  if (o.cmap)          _cTry(() => setCmap(o.cmap));
+  if (o.walk)          _cTry(() => setWalk(o.walk));
+  if (o.preset)        _cTry(() => preset(o.preset));
+  if (o.gn)            _cTry(() => setGN(o.gn));
+  if (o.comet)         _cTry(() => setComet(o.comet));
+  if (o.run === 'selftest') setTimeout(() => _cTry(selfTest), 120);
+  // Scroll target: an explicit id wins, then whatever was opened.
+  if (o.scroll && $(o.scroll)) target = $(o.scroll);
+  setTimeout(() => {
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    _cFlash(target);
+  }, o.G ? 260 : 90);
 }
 
 /* ── boot ──────────────────────────────────────────────────────────────── */
@@ -6145,12 +6980,16 @@ function boot() {
   wireLens();
   setLensZoom(3); setLensPin('auto');
   buildPhi(4096);
-  setViewQuarter(0);            // the raster's own frame by default; the turn is opt-in
+  // Per-view defaults: Grid and Ring at -i, Cayley at 0 so Gamma's two poles
+  // sit left and right. Counts are unaffected either way - self test 17c.
   setView('grid'); setRingRot(0); setRingHole(18); setThetaMode('clamp'); setCmap('A');
+  setPtScale(ptScale); setCayGuideAlpha(100);
   computePartItems(); syncPartUI(); renderPartTable();
   onG(31);
   onOff(0); onW(1); reslope();
   gcdTable();
+  setPcX(pcX);
+  { const c3 = $('cv3'); if (c3) c3.addEventListener('click', pcHit); }
   buildComet();
   // Run the battery once on load so a broken build is visible immediately
   // rather than only when someone thinks to press the button.
@@ -6160,7 +6999,7 @@ function boot() {
     clearTimeout(rt);
     rt = setTimeout(() => {
       if (document.body.classList.contains('fs-open')) setNavH();
-      redraw(false); drawComet();
+      redraw(false); drawComet(); pcSync(); pcDraw();
     }, 160);
   });
 }
