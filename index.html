@@ -102,6 +102,25 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
 .cflash{outline:1px solid var(--gold);outline-offset:4px;
   animation:cflashK 1.7s ease-out;}
 @keyframes cflashK{0%{outline-color:var(--gold);}100%{outline-color:transparent;}}
+/* Self-test rows open onto their own method. A pass is only evidence if the
+   reader can see what was compared against what, and by which two routes. */
+tr.strow{cursor:pointer;}
+tr.strow:hover td{color:var(--cream);}
+.stcar{font-family:var(--mono);font-size:9px;color:var(--cream3);
+  display:inline-block;transform:rotate(-90deg);transition:transform .13s;}
+tr.strow.open .stcar{transform:none;}
+tr.sthow{display:none;}
+tr.sthow.open{display:table-row;}
+tr.sthow td{background:var(--bg1);font-size:12.5px;line-height:1.6;
+  color:var(--cream2);padding:12px 14px;border-left:2px solid var(--edge2);}
+tr.sthow b{color:var(--teal);font-weight:500;}
+/* The per-cell / per-block distinction, shown at the point of confusion
+   rather than explained in a tooltip nobody opens. */
+.qnote{display:inline-flex;align-items:center;gap:7px;margin-left:9px;padding:2px 8px;
+  border:1px solid rgba(232,106,90,.4);color:var(--coral);
+  font-family:var(--mono);font-size:10px;}
+.qnote b{color:var(--coral);}
+.qnote .chip{font-size:9px;padding:2px 6px;}
 .panel.collapsed .ptitle{margin-bottom:0;}
 .panel.collapsed .ptitle .car{transform:rotate(-90deg);}
 .panel.collapsed > .pbody{display:none;}
@@ -464,7 +483,7 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   browser that recomputes each of them from scratch.</div>
 </div>
 
-<section id="sec1" class="dsec">
+<section id="sec1" class="dsec collapsed">
 <h2 class="dsec-h" onclick="toggleSec('sec1')"><span class="num">§1 · Setup</span>Blocks, strips, and the residue count<span class="car">&#9662;</span></h2>
 <div class="dsec-b">
 
@@ -505,6 +524,14 @@ the whole lattice here instead of along a single strip.</p>
 <tr><td><code>a/b</code></td><td><code>1</code></td><td>Farey sector ray</td><td>Stern–Brocot mediant structure</td></tr>
 <tr><td><code>+1</code> or <code>−1</code></td><td><code>1</code></td><td>The same strip read <i>along its index</i> $k$ rather than along the lattice</td><td>first zero at $\mathrm{spf}(k)$ &mdash; so $\pi(x)$ exactly, over a finite range</td></tr>
 </table></div>
+
+<p class="stepnote">Rows one, three and four are the <b>same</b> statement at $w=1$. On any line
+$b\,r - a\,M = c$ a prime can only kill a cell if it divides $c$, so that line's density is
+$\prod_{p \mid c}(1-1/p) = \varphi(|c|)/|c|$, and a width-$w$ band is the weighted mean of
+those over its $w$ lines. That is a closed form for <i>every</i> slope and width. But it is a
+<i>mean of per-line densities</i>, where $D(n)$ in row two is a <i>product of local factors</i>
+&mdash; two exact answers to two different questions, which is what the Walk selector picks
+between.</p>
 
 <h3>The rule underneath</h3>
 
@@ -622,9 +649,11 @@ $$\mathfrak{S}(N) = 2\,C_2 \prod_{\substack{p \mid N \\ p>2}} \frac{p-1}{p-2}$$<
 
 <li><b>Read the result.</b> $\frac{p-1}{p-2} > 1$ for every odd $p$, so $\mathfrak{S}$ is
 <i>raised</i> by every odd prime factor, and raised most by the small ones ($p=3$ gives
-$2$; $p=97$ gives $1.011$). An $N$ divisible by $3$, $5$ and $7$ carries
-$2 \cdot \tfrac{4}{3} \cdot \tfrac{6}{5} = 3.2$ against a prime-poor neighbour's $2$. That
-ratio, not the size of $N$, is what splits the comet into bands.</li>
+$2$; $p=97$ gives $1.011$). An $N$ divisible by $3$, $5$ and $7$ &mdash; say $N=210$ &mdash;
+carries $2 \cdot \tfrac{4}{3} \cdot \tfrac{6}{5} = 3.2$, while a prime-poor neighbour like
+$N = 206 = 2 \cdot 103$ carries only $\tfrac{102}{101} \approx 1.01$. Both are multiplied by
+the same $2C_2$, so $\mathfrak{S}(210) \approx 4.23$ against $\mathfrak{S}(206) \approx 1.33$.
+That ratio, not the size of $N$, is what splits the comet into bands.</li>
 </ol>
 <p class="stepnote">This is the standard evaluation, reproduced here rather than asserted;
 every equality is finite algebra on a convergent product. What is conjectural is not the
@@ -693,9 +722,9 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">View</span>
-    <button class="chip viewchip on" data-view="grid" onclick="setView('grid')">Grid &mdash; (r, M) lattice</button>
-    <button class="chip viewchip" data-view="ring" onclick="setView('ring')">Ring &mdash; polar, M outward</button>
-    <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')">Cayley &mdash; residues mod m</button>
+    <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid &mdash; (r, M) lattice</button>
+    <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring &mdash; polar, M outward</button>
+    <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley &mdash; residues mod m</button>
     <span class="lbl" id="view-lbl"></span>
   </div>
 
@@ -705,9 +734,11 @@ walk anyway.</p>
     <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
     <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
     <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
-    <span class="lbl">per view &mdash; Grid and Ring open at &minus;i, Cayley at 0</span>
+    <span class="lbl">per view &mdash; all three open at 0, and each remembers its own</span>
 
   </div>
+
+  <div id="cellgrid" style="display:none;margin:4px 0 14px;"></div>
 
   <div class="prow vrow" id="row-ring">
     <span class="plabel">Ring</span>
@@ -721,8 +752,8 @@ walk anyway.</p>
     <span class="lbl">hole</span>
     <input type="range" id="ring-hole" min="0" max="100" step="1" value="18" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
     <span class="val" id="ring-hole-v">0.18</span>
-    <button class="chip on" id="ring-gd" onclick="toggleRingGuides()">Guides: on</button>
-    <button class="chip" onclick="setRingRot(0);setRingHole(18)">Reset ring</button>
+    <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
+    <button class="chip" onclick="setRingRot(0);setRingHole(18)" title="Back to no rotation and an 18% inner hole.">Reset ring</button>
   </div>
 
   <div class="prow vrow" id="row-cay">
@@ -738,9 +769,9 @@ walk anyway.</p>
     <span class="lbl">&rho;<sub>D</sub></span>
     <input type="range" id="sl-rhoD" min="0.05" max="3" step="0.05" value="1.8" oninput="setRhoD(+this.value)">
     <span class="val" id="v-rhoD">1.80</span>
-    <button class="chip" onclick="setRhoPair(0.4,1.8)">0.4&middot;1.8</button>
-    <button class="chip" onclick="setRhoPair(0.5,1.5)">0.5&middot;1.5&nbsp;&#8644;</button>
-    <button class="chip" onclick="setRhoPair(0,2)">0&middot;2</button>
+    <button class="chip" onclick="setRhoPair(0.4,1.8)" title="Default. ρ runs 0.40 → 2.20, so most rings land outside the unit circle.">0.4&middot;1.8</button>
+    <button class="chip" onclick="setRhoPair(0.5,1.5)" title="ρ runs 0.50 → 2.00 — reciprocal endpoints, so the inside-the-disk and outside-the-disk halves are mirror images of each other.">0.5&middot;1.5&nbsp;&#8644;</button>
+    <button class="chip" onclick="setRhoPair(0,2)" title="ρ runs 0 → 2, starting at the origin. The innermost rings pile up near Γ(0) = −1.">0&middot;2</button>
   </div>
   <div class="prow vrow" id="row-cay-b" style="display:none">
     <span class="plabel">a (Blaschke)</span>
@@ -756,54 +787,31 @@ walk anyway.</p>
     <span class="lbl">rotate</span>
     <input type="range" id="cay-rot" min="0" max="360" step="1" value="0" oninput="setCayleyRot(+this.value)">
     <span class="val" id="cay-rot-v">0&deg;</span>
-    <button class="chip crchip" id="cr-0"   onclick="setCayleyRot(0)">0&deg;</button>
-    <button class="chip crchip" id="cr-90"  onclick="setCayleyRot(90)">90&deg;</button>
-    <button class="chip crchip" id="cr-180" onclick="setCayleyRot(180)">180&deg;</button>
-    <button class="chip crchip" id="cr-270" onclick="setCayleyRot(270)">270&deg;</button>
+    <button class="chip crchip" id="cr-0"   onclick="setCayleyRot(0)" title="Γ's zero (z=1) and pole (z=−1) both sit on the real axis, so the two singular points fall left and right of the plate.">0&deg;</button>
+    <button class="chip crchip" id="cr-90"  onclick="setCayleyRot(90)" title="Quarter turn of the Cayley field only — the singular points move to top and bottom. Does not touch the global view turn.">90&deg;</button>
+    <button class="chip crchip" id="cr-180" onclick="setCayleyRot(180)" title="Half turn: the singular points stay left and right but swap sides.">180&deg;</button>
+    <button class="chip crchip" id="cr-270" onclick="setCayleyRot(270)" title="Three quarter turns of the Cayley field only.">270&deg;</button>
   </div>
   <div class="prow vrow" id="row-cay-zoom">
     <span class="plabel">Zoom out</span>
-    <button class="chip czchip" id="cz-1" onclick="setCayleyZoomOut(1)">1&times;</button>
-    <button class="chip czchip" id="cz-2" onclick="setCayleyZoomOut(2)">2&times;</button>
-    <button class="chip czchip on" id="cz-4" onclick="setCayleyZoomOut(4)">4&times;</button>
-    <button class="chip czchip" id="cz-8" onclick="setCayleyZoomOut(8)">8&times;</button>
+    <button class="chip czchip" id="cz-1" onclick="setCayleyZoomOut(1)" title="No shrink. Γ is unbounded, so at ρ near 1 the field can run well off the plate.">1&times;</button>
+    <button class="chip czchip" id="cz-2" onclick="setCayleyZoomOut(2)" title="Halve the field to bring Γ's far excursions back on plate. Map A only — Blaschke never leaves the disk.">2&times;</button>
+    <button class="chip czchip on" id="cz-4" onclick="setCayleyZoomOut(4)" title="Quarter scale. Useful when ρ passes through 1 and the pole throws points to infinity.">4&times;</button>
+    <button class="chip czchip" id="cz-8" onclick="setCayleyZoomOut(8)" title="Eighth scale — the whole excursion visible, individual cells no longer separable.">8&times;</button>
     <span class="lbl">zoom in</span>
     <input type="range" id="cay-zin" min="1" max="10" step="0.1" value="1" oninput="setCayleyZoomIn(+this.value)">
     <span class="val" id="cay-zin-v">1.0&times;</span>
     <button class="chip" onclick="setCayleyZoomIn(1)" title="Back to 1&times;">&#8634;</button>
   </div>
 
-  <div class="subtoggle collapsed" onclick="toggleSub(this)">
-    <span class="car">&#9662;</span><span>Does the turn change the slope? &mdash; no, and the near-miss is worth naming</span>
-  </div>
-  <div class="subbody">
-  <p style="font-size:13.5px;">
-  <b>Not at all.</b> The turn is applied once to the finished raster, after every count is
-  taken. The strip is still $b\,r - a\,M \in [s,\,s+w)$ with the same $a/b$, and the self test
-  reruns the whole walk at each quarter and requires byte-identical results.</p>
-
-  <p style="font-size:13.5px;">
-  <b>On screen it certainly looks like it does.</b> A drawn line of screen-slope $m$ turns into
-  one of slope $-1/m$, so a $+1$ diagonal comes out looking like a $-1$ anti-diagonal. But the
-  axes turned with it. It is the same strip photographed from the side.</p>
-
-  <p style="font-size:13.5px;">
-  <b>The tempting version.</b> Rotate the <i>lattice</i> instead of the picture:
-  $(r,M) \mapsto (M,\, G{+}1{-}r)$. That really does carry $r - M = g$ onto
-  $r + M = G{+}1{-}g$ &mdash; a gap diagonal onto an anti-diagonal, exactly. It looks like a
-  unification of the two slopes, and it is not one: <b>coprimality is not preserved.</b> At
-  $G = 60$ the map flips 2062 of the 3600 cells. You would land on an anti-diagonal sitting in
-  a lattice that is no longer the coprimality lattice, where $\varphi(N)$ counts nothing.</p>
-
-  <p style="font-size:13.5px;">
-  <b>The symmetry that is real</b> is the reflection $r \leftrightarrow M$. Since
-  $\gcd$ is symmetric the transpose preserves everything exactly; it sends slope $a/b$ to
-  $b/a$ and $g$ to $-g$. That is precisely the strip pair the partition table already tallies
-  once rather than twice.</p>
-
-  <p class="stepnote">So the $+1$ and $-1$ slopes are not related by any rotation. What does
-  relate them is in the prime counter panel: both strips are $\gcd(k,\cdot)$ read along the
-  strip index. Rotation acts on where the points sit; that acts on what they mean.</p>
+  <div class="prow">
+    <span class="plabel">Plate</span>
+    <span class="lbl">zoom</span>
+    <button class="chip" onclick="plateZoomStep(1/1.4)" title="Zoom the whole plate out, about its centre. Independent of the lens — the plate moves, the loupe magnifies.">&minus;</button>
+    <span class="val" id="plate-k">1.0&times;</span>
+    <button class="chip" onclick="plateZoomStep(1.4)" title="Zoom the whole plate in, about its centre. Works in Grid, Ring and Cayley, and exports carry it.">+</button>
+    <button class="chip" id="plate-reset" onclick="resetPlate()" title="Back to the unzoomed, uncentred plate.">Reset</button>
+    <span class="lbl">drag to move &middot; pinch or scroll to zoom &middot; all three views</span>
   </div>
 
   <div class="prow vrow" id="row-pts">
@@ -813,9 +821,9 @@ walk anyway.</p>
            oninput="setPtScale(+this.value)"
            title="Dot size for the forward-plotted views. Ring and Cayley stamp one dot per sampled cell; the right size depends on G and on how far the map spreads them.">
     <span class="val" id="pt-sz-v">2.0&times;</span>
-    <button class="chip" onclick="setPtScale(1)">1&times;</button>
-    <button class="chip" onclick="setPtScale(2)">2&times;</button>
-    <button class="chip" onclick="setPtScale(4)">4&times;</button>
+    <button class="chip" onclick="setPtScale(1)" title="The old fixed size. Correct on a large screen, dust on a phone.">1&times;</button>
+    <button class="chip" onclick="setPtScale(2)" title="Default.">2&times;</button>
+    <button class="chip" onclick="setPtScale(4)" title="Large dots: readable at small G, overlapping above a few hundred.">4&times;</button>
     <span class="lbl">guides</span>
     <button class="chip on" id="cay-gd" onclick="toggleCayGuides()"
             title="The four constant-M curves. At small G they render as polygons, because that is genuinely how few lattice points sit on those rings.">Cayley: on</button>
@@ -826,8 +834,8 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">Presets</span>
-    <button class="chip"    id="ps-f12"   onclick="preset('f12')">Farey ray · 1/2</button>
-    <button class="chip"    id="ps-f23"   onclick="preset('f23')">Farey ray · 2/3</button>
+    <button class="chip"    id="ps-f12"   onclick="preset('f12')" title="Slope 1/2. The general a/b case — a Farey ray, where the mediant structure lives.">Farey ray · 1/2</button>
+    <button class="chip"    id="ps-f23"   onclick="preset('f23')" title="Slope 2/3. Between 1/2 and 1/1 in the Stern–Brocot tree.">Farey ray · 2/3</button>
   </div>
 
   <div class="prow">
@@ -844,15 +852,15 @@ walk anyway.</p>
     <input type="range" id="g-sl" min="2" max="4096" step="1" value="31" oninput="onG(+this.value)">
     <span class="val" id="g-v">31</span>
     <button class="chip tl" id="g-play" onclick="toggleGPlay()" title="Animate G: 2 up to current value and back, on loop">&#9654; Play</button>
-    <button class="chip" onclick="onG(2)">2</button>
-    <button class="chip" onclick="onG(16)">16</button>
-    <button class="chip" onclick="onG(64)">64</button>
-    <button class="chip" onclick="onG(109)">109</button>
-    <button class="chip" onclick="onG(256)">256</button>
-    <button class="chip" onclick="onG(1024)">1k</button>
-    <button class="chip" onclick="onG(2048)">2k</button>
-    <button class="chip" onclick="onG(4096)">4k</button>
-    <button class="chip" onclick="onG(10000)">10k</button>
+    <button class="chip" onclick="onG(2)" title="The smallest lattice: four cells. Useful for checking the hit test, not the arithmetic.">2</button>
+    <button class="chip" onclick="onG(16)" title="Small enough that every cell is separately visible with labels on.">16</button>
+    <button class="chip" onclick="onG(64)" title="Cell labels still fit; the diagonal structure is already visible.">64</button>
+    <button class="chip" onclick="onG(109)" title="A prime lattice size — no divisor of G shows up as periodic structure in the plate itself.">109</button>
+    <button class="chip" onclick="onG(256)" title="The smallest G that holds the N = 210 anti-diagonal.">256</button>
+    <button class="chip" onclick="onG(1024)" title="Around where the base layer starts aggregating cells per pixel; the lens becomes the only exact view.">1k</button>
+    <button class="chip" onclick="onG(2048)" title="1 million cells. Build is still under a second.">2k</button>
+    <button class="chip" onclick="onG(4096)" title="Slider maximum. 16.7M cells, ~2 MB of bitset.">4k</button>
+    <button class="chip" onclick="onG(10000)" title="Hard cap. 100M cells at one bit each — 12.5 MB. A byte array here would be 100 MB and get killed on a phone.">10k</button>
   </div>
 
   <div class="prow">
@@ -870,8 +878,34 @@ walk anyway.</p>
              onchange="reslope()">
       <button class="sbtn" onclick="bump('b',1)" title="+1">+</button>
     </div>
-    <button class="chip tl" id="pre-diag" onclick="preset('diag')">+1 diagonal</button>
-    <button class="chip cr" id="pre-anti" onclick="preset('anti')">&minus;1 Goldbach</button>
+    <button class="chip tl" id="pre-diag" onclick="preset('diag')" title="Slope +1, offset 6: the gap diagonal r − M = 6, density φ(6)/6 = 1/3.">+1 diagonal</button>
+    <button class="chip cr" id="pre-anti" onclick="preset('anti')" title="Slope −1, N = 210 = 2·3·5·7. Smooth, so 𝔖(210) ≈ 4.23 — the correction works hardest here.">&minus;1 Goldbach &middot; N=210</button>
+    <button class="chip cr" id="ps-grg"  onclick="preset('grg')"
+            title="N = 206 = 2·103. Rough where 210 is smooth — the correction barely moves.">&minus;1 &middot; N=206 rough</button>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">The block</span>
+    <button class="chip"    id="ps-blk5"  onclick="preset('blk5')"
+            title="Width 6, so n = 5. The C(n) case: a band, not a strip — switch Walk to Band to measure it.">Block n = 5</button>
+    <button class="chip"    id="ps-blk29" onclick="preset('blk29')"
+            title="Width 30, so n = 29. Saturated for every prime p ≤ 30.">Block n = 29</button>
+    <button class="chip tl" id="ps-blk1" onclick="preset('blk1')"
+            title="Width 2, so n = 1. The smallest block where anything saturates: p = 2 freezes at 1−1/2, and D(1) = 0.322634, C(1) = 0.530712.">Block n = 1</button>
+    <span class="lbl">the width case &mdash; pair with <b>Walk: Block</b></span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">One line</span>
+    <button class="chip" id="ps-main" onclick="preset('main')"
+            title="r = M. gcd(r,r) = r, so (1,1) is the only coprime cell on the whole line — the degenerate case φ(c)/c cannot cover, and the identity panel gives it its own row.">Main diagonal, g = 0</button>
+    <button class="chip tl" id="ps-gap30b" onclick="preset('gap30')"
+            title="Gap diagonal at g = 30 = 2·3·5. Three small primes, so density φ(30)/30 = 4/15 = 0.2667 — the sparsest kind of diagonal.">Gap g = 30, smooth</button>
+    <button class="chip tl" id="ps-gap97" onclick="preset('gap97')"
+            title="Gap diagonal at g = 97, prime. Only one prime can strike, so density φ(97)/97 = 96/97 = 0.9897 — nearly every cell coprime. Compare with g = 30.">Gap g = 97, prime</button>
+    <button class="chip cr" id="ps-aprime" onclick="preset('aprime')"
+            title="Anti-diagonal at N = 211, prime. φ(211) = 210 = N−1, so every cell on the line is coprime — the criterion from Strip Arithmetic I, visible as an unbroken line.">&minus;1 &middot; N=211 prime</button>
+    <span class="lbl">what one line's index does to its density</span>
   </div>
 
   <div class="prow">
@@ -910,8 +944,8 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">Walk</span>
-    <button class="chip on" id="wk-strip" onclick="setWalk('strip')">Strip &mdash; density in a slope a/b band</button>
-    <button class="chip cr" id="wk-band" onclick="setWalk('band')">Block &mdash; AND over n+1 columns</button>
+    <button class="chip on" id="wk-strip" onclick="setWalk('strip')" title="Counts one cell at a time: the fraction of cells in the band with gcd(r,M)=1. Exact closed form — the weighted mean of φ(c)/c over the band's lines — but NOT C(n): at n=5 it reads 0.578 against D(5) = 0.194142.">Strip &mdash; per <b>cell</b></button>
+    <button class="chip cr" id="wk-band" onclick="setWalk('band')" title="Counts one whole block at a time: gcd(r, M+j)=1 for EVERY j, an AND across all n+1 columns. This is the walk that converges to D(n).">Block &mdash; per <b>block</b>, AND over n+1</button>
     <span class="lbl" id="wk-note" style="color:var(--cream3);"></span>
   </div>
 
@@ -948,8 +982,8 @@ walk anyway.</p>
     </select>
     <button class="chip" id="depth-dir-btn" onclick="toggleDepthDir()"
       title="Block-survival depth can walk two directions. Horizontal: r fixed, M, M+1, M+2… increasing — the C(n) block direction, per cell. Diagonal: every cell on a sum-diagonal g=r+M shares one value — the survival run starting at that diagonal's own left column and stepping rightward at 45°, gcd-tested against g. Reads full exactly when g is prime. Short diagonals near the grid's corners are capped by their own on-grid length, not always 16, so a genuinely complete short strip still reads full.">Depth dir: Horizontal</button>
-    <button class="chip" id="b-strip" onclick="toggleStrip()">Strip: on</button>
-    <button class="chip" onclick="resetView()">Reset</button>
+    <button class="chip stripchip" id="b-strip" onclick="toggleStrip()" title="The main slope/offset strip overlay. A partition overlay hides it so the two do not fight for the plate; switching it back on here makes it stay on.">Strip: on</button>
+    <button class="chip" onclick="resetView()" title="Back to the opening state: slope 1/1, offset 0, width 1, grid view.">Reset</button>
   </div>
 
   <div class="keyhint">
@@ -963,46 +997,47 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">Lens</span>
-    <button class="chip tl" id="lens-on" onclick="toggleLens()">Lens: off</button>
+    <button class="chip tl on" id="lens-on" onclick="toggleLens()" title="Re-reads the bitset and draws true cells at the magnified pitch. Past G = canvas size the base layer aggregates, so this is the only exact view of the lattice.">Lens: on</button>
     <span class="lbl">zoom</span>
-    <button class="chip" id="lz-2" onclick="setLensZoom(2)">2&times;</button>
-    <button class="chip on" id="lz-3" onclick="setLensZoom(3)">3&times;</button>
+    <button class="chip" id="lz-2" onclick="setLensZoom(2)" title="Barely magnified — useful for reading labels rather than cells.">2&times;</button>
+    <button class="chip on" id="lz-3" onclick="setLensZoom(3)" title="Default magnification.">3&times;</button>
     <button class="chip" id="lz-4" onclick="setLensZoom(4)">4&times;</button>
     <button class="chip" id="lz-6" onclick="setLensZoom(6)">6&times;</button>
-    <button class="chip" id="lz-10" onclick="setLensZoom(10)">10&times;</button>
+    <button class="chip" id="lz-10" onclick="setLensZoom(10)" title="Individual cells clearly separated at G in the low thousands.">10&times;</button>
     <button class="chip" id="lz-20" onclick="setLensZoom(20)">20&times;</button>
     <button class="chip" id="lz-30" onclick="setLensZoom(30)">30&times;</button>
     <button class="chip" id="lz-40" onclick="setLensZoom(40)">40&times;</button>
-    <button class="chip" id="lz-50" onclick="setLensZoom(50)">50&times;</button>
-    <button class="chip" id="lz-100" onclick="setLensZoom(100)">100&times;</button>
+    <button class="chip" id="lz-50" onclick="setLensZoom(50)" title="Deep zoom: a handful of cells filling the loupe.">50&times;</button>
+    <button class="chip" id="lz-100" onclick="setLensZoom(100)" title="Maximum. A few cells only — for checking a single gcd by eye.">100&times;</button>
     <div class="stepper">
-      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM-1)">&minus;</button>
+      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM-1)" title="One step less magnification.">&minus;</button>
       <input class="sval" id="lz-in" type="number" min="1" max="500" step="1" value="3"
              oninput="setLensZoom(+this.value,true)" style="width:60px;">
-      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM+1)">+</button>
+      <button class="sbtn" onclick="setLensZoom(LENS_ZOOM+1)" title="One step more magnification.">+</button>
     </div>
   </div>
 
   <div class="prow">
     <span class="plabel">Lens place</span>
-    <button class="chip on" id="lp-auto" onclick="setLensPin('auto')">Auto</button>
-    <button class="chip" id="lp-tl" onclick="setLensPin('tl')">&#9698; TL</button>
-    <button class="chip" id="lp-tr" onclick="setLensPin('tr')">&#9699; TR</button>
-    <button class="chip" id="lp-bl" onclick="setLensPin('bl')">&#9701; BL</button>
-    <button class="chip" id="lp-br" onclick="setLensPin('br')">&#9700; BR</button>
+    <button class="chip on" id="lp-auto" onclick="setLensPin('auto')" title="The loupe follows the pointer and dodges to whichever corner it is not near.">Auto</button>
+    <button class="chip" id="lp-tl" onclick="setLensPin('tl')" title="Pin the loupe top-left so it never covers what you are pointing at.">&#9698; TL</button>
+    <button class="chip" id="lp-tr" onclick="setLensPin('tr')" title="Pin the loupe top-right.">&#9699; TR</button>
+    <button class="chip" id="lp-bl" onclick="setLensPin('bl')" title="Pin the loupe bottom-left.">&#9701; BL</button>
+    <button class="chip" id="lp-br" onclick="setLensPin('br')" title="Pin the loupe bottom-right.">&#9700; BR</button>
     <span class="lbl">size</span>
     <div class="stepper">
-      <button class="sbtn" onclick="setLensSize(lensSize-20)">&minus;</button>
+      <button class="sbtn" onclick="setLensSize(lensSize-20)" title="Smaller loupe — covers less of the plate, shows fewer cells.">&minus;</button>
       <input class="sval" id="ls-num" type="number" min="90" max="420" value="200"
              onchange="setLensSize(+this.value)" style="width:56px;">
-      <button class="sbtn" onclick="setLensSize(lensSize+20)">+</button>
+      <button class="sbtn" onclick="setLensSize(lensSize+20)" title="Larger loupe — more cells at the same zoom, more of the plate hidden.">+</button>
     </div>
     <span class="lbl">labels</span>
     <select id="lens-lbl" onchange="lensRelabel()">
       <optgroup label="Lattice">
         <option value="rM">r/M</option>
+        <option value="res" selected>r mod M &nbsp;(residue)</option>
         <option value="r">r</option>
-        <option value="M" selected>M</option>
+        <option value="M">M</option>
         <option value="dec">r/M decimal</option>
         <option value="gcd">gcd(r,M)</option>
       </optgroup>
@@ -1021,7 +1056,7 @@ walk anyway.</p>
            oninput="setLabelScale(+this.value)"
            title="How large labels want to be. The cell is a hard ceiling — past the point where a label fills its cell this stops growing it, so nothing ever crosses a block edge.">
     <span class="val" id="lbl-sc-v">1.00&times;</span>
-    <button class="chip" onclick="setLabelScale(1);$('lbl-sc').value=1;">reset</button>
+    <button class="chip" onclick="setLabelScale(1);$('lbl-sc').value=1;" title="Back to the default label size.">reset</button>
   </div>
 
   </div>
@@ -1037,11 +1072,11 @@ walk anyway.</p>
     <span id="bar-l">—</span>
     <span id="bar-r">—</span>
     <span class="vchips">
-      <button class="chip viewchip on" data-view="grid" onclick="setView('grid')">Grid</button>
-      <button class="chip viewchip" data-view="ring" onclick="setView('ring')">Ring</button>
-      <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')">Cayley</button>
+      <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid</button>
+      <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring</button>
+      <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley</button>
     </span>
-    <button class="fs-btn" onclick="toggleFS('cv')" id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
+    <button class="fs-btn" onclick="toggleFS('cv')" title="Pin this plate to the whole screen, hide the nav, and open the controls belonging to it." id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
   </div>
   <div class="viewnote" id="view-note"></div>
 
@@ -1086,6 +1121,12 @@ walk anyway.</p>
     </div>
 
     <div class="ctrls">
+      <button class="chip stripchip" onclick="toggleStrip()"
+              title="Turning a partition overlay on hides the main slope/offset strip so the two do not fight for the plate. This puts it back, and it stays back.">Strip: on</button>
+      <span class="lbl">the main slope strip, hidden while an overlay is up</span>
+    </div>
+
+    <div class="ctrls">
       <span class="lbl">gap g</span>
       <button class="chip" onclick="stepPartG(-1)" title="previous g">&#9664;</button>
       <input type="number" id="part-g" value="1" min="1" style="width:80px" onchange="setPartG(+this.value)">
@@ -1101,9 +1142,9 @@ walk anyway.</p>
 
     <div class="ctrls" id="part-run-row" style="display:none">
       <span class="lbl">run</span>
-      <button class="chip" onclick="runStep(-1)">&#9664; run</button>
+      <button class="chip" onclick="runStep(-1)" title="Previous pair in the run: the gap diagonal and its partner, endpoints included.">&#9664; run</button>
       <span class="lbl" id="part-run-lbl">&mdash;</span>
-      <button class="chip" onclick="runStep(1)">run &#9654;</button>
+      <button class="chip" onclick="runStep(1)" title="Next pair in the run. Only the two endpoints are unbroken lines; everything between them is punctured.">run &#9654;</button>
     </div>
 
     <div class="ctrls" id="part-batch-row">
@@ -1124,17 +1165,17 @@ walk anyway.</p>
       <span class="lbl" id="part-dim-v">50%</span>
       <div class="sep"></div>
       <span class="lbl">batch</span>
-      <button class="chip" data-bs="10" onclick="setPartBatch(10)">10</button>
-      <button class="chip on" data-bs="40" onclick="setPartBatch(40)">40</button>
-      <button class="chip" data-bs="0" id="part-bs-all" onclick="setPartBatch(0)">all</button>
-      <button class="chip" onclick="partPageStep(-1)">&#9664;</button>
+      <button class="chip" data-bs="10" onclick="setPartBatch(10)" title="Draw 10 gaps at a time — readable, slow to cover the range.">10</button>
+      <button class="chip on" data-bs="40" onclick="setPartBatch(40)" title="Draw 40 gaps at a time.">40</button>
+      <button class="chip" data-bs="0" id="part-bs-all" onclick="setPartBatch(0)" title="Draw every gap at once. Dense, and the legend stops being useful.">all</button>
+      <button class="chip" onclick="partPageStep(-1)" title="Previous page of gaps at the current batch size.">&#9664;</button>
       <span class="lbl" id="part-pg">batch 1 / 1</span>
-      <button class="chip" onclick="partPageStep(1)">&#9654;</button>
+      <button class="chip" onclick="partPageStep(1)" title="Next page of gaps at the current batch size.">&#9654;</button>
     </div>
 
     <div class="ctrls">
       <button class="chip on" id="pick-chip" onclick="togglePick()" title="Pick on: a table row click, or a click on the plate, adds that gap to the selection. Pick off: a click jumps the main strip there instead.">Pick on &mdash; row click selects</button>
-      <button class="btn c" id="part-clearpick" onclick="clearPicked()">&#10005; clear picks</button>
+      <button class="btn c" id="part-clearpick" onclick="clearPicked()" title="Drop every hand-picked strip and go back to the current mode.">&#10005; clear picks</button>
     </div>
 
     <div class="subtoggle collapsed" id="part-help-toggle" onclick="toggleSub(this)">
@@ -1149,12 +1190,12 @@ walk anyway.</p>
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
-    <button class="btn" onclick="exportPNG(2048)">2K</button>
-    <button class="btn" onclick="exportPNG(4096)">4K</button>
-    <button class="btn" onclick="exportPNG(8192)">8K</button>
+    <button class="btn" onclick="exportPNG(2048)" title="2048px plate with the stat band: eyebrow, counts, and the strip equation, so the image is reproducible from itself.">2K</button>
+    <button class="btn" onclick="exportPNG(4096)" title="4096px. Print size.">4K</button>
+    <button class="btn" onclick="exportPNG(8192)" title="8192px. Large; expect a pause while it composes.">8K</button>
     <div class="sep"></div>
-    <button class="btn" onclick="exportCSV()">Strip CSV</button>
-    <button class="btn" onclick="exportState()">State report</button>
+    <button class="btn" onclick="exportCSV()" title="Every cell on the current strip, with r, M and coprimality.">Strip CSV</button>
+    <button class="btn" onclick="exportState()" title="A text report of the full current state — every parameter and every measured number.">State report</button>
   </div>
 </div>
 
@@ -1207,10 +1248,10 @@ walk anyway.</p>
       <button class="sbtn" onclick="pcBump(100)" title="+100">+</button>
       <button class="sbtn" onclick="pcBump(1000)" title="+1000">&raquo;</button>
     </div>
-    <button class="chip" onclick="setPcX(1000)">1k</button>
-    <button class="chip" onclick="setPcX(5000)">5k</button>
-    <button class="chip" onclick="setPcX(10000)">10k</button>
-    <button class="chip" onclick="setPcX(50000)">50k</button>
+    <button class="chip" onclick="setPcX(1000)" title="π(1000) = 168, at depth K = 31.">1k</button>
+    <button class="chip" onclick="setPcX(5000)" title="π(5000) = 669, at depth K = 70.">5k</button>
+    <button class="chip" onclick="setPcX(10000)" title="π(10000) = 1229, at depth K = 100.">10k</button>
+    <button class="chip" onclick="setPcX(50000)" title="π(50000) = 5133, at depth K = 223. Slowest of the four — about a million gcds.">50k</button>
     <span class="lbl" id="pc-depth-lbl">depth K = 70</span>
   </div>
 
@@ -1219,7 +1260,7 @@ walk anyway.</p>
     <input type="range" id="pc-win" min="0" max="100" value="0" step="1"
            oninput="setPcWin(+this.value)" style="flex:1 1 160px;">
     <span class="lbl" id="pc-win-lbl">k = 2 …</span>
-    <button class="chip" onclick="pcClearPick()">Clear pick</button>
+    <button class="chip" onclick="pcClearPick()" title="Undim every strip and drop the picked one.">Clear pick</button>
     <span class="lbl">click a column to pick a strip &mdash; the rest dim</span>
   </div>
 
@@ -1252,19 +1293,19 @@ walk anyway.</p>
       <button class="sbtn" onclick="bump('gn',16)" title="+16">+</button>
       <button class="sbtn" onclick="bump('gn',128)" title="+128">&raquo;</button>
     </div>
-    <button class="chip" onclick="setGN(256)">256</button>
-    <button class="chip" onclick="setGN(512)">512</button>
-    <button class="chip" onclick="setGN(1024)">1024</button>
-    <button class="chip" onclick="setGN(2048)">2048</button>
+    <button class="chip" onclick="setGN(256)" title="Small n: the remainder in Φ(n)/n² → 6/π² is still clearly visible.">256</button>
+    <button class="chip" onclick="setGN(512)" title="Convergence starting to bite.">512</button>
+    <button class="chip" onclick="setGN(1024)" title="Close enough to 6/π² = 0.607927 to read the agreement off the table.">1024</button>
+    <button class="chip" onclick="setGN(2048)" title="The tightest window here. Doubling n roughly halves the visible remainder.">2048</button>
     <span class="lbl">rows</span>
     <div class="stepper">
-      <button class="sbtn" onclick="bump('gr',-4)">&minus;</button>
+      <button class="sbtn" onclick="bump('gr',-4)" title="Fewer divisor rows in the table.">&minus;</button>
       <input class="sval" id="gr-num" type="number" min="4" max="64" value="16"
              onchange="setGR(+this.value)">
-      <button class="sbtn" onclick="bump('gr',4)">+</button>
+      <button class="sbtn" onclick="bump('gr',4)" title="More divisor rows — each row is the exact count Φ(⌊n/d⌋).">+</button>
     </div>
-    <button class="chip tl" onclick="gcdTable()">Recount</button>
-    <button class="chip" onclick="exportGcdCSV()">CSV</button>
+    <button class="chip tl" onclick="gcdTable()" title="Recount from scratch rather than reusing the cached table.">Recount</button>
+    <button class="chip" onclick="exportGcdCSV()" title="The full divisor table as CSV: d, measured count, and the exact Φ(⌊n/d⌋).">CSV</button>
   </div>
 
   <div id="gcd-sum" class="callout" style="margin:14px 0 10px;"></div>
@@ -1280,14 +1321,16 @@ walk anyway.</p>
   compares it against an independent route &mdash; a bitset against direct gcd, a sieve against a
   closed form, a convolution against a published constant. Red is a real failure.</p>
   <div class="prow" style="border-bottom:none;padding-top:0;">
-    <button class="chip tl" onclick="selfTest()">Run all tests</button>
+    <button class="chip tl" onclick="selfTest()" title="Re-run all rows now. The battery also runs automatically 1.2s after load, so a broken build is visible without pressing anything.">Run all tests</button>
     <span class="lbl" id="st-summary">not run</span>
   </div>
   <div class="scroll"><table id="stt"></table></div>
   </div>
 </div>
 
-<h2 id="sec3"><span class="num">§3 · The comet</span>The singular series as the comet’s band structure</h2>
+<section id="sec3wrap" class="dsec collapsed">
+<h2 id="sec3" class="dsec-h" onclick="toggleSec('sec3wrap')"><span class="num">§3 · The comet</span>The singular series as the comet’s band structure<span class="car">&#9662;</span></h2>
+<div class="dsec-b">
 
 <p>The Goldbach comet plots $r(N)$, the number of ordered prime pairs summing to $N$, against
 $N$. It does not form a single curve: it separates into distinct bands. That the bands are
@@ -1340,18 +1383,18 @@ the <i>spread</i> across neighbouring $N$, not the distance of any single row fr
     <input type="range" id="n-sl" min="4" max="300000" step="5000" value="60000"
            oninput="onN(+this.value)">
     <span class="val" id="n-v">60000</span>
-    <button class="chip" onclick="onN(20000);buildComet()">20k</button>
-    <button class="chip" onclick="onN(60000);buildComet()">60k</button>
-    <button class="chip" onclick="onN(150000);buildComet()">150k</button>
-    <button class="chip" onclick="onN(300000);buildComet()">300k</button>
-    <button class="chip tl" onclick="buildComet()">Recompute</button>
+    <button class="chip" onclick="onN(20000);buildComet()" title="Even N up to 20,000. Fast; the band structure is already unmistakable.">20k</button>
+    <button class="chip" onclick="onN(60000);buildComet()" title="Even N up to 60,000.">60k</button>
+    <button class="chip" onclick="onN(150000);buildComet()" title="Even N up to 150,000. A few seconds to convolve the prime set.">150k</button>
+    <button class="chip" onclick="onN(300000);buildComet()" title="Even N up to 300,000. Slowest setting — the bands are at their cleanest.">300k</button>
+    <button class="chip tl" onclick="buildComet()" title="Rebuild r(N), 𝔖(N) and li₂(N) at the current range.">Recompute</button>
   </div>
 
   <div class="prow">
     <span class="plabel">View</span>
-    <button class="chip tl on" id="cm-raw" onclick="setComet('raw')">Raw r(N)</button>
-    <button class="chip tl" id="cm-norm" onclick="setComet('norm')">&divide; &#120138;(N)</button>
-    <button class="chip tl" id="cm-ratio" onclick="setComet('ratio')">r(N) / &#120138;(N)&middot;li&#8322;(N)</button>
+    <button class="chip tl on" id="cm-raw" onclick="setComet('raw')" title="r(N) itself: the comet as Fliegel and Robertson plotted it in 1989, separated into bands.">Raw r(N)</button>
+    <button class="chip tl" id="cm-norm" onclick="setComet('norm')" title="Divide by 𝔖(N). If the bands are what Hardy and Littlewood say they are, they merge.">&divide; &#120138;(N)</button>
+    <button class="chip tl" id="cm-ratio" onclick="setComet('ratio')" title="r(N) against the full prediction 𝔖(N)·li₂(N). Should sit near 1 with no trend.">r(N) / &#120138;(N)&middot;li&#8322;(N)</button>
     <span class="lbl" style="margin-left:6px;">point &alpha;</span>
     <input type="range" id="a-sl" min="5" max="100" step="5" value="35" oninput="onAlpha(+this.value)">
     <span class="val" id="a-v">.35</span>
@@ -1376,11 +1419,11 @@ the <i>spread</i> across neighbouring $N$, not the distance of any single row fr
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
-    <button class="btn" onclick="exportComet(2048)">2K</button>
-    <button class="btn" onclick="exportComet(4096)">4K</button>
-    <button class="btn" onclick="exportComet(8192)">8K</button>
+    <button class="btn" onclick="exportComet(2048)" title="2048px comet plate with the parameters and the spread numbers.">2K</button>
+    <button class="btn" onclick="exportComet(4096)" title="4096px comet plate.">4K</button>
+    <button class="btn" onclick="exportComet(8192)" title="8192px comet plate.">8K</button>
     <div class="sep"></div>
-    <button class="btn" onclick="exportCometCSV()">Comet CSV</button>
+    <button class="btn" onclick="exportCometCSV()" title="N, r(N), 𝔖(N), li₂(N) and the ratio, for every even N in range.">Comet CSV</button>
   </div>
 </div>
 
@@ -1435,11 +1478,23 @@ the <i>spread</i> across neighbouring $N$, not the distance of any single row fr
   </div>
 </div>
 
-<h2 id="sec4"><span class="num">§4 · Status</span>Provenance of each statement</h2>
+</div>
+</section>
 
-<p>Nothing on this page is offered as a new theorem. The material divides into three
-classical registers, and the point of the section is to say which register each statement
-belongs to.</p>
+<section id="sec4wrap" class="dsec collapsed">
+<h2 id="sec4" class="dsec-h" onclick="toggleSec('sec4wrap')"><span class="num">§4 · Status</span>Provenance of each statement<span class="car">&#9662;</span></h2>
+
+<!-- Deliberately OUTSIDE .dsec-b: .dsec.collapsed hides only .dsec-b, so this
+     line survives the fold. A page whose disclaimers are behind a click while
+     its pictures are open is not being honest by default. -->
+<p class="stepnote" style="margin-top:0;"><b>Nothing on this page is offered as a new
+theorem.</b> The material is classical: elementary counts, one classical theorem, one
+classical evaluation, and one conjecture that is still open. Open this section for which
+register each statement sits in — and for what the page does <i>not</i> claim.</p>
+
+<div class="dsec-b">
+<p>The material divides into three classical registers, and the point of the section is to
+say which register each statement belongs to.</p>
 
 <ul>
 <li><b>Elementary, classical.</b> $\varphi(g)/g$ on the $+1$ diagonal and $\varphi(N)$ on the
@@ -1489,6 +1544,9 @@ $\nu_p$.</b> Conflating them would be an error; the shared object is the residue
 the Euler factor.</p>
 </div>
 
+</div>
+</section>
+
 <div class="foot">
 Strip Arithmetic II · Wessen Getachew · 2026<br>
 Part II of the strip series &mdash; <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I: The Goldbach Diagonal</a>.<br>
@@ -1500,7 +1558,7 @@ Full attribution is in the credits panel below.
 </div>
 
 
-<div class="panel collapsed" id="credits">
+<div class="panel" id="credits">
   <div class="ptitle" onclick="togglePanel(this)"><span>Credits &mdash; whose mathematics this is</span><span class="car">&#9662;</span></div>
   <div class="pbody">
 
@@ -1513,18 +1571,16 @@ Full attribution is in the credits panel below.
   with them.</p>
 
   <div class="prow" style="border-bottom:none;padding-top:0;">
-    <button class="chip tl" id="cadv-btn" onclick="toggleCreditsAdv()">Advanced &mdash; wire each credit to its control</button>
+    <button class="chip tl" id="cadv-btn" onclick="toggleCreditsAdv()" title="Adds a chip to each credit that puts the page into the state where that person's work is visibly doing something, then scrolls there.">Advanced &mdash; wire each credit to its control</button>
     <span class="lbl" id="cadv-note">off &mdash; the list reads as prose</span>
   </div>
 
   <div class="prow cvrow" id="cadv-view-row" style="border-bottom:none;">
     <span class="plabel">Open lattice credits in</span>
-    <button class="chip cvchip on" data-cv="grid"   onclick="setCreditView('grid')">Grid</button>
-    <button class="chip cvchip"    data-cv="ring"   onclick="setCreditView('ring')">Ring</button>
-    <button class="chip cvchip"    data-cv="cayley" onclick="setCreditView('cayley')">Cayley</button>
-    <button class="chip cvchip"    data-cv="keep"   onclick="setCreditView('keep')">Leave as is</button>
-    <span class="lbl">Grid is the default because it is the view the identities are stated in.
-    Rows about a projection set their own view and ignore this.</span>
+    <button class="chip cvchip on" data-cv="grid"   onclick="setCreditView('grid')" title="Credit chips that move the lattice land in Grid. The identities are stated in these coordinates.">Grid</button>
+    <button class="chip cvchip"    data-cv="ring"   onclick="setCreditView('ring')" title="Credit chips land in Ring instead.">Ring</button>
+    <button class="chip cvchip"    data-cv="cayley" onclick="setCreditView('cayley')" title="Credit chips land in Cayley. Heaviest path in the page — expect a pause at large G.">Cayley</button>
+    <button class="chip cvchip"    data-cv="keep"   onclick="setCreditView('keep')" title="Leave the current view alone. Rows whose subject IS a projection still set their own.">Leave as is</button>
   </div>
 
   <h3>Directly used &mdash; results this page states, restates, or recomputes</h3>
@@ -1537,7 +1593,9 @@ Full attribution is in the credits panel below.
 
   <tr><td><b>Leonhard Euler</b></td>
   <td>$\varphi(n)$; the Euler product over primes; and $\zeta(2) = \pi^2/6$, which is the
-  entire content of the $C(n) = \zeta(2)\,D(n)$ normalisation.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'gap30',panel:'Live identity',scroll:'cv'})">φ(g)/g at g = 30</button><button class="chip" onclick="cgo({panel:'gcd distribution',gn:1024})">ζ(2) as the limit</button></div></td></tr>
+  entire content of the $C(n) = \zeta(2)\,D(n)$ normalisation. $\varphi$ also supplies the
+  strip walk's own closed form: on any line $b\,r - a\,M = c$ the density is
+  $\varphi(|c|)/|c|$, and a band is the weighted mean of those over its lines.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'gap30',panel:'Live identity',scroll:'cv'})">φ(g)/g at g = 30</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'gap97',panel:'Live identity',scroll:'cv'})">and at g = 97</button><button class="chip" onclick="cgo({panel:'gcd distribution',gn:1024})">ζ(2) as the limit</button></div></td></tr>
 
   <tr><td><b>August Ferdinand M&ouml;bius</b></td>
   <td>$\mu(d)$ and M&ouml;bius inversion &mdash; the step that turns the local counts
@@ -2653,6 +2711,52 @@ function exportGcdCSV() {
 /* ── strip walk ────────────────────────────────────────────────────────── */
 /* Returns the cells of {s ≤ b·r − a·M < s+w} inside the lattice, plus counts.
    Iterating M and solving for r keeps this O(strip length) — never O(G²). */
+/* The strip walk has a closed form too. It is simply not D(n).
+
+   A width-w band is w separate lines. On the line b·r − a·M = c a prime can
+   only kill a cell if it divides c — p | r and p | M forces p | c — so that
+   line's coprime density is ∏_{p|c}(1−1/p) = φ(|c|)/|c|. The band value is
+   those densities averaged, weighted by how many cells each line contributes.
+
+   Two cases the numbers forced, both checked in the battery:
+     • c = 0 is the main diagonal. gcd(r,r) = r, so exactly one coprime cell
+       in the whole line, not φ(0)/0.
+     • slope −1 lines are finite. r + M = N holds N−1 cells and exactly φ(N)
+       of them are coprime, so the density is φ(N)/(N−1), not φ(N)/N. At
+       N = 210 that is 0.229665 against 0.228571, and the lattice reads the
+       first one.
+
+   Exact wherever a line runs a whole number of periods; what is left over is
+   a partial period, which is the entire reason the tolerance is not zero.
+
+   This is what makes the contrast with D(n) a statement rather than a
+   warning: the strip walk averages per-line densities, the block walk
+   multiplies local factors. Both exact, different questions. */
+const STRIP_PRED_MAXW = 128;
+function stripPredict() {
+  const g = COP_G, a = slopeA, b = slopeB, w = widthW;
+  if (!a || !b || w > STRIP_PRED_MAXW || w * g > 2e6) return null;
+  let acc = 0, wt = 0;
+  for (let c = offS; c < offS + w; c++) {
+    let len = 0;
+    for (let r = 1; r <= g; r++) {
+      const num = b * r - c;
+      if (num % a !== 0) continue;
+      const M = num / a;
+      if (M >= 1 && M <= g) len++;
+    }
+    if (!len) continue;
+    const k = Math.abs(c);
+    let d;
+    if (a === -1 && b === 1) d = k >= 2 ? phi(k, SPF) / (k - 1) : 0;
+    else if (k === 0)        d = 1 / g;
+    else                     d = phi(k, SPF) / k;
+    acc += d * len; wt += len;
+  }
+  // Partial periods, and they shrink as G grows rather than as w grows.
+  const tol = 0.005 + 2 * (Math.abs(offS) + w) / g;
+  return wt ? { pred: acc / wt, tol } : null;
+}
 function walkStrip(limitPts) {
   const pts = [];
   let total = 0, cop = 0;
@@ -2758,6 +2862,46 @@ function doRedraw(rebuildBase) {
     updateIdentity(st);
   }
   updateViewNote();
+  renderCellGrid();
+}
+
+/* At G ≤ 3 the plate is 4 or 9 cells. A label per cell still leaves the
+   reader guessing what the label MODE is actually printing — "labels M" in
+   the footer means nothing if you cannot see an M anywhere. At that size the
+   whole lattice fits in a table, so show it: every cell, its gcd, the three
+   strip coordinates, whether the current strip contains it, and what each
+   label mode would put in it. Above G = 3 this would be noise and it stops. */
+const CELLGRID_MAX = 3;
+function renderCellGrid() {
+  const el = $('cellgrid');
+  if (!el) return;
+  const g = COP_G;
+  if (g > CELLGRID_MAX) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  el.style.display = '';
+  const mode = $('lens-lbl').value;
+  let h = '<div class="scroll"><table>' +
+    '<tr><th>cell (r, M)</th><th>gcd</th><th>coprime</th><th>r &minus; M</th>' +
+    '<th>r + M</th><th>v = b\u00b7r &minus; a\u00b7M</th><th>in strip</th>' +
+    '<th>label \u00b7 ' + mode + '</th></tr>';
+  for (let M = 1; M <= g; M++) {
+    for (let r = 1; r <= g; r++) {
+      const gg = gcd(r, M), co = gg === 1;
+      const v = slopeB * r - slopeA * M;
+      const inS = v >= offS && v < offS + widthW;
+      h += '<tr class="' + (co ? 'good' : '') + '"><td>(' + r + ', ' + M + ')</td>' +
+           '<td class="n">' + gg + '</td>' +
+           '<td class="n">' + (co ? 'yes' : 'no') + '</td>' +
+           '<td class="n">' + (r - M) + '</td>' +
+           '<td class="n">' + (r + M) + '</td>' +
+           '<td class="n">' + v + '</td>' +
+           '<td class="n">' + (inS ? 'yes' : '\u2014') + '</td>' +
+           '<td class="n">' + (mode === 'off' ? '\u2014' : labelText(mode, r, M)) + '</td></tr>';
+    }
+  }
+  h += '</table></div><p class="stepnote" style="margin-top:8px;">Every cell at G = ' + g +
+       ', with what the <b>' + mode + '</b> label mode prints in it. This table stops above ' +
+       'G = ' + CELLGRID_MAX + ', where the plate\'s own labels take over.</p>';
+  el.innerHTML = h;
 }
 /* One painter for screen and export, so a 4K plate is the same picture as the
    canvas rather than a second implementation that can drift from it. */
@@ -2765,9 +2909,24 @@ function paintView(ctx, S, cap) {
   // The global quarter turn is applied once, here, so Grid, Ring, Cayley and
   // every export inherit it from one place and cannot drift apart.
   ctx.save();
+  applyViewport(ctx, S);
   applyViewRot(ctx, S);
   paintViewInner(ctx, S, cap);
   ctx.restore();
+}
+/* Ring and Cayley stamp their points into an offscreen buffer, then blit it.
+   The buffer was built at CSS size while the screen context carries a dpr
+   transform, so every blit was an upscale — invisible while the dots were one
+   pixel of dust, obvious the moment the point-size slider made them big.
+   Build at device resolution instead. Read the scale off the live transform
+   rather than devicePixelRatio: the export path has no dpr scaling and would
+   otherwise supersample a 2048px plate to 4096. hypot(a,b) is the scale
+   magnitude, which survives the quarter turn that has already been applied. */
+function plateScale(ctx) {
+  const t = ctx.getTransform ? ctx.getTransform() : null;
+  if (!t) return 1;
+  const k = Math.hypot(t.a, t.b);
+  return Math.max(1, Math.min(2, k || 1));
 }
 function paintViewInner(ctx, S, cap) {
   if (viewMode === 'cayley') { drawCayley(ctx, S); return; }
@@ -2777,6 +2936,7 @@ function paintViewInner(ctx, S, cap) {
     if (walkMode === 'band') drawRingBand(ctx, S);
     else if (showStrip) drawRingStrip(ctx, S);
     if (ringGuides) drawRingGuides(ctx, S);
+    drawUnitVoid(ctx, S);
     drawPartitionsOverlay(ctx, S);
     return;
   }
@@ -2787,8 +2947,12 @@ function paintViewInner(ctx, S, cap) {
   dimPlateIfPartition(ctx, S);
   if (walkMode === 'band') drawBandOverlay(ctx, S);
   else if (showStrip) drawStripOverlay(ctx, S);
-  drawGridLabels(ctx, S);
   drawPartitionsOverlay(ctx, S);
+  // Labels go LAST. They used to be drawn before the partition overlay, which
+  // then painted over them — switching partitions on silently removed every
+  // cell label. They carry their own dark stroke, so they stay readable on
+  // top of a strip colour.
+  drawGridLabels(ctx, S);
 }
 /* ══════════════════════════════════════════════════════════════════════════
    PARTITIONS — Strip I's Goldbach diagonal, ported with its dynamics.
@@ -3641,6 +3805,77 @@ function rotPt(x, y, S) {            // plate -> screen
   if (q === 3) return [c + dy, c - dx];
   return [x, y];
 }
+/* ── plate viewport ─────────────────────────────────────────
+
+   The lens magnifies a window onto the lattice; this moves the whole plate.
+   They compose rather than compete: zoom the plate to reach a region, then
+   the lens for exact cells.
+
+   Applied once in paintView, OUTSIDE applyViewRot, so Grid, Ring, Cayley and
+   every export inherit it from one place — and inverted once in unviewPt, so
+   the hit test, the lens window and the partition picker all keep pointing at
+   the cell you actually touched. Two places, one transform: the same rule the
+   turn already follows.
+
+   Everything here is in CSS pixels of the S×S plate, which is what the
+   pointer handlers hand us and what the context transform is already scaled
+   to. Mixing in device pixels here is the obvious way to break it. */
+let plateK = 1, plateX = 0, plateY = 0, plateMoved = false;
+const PLATE_KMIN = 0.6, PLATE_KMAX = 40;
+
+function plateClamp(S) {
+  // At k > 1 you may pan by as much as the overhang and no further, so the
+  // plate cannot be dragged off screen and lost.
+  const m = Math.max(0, (plateK - 1) * S / 2);
+  plateX = Math.max(-m, Math.min(m, plateX));
+  plateY = Math.max(-m, Math.min(m, plateY));
+}
+function plateIdentity() { return plateK === 1 && !plateX && !plateY; }
+function applyViewport(ctx, S) {
+  if (plateIdentity()) return;
+  const c = S / 2;
+  ctx.translate(plateX, plateY);
+  ctx.translate(c, c); ctx.scale(plateK, plateK); ctx.translate(-c, -c);
+}
+/* Zoom keeping the point under the finger fixed. Solve for the pan that
+   leaves the anchor's plate coordinate where it was. */
+function plateZoomAt(k1, ax, ay, S) {
+  const c = S / 2;
+  const px = c + (ax - plateX - c) / plateK;
+  const py = c + (ay - plateY - c) / plateK;
+  plateK = Math.max(PLATE_KMIN, Math.min(PLATE_KMAX, k1));
+  plateX = ax - c - (px - c) * plateK;
+  plateY = ay - c - (py - c) * plateK;
+  plateClamp(S);
+}
+function plateS() {
+  const cv = $('cv');
+  return cv ? (cv.getBoundingClientRect().width || 900) : 900;
+}
+function plateZoomStep(f) {
+  const S = plateS();
+  plateZoomAt(plateK * f, S / 2, S / 2, S);
+  syncPlateUI(); hideLens(); redraw(false);
+}
+function resetPlate() {
+  plateK = 1; plateX = 0; plateY = 0;
+  syncPlateUI(); hideLens(); redraw(false);
+}
+function syncPlateUI() {
+  const el = $('plate-k');
+  if (el) el.textContent = plateK.toFixed(plateK < 10 ? 1 : 0) + '\u00d7';
+  const rb = $('plate-reset');
+  if (rb) rb.classList.toggle('on', !plateIdentity());
+}
+/* screen -> plate: undo pan and zoom, then the turn. */
+function unviewPt(x, y, S) {
+  if (!plateIdentity()) {
+    const c = S / 2;
+    x = c + (x - plateX - c) / plateK;
+    y = c + (y - plateY - c) / plateK;
+  }
+  return unrotPt(x, y, S);
+}
 function unrotPt(x, y, S) {          // screen -> plate
   const q = viewQ(), c = S / 2, dx = x - c, dy = y - c;
   if (q === 1) return [c + dy, c - dx];
@@ -3664,11 +3899,12 @@ function upright(ctx, x, y, draw) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(-viewRotRad()); draw(0, 0); ctx.restore();
 }
 /* The turn is still applied once, in paintView, so exports and hit tests read
-   a single viewQuarter. What is per-view is the DEFAULT and the memory: Grid
-   and Ring open at -i, Cayley at 0, because the three views want different
-   framings out of the box and switching view should not silently re-orient
-   the one you just set. VQ holds the last quarter each view was left at. */
-const VQ = { grid: -1, ring: -1, cayley: 0 };
+   a single viewQuarter. What is per-view is the MEMORY: VQ holds the last
+   quarter each view was left at, so switching view does not silently
+   re-orient the one you just set. All three open at 0 — the raster's own
+   frame, where r runs right and M runs down, which is how every identity on
+   the page is written. */
+const VQ = { grid: 0, ring: 0, cayley: 0 };
 function syncRotChips() {
   document.querySelectorAll('.rotchip').forEach(b =>
     b.classList.toggle('on', +b.dataset.q === viewQuarter));
@@ -3756,7 +3992,11 @@ function ringBase(mode, S) {
   ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, S, S);
   const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const C = S / 2;
-  const dot = Math.max(1, S * 0.0026 * ptScale);
+  // Integer size and integer placement: a fillRect on fractional coordinates
+  // is antialiased on all four edges, which is exactly the mush the slider
+  // was making visible at larger sizes.
+  const dot = Math.max(1, Math.round(S * 0.0026 * ptScale));
+  const h = dot / 2;
   for (let M = 1; M <= g; M += step) {
     const rad = ringRad(M, S);
     for (let r = 1; r <= g; r += step) {
@@ -3764,19 +4004,22 @@ function ringBase(mode, S) {
       const th = thetaOf(r, M);                 // rotation applied by drawRingBase's transform
       const q = ringPt(rad, th, S), x = q[0], y = q[1];
       ctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M, boost) : 'rgba(255,255,255,' + Math.min(1, .05 * boost).toFixed(3) + ')';
-      ctx.fillRect(x - dot / 2, y - dot / 2, dot, dot);
+      ctx.fillRect(Math.round(x - h), Math.round(y - h), dot, dot);
     }
   }
   ringCv = cv; ringKey = key;
   return cv;
 }
 function drawRingBase(ctx, S, cap) {
-  const buf = ringBase($('cmode').value, Math.min(cap, S));
+  const bufS = Math.min(2400, Math.round(Math.min(cap, S) * plateScale(ctx)));
+  const buf = ringBase($('cmode').value, bufS);
   ctx.save();
   ctx.translate(S / 2, S / 2);
   ctx.rotate(RING_H * ringRot);   // same handedness as the points inside the buffer
-  ctx.imageSmoothingEnabled = true;
+  // Smooth only when the buffer is genuinely smaller than the plate.
+  ctx.imageSmoothingEnabled = bufS < S;
   ctx.drawImage(buf, -S / 2, -S / 2, S, S);
+  ctx.imageSmoothingEnabled = true;
   ctx.restore();
 }
 /* One strip drawn on Ring, at a given offset s (defaults to offS so a plain
@@ -3923,29 +4166,37 @@ function cayleyBaseKey(S) {
    Strip I's own caption for this view. */
 function drawCayleyField(ctx, S) {
   const boost = partMode !== 'off' ? partBgBoost : 1;
-  const key = cayleyBaseKey(S) + '|' + boost;
-  if (cayCv && cayKey === key) { ctx.drawImage(cayCv, 0, 0); return; }
+  const Sb = Math.min(2400, Math.round(S * plateScale(ctx)));   // device resolution, capped
+  const blit = (cv) => {
+    ctx.imageSmoothingEnabled = Sb < S;
+    ctx.drawImage(cv, 0, 0, S, S);
+    ctx.imageSmoothingEnabled = true;
+  };
+  const key = cayleyBaseKey(Sb) + '|' + boost;
+  if (cayCv && cayKey === key) { blit(cayCv); return; }
   const cv = document.createElement('canvas');
-  cv.width = S; cv.height = S;
+  cv.width = Sb; cv.height = Sb;
   const cctx = cv.getContext('2d');
-  cctx.fillStyle = '#04040d'; cctx.fillRect(0, 0, S, S);
+  cctx.fillStyle = '#04040d'; cctx.fillRect(0, 0, Sb, Sb);
   // Same fix as ringBase: sample the FULL 1..g range at a fixed density
   // instead of truncating to the first 900 rows/cols, which left everything
   // past r or M = 900 as an undrawn void once g exceeded that.
   const g = COP_G, N = 900, step = Math.max(1, Math.ceil(g / N));
   const mode = $('cmode').value;
-  const dot = Math.max(1, S * 0.0026 * ptScale * Math.min(2.4, Math.sqrt(Math.max(1, cayleyZoomIn))));
+  const dot = Math.max(1, Math.round(S * 0.0026 * ptScale * plateScale(ctx) *
+                                     Math.min(2.4, Math.sqrt(Math.max(1, cayleyZoomIn)))));
+  const h = dot / 2;
   for (let M = 1; M <= g; M += step) {
     for (let r = 1; r <= g; r += step) {
       const cop = isCop(r, M);
-      const p = cayleyXY(r, M, S);
+      const p = cayleyXY(r, M, Sb);
       if (!p) continue;
       cctx.fillStyle = cop ? cellRGBAstr(mode, 1, r, M, boost) : 'rgba(255,255,255,' + Math.min(1, .05 * boost).toFixed(3) + ')';
-      cctx.fillRect(p[0] - dot / 2, p[1] - dot / 2, dot, dot);
+      cctx.fillRect(Math.round(p[0] - h), Math.round(p[1] - h), dot, dot);
     }
   }
   cayCv = cv; cayKey = key;
-  ctx.drawImage(cv, 0, 0);
+  blit(cv);
 }
 /* cellRGBA returns a Uint8 tuple; the field wants a css string, so wrap it
    rather than duplicate the colour-mode switch that buildBase already owns.
@@ -3986,6 +4237,81 @@ function drawCayleyStripAt(ctx, S, s, color) {
    reads as stray straight lines if you did not expect it. Hence its own
    control, and its own opacity, rather than sharing Ring's toggle: in Cayley
    these are the most prominent thing on the plate. */
+/* ── the collapsed ring, read as the unit circle ───────────────────
+
+   Drive the hole to 1 and every ring lands on one circle, leaving the disk
+   empty. That void is worth something: on one circle the only coordinate
+   left is θ, and θ is exactly an argument, so the plate becomes a picture of
+   $e^{i\theta}$ on $|z| = 1$.
+
+   Whether it is a picture of ROOTS OF UNITY depends on the θ map, and the
+   three modes genuinely differ — so this says which, rather than implying
+   one reading and letting the other two borrow its authority:
+
+     wrap   θ = 2πr/M   →  the cell sits at e^{2πi·r/M}, an M-th root of
+                            unity, and it is PRIMITIVE exactly when
+                            gcd(r,M) = 1. Coprimality and primitivity are the
+                            same condition here, and φ(M) counts both. This
+                            is the honest roots-of-unity reading.
+     unit   θ = 2πr/G   →  position depends on r alone, so every cell in a
+                            column stacks on one G-th root. The colouring
+                            still marks gcd(r,M) = 1, which is NOT primitivity
+                            of that root — that would be gcd(r,G) = 1.
+     clamp  folds every r ≥ M onto θ = 2π, so the pile-up at z = 1 is an
+            artefact of the fold and not a root at all.
+
+   Cyclotomic footnote, since it is the same object: the primitive M-th roots
+   are precisely the roots of Φ_M, whose degree is φ(M). The anti-diagonal
+   count this page keeps measuring is that degree. */
+function drawUnitVoid(ctx, S) {
+  if (ringHole < 0.9) return;                 // only once there is a void
+  const c = S / 2, R = ringOuter(S) * ringHole;
+  ctx.save();
+  // axes and the four quarter marks: 1, i, -1, -i
+  ctx.strokeStyle = 'rgba(255,255,255,.10)';
+  ctx.lineWidth = Math.max(0.7, S / 1100);
+  ctx.beginPath();
+  ctx.moveTo(c - R, c); ctx.lineTo(c + R, c);
+  ctx.moveTo(c, c - R); ctx.lineTo(c, c + R);
+  ctx.stroke();
+  const fs = Math.max(9, Math.round(S / 72));
+  ctx.font = fs + 'px "JetBrains Mono",monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const marks = [[0, '1'], [1, 'i'], [2, '\u22121'], [3, '\u2212i']];
+  for (const [q, lab] of marks) {
+    const th = q * Math.PI / 2;
+    const x = c + Math.cos(th) * R * 0.9, y = c + RING_H * Math.sin(th) * R * 0.9;
+    upright(ctx, x, y, (ux, uy) => {
+      ctx.fillStyle = 'rgba(200,168,74,.75)';
+      ctx.fillText(lab, ux, uy);
+    });
+  }
+  // what the circle is, in this θ mode
+  const lines = thetaMode === 'wrap'
+    ? ['|z| = 1  ·  z = e^(2πi·r/M)',
+       'an M-th root of unity',
+       'coprime ⇔ primitive  ·  φ(M) of them',
+       'the roots of Φ_M , deg φ(M)']
+    : thetaMode === 'unit'
+    ? ['|z| = 1  ·  z = e^(2πi·r/G)',
+       'the G-th roots of unity',
+       'position is r alone — a column stacks',
+       'colour is gcd(r,M), not primitivity']
+    : ['|z| = 1  ·  θ = 2π·min(r/M,1)',
+       'clamp folds every r ≥ M onto z = 1',
+       'that pile-up is the fold, not a root',
+       'switch θ to wrap for the roots reading'];
+  const lf = Math.max(8, Math.round(S / 95));
+  ctx.font = lf + 'px "JetBrains Mono",monospace';
+  upright(ctx, c, c, (ux, uy) => {
+    const y0 = uy - (lines.length - 1) * lf * 0.9 / 2;
+    lines.forEach((t, i) => {
+      ctx.fillStyle = i === 0 ? 'rgba(238,232,220,.62)' : 'rgba(238,232,220,.34)';
+      ctx.fillText(t, ux, y0 + i * lf * 1.55);
+    });
+  });
+  ctx.restore();
+}
 function drawCayleyGuides(ctx, S) {
   const cx = S / 2, cy = S / 2, g = COP_G;
   ctx.save();
@@ -4037,8 +4363,9 @@ function updateBarBand(bs) {
   const d = bs.total ? bs.good / bs.total : 0;
   $('bar-l').innerHTML = 'G=<b>' + COP_G + '</b> \u00b7 <b>band</b> of w=<b>' + widthW +
     '</b> columns (n=<b>' + (widthW - 1) + '</b>) \u00b7 measured on ' + bs.cap + '\u00d7' + bs.cap;
-  $('bar-r').innerHTML = 'cells <b>' + bs.total.toLocaleString() + '</b> \u00b7 survive AND <b>' +
-    bs.good.toLocaleString() + '</b> \u00b7 density <b>' + fmt(d, 6) + '</b>';
+  $('bar-r').innerHTML = 'positions <b>' + bs.total.toLocaleString() + '</b> \u00b7 survive AND <b>' +
+    bs.good.toLocaleString() + '</b> \u00b7 <b>per-block</b> density <b>' + fmt(d, 6) +
+    '</b> \u00b7 D(' + (widthW - 1) + ') = <b>' + fmt(Dn(widthW - 1), 6) + '</b>';
 }
 function updateIdentityBand(bs) {
   const t = $('idt');
@@ -4070,8 +4397,20 @@ function updateBar(st) {
   const d = st.total ? st.cop / st.total : 0;
   $('bar-l').innerHTML = 'G=<b>' + COP_G + '</b> · slope <b>' + slopeA + '/' + slopeB +
     '</b> · s=<b>' + offS + '</b> · w=<b>' + widthW + '</b>';
+  // Naming the quantity is the fix. A bare "density" beside a width slider
+  // invites being read as C(n); "per-cell" cannot be. And where the other
+  // number exists, show it rather than warning about it in a tooltip —
+  // 0.578 sitting next to 0.194142 explains itself, and the button is the
+  // answer rather than an instruction.
+  let extra = '';
+  if (widthW > 1) {
+    const n = widthW - 1;
+    extra = ' <span class="qnote">mean of φ(c)/c, not D(' + n + ') = <b>' +
+            fmt(Dn(n), 6) + '</b>' +
+            '<button class="chip" onclick="setWalk(\'band\')">measure the block</button></span>';
+  }
   $('bar-r').innerHTML = 'strip cells <b>' + st.total.toLocaleString() + '</b> · coprime <b>' +
-    st.cop.toLocaleString() + '</b> · density <b>' + fmt(d, 6) + '</b>';
+    st.cop.toLocaleString() + '</b> · <b>per-cell</b> density <b>' + fmt(d, 6) + '</b>' + extra;
 }
 
 /* ── live identity check ───────────────────────────────────────────────── */
@@ -4108,11 +4447,32 @@ function updateIdentity(st) {
       }
     }
   }
+  // The strip walk's own closed form, for any slope and any width. This used
+  // to read "no closed form", which was wrong: there is one, it just belongs
+  // to a different question than D(n) does.
+  const sp = stripPredict();
+  if (sp && (widthW > 1 || !rows.length)) {
+    const dlt = Math.abs(meas - sp.pred);
+    rows.push(['Per-cell density: mean of φ(c)/c over its ' + widthW +
+               ' line' + (widthW === 1 ? '' : 's'),
+               fmt(meas, 6), fmt(sp.pred, 6), fmt(dlt, 6), dlt <= sp.tol]);
+  }
+  if (widthW > 1) {
+    const n = widthW - 1, ex = Dn(n);
+    rows.push(['Per-block density, n=' + n + ' — the other question',
+               'switch to Block to measure', 'D(' + n + ') = ' + fmt(ex, 6),
+               'ratio ' + fmt(meas / (ex || 1), 2) + '×', null]);
+  }
   if (!rows.length) {
     rows.push(['No closed form for this slope/width', fmt(meas, 6),
-               slopeA === 1 && slopeB === 1 && widthW > 1
-                 ? 'for C(n) switch to Block mode'
-                 : 'try slope ±1 with w=1', '—', null]);
+               'try slope ±1 with w=1', '—', null]);
+  }
+  if (sp) {
+    rows.push(['', '', '', '', 'note']);
+    rows[rows.length - 1] = ['<span style="color:var(--cream3)">Tolerance ' +
+      fmt(sp.tol, 4) + ' — a line covers a whole number of periods only when ' +
+      'its length is a multiple of rad(c); the remainder is partial. It shrinks ' +
+      'with G, not with width.</span>', '', '', '', null];
   }
   for (const r of rows) {
     const cls = r[4] === true ? 'good' : (r[4] === false ? 'bad' : '');
@@ -4413,6 +4773,14 @@ function updateViewNote() {
   if (!el) return;
   if (viewMode === 'ring') {
     el.innerHTML = 'Ring \u00b7 the same lattice in polar. <b>M</b> is the ring index running ' +
+      (ringHole >= 0.9
+        ? '<b style="color:var(--gold)">collapsed onto one circle</b> \u2014 read as |z| = 1' +
+          (thetaMode === 'wrap'
+            ? ', where a coprime cell is a <b>primitive</b> M-th root of unity and \u03c6(M) counts them. '
+            : thetaMode === 'unit'
+            ? ', the G-th roots of unity \u2014 but position is r alone, so the colour is not primitivity. '
+            : ', though clamp folds every r \u2265 M onto z = 1, so this is not a roots picture. ')
+        : '') +
       'outward, <b>r</b> runs around with \u03b8 = ' + THETA_LABEL[thetaMode] + ' (<b>' + thetaMode + '</b>), ' +
       'so a slope ' + slopeA + '/' + slopeB +
       ' strip is a spiral. Rotation is a draw transform, ' +
@@ -4519,8 +4887,13 @@ function toggleStrip() {
   // switched on by hand while the overlay is up — the overlay no longer owns
   // this state, so it must not switch it back off later
   if (showStrip) stripHiddenByParts = false;
-  $('b-strip').textContent = 'Strip: ' + (showStrip ? 'on' : 'off');
-  $('b-strip').classList.toggle('on', showStrip);
+  // There are two of these now — one in the render row, one beside the
+  // partition modes, since that is where the reader is standing when the
+  // overlay switches it off. Both must read the same state.
+  document.querySelectorAll('.stripchip').forEach(b => {
+    b.textContent = 'Strip: ' + (showStrip ? 'on' : 'off');
+    b.classList.toggle('on', showStrip);
+  });
   redraw(false);
 }
 
@@ -4529,11 +4902,13 @@ function toggleStrip() {
 const PRESETS = {
   diag:  { a: 1,  b: 1, s: 6,   w: 1 },
   anti:  { a: -1, b: 1, s: 210, w: 1, minG: 256 },
-  gap6:  { a: 1,  b: 1, s: 6,   w: 1 },
+  main:  { a: 1,  b: 1, s: 0,   w: 1 },              // gcd(r,r)=r — the degenerate line
   gap30: { a: 1,  b: 1, s: 30,  w: 1 },
-  blk5:  { a: 1,  b: 1, s: 0,   w: 6 },
-  blk29: { a: 1,  b: 1, s: 0,   w: 30 },
-  gsm:   { a: -1, b: 1, s: 210, w: 1, minG: 256 },   // 210 = 2·3·5·7, smooth
+  gap97: { a: 1,  b: 1, s: 97,  w: 1, minG: 128 },   // prime g: φ(97)/97 = 96/97
+  blk1:  { a: 1,  b: 1, s: 0,   w: 2 },              // the smallest saturating block
+  aprime:{ a: -1, b: 1, s: 211, w: 1, minG: 256 },   // 211 prime ⇒ fully coprime
+  blk5:  { a: 1,  b: 1, s: 0,   w: 6 },              // the C(5) case
+  blk29: { a: 1,  b: 1, s: 0,   w: 30 },             // the C(29) case
   grg:   { a: -1, b: 1, s: 206, w: 1, minG: 256 },   // 206 = 2·103, rough
   f12:   { a: 1,  b: 2, s: 1,   w: 1 },
   f23:   { a: 2,  b: 3, s: 1,   w: 1 }
@@ -4566,16 +4941,21 @@ function preset(k) {
    after the user arrives there by stepping rather than clicking. */
 function syncPresetChips() {
   for (const k of Object.keys(PRESETS)) {
-    const el = $(k === 'diag' ? 'pre-diag' : k === 'anti' ? 'pre-anti' : 'ps-' + k);
+    // gap30 has two buttons (the block row and the one-line row); light both.
+    const els = k === 'diag' ? [$('pre-diag')] : k === 'anti' ? [$('pre-anti')]
+              : k === 'gap30' ? [$('ps-gap30'), $('ps-gap30b')] : [$('ps-' + k)];
+    const el = els[0];
     if (!el) continue;
     const P = PRESETS[k];
-    el.classList.toggle('on',
-      P.a === slopeA && P.b === slopeB && P.s === offS && P.w === widthW);
+    const on = P.a === slopeA && P.b === slopeB && P.s === offS && P.w === widthW;
+    for (const e of els) if (e) e.classList.toggle('on', on);
   }
 }
 function resetView() {
   $('sl-a').value = 1; $('sl-b').value = 1;
   slopeA = 1; slopeB = 1;
+  // R means "back to the opening state", so it clears the pan and zoom too.
+  plateK = 1; plateX = 0; plateY = 0; syncPlateUI();
   onOff(0); onW(1); reslope();
 }
 
@@ -4857,6 +5237,7 @@ async function exportPNG(px) {
   ctx.font = (15.5 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3; ctx.textAlign = 'left';
   ctx.fillText('v = b·r − a·M   ·   slope ' + slopeA + '/' + slopeB + '   ·   s = ' + offS +
     '   ·   w = ' + widthW + '   ·   G = ' + COP_G + '   ·   walk = ' + walkMode +
+    (plateIdentity() ? '' : '   ·   plate ' + plateK.toFixed(2) + '×') +
     '   ·   view = ' + viewMode +
     (viewMode === 'ring' ? ' (θ ' + thetaMode + ', rot ' + Math.round(ringRot * 180 / Math.PI) + '°, hole ' + ringHole.toFixed(2) + ')'
      : viewMode === 'cayley' ? ' (map ' + cmap + ', θ ' + thetaMode + (cmap === 'A' ? ', ρ ' + rho0.toFixed(2) + '+' + rhoD.toFixed(2) + '·M/G' : ', a ' + ba.toFixed(2) + '∠' + baAng + '°') + ')' : '') +
@@ -5421,11 +5802,13 @@ function exportCometCSV() {
    true cells as vectors at the magnified pitch, which makes it the only exact
    view of the lattice at large G.
    ══════════════════════════════════════════════════════════════════════════ */
-/* Off by default. The lens follows the pointer, so on a first visit it fires
-   on every incidental move across the plate and reads as the page grabbing at
-   you. It is the only exact view of the lattice past G = canvas size, so it
-   stays one keypress (L) or one chip away — just not uninvited. */
-let LENS_ON = false, LENS_ZOOM = 3, LENS_PIN = 'auto', LENS_REDRAW = null;
+/* On by default. Past G = canvas size the base layer aggregates a block of
+   cells per pixel, so the lens is the only place individual cells are still
+   present — it re-reads the bitset and draws true cells at the magnified
+   pitch. Off by default meant the plate quietly stopped showing cells at
+   exactly the sizes people explore at. Pointer-follow can be pinned to a
+   corner, and L or the chip turns it off. */
+let LENS_ON = true, LENS_ZOOM = 3, LENS_PIN = 'auto', LENS_REDRAW = null;
 let lensSize = 200, lensAt = null;
 const LENS_PRESETS = [2, 3, 4, 6, 10, 20, 30, 40, 50, 100];
 
@@ -5595,7 +5978,7 @@ function latticeHitAt(cx, cy, S) {
   if (!COP_G) return null;
   // Back to the plate frame first. cellAt, ringCellAt and cayleyCellAt all
   // reason in the projection's own coordinates and know nothing of the turn.
-  const u = unrotPt(cx, cy, S); cx = u[0]; cy = u[1];
+  const u = unviewPt(cx, cy, S); cx = u[0]; cy = u[1];
   if (viewMode === 'grid') return cellAt(cx, cy, S, COP_G);
   if (viewMode === 'ring') {
     // Collapsed annulus: every ring is on one circle, so the distance from
@@ -5696,7 +6079,7 @@ function drawLens(px, py) {
   // its window has to be centred on the plate-frame pointer rather than the
   // screen one. Ring and Cayley blit the finished canvas, which already
   // carries the turn, so those keep the screen-frame window.
-  const gs = unrotPt(px * canvasPerCss, py * canvasPerCss, cv.width);
+  const gs = unviewPt(px * canvasPerCss, py * canvasPerCss, cv.width);
   const gx = isGrid ? gs[0] : px * canvasPerCss;
   const gy = isGrid ? gs[1] : py * canvasPerCss;
   const sX = gx - srcSize / 2, sY = gy - srcSize / 2;
@@ -5910,7 +6293,11 @@ function setLabelScale(v) {
   redraw(false);
 }
 function labelText(mode, r, m) {
-  return mode === 'M'     ? '' + m
+  // 'res' is r mod M — the same quantity the resmod render mode colours by
+  // and the same one the Cayley view is built on, so the three agree on what
+  // "residue" means rather than each picking its own.
+  return mode === 'res'   ? '' + (m > 0 ? r % m : 0)
+    : mode === 'M'     ? '' + m
     : mode === 'r'     ? '' + r
     : mode === 'dec'   ? (r / m).toFixed(2)
     : mode === 'gcd'   ? '' + gcd(r, m)
@@ -6112,7 +6499,18 @@ function wireLens() {
     const t = (e.touches && e.touches[0]) ? e.touches[0] : e;
     return { x: t.clientX - b.left, y: t.clientY - b.top, w: b.width, h: b.height };
   };
+  /* Pan and pinch share the canvas with the lens and the partition picker,
+     so the three have to agree on what a gesture means. One pointer that has
+     travelled more than PAN_SLOP is a pan (and the lens hides, because a
+     loupe that jumps while you drag is worse than none). Two pointers are
+     always a pinch. Anything under the slop is still a click. */
+  const PAN_SLOP = 6;
+  const pts = new Map();
+  let pinch0 = 0, pinchK0 = 1, travel = 0;
+  const panning = () => pts.size === 1 && travel > PAN_SLOP;
+
   const move = e => {
+    if (pts.size || panning()) return;          // a gesture owns the pointer
     const p = local(cv, e);
     if (p.x < 0 || p.y < 0 || p.x > p.w || p.y > p.w) { hideLens(); return; }
     drawLens(p.x, p.y);
@@ -6121,7 +6519,59 @@ function wireLens() {
   cv.addEventListener('mouseleave', hideLens);
   cv.addEventListener('touchmove', e => { e.preventDefault(); move(e); }, { passive: false });
   cv.addEventListener('touchstart', e => { e.preventDefault(); move(e); }, { passive: false });
-  cv.addEventListener('click', e => { if (!e._dragged) clickAddPartition(e); });
+  cv.addEventListener('click', e => {
+    // A drag that ends over the plate would otherwise also read as a click
+    // and drop a partition pick where you happened to let go.
+    if (plateMoved) { plateMoved = false; return; }
+    clickAddPartition(e);
+  });
+
+  cv.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    travel = 0;
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      pinch0 = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      pinchK0 = plateK;
+    }
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return;
+    const prev = pts.get(e.pointerId);
+    const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const r = cv.getBoundingClientRect(), S = r.width;
+    if (pts.size >= 2) {
+      const [a, b] = [...pts.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      plateZoomAt(pinchK0 * (d / pinch0), (a.x + b.x) / 2 - r.left,
+                  (a.y + b.y) / 2 - r.top, S);
+      travel = 999; hideLens(); syncPlateUI(); redraw(false);
+    } else {
+      travel += Math.abs(dx) + Math.abs(dy);
+      if (travel <= PAN_SLOP) return;
+      plateX += dx; plateY += dy; plateClamp(S);
+      hideLens(); syncPlateUI(); redraw(false);
+    }
+  });
+  const endPan = e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.delete(e.pointerId);
+    if (pts.size < 2) pinch0 = 0;
+    if (travel > PAN_SLOP) plateMoved = true;
+    if (!pts.size) travel = 0;
+  };
+  cv.addEventListener('pointerup', endPan);
+  cv.addEventListener('pointercancel', endPan);
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect();
+    plateZoomAt(plateK * (e.deltaY < 0 ? 1.12 : 1 / 1.12),
+                e.clientX - r.left, e.clientY - r.top, r.width);
+    hideLens(); syncPlateUI(); redraw(false);
+  }, { passive: false });
 
   const move2 = e => {
     const p = local(cv2, e);
@@ -6166,22 +6616,41 @@ function clickAddPartition(e) {
    product against its closed form, the prime convolution against published
    values. A test that calls the same function twice proves nothing.
    ══════════════════════════════════════════════════════════════════════════ */
+/* Lattice-wide rows follow the live G rather than a hard cap. Below the budget
+   they walk every cell; above it they step at a fixed density and the scope
+   column says which happened, so a row can never quietly shrink its own
+   coverage while still reporting a pass. */
+const CELL_BUDGET = 360000;
+function walkStep(g) { return Math.max(1, Math.ceil(g / Math.sqrt(CELL_BUDGET))); }
+function scopeOf(g, stp) {
+  return stp === 1 ? 'every cell at G = ' + g
+                   : 'G = ' + g + ', every ' + stp + 'th cell (' +
+                     Math.pow(Math.ceil(g / stp), 2).toLocaleString() + ' of ' +
+                     (g * g).toLocaleString() + ')';
+}
+function stRowToggle(i) {
+  const el = $('sthow-' + i);
+  if (!el) return;
+  const open = el.classList.toggle('open');
+  if (el.previousElementSibling) el.previousElementSibling.classList.toggle('open', open);
+}
 function selfTest() {
   const rows = [];
-  const add = (name, got, want, ok, note) =>
-    rows.push({ name, got, want, ok, note: note || '' });
+  const add = (name, got, want, ok, note, how) =>
+    rows.push({ name, got, want, ok, note: note || '', how: how || '' });
   /* Most of these tests count DISAGREEMENTS, so the honest pass value is zero.
      Printing "computed 0 / expected 0" made a passing row look like a row that
      never ran. Report the agreement instead: how many comparisons were made and
      how many held. */
-  const addCount = (name, agree, total, note, sample) =>
+  const addCount = (name, agree, total, note, sample, how) =>
     rows.push({
       name,
       got: agree.toLocaleString() + ' / ' + total.toLocaleString() + ' agree' +
            (sample ? '  (' + sample + ')' : ''),
       want: 'all ' + total.toLocaleString(),
       ok: agree === total,
-      note: note || ''
+      note: note || '',
+      how: how || ''
     });
   const near = (a, b, tol) => Math.abs(a - b) <= tol;
   const t0 = performance.now();
@@ -6197,7 +6666,8 @@ function selfTest() {
       total++; if (c === PHI[n]) agree++;
     }
     addCount('φ sieve vs direct gcd count', agree, total, 'n ≤ 400',
-             'φ(400)=' + PHI[400]);
+             'φ(400)=' + PHI[400],
+             '<b>Asserts</b> the sieve that builds PHI[] agrees with the definition of φ. <b>Route A</b> is the sieve: one pass subtracting r/p for each prime p | n. <b>Route B</b> counts, for each n, how many k ≤ n have gcd(k, n) = 1 by calling gcd n times. Nothing is shared — one multiplies, the other divides. Every n up to 400.');
   }
 
   /* — 2. Phi(n) closed form vs direct pair enumeration — */
@@ -6209,7 +6679,8 @@ function selfTest() {
       total++; if (c === Phi(n)) agree++;
     }
     addCount('Φ(n) = 2Σφ(k)−1 vs enumeration', agree, total, 'n ≤ 120',
-             'Φ(120)=' + Phi(120).toLocaleString());
+             'Φ(120)=' + Phi(120).toLocaleString(),
+             '<b>Asserts</b> the closed form for the number of coprime ordered pairs in [1,n]². <b>Route A</b> evaluates 2·Σφ(k) − 1 from the φ table. <b>Route B</b> enumerates all n² pairs and tests gcd on each. The −1 corrects the double count of (1,1). Every n up to 120.');
   }
 
   /* — 3. partition identity — */
@@ -6222,25 +6693,29 @@ function selfTest() {
       last = tot;
     }
     addCount('Σ_d Φ(⌊n/d⌋) = n²', agree, total, 'exact identity',
-             'n=1000: Σ=' + last.toLocaleString());
+             'n=1000: Σ=' + last.toLocaleString(),
+             '<b>Asserts</b> that classifying every pair by its gcd partitions the square exactly: each pair has exactly one gcd, so summing Φ(⌊n/d⌋) over all d must recover n². This is an identity, not a limit — there is no tolerance and no error term. A failure would mean the Φ table is wrong, not that convergence is slow.');
   }
 
   /* — 4. coprime density limit — */
   {
     const v = Phi(4096) / (4096 * 4096), t = 6 / (Math.PI * Math.PI);
-    add('Φ(n)/n² → 6/π²', v.toFixed(6), t.toFixed(6), near(v, t, 2e-3), 'n = 4096');
+    add('Φ(n)/n² → 6/π²', v.toFixed(6), t.toFixed(6), near(v, t, 2e-3), 'n = 4096',
+             '<b>Asserts</b> the classical coprime-pair density (Mertens 1874). This is the only asymptotic row in the elementary group, so it carries a tolerance: 2×10⁻³ at n = 4096. It is convergence being checked, not an identity — a value just outside tolerance would mean slow convergence, not a broken Φ.');
   }
 
   /* — 5. bitset vs direct gcd, every cell — */
   {
+    // Follows the live G instead of stopping at 512: below the budget every
+    // cell is checked, above it a fixed-density sample, and the scope says so.
     let agree = 0, total = 0, cop = 0;
-    const n = Math.min(COP_G, 512);
-    for (let M = 1; M <= n; M++) for (let r = 1; r <= n; r++) {
+    const n = COP_G, stp = walkStep(n);
+    for (let M = 1; M <= n; M += stp) for (let r = 1; r <= n; r += stp) {
       const want = gcd(r, M) === 1 ? 1 : 0;
       total++; if ((isCop(r, M) ? 1 : 0) === want) agree++;
       if (want) cop++;
     }
-    addCount('coprimality bitset vs gcd', agree, total, 'every cell at G=' + n,
+    addCount('coprimality bitset vs gcd', agree, total, scopeOf(n, stp),
              cop.toLocaleString() + ' coprime');
   }
 
@@ -6257,7 +6732,8 @@ function selfTest() {
     }
     slopeA = sa; slopeB = sb; offS = so; widthW = sw;
     addCount('anti-diagonal count = φ(N)', agree, total,
-             'N ≤ G only, so raise G for more', shown.join(', '));
+             'N ≤ G only, so raise G for more', shown.join(', '),
+             '<b>Asserts</b> Strip I\'s criterion. On r + M = N a cell is coprime iff gcd(r, N−r) = gcd(r, N) = 1, so the count is φ(N). <b>Route A</b> is the live strip walk over the bitset, the same code the plate uses. <b>Route B</b> is the φ table. Only N ≤ G can be tested, since the anti-diagonal has to fit on the lattice — raise G to widen this row.');
   }
 
   /* — 7. diagonal density → phi(g)/g — */
@@ -6274,7 +6750,8 @@ function selfTest() {
       for (let M = 1; M + g0 <= N; M++) { tot++; if (gcd(M + g0, M) === 1) cop++; }
       worst = Math.max(worst, Math.abs(cop / tot - PHI[g0] / g0));
     }
-    add('diagonal density → φ(g)/g', worst.toFixed(4), '&lt; 0.02', worst < 0.02, N + '-long window');
+    add('diagonal density → φ(g)/g', worst.toFixed(4), '&lt; 0.02', worst < 0.02, N + '-long window',
+             '<b>Asserts</b> that on r − M = g the coprime density is φ(g)/g, since gcd(M+g, M) = gcd(g, M). <b>Deliberately not measured on the live lattice:</b> at small G the window past offset g is tiny (at G = 31, g = 30 leaves a single point) and the ratio would be sampling noise rather than a wrong identity. Pinned to a fixed 5000-long window computed by gcd directly.');
   }
 
   /* — 8. nu_p for consecutive blocks — */
@@ -6286,7 +6763,8 @@ function selfTest() {
       total++; if (seen.size === Math.min(n + 1, p)) agree++;
     }
     addCount('ν_p{0..n} = min(n+1, p)', agree, total, 'n < 40 × 8 primes',
-             'saturates at p ≤ n+1');
+             'saturates at p ≤ n+1',
+             '<b>Asserts</b> the pigeonhole step §1 rests on: n+1 consecutive integers occupy min(n+1, p) classes mod p. <b>Route A</b> is the formula. <b>Route B</b> builds the actual residue set mod p and counts it. This is the row that would catch a saturation bug — if min() were wrong, every C(n) number on the page would be too.');
   }
 
   /* — 9. nu_p for the Goldbach pair — */
@@ -6299,7 +6777,8 @@ function selfTest() {
       if (want === 1) collide++;
     }
     addCount('ν_p{0,N} = 1 if p|N else 2', agree, total, 'N < 300 × 6 primes',
-             collide.toLocaleString() + ' collisions');
+             collide.toLocaleString() + ' collisions',
+             '<b>Asserts</b> the Goldbach half of the same rule: {0, N} occupies two classes unless p divides N, when the two offsets collide into one. <b>Route A</b> is the p | N test. <b>Route B</b> counts the residue set. Every factor (p−1)/(p−2) in 𝔖(N) comes from a case this row checks.');
   }
 
   /* — 10. singular series: product form vs closed form — */
@@ -6316,18 +6795,21 @@ function selfTest() {
       worst = Math.max(worst, Math.abs(prod - closed) / closed);
     }
     add('𝔖 product vs 2C₂∏(p−1)/(p−2)', worst.toExponential(1), '&lt; 1e-3',
-        worst < 1e-3, 'truncation only');
+        worst < 1e-3, 'truncation only',
+             '<b>Asserts</b> Hardy and Littlewood\'s closed form. <b>Route A</b> evaluates the raw Euler product ∏(1−ν_p/p)/(1−1/p)² term by term over primes. <b>Route B</b> uses the collapsed form 2C₂∏(p−1)/(p−2) from §1. The tolerance is the tail of the truncated product, not a modelling error.');
   }
 
   /* — 11. twin-prime constant — */
-  add('C₂ constant', C2.toFixed(10), '0.6601618158', near(C2, 0.6601618158, 1e-9), 'A005597');
+  add('C₂ constant', C2.toFixed(10), '0.6601618158', near(C2, 0.6601618158, 1e-9), 'A005597',
+             '<b>Asserts</b> the twin-prime constant against its published value in OEIS A005597. Not a derivation — an external anchor. Every 𝔖 on the page is scaled by this number, so a typo here would shift the whole comet by a constant factor while every internal consistency check still passed.');
 
   /* — 12. li2 vs high-resolution reference — */
   {
     const REF = { 1000: 34.6851, 20000: 270.9637, 60000: 631.1828, 300000: 2300.8131 };
     let worst = 0;
     for (const k in REF) worst = Math.max(worst, Math.abs(li2(+k) - REF[k]) / REF[k]);
-    add('li₂ vs 400k-step Simpson', worst.toExponential(1), '&lt; 1e-4', worst < 1e-4, '4 anchors');
+    add('li₂ vs 400k-step Simpson', worst.toExponential(1), '&lt; 1e-4', worst < 1e-4, '4 anchors',
+             '<b>Asserts</b> that the fast li₂ — composite Simpson split at t = 100, about 4k evaluations — matches a 400k-step reference at four anchors. <b>Why the split matters:</b> the integrand falls from ~2.08 at t = 2 to ~0.047 at t = 100, so a single panel width is wrong at both ends. A trapezoid version drifts about 1.5% over the low range.');
   }
 
   /* — 13. prime-pair convolution vs known counts — */
@@ -6339,7 +6821,8 @@ function selfTest() {
     }
     const ok = c[10000] === 254 && c[20000] === 462;
     add('r(N) ordered pair counts', 'r(10⁴)=' + c[10000] + ', r(2·10⁴)=' + c[20000],
-        'r(10⁴)=254, r(2·10⁴)=462', ok, 'independent convolution');
+        'r(10⁴)=254, r(2·10⁴)=462', ok, 'independent convolution',
+             '<b>Asserts</b> the comet\'s own counts against published values of the Goldbach function. <b>Note the convention:</b> these are ORDERED pairs, so r(N) is twice the usual unordered count except where p = q. An off-by-two here would rescale the whole comet without changing its shape, which is exactly the kind of error a visual check cannot catch.');
   }
 
   /* — 14. does S actually tighten the spread? — */
@@ -6350,7 +6833,8 @@ function selfTest() {
     const better = b.sd < a.sd / 3;
     add('𝔖 tightens the comet spread',
         'σ ' + a.sd.toFixed(3) + ' → ' + b.sd.toFixed(3),
-        'at least 3× tighter', better, 'even N ≥ 1000');
+        'at least 3× tighter', better, 'even N ≥ 1000',
+             '<b>Asserts</b> the claim §3 makes visually: dividing r(N) by 𝔖(N) narrows the band. The measured spread of the normalised ratio must be smaller than the spread of the raw counts. <b>This is not evidence for Hardy–Littlewood</b> — it only checks that the panel is drawing what it says it draws.');
   } else {
     add('𝔖 tightens the comet spread', 'comet not built', '—', null, 'run Recompute first');
   }
@@ -6370,7 +6854,8 @@ function selfTest() {
     }
     add('band AND-density → D(n)', detail.join(', '),
         [0, 1, 2, 5].map(n => Dn(n).toFixed(4)).join(', '),
-        ok, '400×400 window');
+        ok, '400×400 window',
+             '<b>Asserts</b> the §1 derivation end to end. <b>Route A</b> walks the lattice testing gcd(r, M+j) = 1 for every j in the block — an AND across the band, not an average within a strip. <b>Route B</b> is the Euler product ∏(1−ν_p/p²). A strip average of the same band reads 0.578, which is not an error but the mean of φ(c)/c over c = 0…5 — exact, and a factor of three away from D(5) = 0.194142. Two closed forms, two questions.');
   }
 
   /* — 16. gcd counts vs Phi — */
@@ -6382,7 +6867,8 @@ function selfTest() {
       if (cnt[d] === Phi(Math.floor(n / d))) agree++;
     }
     addCount('count(gcd=d) = Φ(⌊n/d⌋)', agree, n, 'every divisor at n = 256',
-             'Σ=' + tot.toLocaleString() + ' = 256²');
+             'Σ=' + tot.toLocaleString() + ' = 256²',
+             '<b>Asserts</b> the exact distribution behind the gcd panel: pairs with gcd exactly d are pairs (r/d, M/d) that are coprime, so there are Φ(⌊n/d⌋) of them. <b>Route A</b> tallies gcd over all n² pairs. <b>Route B</b> is the Φ table. Checked for every divisor d, not just small ones.');
   }
 
   /* — 17. ring projection: the forward map and its inverse agree — */
@@ -6412,7 +6898,8 @@ function selfTest() {
       }
     }
     thetaMode = savedTM;
-    addCount('ring polar map inverts (3 θ modes)', agree, tot, 'cell centres at G = ' + g, bad || 'exact');
+    addCount('ring polar map inverts (3 θ modes)', agree, tot, 'cell centres at G = ' + g, bad || 'exact',
+             '<b>Asserts</b> that where Ring draws a cell is where clicking finds it. The forward map (ringRad / ringAng) and the inverse (ringCellAt) are written separately, so either can drift. <b>The fold is expected, not an error:</b> clamp sends every r ≥ M onto the r = M point and wrap sends r to ((r−1) mod M)+1, so the expected r is folded before comparing. Only unit is injective.');
   }
 
   /* — 17b. the global turn is a bijection the hit test undoes exactly — */
@@ -6423,8 +6910,26 @@ function selfTest() {
     // notice. Every quarter is checked, in all three views, because the three
     // take the turn by different routes: Grid re-projects, Ring goes through
     // ringCellAt, Cayley through the inverse Möbius.
+    //
+    // One correction, and it is the point of the row: only Grid is injective.
+    // Ring and Cayley both take their angle from thetaOf, which FOLDS — clamp
+    // sends every r ≥ M onto the r = M point, wrap sends r onto ((r−1) mod M)+1
+    // — so demanding c.r === r there asks the projection for information it
+    // deliberately threw away, and the row was failing on the fold rather than
+    // on the turn. What the turn must preserve is the FOLDED cell, which is
+    // what the picture actually shows. Test 17 already folds this way; this
+    // row was the odd one out.
     const S = 900, g = COP_G, stp = Math.max(1, g >> 3);
     const savedQ = viewQuarter, savedVM = viewMode;
+    // projectCell works in the plate frame; latticeHitAt also undoes the
+    // viewport. Neutralise it, or this row would fail simply because the
+    // reader had pinched the plate before pressing the button.
+    const pK = plateK, pX = plateX, pY = plateY;
+    plateK = 1; plateX = 0; plateY = 0;
+    const fold = (r, M) => viewMode === 'grid' ? r
+                         : thetaMode === 'clamp' ? Math.min(r, M)
+                         : thetaMode === 'wrap' ? (((r - 1) % M) + 1)
+                         : r;                                  // unit: injective
     let agree = 0, tot = 0, bad = '';
     for (const vm of ['grid', 'ring', 'cayley']) {
       viewMode = vm;
@@ -6436,16 +6941,20 @@ function selfTest() {
             if (!p) continue;                       // off-plate (Cayley pole)
             tot++;
             const c = latticeHitAt(p[0], p[1], S);
-            if (c && c.r === r && c.M === M) agree++;
+            const wantR = fold(r, M);
+            if (c && c.r === wantR && c.M === M) agree++;
             else if (!bad) bad = vm + ' q=' + q + ': (' + r + ',' + M + ') \u2192 ' +
-                                 (c ? c.r + ',' + c.M : 'outside');
+                                 (c ? c.r + ',' + c.M : 'outside') + ' want ' + wantR + ',' + M;
           }
         }
       }
     }
     viewQuarter = savedQ; viewMode = savedVM;
+    plateK = pK; plateX = pX; plateY = pY;
     addCount('quarter turn: project \u2192 hit test round-trips', agree, tot,
-             'grid/ring/cayley \u00d7 0, \u2212i, +i, \u22121', bad || 'exact');
+             'grid/ring/cayley \u00d7 0, \u2212i, +i, \u22121 \u00b7 folded where \u03b8 folds',
+             bad || 'exact',
+             '<b>Asserts</b> that the global turn is a bijection the hit test undoes exactly, in all three views at all four quarters. Grid re-projects, Ring goes through ringCellAt, Cayley through the inverse Möbius — three different routes to the same guarantee. <b>Same fold as row 17:</b> only Grid is injective, so on Ring and Cayley the expected cell is folded first. Demanding an unfolded round-trip asks the projection for information θ deliberately discarded.');
   }
 
   /* — 17bb. the Gaussian splitting rules, against direct division in Z[i] — */
@@ -6485,7 +6994,8 @@ function selfTest() {
       }
     }
     addCount('\u03a9 in Z[i] from N(z) vs direct Gaussian division', agree, tot,
-             'z = r+iM, r,M \u2264 ' + G0, bad || 'exact');
+             'z = r+iM, r,M \u2264 ' + G0, bad || 'exact',
+             '<b>Asserts</b> that the Gaussian factor count read off the norm matches actual division in Z[i]. <b>Route A</b> reads Ω(z) from the factorisation of N(z) = r²+M² through the p mod 4 trichotomy. <b>Route B</b> divides z by real Gaussian primes until it runs out. This row is outside the ν_p argument — nothing in §1 depends on it.');
   }
 
   /* — 17bc. Gaussian primes are contained in the coprime plate — */
@@ -6503,7 +7013,8 @@ function selfTest() {
       }
     }
     addCount('every Gaussian prime lies on a gcd = 1 cell', ok, tot,
-             'r, M \u2264 ' + G0, 'containment, not coincidence');
+             'r, M \u2264 ' + G0, 'containment, not coincidence',
+             '<b>Asserts</b> containment: if d divided both r and M then d² would divide N(z), so no Gaussian prime can sit on a non-coprime cell. <b>The converse is false and worth knowing:</b> primitive is not prime — 1+3i has gcd(1,3) = 1 and still factors as (1+i)(2+i). Gaussian primes are a sparse subset of the coprime plate, not the whole of it.');
   }
 
   /* — 17bd. a saturated prime really is certain death — */
@@ -6529,7 +7040,8 @@ function selfTest() {
       }
     }
     addCount('saturated prime p \u2264 n+1 dividing r \u21d2 the block dies', ok, tot,
-             'walked directly, n = 0, 3, 7, 15', bad || 'no survivors');
+             'walked directly, n = 0, 3, 7, 15', bad || 'no survivors',
+             '<b>Asserts</b> the mechanism behind the saturation colour mode. Once p ≤ n+1 the block covers every class mod p, so if p also divides r the block cannot survive — certain death, not a probability. This is the cell-level form of the local factor freezing at 1 − 1/p.');
   }
 
   /* — 17be. quadratic residues and Gaussian splitting are one dichotomy — */
@@ -6555,7 +7067,8 @@ function selfTest() {
     }
     _qrM = -1;
     addCount('(\u22121 is a square mod p) = (p \u2261 1 mod 4) = (p splits)', ok, tot,
-             'QR table vs p mod 4 vs sum of two squares', bad || 'three routes, one answer');
+             'QR table vs p mod 4 vs sum of two squares', bad || 'three routes, one answer',
+             '<b>Asserts</b> one dichotomy reached three ways: by computing the quadratic residues mod p, by the residue of p mod 4, and by whether p splits in Z[i]. All three must agree cell by cell. <b>Why they are the same:</b> Z[i] = Z[x]/(x²+1), so p splits exactly when x²+1 has a root mod p, exactly when −1 is a square.');
   }
 
   /* — 17bf. the per-strip closed forms in the export band — */
@@ -6573,7 +7086,8 @@ function selfTest() {
       else if (!bad) bad = 'r+M=' + N + ': ' + st.cop + ' vs \u03c6=' + phiOf(N);
     }
     addCount('sum strip: count = \u03c6(N), density = \u03c6(N)/(N\u22121)', ok, tot,
-             'walked against the closed form, N \u2264 G+1', bad || 'exact');
+             'walked against the closed form, N \u2264 G+1', bad || 'exact',
+             '<b>Asserts</b> the closed forms printed beside each strip in the export band. <b>Watch the denominator:</b> the density is φ(N)/(N−1), not φ(N)/N, because the r = N cell is not on the line. An export that printed a closed form nobody checked would be worse than printing none.');
   }
 
   /* — 17bg. the first zero on a strip is spf(k) — */
@@ -6592,7 +7106,8 @@ function selfTest() {
       if (first === want) ok++; else if (!bad) bad = 'k=' + k + ': ' + first + ' vs spf ' + spf;
     }
     addCount('first zero on strip k = spf(k)', ok, tot,
-             'strip scan vs the factor table, k \u2264 4000, depth 200', bad || 'exact');
+             'strip scan vs the factor table, k \u2264 4000, depth 200', bad || 'exact',
+             '<b>Asserts</b> the prime counter\'s whole reading. <b>Route A</b> scans gcd(k, M) upward from M = 2 and records where it first exceeds 1. <b>Route B</b> reads the smallest prime factor off the SPF table. One walks, the other looks up — nothing shared. Reading spf from the table to prove the strip finds spf would be the two sides sharing an implementation.');
   }
 
   /* — 17bh. clean strips to depth √x count the primes — */
@@ -6611,7 +7126,8 @@ function selfTest() {
     }
     pcX = savedX; pcCompute();
     addCount('clean strips and Legendre both give \u03c0(x)', ok, tot,
-             'x = 1000, 5000, 10000 against an independent sieve', bad || 'exact');
+             'x = 1000, 5000, 10000 against an independent sieve', bad || 'exact',
+             '<b>Asserts</b> π(x) three ways with no shared code. <b>A</b> counts strips with no zero to depth √x, plus π(√x). <b>B</b> is Legendre\'s inclusion–exclusion over squarefree products of primes ≤ √x. <b>C</b> is a plain Eratosthenes sieve touching neither the bitset nor SPF. A vs C disagreeing means the strip reading is wrong; A vs B means the Möbius bookkeeping is.');
   }
 
   /* — 17bi. the zeros below the first one are periodic mod rad(k) — */
@@ -6630,7 +7146,79 @@ function selfTest() {
       if (good) ok++; else if (!bad) bad = 'k=' + k + ' not periodic mod ' + R;
     }
     addCount('strip zeros are periodic mod rad(k)', ok, tot,
-             'M vs M mod rad(k), k \u2264 600, M \u2264 400', bad || 'exact');
+             'M vs M mod rad(k), k \u2264 600, M \u2264 400', bad || 'exact',
+             '<b>Asserts</b> the repeated-block structure, stated precisely: whether M is a zero on strip k depends only on M mod rad(k). Checked by comparing gcd(k, M) against gcd(k, M mod rad(k)) for every M in range. This is what makes depth √x sufficient rather than needing the whole line.');
+  }
+
+  /* — 17bi2. the strip walk's own closed form — */
+  {
+    // The row that would have caught the error this test was written after:
+    // the identity panel claimed the strip walk had no closed form. It has
+    // one. Route A walks the lattice; route B is the weighted mean of
+    // \u03c6(c)/c over the band's lines, out of the factor table. Nothing shared.
+    const sA = slopeA, sB = slopeB, sS = offS, sW = widthW;
+    const cases = [[1, 1, 0, 6], [1, 1, 1, 6], [1, 1, 7, 4], [1, 2, 1, 6],
+                   [2, 3, 1, 6], [1, 3, 5, 4], [-1, 1, 100, 6], [1, 1, 0, 1]];
+    let ok = 0, tot = 0, bad = '', worst = 0;
+    for (const [a, b, s0, w] of cases) {
+      if (Math.abs(s0) + w > COP_G) continue;       // does not fit this lattice
+      slopeA = a; slopeB = b; offS = s0; widthW = w;
+      const st = walkStrip(0), sp = stripPredict();
+      if (!sp || !st.total) continue;
+      const meas = st.cop / st.total, d = Math.abs(meas - sp.pred);
+      worst = Math.max(worst, d);
+      tot++;
+      if (d <= sp.tol) ok++;
+      else if (!bad) bad = a + '/' + b + ' s=' + s0 + ' w=' + w + ': ' +
+                           meas.toFixed(5) + ' vs ' + sp.pred.toFixed(5);
+    }
+    slopeA = sA; slopeB = sB; offS = sS; widthW = sW;
+    addCount('strip density = mean of \u03c6(c)/c over its lines', ok, tot,
+             'slopes 1/1, 1/2, 2/3, 1/3, \u22121/1 at G = ' + COP_G,
+             bad || 'worst \u0394 ' + worst.toExponential(1),
+             '<b>Asserts</b> that the strip walk has an exact closed form, and what it is. ' +
+             '<b>Route A</b> walks the lattice bitset. <b>Route B</b> averages \u03c6(|c|)/|c| over ' +
+             'the band\'s lines, weighted by cell count, from the factor table. ' +
+             '<b>Two special cases</b> the numbers forced: c = 0 is the main diagonal, where ' +
+             'gcd(r,r) = r leaves exactly one coprime cell; and slope \u22121 lines are finite, so ' +
+             'r + M = N gives \u03c6(N)/(N\u22121), not \u03c6(N)/N \u2014 0.229665 rather than 0.228571 at N = 210. ' +
+             '<b>The tolerance is not zero</b> because a line only covers a whole number of ' +
+             'periods when its length is a multiple of rad(c); the remainder is a partial ' +
+             'period, and it shrinks with G rather than with width.');
+  }
+
+  /* — 17bi3. coprime ⇔ primitive root of unity — */
+  {
+    // The claim the collapsed ring now prints inside its void. Route A is
+    // gcd by Euclid. Route B never divides: it finds the multiplicative
+    // ORDER of e^(2\u03c0i\u00b7r/M) by stepping k until M | r\u00b7k, which is the
+    // definition of the root returning to 1. Order = M is primitivity.
+    let ok = 0, tot = 0, bad = '', phiOK = 0, phiTot = 0;
+    for (let M = 1; M <= 200; M++) {
+      let prim = 0;
+      for (let r = 1; r <= M; r++) {
+        let order = M;
+        for (let k = 1; k <= M; k++) { if ((r * k) % M === 0) { order = k; break; } }
+        const isPrim = order === M;
+        if (isPrim) prim++;
+        tot++;
+        if (isPrim === (gcd(r, M) === 1)) ok++;
+        else if (!bad) bad = 'r=' + r + ' M=' + M;
+      }
+      phiTot++;
+      if (prim === phi(M, SPF)) phiOK++;
+    }
+    addCount('coprime \u21d4 primitive M-th root of unity', ok + phiOK, tot + phiTot,
+             'order of e^(2\u03c0i\u00b7r/M) vs gcd, M \u2264 200',
+             bad || '\u03c6(M) counts the primitives in all ' + phiTot + ' orders',
+             '<b>Asserts</b> what the Ring view prints inside the void once the hole reaches 1: ' +
+             'the cell (r, M) sits at e^(2\u03c0i\u00b7r/M), and that is a <i>primitive</i> M-th root of ' +
+             'unity exactly when gcd(r, M) = 1. <b>Route A</b> is gcd by Euclid. <b>Route B</b> never ' +
+             'divides \u2014 it finds the multiplicative order by stepping k until M divides r\u00b7k, which ' +
+             'is the root returning to 1. <b>Second half of the row</b> checks that the number of ' +
+             'primitives at each order equals \u03c6(M), which is also the degree of the cyclotomic ' +
+             'polynomial \u03a6_M. <b>Only the wrap \u03b8 map</b> gives this reading: unit places by r ' +
+             'alone, and clamp folds every r \u2265 M onto z = 1.');
   }
 
   /* — 17bj. the turn is not an arithmetic symmetry; the transpose is — */
@@ -6656,7 +7244,8 @@ function selfTest() {
     const ok = (tBad === 0) && (qFlip === 2062) && mapOK;
     addCount('turn is not a gcd symmetry, transpose is', ok ? 3 : 0, 3,
              'G = 60: reflection exact, turn flips 2062 of 3600, r\u2212M=g \u2192 r+M=G+1\u2212g',
-             ok ? 'as stated in \u00a72' : 'reflection bad ' + tBad + ', flips ' + qFlip + ', map ' + mapOK);
+             ok ? 'as stated in \u00a72' : 'reflection bad ' + tBad + ', flips ' + qFlip + ', map ' + mapOK,
+             '<b>Asserts</b> the three claims in §2\'s note, including its number. The reflection r ↔ M preserves gcd exactly (gcd is symmetric). The quarter-turn coordinate map (r,M) → (M, G+1−r) carries r−M=g onto r+M=G+1−g but flips 2062 of 3600 cells at G = 60. <b>The count is recomputed here</b> so the prose cannot drift away from the arithmetic it describes.');
   }
 
   /* — 17c. the turn cannot change a single count — */
@@ -6675,7 +7264,8 @@ function selfTest() {
     viewQuarter = savedQ;
     addCount('strip walk is invariant under the turn', agree, tot,
              'slope ' + slopeA + '/' + slopeB + ', offset ' + offS + ', width ' + widthW,
-             bad || 'identical');
+             bad || 'identical',
+             '<b>Asserts</b> that rotating the view changes no measurement. The whole strip walk is rerun at each quarter and the results must be byte-identical. <b>Why it needs checking:</b> the turn is a canvas transform applied after measurement, which is an argument, not a proof — this is the proof.');
   }
 
   /* — 18. Cayley map B at a=0 is the identity: φ₀(z) ≡ z, so the Blaschke
@@ -6696,7 +7286,8 @@ function selfTest() {
       }
     }
     ba = savedBa; cmap = savedCmap;
-    addCount('Blaschke a=0 reproduces the ring', agree, tot, 'φ₀(z) ≡ z, sampled at G = ' + g, bad || 'exact');
+    addCount('Blaschke a=0 reproduces the ring', agree, tot, 'φ₀(z) ≡ z, sampled at G = ' + g, bad || 'exact',
+             '<b>Asserts</b> that Cayley map B at a = 0 is the identity, so its picture is exactly the Ring picture. φ₀(z) = (z−0)/(1−0) = z. This is what licenses the claim that Cayley is Ring conformally bent rather than a second, unrelated view.');
   }
 
   /* — 19. Blaschke map B stays inside the closed unit disk everywhere — */
@@ -6713,7 +7304,8 @@ function selfTest() {
         if (mod <= 1 + 1e-6) ok++;
       }
     }
-    addCount('Blaschke stays inside |w| ≤ 1', ok, tot, 'automorphism of the disk', 'max |w| = ' + worst.toFixed(6));
+    addCount('Blaschke stays inside |w| ≤ 1', ok, tot, 'automorphism of the disk', 'max |w| = ' + worst.toFixed(6),
+             '<b>Asserts</b> boundedness: φ_a is an automorphism of the unit disk, so no image can escape it. This is why map B needs no zoom-out control while map A does — Γ is unbounded and its picture can run off the plate. A point outside would mean the parameter a had left the disk.');
   }
 
   /* — render — */
@@ -6723,11 +7315,17 @@ function selfTest() {
   rows.forEach((r, i) => {
     const cls = r.ok === true ? 'good' : r.ok === false ? 'bad' : '';
     if (r.ok === true) pass++; else if (r.ok === false) failn++; else skip++;
+    // A green tick is only worth something if the reader can see what was
+    // compared against what. Every row opens onto its own method.
     t.insertAdjacentHTML('beforeend',
-      '<tr class="' + cls + '"><td class="n">' + (i + 1) + '</td><td>' + r.name +
-      '</td><td class="n">' + r.got + '</td><td class="n">' + r.want +
+      '<tr class="' + cls + (r.how ? ' strow' : '') + '"' +
+      (r.how ? ' onclick="stRowToggle(' + i + ')"' : '') +
+      '><td class="n">' + (i + 1) + '</td><td>' + (r.how ? '<span class="stcar">&#9662;</span> ' : '') +
+      r.name + '</td><td class="n">' + r.got + '</td><td class="n">' + r.want +
       '</td><td>' + r.note + '</td><td class="n">' +
       (r.ok === true ? '&#10003;' : r.ok === false ? '&#10007;' : '&ndash;') + '</td></tr>');
+    if (r.how) t.insertAdjacentHTML('beforeend',
+      '<tr class="sthow" id="sthow-' + i + '"><td></td><td colspan="5">' + r.how + '</td></tr>');
   });
   $('st-summary').innerHTML = '<b style="color:' + (failn ? 'var(--coral)' : 'var(--lime)') + '">' +
     pass + ' passed</b>, ' + failn + ' failed' + (skip ? ', ' + skip + ' skipped' : '') +
@@ -6744,7 +7342,13 @@ function hintSpent() {
 }
 function togglePanel(titleEl) {
   hintSpent();
-  titleEl.parentElement.classList.toggle('collapsed');
+  const panel = titleEl.parentElement;
+  const opened = !panel.classList.toggle('collapsed');
+  // A canvas in a collapsed panel reports clientWidth 0, so anything drawn
+  // before the panel is opened is sized against a fallback. Re-fit on open.
+  if (opened && panel.querySelector('#cv3')) {
+    setTimeout(() => { pcSync(); pcDraw(); }, 20);
+  }
 }
 function toggleSub(el) {
   hintSpent();
@@ -6752,9 +7356,34 @@ function toggleSub(el) {
 }
 /* Prose sections fold from their own heading. §1 is the one above the canvas,
    so folding it is what puts the controls directly under a fullscreen plate. */
+/* A canvas inside a collapsed section reports clientWidth 0, so anything
+   drawn while it was folded is sized against a fallback. §1 and §3 both open
+   collapsed now, so re-fit on the way open. */
+function secRefit(el) {
+  if (!el) return;
+  setTimeout(() => {
+    if (el.querySelector('#cv2')) drawComet();   // drawComet sizes itself
+    if (el.querySelector('#cv'))  redraw(false);
+    if (el.querySelector('#cv3')) { pcSync(); pcDraw(); }
+  }, 20);
+}
 function toggleSec(id) {
   const el = $(id);
-  if (el) el.classList.toggle('collapsed');
+  if (!el) return;
+  const opened = !el.classList.toggle('collapsed');
+  if (opened) secRefit(el);
+}
+/* Open every collapsed ancestor of a target, so a deep link lands on
+   something visible rather than scrolling to a folded heading. */
+function revealAncestors(el) {
+  let n = el, hit = null;
+  while (n && n !== document.body) {
+    if (n.classList && n.classList.contains('dsec') && n.classList.contains('collapsed')) {
+      n.classList.remove('collapsed'); hit = n;
+    }
+    n = n.parentElement;
+  }
+  if (hit) secRefit(hit);
 }
 
 /* ── credits ──────────────────────────────────────────────
@@ -6837,6 +7466,7 @@ function cgo(o) {
   if (o.run === 'selftest') setTimeout(() => _cTry(selfTest), 120);
   // Scroll target: an explicit id wins, then whatever was opened.
   if (o.scroll && $(o.scroll)) target = $(o.scroll);
+  if (target) revealAncestors(target);
   setTimeout(() => {
     if (!target) return;
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -6980,10 +7610,10 @@ function boot() {
   wireLens();
   setLensZoom(3); setLensPin('auto');
   buildPhi(4096);
-  // Per-view defaults: Grid and Ring at -i, Cayley at 0 so Gamma's two poles
-  // sit left and right. Counts are unaffected either way - self test 17c.
+  // All three views open unturned. Counts are unaffected by the turn either
+  // way - self test 17c reruns the whole walk at each quarter.
   setView('grid'); setRingRot(0); setRingHole(18); setThetaMode('clamp'); setCmap('A');
-  setPtScale(ptScale); setCayGuideAlpha(100);
+  setPtScale(ptScale); setCayGuideAlpha(100); syncPlateUI();
   computePartItems(); syncPartUI(); renderPartTable();
   onG(31);
   onOff(0); onW(1); reslope();
