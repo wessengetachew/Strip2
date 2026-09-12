@@ -348,7 +348,14 @@ h2.dsec-h .car{font-family:var(--mono);font-size:12px;color:var(--cream3);margin
 #lensinfo u{color:var(--coral);text-decoration:none}
 
 .cvwrap{position:relative;background:#04040d;border:1px solid var(--edge);overflow:hidden;}
-canvas.main{display:block;width:100%;height:auto;cursor:crosshair;}
+/* touch-action:none hands every touch to our pointer handlers. Without it
+   the browser claims two-finger gestures as page zoom, so plate zoom never
+   ran, lensParkForZoom never fired, and the magnifier stayed on over what
+   looked like a zoomed plate. It also fires pointercancel mid-gesture, which
+   could strand the pan state and kill the lens for good. The cost is that a
+   drag on the plate pans instead of scrolling the page — which is the
+   gesture we wanted anyway. */
+canvas.main{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none;}
 /* Sits directly over cv2, same box, same backing resolution — it only ever
    holds the lens's zoom-window outline, so redrawing it on every pointer
    move is cheap even though the plot underneath (150k points at N=300k)
@@ -753,6 +760,15 @@ walk anyway.</p>
     <input type="range" id="ring-hole" min="0" max="100" step="1" value="18" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
     <span class="val" id="ring-hole-v">0.18</span>
     <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
+    <span class="lbl">order M</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="setVoidM(voidM-1)" title="Previous order">&minus;</button>
+      <input class="sval" id="void-m" type="number" min="1" value="12"
+             onchange="setVoidM(+this.value)"
+             title="Which order the collapsed ring singles out: its M roots of unity, the φ(M) primitive ones among them, and their resultant μ(M).">
+      <button class="sbtn" onclick="setVoidM(voidM+1)" title="Next order">+</button>
+      <span class="pt" id="void-m-pt"></span>
+    </div>
     <button class="chip" onclick="setRingRot(0);setRingHole(18)" title="Back to no rotation and an 18% inner hole.">Reset ring</button>
   </div>
 
@@ -811,6 +827,7 @@ walk anyway.</p>
     <span class="val" id="plate-k">1.0&times;</span>
     <button class="chip" onclick="plateZoomStep(1.4)" title="Zoom the whole plate in, about its centre. Works in Grid, Ring and Cayley, and exports carry it.">+</button>
     <button class="chip" id="plate-reset" onclick="resetPlate()" title="Back to the unzoomed, uncentred plate.">Reset</button>
+    <button class="chip tl lenschip on" onclick="toggleLens()" title="Zooming parks the magnifier, since the loupe and the plate zoom disagree about what is under your finger mid-pinch. Switch it back on here and it works at whatever zoom the plate is now at.">Lens: on</button>
     <span class="lbl">drag to move &middot; pinch or scroll to zoom &middot; all three views</span>
   </div>
 
@@ -944,9 +961,10 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">Walk</span>
-    <button class="chip on" id="wk-strip" onclick="setWalk('strip')" title="Counts one cell at a time: the fraction of cells in the band with gcd(r,M)=1. Exact closed form — the weighted mean of φ(c)/c over the band's lines — but NOT C(n): at n=5 it reads 0.578 against D(5) = 0.194142.">Strip &mdash; per <b>cell</b></button>
+    <button class="chip tl on" id="wk-strip" onclick="setWalk('strip')" title="Counts one cell at a time: the fraction of cells in the band with gcd(r,M)=1. Exact closed form — the weighted mean of φ(c)/c over the band's lines — but NOT C(n): at n=5 it reads 0.578 against D(5) = 0.194142.">Strip &mdash; per <b>cell</b></button>
     <button class="chip cr" id="wk-band" onclick="setWalk('band')" title="Counts one whole block at a time: gcd(r, M+j)=1 for EVERY j, an AND across all n+1 columns. This is the walk that converges to D(n).">Block &mdash; per <b>block</b>, AND over n+1</button>
     <span class="lbl" id="wk-note" style="color:var(--cream3);"></span>
+    <span class="lbl">overlay: <b style="color:var(--teal)">teal = strip</b> &middot; <b style="color:var(--coral)">coral = block</b></span>
   </div>
 
   <div class="prow">
@@ -997,7 +1015,7 @@ walk anyway.</p>
 
   <div class="prow">
     <span class="plabel">Lens</span>
-    <button class="chip tl on" id="lens-on" onclick="toggleLens()" title="Re-reads the bitset and draws true cells at the magnified pitch. Past G = canvas size the base layer aggregates, so this is the only exact view of the lattice.">Lens: on</button>
+    <button class="chip tl on lenschip" id="lens-on" onclick="toggleLens()" title="Re-reads the bitset and draws true cells at the magnified pitch. Past G = canvas size the base layer aggregates, so this is the only exact view of the lattice.">Lens: on</button>
     <span class="lbl">zoom</span>
     <button class="chip" id="lz-2" onclick="setLensZoom(2)" title="Barely magnified — useful for reading labels rather than cells.">2&times;</button>
     <button class="chip on" id="lz-3" onclick="setLensZoom(3)" title="Default magnification.">3&times;</button>
@@ -1602,6 +1620,11 @@ Full attribution is in the credits panel below.
   $1-\nu_p/p^2$ into a density statement about $D(n)$ rather than a heuristic.
   Separately, the Cayley view's disk map is a M&ouml;bius transformation: same name,
   unrelated object, and worth not confusing.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',walk:'band',preset:'blk29',scroll:'cv'})">band walk, n = 29</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'cayley',scroll:'cv'})">the other Möbius — disk map</button></div></td></tr>
+
+  <tr><td><b>Srinivasa Ramanujan</b></td>
+  <td>The sums $c_M(n) = \sum_{\gcd(r,M)=1} e^{2\pi i r n/M}$. The arrow the collapsed ring
+  draws in its void is $c_M(1) = \mu(M)$ &mdash; the same $\mu$ M&ouml;bius supplies to the
+  $D(n)$ derivation, arriving here as a resultant rather than as a weight.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'ring',panel:'Self test',run:'selftest'})">check it</button></div></td></tr>
 
   <tr><td><b>Sunzi Suanjing</b> and the classical Chinese remainder tradition</td>
   <td>CRT is what licenses multiplying local factors across distinct primes. It is the
@@ -3683,8 +3706,12 @@ function onGridChanged() {
 function drawStripOverlay(ctx, S) {
   const g = COP_G, k = S / g, a = slopeA, b = slopeB;
   ctx.save();
-  ctx.strokeStyle = 'rgba(224,80,96,.85)';
-  ctx.fillStyle = 'rgba(224,80,96,.13)';
+  // Strip is TEAL, band is CORAL. They used to share one red, so the two
+  // walks the page spends §1 separating looked identical on the plate — and
+  // with a block overlay up you could not see a Farey ray at all. The chips
+  // already coded it this way (wk-band carries .cr); the plate did not.
+  ctx.strokeStyle = 'rgba(61,200,184,.9)';
+  ctx.fillStyle = 'rgba(61,200,184,.14)';
   ctx.lineWidth = Math.max(1, 1.2 * (S / 900));
   // The strip is a band between two parallel lines; draw it as a polygon in
   // lattice coords, one clip per edge, rather than cell by cell.
@@ -3820,6 +3847,15 @@ function rotPt(x, y, S) {            // plate -> screen
    Everything here is in CSS pixels of the S×S plate, which is what the
    pointer handlers hand us and what the context transform is already scaled
    to. Mixing in device pixels here is the obvious way to break it. */
+/* Which order M the void singles out. The ring shows every M at once, but a
+   resultant is per-order, so one has to be named. */
+let voidM = 12;
+function setVoidM(v) {
+  voidM = Math.max(1, Math.min(Math.max(1, COP_G), Math.round(+v) || 1));
+  const el = $('void-m'); if (el) el.value = voidM;
+  markPrime('void-m-pt', voidM);
+  redraw(false);
+}
 let plateK = 1, plateX = 0, plateY = 0, plateMoved = false;
 const PLATE_KMIN = 0.6, PLATE_KMAX = 40;
 
@@ -3855,7 +3891,7 @@ function plateS() {
 function plateZoomStep(f) {
   const S = plateS();
   plateZoomAt(plateK * f, S / 2, S / 2, S);
-  syncPlateUI(); hideLens(); redraw(false);
+  syncPlateUI(); lensParkForZoom(); redraw(false);
 }
 function resetPlate() {
   plateK = 1; plateX = 0; plateY = 0;
@@ -3926,6 +3962,22 @@ function ringRad(M, S) { return ringOuter(S) * (ringHole + (1 - ringHole) * ((M 
    the rings, so anything that reads M off a distance has to say so instead of
    dividing by zero. */
 function ringCollapsed() { return 1 - ringHole < 1e-6; }
+/* μ(n) from the distinct-prime factorisation: 0 on any square factor,
+   otherwise (−1)^ω. Reuses the SPF table like everything else here, so the
+   void's arrow and the self test that checks it do NOT share a route — the
+   test sums unit vectors instead. */
+function mobius(n, spf) {
+  if (n < 1) return 0;
+  if (n === 1) return 1;
+  let m = n, c = 0;
+  for (const q of pfac(n, spf)) {
+    c++;
+    let e = 0;
+    while (m % q === 0) { m /= q; e++; }
+    if (e > 1) return 0;
+  }
+  return c % 2 ? -1 : 1;
+}
 function ringAng(r, M) { return ringRot + thetaOf(r, M == null ? 1 : M); }
 /* Inverse, in the buffer's own frame — the projection before any rotation.
    This is what the buffer pass walks. M comes from the radius first (as
@@ -4053,7 +4105,7 @@ function drawRingStripAt(ctx, S, s, color) {
   }
   ctx.restore();
 }
-function drawRingStrip(ctx, S) { drawRingStripAt(ctx, S, offS, 'rgba(224,80,96,.85)'); }
+function drawRingStrip(ctx, S) { drawRingStripAt(ctx, S, offS, 'rgba(61,200,184,.9)'); }
 function drawRingBand(ctx, S) {
   const g = COP_G, w = widthW, C = S / 2;
   const step = Math.max(1, Math.ceil(g / 600));
@@ -4286,6 +4338,76 @@ function drawUnitVoid(ctx, S) {
       ctx.fillText(lab, ux, uy);
     });
   }
+  /* The resultant. Sum the primitive M-th roots as vectors and you land on
+     μ(M) — Ramanujan's c_M(1). Since each is a unit vector and the sum is an
+     integer in {−1, 0, 1}, the arrow can only ever finish on the mark
+     labelled 1, on the mark labelled −1, or at the centre. Those three marks
+     were drawn before this had anything to point at; now they are the only
+     three places it can point.
+
+     Summing ALL M roots gives 0 for every M > 1 (a closed geometric series),
+     so whatever the primitives contribute, the non-primitives contribute
+     exactly −μ(M). Both statements are checked in the battery.
+
+     Only drawn in wrap, because only there does a cell's position encode
+     r/M — see the mode note below. */
+  let resLines = [];
+  if (thetaMode === 'wrap') {
+    const M = Math.max(1, Math.min(voidM, COP_G));
+    let sx = 0, sy = 0, cnt = 0;
+    const spokes = [];
+    for (let r = 1; r <= M; r++) {
+      if (gcd(r, M) !== 1) continue;
+      const th = TAU * r / M;
+      sx += Math.cos(th); sy += Math.sin(th);
+      cnt++;
+      if (cnt <= 96) spokes.push(th);
+    }
+    // every root of this order, primitive or not, as faint ticks
+    if (M <= 96) {
+      ctx.strokeStyle = 'rgba(255,255,255,.16)';
+      ctx.lineWidth = Math.max(0.7, S / 1300);
+      for (let r = 1; r <= M; r++) {
+        const a = ringPt(R * 0.94, ringRot + TAU * r / M, S);
+        const b = ringPt(R, ringRot + TAU * r / M, S);
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      }
+    }
+    // the primitives, as the vectors actually being added
+    ctx.strokeStyle = 'rgba(61,200,184,.30)';
+    ctx.lineWidth = Math.max(0.7, S / 1400);
+    for (const th of spokes) {
+      const q = ringPt(R, ringRot + th, S);
+      ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(q[0], q[1]); ctx.stroke();
+    }
+    // the resultant
+    const mu = mobius(M, SPF);
+    const mag = Math.hypot(sx, sy);
+    if (mag > 1e-9) {
+      const th = Math.atan2(sy, sx);
+      const tip = ringPt(R * Math.min(1, mag), ringRot + th, S);
+      ctx.strokeStyle = 'rgba(242,200,96,.95)';
+      ctx.lineWidth = Math.max(1.6, S / 320);
+      ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
+      const hd = Math.max(4, S / 120);
+      ctx.fillStyle = 'rgba(242,200,96,.95)';
+      ctx.beginPath();
+      ctx.arc(tip[0], tip[1], hd * 0.55, 0, TAU);
+      ctx.fill();
+    } else {
+      // mu = 0: the primitives cancel exactly, so mark the centre instead
+      ctx.strokeStyle = 'rgba(242,200,96,.8)';
+      ctx.lineWidth = Math.max(1.2, S / 500);
+      const rr = Math.max(3, S / 150);
+      ctx.beginPath(); ctx.arc(c, c, rr, 0, TAU); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c - rr, c - rr); ctx.lineTo(c + rr, c + rr);
+      ctx.moveTo(c + rr, c - rr); ctx.lineTo(c - rr, c + rr); ctx.stroke();
+    }
+    resLines = ['order M = ' + M + '  ·  φ(M) = ' + cnt + ' primitive of ' + M,
+                'Σ primitive roots = μ(M) = ' + mu +
+                (mu === 0 ? '  — they cancel' : mu > 0 ? '  — lands on 1' : '  — lands on −1')];
+  }
+
   // what the circle is, in this θ mode
   const lines = thetaMode === 'wrap'
     ? ['|z| = 1  ·  z = e^(2πi·r/M)',
@@ -4303,10 +4425,15 @@ function drawUnitVoid(ctx, S) {
        'switch θ to wrap for the roots reading'];
   const lf = Math.max(8, Math.round(S / 95));
   ctx.font = lf + 'px "JetBrains Mono",monospace';
+  // The text block sits below the centre so the resultant arrow, which
+  // starts at the centre, is not written over.
   upright(ctx, c, c, (ux, uy) => {
-    const y0 = uy - (lines.length - 1) * lf * 0.9 / 2;
-    lines.forEach((t, i) => {
-      ctx.fillStyle = i === 0 ? 'rgba(238,232,220,.62)' : 'rgba(238,232,220,.34)';
+    const all = resLines.concat(resLines.length ? [''] : [], lines);
+    const y0 = uy + R * 0.30;
+    all.forEach((t, i) => {
+      ctx.fillStyle = i < resLines.length ? 'rgba(242,200,96,.80)'
+                    : i === resLines.length + (resLines.length ? 1 : 0)
+                      ? 'rgba(238,232,220,.62)' : 'rgba(238,232,220,.34)';
       ctx.fillText(t, ux, y0 + i * lf * 1.55);
     });
   });
@@ -4355,7 +4482,7 @@ function drawCayley(ctx, S) {
   dimPlateIfPartition(ctx, S);
   if (cayGuides) drawCayleyGuides(ctx, S);
   if (walkMode === 'band') drawCayleyBand(ctx, S);
-  else if (showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(224,80,96,.9)');
+  else if (showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(61,200,184,.95)');
   drawPartitionsOverlay(ctx, S);
 }
 
@@ -4900,23 +5027,28 @@ function toggleStrip() {
 /* Presets are the page's argument in button form: the same walk at four
    settings is the gap diagonal, C(n), Goldbach, and a Farey ray. */
 const PRESETS = {
-  diag:  { a: 1,  b: 1, s: 6,   w: 1 },
-  anti:  { a: -1, b: 1, s: 210, w: 1, minG: 256 },
-  main:  { a: 1,  b: 1, s: 0,   w: 1 },              // gcd(r,r)=r — the degenerate line
-  gap30: { a: 1,  b: 1, s: 30,  w: 1 },
-  gap97: { a: 1,  b: 1, s: 97,  w: 1, minG: 128 },   // prime g: φ(97)/97 = 96/97
-  blk1:  { a: 1,  b: 1, s: 0,   w: 2 },              // the smallest saturating block
-  aprime:{ a: -1, b: 1, s: 211, w: 1, minG: 256 },   // 211 prime ⇒ fully coprime
-  blk5:  { a: 1,  b: 1, s: 0,   w: 6 },              // the C(5) case
-  blk29: { a: 1,  b: 1, s: 0,   w: 30 },             // the C(29) case
-  grg:   { a: -1, b: 1, s: 206, w: 1, minG: 256 },   // 206 = 2·103, rough
-  f12:   { a: 1,  b: 2, s: 1,   w: 1 },
-  f23:   { a: 2,  b: 3, s: 1,   w: 1 }
+  diag:  { a: 1,  b: 1, s: 6,   w: 1, walk: 'strip' },
+  anti:  { a: -1, b: 1, s: 210, w: 1, minG: 256, walk: 'strip' },
+  main:  { a: 1,  b: 1, s: 0,   w: 1, walk: 'strip' },   // gcd(r,r)=r — degenerate line
+  gap30: { a: 1,  b: 1, s: 30,  w: 1, walk: 'strip' },
+  gap97: { a: 1,  b: 1, s: 97,  w: 1, minG: 128, walk: 'strip' },  // φ(97)/97 = 96/97
+  blk1:  { a: 1,  b: 1, s: 0,   w: 2, walk: 'band' },    // smallest saturating block
+  aprime:{ a: -1, b: 1, s: 211, w: 1, minG: 256, walk: 'strip' },  // prime ⇒ fully coprime
+  blk5:  { a: 1,  b: 1, s: 0,   w: 6,  walk: 'band' },   // the C(5) case
+  blk29: { a: 1,  b: 1, s: 0,   w: 30, walk: 'band' },   // the C(29) case
+  grg:   { a: -1, b: 1, s: 206, w: 1, minG: 256, walk: 'strip' },  // 206 = 2·103, rough
+  f12:   { a: 1,  b: 2, s: 1,   w: 1, walk: 'strip' },
+  f23:   { a: 2,  b: 3, s: 1,   w: 1, walk: 'strip' }
 };
 /* Extracted from preset() so anything holding a strip spec — a preset chip, a
    credit chip, or a picked column in the counter — lands the same way. */
 function applyStrip(P) {
   const go = () => {
+    // A preset carries the walk it is about. Landing a Farey ray while the
+    // Block walk is up drew a band overlay and no ray at all, so the chip
+    // appeared to do nothing — the page's own argument, hidden by its own
+    // control state.
+    if (P.walk && P.walk !== walkMode) setWalk(P.walk);
     $('sl-a').value = P.a; $('sl-b').value = P.b;
     slopeA = P.a; slopeB = P.b;
     offS = P.s; widthW = P.w;
@@ -5833,11 +5965,31 @@ function setLensSize(v) {
   $('ls-num').value = lensSize;
   if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
 }
+let lensLast = null;
+function syncLensChips() {
+  document.querySelectorAll('.lenschip').forEach(b => {
+    b.textContent = 'Lens: ' + (LENS_ON ? 'on' : 'off');
+    b.classList.toggle('on', LENS_ON);
+  });
+}
 function toggleLens() {
   LENS_ON = !LENS_ON;
-  $('lens-on').textContent = 'Lens: ' + (LENS_ON ? 'on' : 'off');
-  $('lens-on').classList.toggle('on', LENS_ON);
+  syncLensChips();
   if (!LENS_ON) hideLens();
+  // Turning it back on should show it where you left it, at whatever zoom
+  // the plate is now at, rather than waiting for the next pointer move.
+  else if (lensLast) drawLens(lensLast[0], lensLast[1]);
+}
+/* Zooming parks the lens rather than fighting it: the loupe magnifies a
+   window on the lattice and the plate zoom moves the whole lattice, so
+   during a pinch the two disagree about what is under your finger. Panning
+   only HIDES it for the duration; zooming switches it off and leaves the
+   button lit for you, because a change of scale is a change of intent. */
+function lensParkForZoom() {
+  if (!LENS_ON) return;
+  LENS_ON = false;
+  syncLensChips();
+  hideLens();
 }
 function hideLens() {
   for (const id of ['lens', 'lensinfo', 'lens2', 'lensinfo2']) {
@@ -6137,7 +6289,7 @@ function drawLens(px, py) {
       lctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (col[3] / 255) + ')';
       lctx.fillRect(lx, ly, w + .5, w + .5);
       if (showStrip && inStrip(r, M)) {
-        lctx.fillStyle = 'rgba(224,80,96,.32)';
+        lctx.fillStyle = 'rgba(61,200,184,.34)';
         lctx.fillRect(lx, ly, w + .5, w + .5);
       }
       let onPartition = false;
@@ -6510,9 +6662,15 @@ function wireLens() {
   const panning = () => pts.size === 1 && travel > PAN_SLOP;
 
   const move = e => {
-    if (pts.size || panning()) return;          // a gesture owns the pointer
+    // Guard on an ACTUAL gesture, not merely on a pointer being down. The
+    // first version tested pts.size, and on a phone every touch puts a
+    // pointer down — so touchmove, the only thing that drives the lens on
+    // mobile, returned immediately and the magnifier appeared to die the
+    // moment pan/zoom was added. One finger under the slop is still a hover.
+    if (panning() || pts.size >= 2) return;
     const p = local(cv, e);
     if (p.x < 0 || p.y < 0 || p.x > p.w || p.y > p.w) { hideLens(); return; }
+    lensLast = [p.x, p.y];
     drawLens(p.x, p.y);
   };
   cv.addEventListener('mousemove', move);
@@ -6548,10 +6706,18 @@ function wireLens() {
       const d = Math.hypot(a.x - b.x, a.y - b.y);
       plateZoomAt(pinchK0 * (d / pinch0), (a.x + b.x) / 2 - r.left,
                   (a.y + b.y) / 2 - r.top, S);
-      travel = 999; hideLens(); syncPlateUI(); redraw(false);
+      travel = 999; lensParkForZoom(); syncPlateUI(); redraw(false);
     } else {
       travel += Math.abs(dx) + Math.abs(dy);
-      if (travel <= PAN_SLOP) return;
+      if (travel <= PAN_SLOP) {
+        // Still a hover, not a drag. Drive the lens from here too, so it
+        // follows a finger without depending on touchmove firing.
+        const p = local(cv, e);
+        if (p.x >= 0 && p.y >= 0 && p.x <= p.w && p.y <= p.w) {
+          lensLast = [p.x, p.y]; drawLens(p.x, p.y);
+        }
+        return;
+      }
       plateX += dx; plateY += dy; plateClamp(S);
       hideLens(); syncPlateUI(); redraw(false);
     }
@@ -6565,12 +6731,21 @@ function wireLens() {
   };
   cv.addEventListener('pointerup', endPan);
   cv.addEventListener('pointercancel', endPan);
+  cv.addEventListener('lostpointercapture', endPan);
+  // Insurance: a pointer whose up never reaches the canvas would leave
+  // panning() true forever, and the lens would stay dead with no way back.
+  window.addEventListener('pointerup', e => {
+    if (!pts.size) return;
+    pts.delete(e.pointerId);
+    if (pts.size < 2) pinch0 = 0;
+    if (!pts.size) travel = 0;
+  });
   cv.addEventListener('wheel', e => {
     e.preventDefault();
     const r = cv.getBoundingClientRect();
     plateZoomAt(plateK * (e.deltaY < 0 ? 1.12 : 1 / 1.12),
                 e.clientX - r.left, e.clientY - r.top, r.width);
-    hideLens(); syncPlateUI(); redraw(false);
+    lensParkForZoom(); syncPlateUI(); redraw(false);
   }, { passive: false });
 
   const move2 = e => {
@@ -7221,6 +7396,48 @@ function selfTest() {
              'alone, and clamp folds every r \u2265 M onto z = 1.');
   }
 
+  /* — 17bi4. the resultant of the primitive roots is μ(M) — */
+  {
+    // What the void's arrow asserts. Route A sums unit vectors with cos/sin.
+    // Route B reads μ off the factorisation. Trig against factorisation —
+    // no shared step. The companion check is that ALL M roots sum to zero,
+    // which is what makes the non-primitives contribute exactly −μ(M).
+    let ok = 0, tot = 0, worst = 0, bad = '';
+    let zOK = 0, zTot = 0, zWorst = 0;
+    for (let M = 1; M <= 300; M++) {
+      let sx = 0, sy = 0, ax = 0, ay = 0;
+      for (let r = 1; r <= M; r++) {
+        const t = TAU * r / M, ct = Math.cos(t), st = Math.sin(t);
+        ax += ct; ay += st;
+        if (gcd(r, M) === 1) { sx += ct; sy += st; }
+      }
+      const mu = mobius(M, SPF);
+      const d = Math.max(Math.abs(sx - mu), Math.abs(sy));
+      worst = Math.max(worst, d);
+      tot++;
+      if (d < 1e-9) ok++; else if (!bad) bad = 'M=' + M + ': (' + sx.toFixed(6) + ',' + sy.toFixed(6) + ') vs \u03bc=' + mu;
+      if (M > 1) {
+        zTot++;
+        const z = Math.hypot(ax, ay);
+        zWorst = Math.max(zWorst, z);
+        if (z < 1e-9) zOK++;
+      }
+    }
+    addCount('\u03a3 primitive M-th roots = \u03bc(M)', ok + zOK, tot + zTot,
+             'unit vectors vs the factorisation, M \u2264 300',
+             bad || 'worst \u0394 ' + worst.toExponential(1) + ', all-roots sum \u2264 ' + zWorst.toExponential(1),
+             '<b>Asserts</b> the arrow the collapsed ring draws in its void: add the primitive ' +
+             'M-th roots of unity as vectors and you land exactly on \u03bc(M) \u2014 Ramanujan\'s c_M(1). ' +
+             '<b>Route A</b> sums cos and sin. <b>Route B</b> reads \u03bc off the distinct-prime ' +
+             'factorisation. Trigonometry against factorisation, nothing shared. ' +
+             '<b>The companion half</b> checks that all M roots sum to zero for every M &gt; 1, a ' +
+             'closed geometric series \u2014 which is what forces the non-primitive roots to ' +
+             'contribute exactly \u2212\u03bc(M). <b>Why it matters here:</b> this is the same \u03bc that does ' +
+             'the counting in the D(n) derivation, so the ring carries both of the page\'s ' +
+             'functions at once \u2014 \u03c6(M) is how many coprime cells there are, \u03bc(M) is where they ' +
+             'add up to.');
+  }
+
   /* — 17bj. the turn is not an arithmetic symmetry; the transpose is — */
   {
     // The §2 note claims three things and quotes a number. All three are
@@ -7613,7 +7830,8 @@ function boot() {
   // All three views open unturned. Counts are unaffected by the turn either
   // way - self test 17c reruns the whole walk at each quarter.
   setView('grid'); setRingRot(0); setRingHole(18); setThetaMode('clamp'); setCmap('A');
-  setPtScale(ptScale); setCayGuideAlpha(100); syncPlateUI();
+  setPtScale(ptScale); setCayGuideAlpha(100); syncPlateUI(); setVoidM(voidM);
+  syncLensChips();
   computePartItems(); syncPartUI(); renderPartTable();
   onG(31);
   onOff(0); onW(1); reslope();
