@@ -83,6 +83,20 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
 
 /* ── PANELS ── */
 .panel{background:var(--bg1);border:1px solid var(--edge);padding:16px 18px;margin:22px 0;}
+.export-modal{display:none;position:fixed;inset:0;background:rgba(2,2,8,.78);z-index:2000;
+  align-items:flex-start;justify-content:center;overflow:auto;padding:40px 14px;}
+.export-box{background:var(--bg1);border:1px solid var(--edge2);padding:18px 20px;max-width:640px;width:100%;}
+.export-hd{display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);letter-spacing:.06em;color:var(--gold);margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--edge);}
+.export-hd .btn{padding:2px 10px;line-height:1;}
+.export-preview-wrap{margin-top:6px;}
+#export-preview-slot{display:flex;gap:6px;background:var(--bg);border:1px solid var(--edge);
+  padding:8px;min-height:80px;align-items:center;justify-content:center;flex-wrap:wrap;}
+#export-preview-slot canvas{max-width:100%;height:auto;display:block;}
+#export-preview-slot .exp-tile{text-align:center;}
+#export-preview-slot .exp-tile-tag{font-family:var(--mono);font-size:9px;letter-spacing:.08em;
+  color:var(--gold);margin-top:4px;}
 .ptitle{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--gold);margin-bottom:12px;cursor:pointer;user-select:none;
   display:flex;align-items:center;justify-content:space-between;gap:10px;}
@@ -94,7 +108,7 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
    head of the drawer for the duration; everything else keeps order 0 and so
    keeps its relative sequence. Outside fullscreen the drawer is ordinary
    block flow and this does nothing. */
-body.fs-open #ctl-body{display:flex;flex-direction:column;}
+body.fs-open #ctl-toggle:not(.collapsed) + #ctl-body{display:flex;flex-direction:column;}
 body.fs-open #ctl-body > .cvbar{order:-2;margin-top:0;}
 body.fs-open #ctl-body > #view-note{order:-1;}
 
@@ -404,6 +418,14 @@ canvas.main{display:block;width:100%;height:auto;cursor:crosshair;touch-action:n
   font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:3px 8px;
   border-radius:3px;cursor:pointer;}
 .fs-btn:hover{border-color:var(--teal);color:var(--teal);}
+body.fs-open .quickbar{display:none;}
+.fs-lockbar{display:none;}
+body.fs-open .fs-lockbar{display:flex;position:fixed;left:0;right:0;top:var(--canvbot,0px);
+  height:26px;box-sizing:border-box;z-index:790;background:var(--bg1);
+  border-bottom:1px solid var(--edge2);font-family:var(--mono);font-size:10.5px;
+  color:var(--cream2);padding:5px 12px;gap:14px;align-items:center;
+  white-space:nowrap;overflow-x:auto;}
+.fs-lockbar b{color:var(--gold);}
 body.fs-open #content{padding-top:var(--fsh,50vh);}
 .cvwrap.fs-pin{position:fixed;top:var(--navh,0px);left:0;right:0;width:100%;z-index:800;
   display:flex;align-items:center;justify-content:center;border-left:none;border-right:none;
@@ -482,12 +504,8 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 
 <div id="wg-pagenav">
   <span class="wm">WESSEN GETACHEW</span>
-  <a class="navbtn tealb" href="https://wessengetachew.github.io/smith/page2.html">Explorer</a>
-  <a class="navbtn" href="https://wessengetachew.github.io/smith/page5.html">P5 · Gap Diagonal</a>
   <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
-     title="Fullscreen: the lattice. Pins the plate to the top of the screen with its controls below.">⛶ Strip</button>
-  <button class="navbtn fsnavbtn" data-fs-target="cv2" onclick="toggleFS('cv2')"
-     title="Fullscreen: the Goldbach comet. Opens §3 if it is folded, then pins the plot to the top of the screen with its controls below.">⛶ Comet</button>
+     title="Fullscreen: the lattice. Pins the plate to the top of the screen with its controls below.">⛶ Fullscreen</button>
 </div>
 
 
@@ -750,97 +768,6 @@ walk anyway.</p>
   <div class="subbody" id="ctl-body">
 
   <div class="prow">
-    <span class="plabel">View</span>
-    <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid &mdash; (r, M) lattice</button>
-    <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring &mdash; polar, M outward</button>
-    <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley &mdash; residues mod m</button>
-    <span class="lbl" id="view-lbl"></span>
-  </div>
-
-  <div class="prow">
-    <span class="plabel">Turn</span>
-    <button class="chip rotchip on" data-q="0" onclick="setViewQuarter(0)" title="No turn. Ring &theta;=0 sits on the right and the grid origin in the top-left corner — the raster's own frame.">0</button>
-    <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
-    <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
-    <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
-    <span class="hint">per view &mdash; all three open at 0, and each remembers its own</span>
-
-  </div>
-
-  <div class="prow vrow" id="row-ring">
-    <span class="plabel">Ring</span>
-    <span class="lbl">&theta; map</span>
-    <button class="chip thetamode" data-tm="wrap" onclick="setThetaMode('wrap')" title="&theta;=2&pi;r/M, unbounded &mdash; r&gt;M laps the ring">wrap</button>
-    <button class="chip thetamode on" data-tm="clamp" onclick="setThetaMode('clamp')" title="&theta;=2&pi;&middot;min(r/M,1) &mdash; r&ge;M pinned at the limit. The default: ring M then carries its points at the Mth roots of unity.">clamp</button>
-    <button class="chip thetamode" data-tm="unit" onclick="setThetaMode('unit')" title="&theta;=2&pi;r/G &mdash; radial spokes, budgeted by G not M">unit</button>
-    <span class="lbl">rotate</span>
-    <input type="range" id="ring-rot" min="0" max="360" step="1" value="0" oninput="setRingRot(+this.value)">
-    <span class="val" id="ring-rot-v">0&deg;</span>
-    <span class="lbl">hole</span>
-    <input type="range" id="ring-hole" min="0" max="100" step="1" value="18" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
-    <span class="val" id="ring-hole-v">0.18</span>
-    <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
-    <span class="lbl">order M</span>
-    <div class="stepper">
-      <button class="sbtn" onclick="setVoidM(voidM-1)" title="Previous order">&minus;</button>
-      <input class="sval" id="void-m" type="number" min="1" value="12"
-             onchange="setVoidM(+this.value)"
-             title="Which order the collapsed ring singles out: its M roots of unity, the φ(M) primitive ones among them, and their resultant μ(M).">
-      <button class="sbtn" onclick="setVoidM(voidM+1)" title="Next order">+</button>
-      <span class="pt" id="void-m-pt"></span>
-    </div>
-    <button class="chip" onclick="setRingRot(0);setRingHole(18)" title="Back to no rotation and an 18% inner hole.">Reset ring</button>
-  </div>
-
-  <div class="prow vrow" id="row-cay">
-    <span class="plabel">Map</span>
-    <button class="chip cmapchip on" data-cm="A" onclick="setCmap('A')" title="&Gamma;(z)=(z&minus;1)/(z+1) on z=&rho;&middot;e^{i&theta;}, &rho;=rho0+rhoD&middot;M/G. Unbounded.">A &middot; &Gamma;</button>
-    <button class="chip cmapchip" data-cm="B" onclick="setCmap('B')" title="Blaschke &phi;_a(z)=(z&minus;a)/(1&minus;&#257;z) on z=(M/G)e^{i&theta;}. Bounded, |w|&le;1.">B &middot; Blaschke</button>
-  </div>
-  <div class="prow vrow" id="row-cay-a">
-    <span class="plabel">&rho; = &rho;&#8320;+&rho;<sub>D</sub>&middot;M/G</span>
-    <span class="lbl">&rho;&#8320;</span>
-    <input type="range" id="sl-rho0" min="0" max="3" step="0.05" value="0.4" oninput="setRho0(+this.value)">
-    <span class="val" id="v-rho0">0.40</span>
-    <span class="lbl">&rho;<sub>D</sub></span>
-    <input type="range" id="sl-rhoD" min="0.05" max="3" step="0.05" value="1.8" oninput="setRhoD(+this.value)">
-    <span class="val" id="v-rhoD">1.80</span>
-    <button class="chip" onclick="setRhoPair(0.4,1.8)" title="Default. ρ runs 0.40 → 2.20, so most rings land outside the unit circle.">0.4&middot;1.8</button>
-    <button class="chip" onclick="setRhoPair(0.5,1.5)" title="ρ runs 0.50 → 2.00 — reciprocal endpoints, so the inside-the-disk and outside-the-disk halves are mirror images of each other.">0.5&middot;1.5&nbsp;&#8644;</button>
-    <button class="chip" onclick="setRhoPair(0,2)" title="ρ runs 0 → 2, starting at the origin. The innermost rings pile up near Γ(0) = −1.">0&middot;2</button>
-  </div>
-  <div class="prow vrow" id="row-cay-b" style="display:none">
-    <span class="plabel">a (Blaschke)</span>
-    <span class="lbl">|a|</span>
-    <input type="range" id="sl-ba" min="0" max="0.95" step="0.01" value="0.45" oninput="setBA(+this.value)">
-    <span class="val" id="v-ba">0.45</span>
-    <span class="lbl">arg a</span>
-    <input type="range" id="sl-baang" min="0" max="360" step="1" value="0" oninput="setBAAng(+this.value)">
-    <span class="val" id="v-baang">0&deg;</span>
-    <button class="chip" onclick="setBA(0)" title="Identity &mdash; reproduces the ring exactly">a = 0</button>
-  </div>
-  <div class="prow vrow" id="row-cay-c">
-    <span class="lbl">rotate</span>
-    <input type="range" id="cay-rot" min="0" max="360" step="1" value="0" oninput="setCayleyRot(+this.value)">
-    <span class="val" id="cay-rot-v">0&deg;</span>
-    <button class="chip crchip" id="cr-0"   onclick="setCayleyRot(0)" title="Γ's zero (z=1) and pole (z=−1) both sit on the real axis, so the two singular points fall left and right of the plate.">0&deg;</button>
-    <button class="chip crchip" id="cr-90"  onclick="setCayleyRot(90)" title="Quarter turn of the Cayley field only — the singular points move to top and bottom. Does not touch the global view turn.">90&deg;</button>
-    <button class="chip crchip" id="cr-180" onclick="setCayleyRot(180)" title="Half turn: the singular points stay left and right but swap sides.">180&deg;</button>
-    <button class="chip crchip" id="cr-270" onclick="setCayleyRot(270)" title="Three quarter turns of the Cayley field only.">270&deg;</button>
-  </div>
-  <div class="prow vrow" id="row-cay-zoom">
-    <span class="plabel">Zoom out</span>
-    <button class="chip czchip" id="cz-1" onclick="setCayleyZoomOut(1)" title="No shrink. Γ is unbounded, so at ρ near 1 the field can run well off the plate.">1&times;</button>
-    <button class="chip czchip" id="cz-2" onclick="setCayleyZoomOut(2)" title="Halve the field to bring Γ's far excursions back on plate. Map A only — Blaschke never leaves the disk.">2&times;</button>
-    <button class="chip czchip on" id="cz-4" onclick="setCayleyZoomOut(4)" title="Quarter scale. Useful when ρ passes through 1 and the pole throws points to infinity.">4&times;</button>
-    <button class="chip czchip" id="cz-8" onclick="setCayleyZoomOut(8)" title="Eighth scale — the whole excursion visible, individual cells no longer separable.">8&times;</button>
-    <span class="lbl">zoom in</span>
-    <input type="range" id="cay-zin" min="1" max="10" step="0.1" value="1" oninput="setCayleyZoomIn(+this.value)">
-    <span class="val" id="cay-zin-v">1.0&times;</span>
-    <button class="chip" onclick="setCayleyZoomIn(1)" title="Back to 1&times;">&#8634;</button>
-  </div>
-
-  <div class="prow">
     <span class="plabel">Plate</span>
     <span class="lbl">zoom</span>
     <button class="chip" onclick="plateZoomStep(1/1.4)" title="Zoom the whole plate out, about its centre. Independent of the lens — the plate moves, the loupe magnifies.">&minus;</button>
@@ -879,15 +806,11 @@ walk anyway.</p>
        G, rather than under the plate. They are what you watch while turning a
        knob, and under the plate they sat below the lens rows where every
        adjustment meant scrolling away from the numbers it changed. -->
-  <div class="cvbar">
+  <!-- Locked readout: fixed just below the pinned canvas in fullscreen so it
+       stays on screen while the rest of the drawer scrolls underneath it. -->
+  <div class="fs-lockbar" id="fs-lockbar">
     <span id="bar-l">—</span>
     <span id="bar-r">—</span>
-    <span class="vchips">
-      <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid</button>
-      <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring</button>
-      <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley</button>
-    </span>
-    <button class="fs-btn" onclick="toggleFS('cv')" title="Pin this plate to the whole screen, hide the nav, and open the controls belonging to it." id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
   </div>
   <div class="viewnote" id="view-note"></div>
 
@@ -1123,6 +1046,103 @@ walk anyway.</p>
     <div id="lensinfo"></div>
   </div>
 
+  <div class="panel collapsed" id="view-panel" style="margin:10px 0 22px;">
+    <div class="ptitle" onclick="togglePanel(this)"><span>View &mdash; Grid, Ring, Cayley</span><span class="car">&#9662;</span></div>
+    <div class="pbody">
+  <div class="prow">
+    <span class="plabel">View</span>
+    <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid &mdash; (r, M) lattice</button>
+    <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring &mdash; polar, M outward</button>
+    <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley &mdash; residues mod m</button>
+    <span class="lbl" id="view-lbl"></span>
+  </div>
+
+  <div class="prow">
+    <span class="plabel">Turn</span>
+    <button class="chip rotchip on" data-q="0" onclick="setViewQuarter(0)" title="No turn. Ring &theta;=0 sits on the right and the grid origin in the top-left corner — the raster's own frame.">0</button>
+    <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
+    <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
+    <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
+    <span class="hint">per view &mdash; all three open at 0, and each remembers its own</span>
+
+  </div>
+
+  <div class="prow vrow" id="row-ring">
+    <span class="plabel">Ring</span>
+    <span class="lbl">&theta; map</span>
+    <button class="chip thetamode" data-tm="wrap" onclick="setThetaMode('wrap')" title="&theta;=2&pi;r/M, unbounded &mdash; r&gt;M laps the ring">wrap</button>
+    <button class="chip thetamode on" data-tm="clamp" onclick="setThetaMode('clamp')" title="&theta;=2&pi;&middot;min(r/M,1) &mdash; r&ge;M pinned at the limit. The default: ring M then carries its points at the Mth roots of unity.">clamp</button>
+    <button class="chip thetamode" data-tm="unit" onclick="setThetaMode('unit')" title="&theta;=2&pi;r/G &mdash; radial spokes, budgeted by G not M">unit</button>
+    <span class="lbl">rotate</span>
+    <input type="range" id="ring-rot" min="0" max="360" step="1" value="0" oninput="setRingRot(+this.value)">
+    <span class="val" id="ring-rot-v">0&deg;</span>
+    <span class="lbl">hole</span>
+    <input type="range" id="ring-hole" min="0" max="100" step="1" value="18" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
+    <span class="val" id="ring-hole-v">0.18</span>
+    <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
+    <span class="lbl">order M</span>
+    <div class="stepper">
+      <button class="sbtn" onclick="setVoidM(voidM-1)" title="Previous order">&minus;</button>
+      <input class="sval" id="void-m" type="number" min="1" value="12"
+             onchange="setVoidM(+this.value)"
+             title="Which order the collapsed ring singles out: its M roots of unity, the φ(M) primitive ones among them, and their resultant μ(M).">
+      <button class="sbtn" onclick="setVoidM(voidM+1)" title="Next order">+</button>
+      <span class="pt" id="void-m-pt"></span>
+    </div>
+    <button class="chip" onclick="setRingRot(0);setRingHole(18)" title="Back to no rotation and an 18% inner hole.">Reset ring</button>
+  </div>
+
+  <div class="prow vrow" id="row-cay">
+    <span class="plabel">Map</span>
+    <button class="chip cmapchip on" data-cm="A" onclick="setCmap('A')" title="&Gamma;(z)=(z&minus;1)/(z+1) on z=&rho;&middot;e^{i&theta;}, &rho;=rho0+rhoD&middot;M/G. Unbounded.">A &middot; &Gamma;</button>
+    <button class="chip cmapchip" data-cm="B" onclick="setCmap('B')" title="Blaschke &phi;_a(z)=(z&minus;a)/(1&minus;&#257;z) on z=(M/G)e^{i&theta;}. Bounded, |w|&le;1.">B &middot; Blaschke</button>
+  </div>
+  <div class="prow vrow" id="row-cay-a">
+    <span class="plabel">&rho; = &rho;&#8320;+&rho;<sub>D</sub>&middot;M/G</span>
+    <span class="lbl">&rho;&#8320;</span>
+    <input type="range" id="sl-rho0" min="0" max="3" step="0.05" value="0.4" oninput="setRho0(+this.value)">
+    <span class="val" id="v-rho0">0.40</span>
+    <span class="lbl">&rho;<sub>D</sub></span>
+    <input type="range" id="sl-rhoD" min="0.05" max="3" step="0.05" value="1.8" oninput="setRhoD(+this.value)">
+    <span class="val" id="v-rhoD">1.80</span>
+    <button class="chip" onclick="setRhoPair(0.4,1.8)" title="Default. ρ runs 0.40 → 2.20, so most rings land outside the unit circle.">0.4&middot;1.8</button>
+    <button class="chip" onclick="setRhoPair(0.5,1.5)" title="ρ runs 0.50 → 2.00 — reciprocal endpoints, so the inside-the-disk and outside-the-disk halves are mirror images of each other.">0.5&middot;1.5&nbsp;&#8644;</button>
+    <button class="chip" onclick="setRhoPair(0,2)" title="ρ runs 0 → 2, starting at the origin. The innermost rings pile up near Γ(0) = −1.">0&middot;2</button>
+    <button class="chip" onclick="setRhoPair(0,1)" title="ρ runs 0 → 1, staying inside the unit circle the whole way — the innermost rings start at the origin and the outermost just reach the rim.">0&middot;1</button>
+  </div>
+  <div class="prow vrow" id="row-cay-b" style="display:none">
+    <span class="plabel">a (Blaschke)</span>
+    <span class="lbl">|a|</span>
+    <input type="range" id="sl-ba" min="0" max="0.95" step="0.01" value="0.45" oninput="setBA(+this.value)">
+    <span class="val" id="v-ba">0.45</span>
+    <span class="lbl">arg a</span>
+    <input type="range" id="sl-baang" min="0" max="360" step="1" value="0" oninput="setBAAng(+this.value)">
+    <span class="val" id="v-baang">0&deg;</span>
+    <button class="chip" onclick="setBA(0)" title="Identity &mdash; reproduces the ring exactly">a = 0</button>
+  </div>
+  <div class="prow vrow" id="row-cay-c">
+    <span class="lbl">rotate</span>
+    <input type="range" id="cay-rot" min="0" max="360" step="1" value="0" oninput="setCayleyRot(+this.value)">
+    <span class="val" id="cay-rot-v">0&deg;</span>
+    <button class="chip crchip" id="cr-0"   onclick="setCayleyRot(0)" title="Γ's zero (z=1) and pole (z=−1) both sit on the real axis, so the two singular points fall left and right of the plate.">0&deg;</button>
+    <button class="chip crchip" id="cr-90"  onclick="setCayleyRot(90)" title="Quarter turn of the Cayley field only — the singular points move to top and bottom. Does not touch the global view turn.">90&deg;</button>
+    <button class="chip crchip" id="cr-180" onclick="setCayleyRot(180)" title="Half turn: the singular points stay left and right but swap sides.">180&deg;</button>
+    <button class="chip crchip" id="cr-270" onclick="setCayleyRot(270)" title="Three quarter turns of the Cayley field only.">270&deg;</button>
+  </div>
+  <div class="prow vrow" id="row-cay-zoom">
+    <span class="plabel">Zoom out</span>
+    <button class="chip czchip" id="cz-1" onclick="setCayleyZoomOut(1)" title="No shrink. Γ is unbounded, so at ρ near 1 the field can run well off the plate.">1&times;</button>
+    <button class="chip czchip" id="cz-2" onclick="setCayleyZoomOut(2)" title="Halve the field to bring Γ's far excursions back on plate. Map A only — Blaschke never leaves the disk.">2&times;</button>
+    <button class="chip czchip" id="cz-4" onclick="setCayleyZoomOut(4)" title="Quarter scale. Useful when ρ passes through 1 and the pole throws points to infinity.">4&times;</button>
+    <button class="chip czchip on" id="cz-8" onclick="setCayleyZoomOut(8)" title="Eighth scale — the whole excursion visible, individual cells no longer separable.">8&times;</button>
+    <span class="lbl">zoom in</span>
+    <input type="range" id="cay-zin" min="1" max="10" step="0.1" value="1" oninput="setCayleyZoomIn(+this.value)">
+    <span class="val" id="cay-zin-v">1.0&times;</span>
+    <button class="chip" onclick="setCayleyZoomIn(1)" title="Back to 1&times;">&#8634;</button>
+  </div>
+    </div>
+  </div>
+
   <div class="panel collapsed" style="margin:14px 0 0;">
     <div class="ptitle" onclick="togglePanel(this)"><span>Goldbach partitions &mdash; Strip I's E = g + s, ported in full</span><span class="car">&#9662;</span></div>
     <div class="pbody">
@@ -1182,6 +1202,11 @@ walk anyway.</p>
       <div class="sep"></div>
       <button class="chip" id="part-playg" onclick="togglePlayGap()" title="Walk g from 1 to G+1 and back, drawing every partition's four strips live.">&#9654; Play g</button>
       <button class="chip" id="part-playp" onclick="togglePlayPairs()" title="Walk only the Goldbach pairs of E, one at a time, looping. In pair &rarr; pair mode it walks the runs themselves instead.">&#9654; Play Goldbach pairs</button>
+      <span class="lbl">speed</span>
+      <input type="range" id="play-speed" min="-100" max="100" step="1" value="0"
+             oninput="setPlaySpeed(+this.value)"
+             title="Shared speed for Play g and Play Goldbach pairs. Centre is the original speed; left is up to 3&times; slower, right up to 3&times; faster.">
+      <span class="val" id="play-speed-v">1.00&times;</span>
     </div>
 
     <div class="ctrls" id="part-run-row" style="display:none">
@@ -1234,12 +1259,40 @@ walk anyway.</p>
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
-    <button class="btn" onclick="exportPNG(2048)" title="2048px plate with the stat band: eyebrow, counts, and the strip equation, so the image is reproducible from itself.">2K</button>
-    <button class="btn" onclick="exportPNG(4096)" title="4096px. Print size.">4K</button>
-    <button class="btn" onclick="exportPNG(8192)" title="8192px. Large; expect a pause while it composes.">8K</button>
+    <button class="btn" onclick="openExportModal()" title="Pick any of Grid, Ring and Cayley — one, two, or all three — preview the composed plate, then export it.">Export &#9662;</button>
     <div class="sep"></div>
     <button class="btn" onclick="exportCSV()" title="Every cell on the current strip, with r, M and coprimality.">Strip CSV</button>
     <button class="btn" onclick="exportState()" title="A text report of the full current state — every parameter and every measured number.">State report</button>
+  </div>
+</div>
+
+<div id="export-modal" class="export-modal" onclick="if(event.target===this)closeExportModal()">
+  <div class="export-box">
+    <div class="export-hd">
+      <span>Export plate</span>
+      <button class="btn" onclick="closeExportModal()" title="Close">&times;</button>
+    </div>
+    <div class="prow">
+      <span class="plabel">Views</span>
+      <button class="chip evchip" data-ev="grid" onclick="toggleExportView('grid')" title="Grid — (r, M) lattice">Grid</button>
+      <button class="chip evchip" data-ev="ring" onclick="toggleExportView('ring')" title="Ring — polar, M outward">Ring</button>
+      <button class="chip evchip" data-ev="cayley" onclick="toggleExportView('cayley')" title="Cayley — residues mod m">Cayley</button>
+    </div>
+    <div class="pnote" style="padding:2px 0 8px;">Pick any one, any two, or all three &mdash; each draws with its own saved parameters and they're laid out side by side on one plate.</div>
+    <div class="prow">
+      <span class="plabel">Resolution</span>
+      <button class="chip erchip" data-er="2048" onclick="setExportRes(2048)" title="2048px per row. Quick.">2K</button>
+      <button class="chip erchip" data-er="4096" onclick="setExportRes(4096)" title="4096px per row. Print size.">4K</button>
+      <button class="chip erchip" data-er="8192" onclick="setExportRes(8192)" title="8192px per row. Large; expect a pause while it composes.">8K</button>
+    </div>
+    <div class="export-preview-wrap">
+      <div class="pnote" id="export-preview-note" style="padding:4px 0;">Preview</div>
+      <div id="export-preview-slot"></div>
+    </div>
+    <div class="ctrls" style="margin-top:14px;">
+      <button class="btn" id="export-go-btn" onclick="runExport()" title="Compose the selected views at the chosen resolution and download.">&#8681; Download PNG</button>
+      <button class="btn" onclick="closeExportModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1602,7 +1655,7 @@ Full attribution is in the credits panel below.
 </div>
 
 
-<div class="panel" id="credits">
+<div class="panel collapsed" id="credits">
   <div class="ptitle" onclick="togglePanel(this)"><span>Credits &mdash; whose mathematics this is</span><span class="car">&#9662;</span></div>
   <div class="pbody">
 
@@ -1746,11 +1799,13 @@ Full attribution is in the credits panel below.
   <h3>Same author</h3>
   <p style="font-size:13.5px;margin:0 0 8px;">
   <a href="https://wessengetachew.github.io/Partition/">Strip Arithmetic I &mdash; The Goldbach Diagonal</a>,
+  the <a href="https://wessengetachew.github.io/smith/page2.html">Explorer</a>,
   and the C(n) suite: <a href="https://wessengetachew.github.io/smith/page5.html">Page 5</a>,
   <a href="https://wessengetachew.github.io/smith/page6.html">Page 6</a>,
   <a href="https://wessengetachew.github.io/smith/page8.html">Page 8</a>. The strip framing, the
   slope/width parametrisation, and the browser arithmetic are the parts of this page that are
-  mine; they are a way of looking, not a result.</p>
+  mine; they are a way of looking, not a result. These companion pages don't link back here &mdash;
+  use your browser's back button to return.</p>
 
   </div>
 </div>
@@ -1822,7 +1877,7 @@ const THETA_LABEL = { wrap: '2\u03c0r/M', clamp: '2\u03c0\u00b7min(r/M,1)', unit
 let cmap = 'A';
 let rho0 = 0.4, rhoD = 1.8;
 let ba = 0.45, baAng = 0;
-let cayleyRot = 0, cayleyZoomOut = 4, cayleyZoomIn = 1;
+let cayleyRot = 0, cayleyZoomOut = 8, cayleyZoomIn = 1;
 
 /* Partitions — Strip I's Goldbach diagonal, ported with its dynamics rather
    than reduced to a hand-typed list of offsets. Nothing here is stored per
@@ -3294,9 +3349,11 @@ function syncStripVisibility() {
 function setPartMode(m) {
   partMode = m; partPage = 0;
   syncStripVisibility();
-  // A hand-picked set, and a run, are both meant to be seen whole: batching
-  // either would hide most of what the reader just chose.
-  if (m === 'picked' || m === 'run') partBatch = 0;
+  // A hand-picked set, a run, and "all partitions" are all meant to be seen
+  // whole: batching any of them would hide most of what the reader just
+  // asked for. computePartItems() below still falls back to a batch of 40
+  // on its own if the full set would be too expensive to draw at once.
+  if (m === 'picked' || m === 'run' || m === 'all') partBatch = 0;
   computePartItems();
   syncPartUI(); renderPartTable(); redraw(false);
 }
@@ -3356,8 +3413,23 @@ function stepPair(dir) {
    In pair → pair mode the natural sweep is the runs themselves, so that is
    what Play walks there instead. */
 let partSweepId = null, partSweepDir = 1;
+let wgPlayMult = 1, partSweepFn = null, partSweepBase = 0;
+function setPlaySpeed(v) {
+  wgPlayMult = Math.pow(3, v / 100);
+  const el = $('play-speed-v');
+  if (el) el.textContent = wgPlayMult.toFixed(2) + '\u00d7';
+  if (partSweepId && partSweepFn) {
+    clearInterval(partSweepId);
+    partSweepId = setInterval(partSweepFn, Math.max(20, partSweepBase / wgPlayMult));
+  }
+}
+function startPartSweep(fn, baseMs) {
+  partSweepFn = fn; partSweepBase = baseMs;
+  partSweepId = setInterval(fn, Math.max(20, baseMs / wgPlayMult));
+}
 function stopPartSweeps() {
   if (partSweepId) { clearInterval(partSweepId); partSweepId = null; }
+  partSweepFn = null; partSweepBase = 0;
   const a = $('part-playg'), b = $('part-playp');
   if (a) { a.innerHTML = '&#9654; Play g'; a.classList.remove('on'); }
   if (b) { b.innerHTML = '&#9654; Play Goldbach pairs'; b.classList.remove('on'); }
@@ -3368,7 +3440,7 @@ function togglePlayGap() {
   const b = $('part-playg');
   b.innerHTML = '&#9632; Stop'; b.classList.add('on');
   partSweepDir = 1; setPartG(1, true);
-  partSweepId = setInterval(() => {
+  startPartSweep(() => {
     const hi = COP_G + 1, step = Math.max(1, Math.round((hi - 1) / 90));
     let n = partG + partSweepDir * step;
     if (n >= hi) { n = hi; partSweepDir = -1; }
@@ -3382,7 +3454,7 @@ function togglePlayPairs() {
   if (partMode === 'run') {
     if (goldbachGaps().length < 2) return;
     b.innerHTML = '&#9632; Stop'; b.classList.add('on');
-    partSweepId = setInterval(() => runStep(1), 1200);
+    startPartSweep(() => runStep(1), 1200);
     return;
   }
   // Any other overlay mode has no single g to step through, and paging its
@@ -3394,7 +3466,7 @@ function togglePlayPairs() {
   b.innerHTML = '&#9632; Stop'; b.classList.add('on');
   let i = pairs.findIndex(x => x >= partG);
   if (i < 0) i = 0;
-  partSweepId = setInterval(() => {
+  startPartSweep(() => {
     const live = goldbachGaps();
     if (!live.length) return;
     setPartG(live[i % live.length], true); i++;
@@ -4213,7 +4285,11 @@ function drawCayleyField(ctx, S) {
   const boost = partMode !== 'off' ? partBgBoost : 1;
   const Sb = Math.min(2400, Math.round(S * plateScale(ctx)));   // device resolution, capped
   const blit = (cv) => {
-    ctx.imageSmoothingEnabled = Sb < S;
+    // Always crisp: smoothing here blurs individual points into soft
+    // blobs as soon as the field is scaled up past its buffer resolution
+    // — exactly when zooming in, which is when a reader most wants to see
+    // sharp dots, not blur.
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cv, 0, 0, S, S);
     ctx.imageSmoothingEnabled = true;
   };
@@ -5282,12 +5358,14 @@ function drawPartBand(ctx, x, y, w, S, rows) {
   });
   ctx.restore();
 }
-async function exportPNG(px) {
+async function exportPNG(px, views) {
   if (!COP) return;
+  views = (views && views.length) ? views : [viewMode];
   if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
   const S = px / 1920;                       // every dimension below is at 1920
   const m = 84 * S;
-  const plateSide = px - 2 * m;
+  const tileGap = 24 * S;
+  const plateSide = (px - 2 * m - tileGap * (views.length - 1)) / views.length;
   // The partition overlay was reduced to one grey line in the footer, below
   // the plate, while its four strips are the most conspicuous thing ON the
   // plate. It gets a band of its own directly under the stat cards instead —
@@ -5361,7 +5439,21 @@ async function exportPNG(px) {
 
   if (partMode !== 'off') drawPartBand(ctx, m, 528 * S, px - 2 * m, S, pRows);
 
-  paintPlate(ctx, m, headerH, plateSide);
+  // One tile per requested view. viewMode is swapped in only for the
+  // duration of each tile's paint, so Grid/Ring/Cayley — and their own
+  // saved parameters — each draw themselves exactly as they would on
+  // screen, then the live view is restored.
+  const VIEW_TAG = { grid: 'GRID', ring: 'RING', cayley: 'CAYLEY' };
+  const viewModeWas = viewMode;
+  views.forEach((v, i) => {
+    const tx = m + i * (plateSide + tileGap);
+    viewMode = v;
+    paintPlate(ctx, tx, headerH, plateSide);
+    ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold;
+    ctx.font = (14 * S) + 'px ' + MONO;
+    ctx.fillText(VIEW_TAG[v] || v.toUpperCase(), tx + plateSide / 2, headerH - 16 * S);
+  });
+  viewMode = viewModeWas;
 
   // footer — every parameter the current plate depends on, not just the
   // headline ones, so the image is reproducible without the page open
@@ -5370,9 +5462,10 @@ async function exportPNG(px) {
   ctx.fillText('v = b·r − a·M   ·   slope ' + slopeA + '/' + slopeB + '   ·   s = ' + offS +
     '   ·   w = ' + widthW + '   ·   G = ' + COP_G + '   ·   walk = ' + walkMode +
     (plateIdentity() ? '' : '   ·   plate ' + plateK.toFixed(2) + '×') +
-    '   ·   view = ' + viewMode +
-    (viewMode === 'ring' ? ' (θ ' + thetaMode + ', rot ' + Math.round(ringRot * 180 / Math.PI) + '°, hole ' + ringHole.toFixed(2) + ')'
-     : viewMode === 'cayley' ? ' (map ' + cmap + ', θ ' + thetaMode + (cmap === 'A' ? ', ρ ' + rho0.toFixed(2) + '+' + rhoD.toFixed(2) + '·M/G' : ', a ' + ba.toFixed(2) + '∠' + baAng + '°') + ')' : '') +
+    '   ·   views = ' + views.map(v => v +
+      (v === 'ring' ? ' (θ ' + thetaMode + ', rot ' + Math.round(ringRot * 180 / Math.PI) + '°, hole ' + ringHole.toFixed(2) + ')'
+       : v === 'cayley' ? ' (map ' + cmap + ', θ ' + thetaMode + (cmap === 'A' ? ', ρ ' + rho0.toFixed(2) + '+' + rhoD.toFixed(2) + '·M/G' : ', a ' + ba.toFixed(2) + '∠' + baAng + '°') + ')' : '')
+    ).join(', ') +
     '   ·   render ' + $('cmode').value + '   ·   labels ' + $('lens-lbl').value +
     '   ·   strip highlight ' + (showStrip ? 'on' : 'off'), m, fy);
   ctx.fillText('lens ' + (LENS_ON ? 'on' : 'off') + '   ·   zoom ' + LENS_ZOOM + '×   ·   place ' +
@@ -5395,7 +5488,8 @@ async function exportPNG(px) {
   ctx.fillText('Strip I · wessengetachew.github.io/Partition', px - m, fy + 54 * S);
 
   dl(cv, 'strips2-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' +
-      slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + px + '.png');
+      slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G +
+      '-' + views.join('+') + '-' + px + '.png');
 }
 function dl(cv, name) {
   cv.toBlob(b => {
@@ -5403,6 +5497,82 @@ function dl(cv, name) {
     a.href = URL.createObjectURL(b); a.download = name; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   });
+}
+
+/* Export modal — pick any of Grid/Ring/Cayley (one, two, or all three),
+   preview the plate that composition will produce, then export it at the
+   chosen resolution. Views are always rendered Grid, Ring, Cayley in that
+   fixed order regardless of click order, so the layout never depends on
+   which chip was toggled last. */
+let exportViews = ['grid'];
+let exportRes = 2048;
+const EXPORT_VIEW_ORDER = ['grid', 'ring', 'cayley'];
+function orderedExportViews() { return EXPORT_VIEW_ORDER.filter(v => exportViews.includes(v)); }
+function openExportModal() {
+  exportViews = [viewMode];
+  exportRes = 2048;
+  $('export-modal').style.display = 'flex';
+  syncExportUI();
+}
+function closeExportModal() {
+  $('export-modal').style.display = 'none';
+}
+function toggleExportView(v) {
+  const i = exportViews.indexOf(v);
+  if (i >= 0) {
+    if (exportViews.length === 1) return; // at least one view stays selected
+    exportViews.splice(i, 1);
+  } else {
+    exportViews.push(v);
+  }
+  syncExportUI();
+}
+function setExportRes(px) {
+  exportRes = px;
+  syncExportUI();
+}
+function syncExportUI() {
+  document.querySelectorAll('#export-modal .evchip').forEach(b => {
+    b.classList.toggle('on', exportViews.includes(b.dataset.ev));
+  });
+  document.querySelectorAll('#export-modal .erchip').forEach(b => {
+    b.classList.toggle('on', +b.dataset.er === exportRes);
+  });
+  updateExportPreview();
+}
+function updateExportPreview() {
+  const views = orderedExportViews();
+  const slot = $('export-preview-slot');
+  if (!slot) return;
+  slot.innerHTML = '';
+  const tag = { grid: 'GRID', ring: 'RING', cayley: 'CAYLEY' };
+  const viewModeWas = viewMode;
+  const side = 160;
+  views.forEach(v => {
+    const cv = document.createElement('canvas');
+    cv.width = side; cv.height = side;
+    viewMode = v;
+    paintPlate(cv.getContext('2d'), 0, 0, side);
+    const wrap = document.createElement('div');
+    wrap.className = 'exp-tile';
+    wrap.appendChild(cv);
+    const lab = document.createElement('div');
+    lab.className = 'exp-tile-tag';
+    lab.textContent = tag[v] || v.toUpperCase();
+    wrap.appendChild(lab);
+    slot.appendChild(wrap);
+  });
+  viewMode = viewModeWas;
+}
+async function runExport() {
+  const btn = $('export-go-btn');
+  const wasText = btn.textContent;
+  btn.textContent = 'Composing\u2026'; btn.disabled = true;
+  try {
+    await exportPNG(exportRes, orderedExportViews());
+  } finally {
+    btn.textContent = wasText; btn.disabled = false;
+  }
 }
 function exportCSV() {
   const st = walkStrip(500000);
@@ -7762,7 +7932,9 @@ function fsAvailH() {
 function syncFSChrome(wrapEl, sizePx) {
   const navh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navh')) || 0;
   wrapEl.style.height = sizePx + 'px';
-  document.documentElement.style.setProperty('--fsh', (navh + sizePx) + 'px');
+  const canvBot = navh + sizePx;
+  document.documentElement.style.setProperty('--canvbot', canvBot + 'px');
+  document.documentElement.style.setProperty('--fsh', (canvBot + 27) + 'px');
 }
 /* Entering fullscreen, the first thing below the pinned canvas should be the
    controls, not the prose — so §1 folds up and the control drawer opens. Both
@@ -7860,7 +8032,7 @@ function onBrowserFSChange() {
 ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
   .forEach(ev => document.addEventListener(ev, onBrowserFSChange));
 function setFSButtonState(id, on) {
-  const short = id === 'cv' ? 'Strip' : 'Comet';
+  const short = id === 'cv' ? 'Fullscreen' : 'Comet';
   document.querySelectorAll('[data-fs-target="' + id + '"]').forEach(b => {
     b.classList.toggle('on', on);
     b.textContent = b.classList.contains('fsnavbtn')
