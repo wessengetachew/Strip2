@@ -88,6 +88,16 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
   display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .ptitle:hover{color:var(--cream1);}
 .ptitle .car{font-size:9px;opacity:.6;transition:transform .15s;flex:none;}
+/* In fullscreen the plate is pinned to the top of the screen and the drawer
+   flows under it, so the first thing below the picture should be the numbers
+   the picture is of. Flex order lifts the readout and the view note to the
+   head of the drawer for the duration; everything else keeps order 0 and so
+   keeps its relative sequence. Outside fullscreen the drawer is ordinary
+   block flow and this does nothing. */
+body.fs-open #ctl-body{display:flex;flex-direction:column;}
+body.fs-open #ctl-body > .cvbar{order:-2;margin-top:0;}
+body.fs-open #ctl-body > #view-note{order:-1;}
+
 /* Credits advanced mode. The attribution list reads as prose first; the wiring
    that jumps to the control each credit is responsible for is opt-in, because
    showing seventeen rows of buttons by default turns a courtesy into a machine. */
@@ -201,6 +211,13 @@ html.hint-off .subtoggle.collapsed .car{animation:none;}
 .ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px;}
 .cg{display:flex;align-items:center;gap:6px;}
 .lbl{font-family:var(--mono);font-size:11px;color:var(--cream3);white-space:nowrap;}
+/* .lbl must not break mid-name, which is right for a two-word control label
+   and wrong for a sentence: on a phone one long nowrap span widens the whole
+   row, and the row widens the page. Sentences get .hint, which wraps, takes
+   the full row, and can break inside a word rather than push the layout. */
+.hint{font-family:var(--mono);font-size:10.5px;line-height:1.5;color:var(--cream3);
+  white-space:normal;overflow-wrap:anywhere;flex:1 1 100%;margin-top:1px;}
+.prow,.ctrls{max-width:100%;min-width:0;}
 /* .lbl is nowrap on purpose — it labels controls that must not break mid-name.
    Prose must never use it: a long sentence with nowrap sets the page's minimum
    width to the length of that sentence, and every viewport narrower than it
@@ -285,7 +302,10 @@ select{cursor:pointer;}
 
 .chip{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 9px;
   background:transparent;border:1px solid var(--edge2);color:var(--cream3);cursor:pointer;
-  transition:all .13s;white-space:nowrap;}
+  /* A chip label is a name and should not break mid-name, but a long one must
+     still not be wider than the screen — nowrap plus an unbounded width is
+     what pushes a phone layout sideways. */
+  transition:all .13s;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
 .chip:hover{border-color:var(--gold);color:var(--gold);}
 .chip.on{background:var(--gold2);border-color:var(--gold);color:var(--gold);}
 .chip:disabled{opacity:.35;cursor:default;}
@@ -465,7 +485,9 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   <a class="navbtn tealb" href="https://wessengetachew.github.io/smith/page2.html">Explorer</a>
   <a class="navbtn" href="https://wessengetachew.github.io/smith/page5.html">P5 · Gap Diagonal</a>
   <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
-     title="Fullscreen: Strip / block view">⛶ Strip</button>
+     title="Fullscreen: the lattice. Pins the plate to the top of the screen with its controls below.">⛶ Strip</button>
+  <button class="navbtn fsnavbtn" data-fs-target="cv2" onclick="toggleFS('cv2')"
+     title="Fullscreen: the Goldbach comet. Opens §3 if it is folded, then pins the plot to the top of the screen with its controls below.">⛶ Comet</button>
 </div>
 
 
@@ -725,7 +747,7 @@ walk anyway.</p>
   <div class="subtoggle collapsed" id="ctl-toggle" onclick="toggleSub(this)">
     <span class="car">&#9662;</span><span>Controls &mdash; presets, slope/offset/width, walk, render, lens</span>
   </div>
-  <div class="subbody">
+  <div class="subbody" id="ctl-body">
 
   <div class="prow">
     <span class="plabel">View</span>
@@ -741,11 +763,9 @@ walk anyway.</p>
     <button class="chip rotchip" data-q="-1" onclick="setViewQuarter(-1)" title="&minus;i &mdash; a quarter turn counter-clockwise on screen. Ring &theta;=0 goes to the top, the way a clock face carries 0, and the grid's (r=1, M=1) corner goes to the bottom-left. Multiplication by +i in the complex plane; the sign differs because canvas y runs downward.">&minus;i</button>
     <button class="chip rotchip" data-q="1" onclick="setViewQuarter(1)" title="+i &mdash; a quarter turn clockwise on screen.">+i</button>
     <button class="chip rotchip" data-q="2" onclick="setViewQuarter(2)" title="&minus;1 &mdash; a half turn.">&minus;1</button>
-    <span class="lbl">per view &mdash; all three open at 0, and each remembers its own</span>
+    <span class="hint">per view &mdash; all three open at 0, and each remembers its own</span>
 
   </div>
-
-  <div id="cellgrid" style="display:none;margin:4px 0 14px;"></div>
 
   <div class="prow vrow" id="row-ring">
     <span class="plabel">Ring</span>
@@ -828,7 +848,7 @@ walk anyway.</p>
     <button class="chip" onclick="plateZoomStep(1.4)" title="Zoom the whole plate in, about its centre. Works in Grid, Ring and Cayley, and exports carry it.">+</button>
     <button class="chip" id="plate-reset" onclick="resetPlate()" title="Back to the unzoomed, uncentred plate.">Reset</button>
     <button class="chip tl lenschip on" onclick="toggleLens()" title="Zooming parks the magnifier, since the loupe and the plate zoom disagree about what is under your finger mid-pinch. Switch it back on here and it works at whatever zoom the plate is now at.">Lens: on</button>
-    <span class="lbl">drag to move &middot; pinch or scroll to zoom &middot; all three views</span>
+    <span class="hint">unzoomed, a drag moves the <b>lens</b> &middot; zoomed in, a drag <b>pans</b> &middot; pinch or scroll to zoom &middot; all three views</span>
   </div>
 
   <div class="prow vrow" id="row-pts">
@@ -855,6 +875,22 @@ walk anyway.</p>
     <button class="chip"    id="ps-f23"   onclick="preset('f23')" title="Slope 2/3. Between 1/2 and 1/1 in the Stern–Brocot tree.">Farey ray · 2/3</button>
   </div>
 
+  <!-- The readout and the view switch live with the controls, directly above
+       G, rather than under the plate. They are what you watch while turning a
+       knob, and under the plate they sat below the lens rows where every
+       adjustment meant scrolling away from the numbers it changed. -->
+  <div class="cvbar">
+    <span id="bar-l">—</span>
+    <span id="bar-r">—</span>
+    <span class="vchips">
+      <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid</button>
+      <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring</button>
+      <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley</button>
+    </span>
+    <button class="fs-btn" onclick="toggleFS('cv')" title="Pin this plate to the whole screen, hide the nav, and open the controls belonging to it." id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
+  </div>
+  <div class="viewnote" id="view-note"></div>
+
   <div class="prow">
     <span class="plabel">G</span>
     <div class="stepper">
@@ -868,7 +904,7 @@ walk anyway.</p>
     <span class="prime-tag" id="g-pt">prime</span>
     <input type="range" id="g-sl" min="2" max="4096" step="1" value="31" oninput="onG(+this.value)">
     <span class="val" id="g-v">31</span>
-    <button class="chip tl" id="g-play" onclick="toggleGPlay()" title="Animate G: 2 up to current value and back, on loop">&#9654; Play</button>
+    <button class="chip tl gplaychip" id="g-play" onclick="toggleGPlay()" title="Animate G: 2 up to current value and back, on loop">&#9654; Play</button>
     <button class="chip" onclick="onG(2)" title="The smallest lattice: four cells. Useful for checking the hit test, not the arithmetic.">2</button>
     <button class="chip" onclick="onG(16)" title="Small enough that every cell is separately visible with labels on.">16</button>
     <button class="chip" onclick="onG(64)" title="Cell labels still fit; the diagonal structure is already visible.">64</button>
@@ -909,7 +945,7 @@ walk anyway.</p>
             title="Width 30, so n = 29. Saturated for every prime p ≤ 30.">Block n = 29</button>
     <button class="chip tl" id="ps-blk1" onclick="preset('blk1')"
             title="Width 2, so n = 1. The smallest block where anything saturates: p = 2 freezes at 1−1/2, and D(1) = 0.322634, C(1) = 0.530712.">Block n = 1</button>
-    <span class="lbl">the width case &mdash; pair with <b>Walk: Block</b></span>
+    <span class="hint">the width case &mdash; pair with <b>Walk: Block</b></span>
   </div>
 
   <div class="prow">
@@ -922,7 +958,7 @@ walk anyway.</p>
             title="Gap diagonal at g = 97, prime. Only one prime can strike, so density φ(97)/97 = 96/97 = 0.9897 — nearly every cell coprime. Compare with g = 30.">Gap g = 97, prime</button>
     <button class="chip cr" id="ps-aprime" onclick="preset('aprime')"
             title="Anti-diagonal at N = 211, prime. φ(211) = 210 = N−1, so every cell on the line is coprime — the criterion from Strip Arithmetic I, visible as an unbroken line.">&minus;1 &middot; N=211 prime</button>
-    <span class="lbl">what one line's index does to its density</span>
+    <span class="hint">what one line's index does to its density</span>
   </div>
 
   <div class="prow">
@@ -963,8 +999,8 @@ walk anyway.</p>
     <span class="plabel">Walk</span>
     <button class="chip tl on" id="wk-strip" onclick="setWalk('strip')" title="Counts one cell at a time: the fraction of cells in the band with gcd(r,M)=1. Exact closed form — the weighted mean of φ(c)/c over the band's lines — but NOT C(n): at n=5 it reads 0.578 against D(5) = 0.194142.">Strip &mdash; per <b>cell</b></button>
     <button class="chip cr" id="wk-band" onclick="setWalk('band')" title="Counts one whole block at a time: gcd(r, M+j)=1 for EVERY j, an AND across all n+1 columns. This is the walk that converges to D(n).">Block &mdash; per <b>block</b>, AND over n+1</button>
-    <span class="lbl" id="wk-note" style="color:var(--cream3);"></span>
-    <span class="lbl">overlay: <b style="color:var(--teal)">teal = strip</b> &middot; <b style="color:var(--coral)">coral = block</b></span>
+    <span class="hint" id="wk-note"></span>
+    <span class="hint">overlay: <b style="color:var(--teal)">teal = strip</b> &middot; <b style="color:var(--coral)">coral = block</b></span>
   </div>
 
   <div class="prow">
@@ -1053,8 +1089,8 @@ walk anyway.</p>
     <select id="lens-lbl" onchange="lensRelabel()">
       <optgroup label="Lattice">
         <option value="rM">r/M</option>
-        <option value="res" selected>r mod M &nbsp;(residue)</option>
-        <option value="r">r</option>
+        <option value="res">r mod M &nbsp;(residue)</option>
+        <option value="r" selected>r</option>
         <option value="M">M</option>
         <option value="dec">r/M decimal</option>
         <option value="gcd">gcd(r,M)</option>
@@ -1086,17 +1122,6 @@ walk anyway.</p>
     <canvas id="lens"></canvas>
     <div id="lensinfo"></div>
   </div>
-  <div class="cvbar">
-    <span id="bar-l">—</span>
-    <span id="bar-r">—</span>
-    <span class="vchips">
-      <button class="chip viewchip on" data-view="grid" onclick="setView('grid')" title="The raster itself: r across, M down, one pixel per lattice cell. Every identity on the page is stated in these coordinates.">Grid</button>
-      <button class="chip viewchip" data-view="ring" onclick="setView('ring')" title="The same lattice in polar. M is the ring index running outward, r runs around. A slope a/b strip becomes a spiral.">Ring</button>
-      <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley</button>
-    </span>
-    <button class="fs-btn" onclick="toggleFS('cv')" title="Pin this plate to the whole screen, hide the nav, and open the controls belonging to it." id="fsbtn-cv" data-fs-target="cv">⛶ Fullscreen</button>
-  </div>
-  <div class="viewnote" id="view-note"></div>
 
   <div class="panel collapsed" style="margin:14px 0 0;">
     <div class="ptitle" onclick="togglePanel(this)"><span>Goldbach partitions &mdash; Strip I's E = g + s, ported in full</span><span class="car">&#9662;</span></div>
@@ -1125,6 +1150,7 @@ walk anyway.</p>
       <input type="range" id="pg-sl" min="2" max="4096" step="1" value="31"
              oninput="stopGPlay();onG(+this.value)">
       <span class="val" id="pg-v">31</span>
+      <button class="chip tl gplaychip" onclick="toggleGPlay()" title="Animate G: 2 up to the current value and back, on loop. The partition family reprojects on every tick, since E = 2(G+1) is read off the live lattice.">&#9654; Play</button>
       <span class="lbl" id="pg-e">&mdash;</span>
     </div>
 
@@ -1141,7 +1167,7 @@ walk anyway.</p>
     <div class="ctrls">
       <button class="chip stripchip" onclick="toggleStrip()"
               title="Turning a partition overlay on hides the main slope/offset strip so the two do not fight for the plate. This puts it back, and it stays back.">Strip: on</button>
-      <span class="lbl">the main slope strip, hidden while an overlay is up</span>
+      <span class="hint">the main slope strip, hidden while an overlay is up</span>
     </div>
 
     <div class="ctrls">
@@ -1279,7 +1305,7 @@ walk anyway.</p>
            oninput="setPcWin(+this.value)" style="flex:1 1 160px;">
     <span class="lbl" id="pc-win-lbl">k = 2 …</span>
     <button class="chip" onclick="pcClearPick()" title="Undim every strip and drop the picked one.">Clear pick</button>
-    <span class="lbl">click a column to pick a strip &mdash; the rest dim</span>
+    <span class="hint">click a column to pick a strip &mdash; the rest dim</span>
   </div>
 
   <div class="cvwrap"><canvas id="cv3" class="main"></canvas></div>
@@ -2885,47 +2911,8 @@ function doRedraw(rebuildBase) {
     updateIdentity(st);
   }
   updateViewNote();
-  renderCellGrid();
 }
 
-/* At G ≤ 3 the plate is 4 or 9 cells. A label per cell still leaves the
-   reader guessing what the label MODE is actually printing — "labels M" in
-   the footer means nothing if you cannot see an M anywhere. At that size the
-   whole lattice fits in a table, so show it: every cell, its gcd, the three
-   strip coordinates, whether the current strip contains it, and what each
-   label mode would put in it. Above G = 3 this would be noise and it stops. */
-const CELLGRID_MAX = 3;
-function renderCellGrid() {
-  const el = $('cellgrid');
-  if (!el) return;
-  const g = COP_G;
-  if (g > CELLGRID_MAX) { el.innerHTML = ''; el.style.display = 'none'; return; }
-  el.style.display = '';
-  const mode = $('lens-lbl').value;
-  let h = '<div class="scroll"><table>' +
-    '<tr><th>cell (r, M)</th><th>gcd</th><th>coprime</th><th>r &minus; M</th>' +
-    '<th>r + M</th><th>v = b\u00b7r &minus; a\u00b7M</th><th>in strip</th>' +
-    '<th>label \u00b7 ' + mode + '</th></tr>';
-  for (let M = 1; M <= g; M++) {
-    for (let r = 1; r <= g; r++) {
-      const gg = gcd(r, M), co = gg === 1;
-      const v = slopeB * r - slopeA * M;
-      const inS = v >= offS && v < offS + widthW;
-      h += '<tr class="' + (co ? 'good' : '') + '"><td>(' + r + ', ' + M + ')</td>' +
-           '<td class="n">' + gg + '</td>' +
-           '<td class="n">' + (co ? 'yes' : 'no') + '</td>' +
-           '<td class="n">' + (r - M) + '</td>' +
-           '<td class="n">' + (r + M) + '</td>' +
-           '<td class="n">' + v + '</td>' +
-           '<td class="n">' + (inS ? 'yes' : '\u2014') + '</td>' +
-           '<td class="n">' + (mode === 'off' ? '\u2014' : labelText(mode, r, M)) + '</td></tr>';
-    }
-  }
-  h += '</table></div><p class="stepnote" style="margin-top:8px;">Every cell at G = ' + g +
-       ', with what the <b>' + mode + '</b> label mode prints in it. This table stops above ' +
-       'G = ' + CELLGRID_MAX + ', where the plate\'s own labels take over.</p>';
-  el.innerHTML = h;
-}
 /* One painter for screen and export, so a 4K plate is the same picture as the
    canvas rather than a second implementation that can drift from it. */
 function paintView(ctx, S, cap) {
@@ -3710,9 +3697,12 @@ function drawStripOverlay(ctx, S) {
   // walks the page spends §1 separating looked identical on the plate — and
   // with a block overlay up you could not see a Farey ray at all. The chips
   // already coded it this way (wk-band carries .cr); the plate did not.
-  ctx.strokeStyle = 'rgba(61,200,184,.9)';
-  ctx.fillStyle = 'rgba(61,200,184,.14)';
-  ctx.lineWidth = Math.max(1, 1.2 * (S / 900));
+  ctx.fillStyle = 'rgba(61,200,184,.16)';
+  // Teal at width 1 vanishes into a busy render mode. Cased: a dark stroke
+  // laid down first, the colour over it, so the line reads on a coral block
+  // plate, on a pale gcd plate and on the near-black default alike. Same
+  // trick the cell labels use, for the same reason.
+  const lw = Math.max(1.4, 2.0 * (S / 900));
   // The strip is a band between two parallel lines; draw it as a polygon in
   // lattice coords, one clip per edge, rather than cell by cell.
   ctx.beginPath();
@@ -3729,7 +3719,10 @@ function drawStripOverlay(ctx, S) {
   for (const q of lo) ctx.lineTo(q[0], q[1]);
   for (let i = hi.length - 1; i >= 0; i--) ctx.lineTo(hi[i][0], hi[i][1]);
   ctx.closePath();
-  ctx.fill(); ctx.stroke();
+  ctx.fill();
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(4,4,13,.72)';   ctx.lineWidth = lw * 2.6; ctx.stroke();
+  ctx.strokeStyle = 'rgba(61,200,184,1)'; ctx.lineWidth = lw;       ctx.stroke();
   ctx.restore();
 }
 function drawBandOverlay(ctx, S) {
@@ -4085,7 +4078,7 @@ function drawRingStripAt(ctx, S, s, color) {
   const step = Math.max(1, Math.ceil(g / 1600));
   ctx.save();
   ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(1, ringT * step);
+  ctx.lineWidth = Math.max(1.8, ringT * step);   // floor, or it thins to nothing at large G
   for (let M = 1; M <= g; M += step) {
     const Mm = M + (step - 1) / 2;
     const lo = Math.max(1, Math.ceil((s + a * Mm) / b));
@@ -4676,17 +4669,24 @@ function syncGMirror(v) {
 }
 
 let gPlayTimer = null, gPlayTarget = 0, gPlayDir = 1;
+/* The transport lives in two rows now — the lattice G row and the partition
+   panel's own lattice G row, which had the steppers but no way to start or
+   stop a sweep without scrolling back up. One state, both buttons. */
+function syncGPlayChips(running) {
+  document.querySelectorAll('.gplaychip').forEach(b => {
+    b.innerHTML = running ? '&#9632; Stop' : '&#9654; Play';
+    b.classList.toggle('on', running);
+  });
+}
 function stopGPlay() {
   if (gPlayTimer) { clearInterval(gPlayTimer); gPlayTimer = null; }
-  $('g-play').innerHTML = '&#9654; Play';
-  $('g-play').classList.remove('on');
+  syncGPlayChips(false);
 }
 function toggleGPlay() {
   if (gPlayTimer) { stopGPlay(); return; }
   gPlayTarget = Math.max(2, G);          // the value in the box when Play was pressed
   gPlayDir = 1;
-  $('g-play').innerHTML = '&#9632; Stop';
-  $('g-play').classList.add('on');
+  syncGPlayChips(true);
   const step = () => {
     const range = gPlayTarget - 2;
     const inc = Math.max(1, Math.round(range / 40));  // ~40 steps each way
@@ -6499,12 +6499,57 @@ function drawGridLabels(ctx, S) {
       ' — too small for "' + widest + '"';
     return;
   }
+  /* At G = 2 or 3 a cell is enormous and one number in the middle of it
+     wastes the space. The room is there, so spend it: the cell's own
+     coordinates, its gcd and the three strip coordinates, stacked. The
+     chosen label mode stays on the top line so switching modes still does
+     something visible. Keyed on the CELL SIZE in pixels rather than on G,
+     because that is the thing that decides whether the lines fit — a phone
+     at G = 3 and a desktop at G = 3 are not the same cell. */
+  const rich = cell >= 108;
   ctx.save();
-  ctx.font = fs + 'px "JetBrains Mono",monospace';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  if (rich) {
+    const rfs = Math.min(fs, Math.max(9, cell / 11));
+    ctx.font = rfs + 'px "JetBrains Mono",monospace';
+    ctx.lineWidth = rfs * LABEL_STROKE;
+    for (let M = 1; M <= g; M++) {
+      for (let r = 1; r <= g; r++) {
+        const x = (r - 0.5) * cell, y = (M - 0.5) * cell;
+        const gg = gcd(r, M), co = gg === 1;
+        const v = slopeB * r - slopeA * M;
+        const inS = v >= offS && v < offS + widthW;
+        const lines = [
+          (mode === 'off' ? '' : labelText(mode, r, M)),
+          '(' + r + ', ' + M + ')',
+          'gcd ' + gg + (co ? '  coprime' : ''),
+          'r\u2212M ' + (r - M) + '   r+M ' + (r + M),
+          'v ' + v + (inS ? '   in strip' : '')
+        ].filter(t => t !== '');
+        upright(ctx, x, y, (ux, uy) => {
+          const y0 = uy - (lines.length - 1) * rfs * 1.5 / 2;
+          lines.forEach((t, i) => {
+            ctx.strokeStyle = 'rgba(4,4,13,.92)';
+            ctx.lineWidth = rfs * LABEL_STROKE * (i === 0 ? 1.15 : 1);
+            ctx.font = (i === 0 ? Math.round(rfs * 1.45) : rfs) +
+                       'px "JetBrains Mono",monospace';
+            ctx.strokeText(t, ux, y0 + i * rfs * 1.5);
+            ctx.fillStyle = i === 0 ? (co ? 'rgba(214,180,86,1)' : 'rgba(255,255,255,.65)')
+                          : i === 4 && inS ? 'rgba(61,200,184,.95)'
+                          : 'rgba(238,232,220,.46)';
+            ctx.fillText(t, ux, y0 + i * rfs * 1.5);
+          });
+        });
+      }
+    }
+    ctx.restore();
+    return;
+  }
+  ctx.font = fs + 'px "JetBrains Mono",monospace';
   // Exactly the stroke the fit budgeted for. The old Math.max(1.2, …) floor
   // could exceed the budget at small sizes and was itself the overflow.
-  ctx.lineWidth = fs * LABEL_STROKE; ctx.lineJoin = 'round';
+  ctx.lineWidth = fs * LABEL_STROKE;
   for (let M = 1; M <= g; M++) {
     for (let r = 1; r <= g; r++) {
       const x = (r - 0.5) * cell, y = (M - 0.5) * cell;
@@ -6659,7 +6704,13 @@ function wireLens() {
   const PAN_SLOP = 6;
   const pts = new Map();
   let pinch0 = 0, pinchK0 = 1, travel = 0;
-  const panning = () => pts.size === 1 && travel > PAN_SLOP;
+  // A one-finger drag only pans when there is something to pan. At plateK = 1
+  // plateClamp pins the offsets to zero, so the drag was a no-op that still
+  // hid the lens and swallowed the click — strictly worse than doing nothing.
+  // Unzoomed, the finger belongs to the loupe, which is how it worked before
+  // the viewport existed. Zoom in and the drag becomes a pan.
+  const canPan = () => plateK > 1;
+  const panning = () => pts.size === 1 && travel > PAN_SLOP && canPan();
 
   const move = e => {
     // Guard on an ACTUAL gesture, not merely on a pointer being down. The
@@ -6709,9 +6760,10 @@ function wireLens() {
       travel = 999; lensParkForZoom(); syncPlateUI(); redraw(false);
     } else {
       travel += Math.abs(dx) + Math.abs(dy);
-      if (travel <= PAN_SLOP) {
-        // Still a hover, not a drag. Drive the lens from here too, so it
-        // follows a finger without depending on touchmove firing.
+      if (travel <= PAN_SLOP || !canPan()) {
+        // Hover, or a drag on an unzoomed plate: either way the loupe owns
+        // the finger. Driving it from pointermove means it follows on touch
+        // without depending on touchmove firing.
         const p = local(cv, e);
         if (p.x >= 0 && p.y >= 0 && p.x <= p.w && p.y <= p.w) {
           lensLast = [p.x, p.y]; drawLens(p.x, p.y);
@@ -6726,7 +6778,7 @@ function wireLens() {
     if (!pts.has(e.pointerId)) return;
     pts.delete(e.pointerId);
     if (pts.size < 2) pinch0 = 0;
-    if (travel > PAN_SLOP) plateMoved = true;
+    if (travel > PAN_SLOP && canPan()) plateMoved = true;
     if (!pts.size) travel = 0;
   };
   cv.addEventListener('pointerup', endPan);
@@ -7743,6 +7795,10 @@ function toggleFS(id) {
     setFSButtonState(otherId, false);
   }
   const cv = $(id);
+  // §3 opens collapsed, so the comet's plate can be inside a folded section.
+  // Pinning a canvas whose section is display:none gives a fixed element with
+  // no measurable size — unfold first, then pin.
+  revealAncestors(cv);
   const wrap = cv.parentElement;
   const on = wrap.classList.toggle('fs-pin');
   // Fullscreen always hides the top toolbar (Explorer / P5 / P6 / P8 /
