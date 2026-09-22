@@ -1643,8 +1643,12 @@ walk anyway.</p>
       of the <a href="https://wessengetachew.github.io/smith/" target="_blank" rel="noopener">C(n) framework</a>,
       the Gap Diagonal Identity split the lattice into diagonal strips and handed off a side quest: follow one
       strip at a time instead of the whole triangle. <a href="https://wessengetachew.github.io/Partition/" target="_blank" rel="noopener">Strip I</a>
-      picked it up first. This is Strip II &mdash; <i>Visualizing Partitio Numerorum</i> &mdash; and, for now,
-      the last thread of that quest. Pick how you want to see it, or jump straight in.
+      picked it up first. This is Strip II &mdash; <i>Visualizing Partitio Numerorum</i>. What's below is the
+      foundational layer underneath all of it: the G lattice in Grid, Ring and Cayley, its coloring, and the
+      lift dynamics &mdash; D(n), the residue spiral, the &plusmn;n path. Strip II built its slope a/b &middot;
+      offset s &middot; width w dynamic on top of this &mdash; the walk that becomes block-coprime density C(n)
+      at slope +1, and is home to the Goldbach strips and partition overlays at slope &minus;1. Pick how you
+      want to see the geometry, or jump straight in.
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
@@ -1682,7 +1686,12 @@ walk anyway.</p>
       <span class="val" id="welcome-rhod-v" style="min-width:32px;">1.80</span>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,2)" title="&rho; runs 0 &rarr; 2, starting at the origin. The innermost rings pile up near &Gamma;(0) = &minus;1.">0&middot;2</button>
     </div>
-    <div class="prow"><span class="plabel">Coloring</span>
+    <div class="prow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
+      <span class="lbl">hole</span>
+      <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
+      <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
+    </div>
+        <div class="prow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
       <button class="chip" onclick="stepWelcome(1)" title="Next coloring (Down arrow)">&#9660;</button>
       <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
@@ -3165,6 +3174,7 @@ const OPENER_CZ_DEFAULT = 0.33;
 /* Cayley map A's rho = rho0 + rhoD*M/G for the preview only: same defaults and
    ranges as the Cayley panel on the page, but its own sliders. */
 let OPENER_RHO0 = 0.4, OPENER_RHOD = 1.8;
+let OPENER_RING_HOLE = 0;   // Ring preview's inner radius, 0..1 &mdash; the page's own "hole" control, mirrored here
 let OPENER_CZ = OPENER_CZ_DEFAULT;   // Cayley preview zoom; below 1 zooms out
 function openerColor(r, M) {
   const mode = $('cmode') ? $('cmode').value : WELCOME_PRESET.cmode;
@@ -3228,12 +3238,13 @@ function olSpiral(ctx, xy, G, dot, lw) {
     }
   }
 }
+// n = 0 is the M/2 diagonal itself (+n and -n path coincide there); n >= 1 splits into two paths.
 function olNPath(ctx, xy, G, n, dot, lw) {
-  const signs = [1, -1];
+  const signs = n === 0 ? [1] : [1, -1];
   for (let si = 0; si < signs.length; si++) {
     const sign = signs[si], pts = [];
     for (let M = 2; M <= G; M++) {
-      const rHalf = (M + sign * Math.max(1, n)) / 2;
+      const rHalf = (M + sign * n) / 2;
       if (rHalf < 1 || rHalf >= M || Math.round(rHalf) !== rHalf) continue;
       const pt = xy(rHalf, M); if (!pt) continue;
       pts.push({ pt: pt, cop: gcd(rHalf, M) === 1 });
@@ -3261,10 +3272,10 @@ function olConnect(ctx, xy, G, n, lw) {
   const p = OL.p, spiral = new Map();
   for (let M = p + 1; M <= G; M++) { if (gcd(p, M) !== 1) continue; const pt = xy(p, M); if (pt) spiral.set(M, pt); }
   ctx.strokeStyle = 'rgba(232,227,219,.35)'; ctx.lineWidth = lw;
-  for (let k = 0; k < 2; k++) {
+  for (let k = 0; k < (n === 0 ? 1 : 2); k++) {
     const sign = k ? -1 : 1;
     for (let M = 2; M <= G; M++) {
-      const rHalf = (M + sign * Math.max(1, n)) / 2;
+      const rHalf = (M + sign * n) / 2;
       if (rHalf < 1 || rHalf >= M || Math.round(rHalf) !== rHalf || gcd(rHalf, M) !== 1) continue;
       const a = spiral.get(M); if (!a) continue;
       const b = xy(rHalf, M); if (!b) continue;
@@ -3272,19 +3283,32 @@ function olConnect(ctx, xy, G, n, lw) {
     }
   }
 }
-// r mod (M+1) is r itself for every r < M, so each line runs (r, M) -> (r, M+1): survives if gcd(r, M+1) = 1.
-function olChain(ctx, xy, G, lw) {
-  const pathLift = new Path2D(), pathDie = new Path2D();
+// r mod (M+1) is r itself for every r < M, so each line runs (r, M) -> (r, M+1). Tied to n through
+// SATURATION, the same p <= n+1 rule the page's own block modes use: once a prime is saturated the
+// block meets every class mod p, so a saturated prime dividing r dooms it regardless of M. At n = 0
+// nothing is saturated yet, so every coprime r connects; raising n peels r's off starting with the
+// ones divisible by 2 (saturates first, at n = 1), then 3 (n = 2), and on up. A broken r loses its
+// LINE the moment it is caught — there is nothing left for it to connect to — but its point stays,
+// as a red dot, so you can watch the doomed set spread without the plate emptying out.
+function olChain(ctx, xy, G, n, lw) {
+  const pathLift = new Path2D();
+  const dieDots = [];
+  const lim = n + 1;
   for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
     if (gcd(r, M) !== 1) continue;
     const A = xy(r, M); if (!A) continue;
+    const spf = spfOf(r), broken = spf !== 0 && spf <= lim;
+    if (broken) { if (OL.broken) dieDots.push(A); continue; }
     const B = xy(r, M + 1); if (!B) continue;
-    const tgt = gcd(r, M + 1) === 1 ? pathLift : pathDie;
-    tgt.moveTo(A[0], A[1]); tgt.lineTo(B[0], B[1]);
+    if (OL.surv) { pathLift.moveTo(A[0], A[1]); pathLift.lineTo(B[0], B[1]); }
   }
   ctx.lineWidth = lw;
   if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathLift); }
-  if (OL.broken) { ctx.strokeStyle = 'rgba(224,80,96,.55)'; ctx.stroke(pathDie); }
+  if (OL.broken) {
+    ctx.fillStyle = 'rgba(224,80,96,.7)';
+    const rad = Math.max(0.6, lw * 0.85);
+    for (let i = 0; i < dieDots.length; i++) { const p = dieDots[i]; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, TAU); ctx.fill(); }
+  }
 }
 function openerDrawLift(ctx, xy, S) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
@@ -3294,7 +3318,7 @@ function openerDrawLift(ctx, xy, S) {
   if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2), cl(cell * 0.24, 0.6, 1.8));
   if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2), cl(cell * 0.3, 0.7, 2.2));
   if (m === 'connect') olConnect(ctx, xy, G, n, cl(cell * 0.2, 0.5, 1.4));
-  if (OL.chain) olChain(ctx, xy, G, cl(cell * 0.25, 0.4, 1.5));
+  if (OL.chain) olChain(ctx, xy, G, n, cl(cell * 0.25, 0.4, 1.5));
   ctx.restore();
 }
 // The lift settings only move the overlays, so redraw the three tiles and leave the tally alone.
@@ -3497,6 +3521,13 @@ function setOpenerRhoD(v) {
   openerRotSoon('x');
 }
 function setOpenerRhoPair(a, b) { setOpenerRho0(a); setOpenerRhoD(b); }
+function setOpenerRingHole(pct) {
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  OPENER_RING_HOLE = pct / 100;
+  const sl = $('welcome-ring-hole'); if (sl && +sl.value !== pct) sl.value = pct;
+  const l = $('welcome-ring-hole-v'); if (l) l.textContent = OPENER_RING_HOLE.toFixed(2);
+  openerRotSoon('r');   // Ring tile only
+}
 function openerCayleyWheel(e) {
   e.preventDefault();
   const sl = $('welcome-cz');
@@ -3542,12 +3573,13 @@ function openerDrawRing(t) {
   const c = openerDPRCanvas('welcome-cv-ring'); if (!c) return;
   const ctx = c.ctx, S = Math.min(c.w, c.h), cx = c.w / 2, cy = c.h / 2;
   const outer = S / 2 * 0.92, dot = Math.max(0.5, Math.min(S * 0.018, outer / OPENER_G * 0.6));
+  const holeR = outer * OPENER_RING_HOLE, holeSpan = outer - holeR;   // rings 1..G pack into [holeR, outer]
   ctx.save();
   if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
   _openerPts.forEach((p, i) => {
     const a = openerPointAlpha(i, t); if (a <= 0) return;
     const r = p[0], M = p[1];
-    const rad = outer * ((M - 0.5) / OPENER_G);
+    const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G);
     const th = TAU * Math.min(r / M, 1);   // canonical 'clamp' angle, independent of the live plate's own mode
     const x = cx + rad * Math.cos(th), y = cy + rad * Math.sin(th);
     const col = openerColor(r, M);
@@ -3557,9 +3589,59 @@ function openerDrawRing(t) {
   });
   ctx.globalAlpha = 1;
   if (t >= 1) openerDrawLift(ctx, (r, M) => {
-    const rad = outer * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
+    const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
     return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
   }, S);
+  openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
+  ctx.restore();
+}
+/* Ring hole >= 0.5: the roots-of-unity reading the page shows once the ring fully
+   collapses (there at hole >= 0.9). Order M is the lift dropdown's own p stepper, so
+   there is one fewer control to add. Ticks are every M-th root, the teal spokes are
+   the primitive ones, and the gold arrow is their vector sum = mu(M): it can only land
+   on 1, on -1, or at the centre, by the same three-way argument as the main page. */
+function openerDrawVoid(ctx, cx, cy, R, rot) {
+  if (OPENER_RING_HOLE < 0.5 || R < 8) return;
+  const M = Math.max(1, Math.min(256, OL.p));
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = Math.max(0.6, R / 90);
+  ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
+  if (M <= 96) {
+    ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.lineWidth = Math.max(0.6, R / 110);
+    for (let r = 1; r <= M; r++) {
+      const th = TAU * r / M;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(th) * R * 0.92, cy + Math.sin(th) * R * 0.92);
+      ctx.lineTo(cx + Math.cos(th) * R, cy + Math.sin(th) * R); ctx.stroke();
+    }
+  }
+  let sx = 0, sy = 0, cnt = 0;
+  ctx.strokeStyle = 'rgba(61,200,184,.30)'; ctx.lineWidth = Math.max(0.6, R / 120);
+  for (let r = 1; r <= M; r++) {
+    if (gcd(r, M) !== 1) continue;
+    const th = TAU * r / M;
+    sx += Math.cos(th); sy += Math.sin(th); cnt++;
+    if (cnt <= 96) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(th) * R, cy + Math.sin(th) * R); ctx.stroke(); }
+  }
+  const mu = mobius(M, SPF || (SPF = buildSPF(Math.max(256, M) + 1))), mag = Math.hypot(sx, sy);
+  if (mag > 1e-9) {
+    const th = Math.atan2(sy, sx), tx = cx + Math.cos(th) * R * Math.min(1, mag), ty = cy + Math.sin(th) * R * Math.min(1, mag);
+    ctx.strokeStyle = 'rgba(242,200,96,.95)'; ctx.lineWidth = Math.max(1.3, R / 34);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.fillStyle = 'rgba(242,200,96,.95)'; ctx.beginPath(); ctx.arc(tx, ty, Math.max(2, R / 22), 0, TAU); ctx.fill();
+  } else {
+    const rr = Math.max(2, R / 24);
+    ctx.strokeStyle = 'rgba(242,200,96,.8)'; ctx.lineWidth = Math.max(1, R / 60);
+    ctx.beginPath(); ctx.arc(cx, cy, rr, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - rr, cy - rr); ctx.lineTo(cx + rr, cy + rr); ctx.moveTo(cx + rr, cy - rr); ctx.lineTo(cx - rr, cy + rr); ctx.stroke();
+  }
+  // Text stays upright regardless of the Ring turn: cancel the rotation just for this.
+  ctx.translate(cx, cy); ctx.rotate(-rot);
+  const fs = Math.max(7, Math.round(R / 8));
+  ctx.font = fs + 'px "JetBrains Mono",monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const muTxt = mu === 0 ? '\u03bc=0 \u2014 cancel' : mu > 0 ? '\u03bc=1 \u2014 \u2192 1' : '\u03bc=\u22121 \u2014 \u2192 \u22121';
+  [['M = ' + M, 'rgba(242,200,96,.85)'], ['\u03c6(M) = ' + cnt, 'rgba(242,200,96,.85)'], [muTxt, 'rgba(238,232,220,.55)']].forEach((t, i) => {
+    ctx.fillStyle = t[1]; ctx.fillText(t[0], 0, R * 0.32 + i * fs * 1.5);
+  });
   ctx.restore();
 }
 /* One (r, M) -> canvas point for the Cayley preview: ring point, Moebius map A at
