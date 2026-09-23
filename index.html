@@ -362,11 +362,22 @@ select{cursor:pointer;}
 #ol-math table{border-collapse:collapse;width:100%;}
 #ol-math td{padding:2px 8px 2px 0;vertical-align:top;}
 #ol-math td.n{text-align:right;color:var(--cream);padding-right:0;overflow-wrap:anywhere;}
-#welcome-preview{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:6px 0 16px;}
+#welcome-preview{display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"grid mid ring" "cay cay cay";gap:10px 8px;margin:6px 0 16px;}
 #welcome-preview .wp-tile{text-align:center;min-width:0;width:100%;}
-#welcome-preview .wp-grid{justify-self:start;max-width:260px;}
-#welcome-preview .wp-ring{justify-self:end;max-width:260px;}
-#welcome-preview .wp-cay{grid-column:1 / -1;justify-self:center;max-width:520px;}
+#welcome-preview .wp-grid{grid-area:grid;justify-self:start;max-width:260px;}
+#welcome-preview .wp-ring{grid-area:ring;justify-self:end;max-width:260px;}
+#welcome-preview .wp-cay{grid-area:cay;justify-self:center;max-width:520px;}
+/* Single-view mode (wvSetView): the other two tiles are display:none, but they
+   were still reserving their grid columns/row -- Grid stayed pinned to the
+   left column with empty ring-column space to its right, Ring stayed pinned
+   right with empty space to its left, and Cayley stayed capped at the same
+   width it uses when sharing the row with the other two. One column, one
+   area, and a wider cap on whichever tile is actually showing fixes all three. */
+#welcome-preview.wv-solo{grid-template-columns:1fr;grid-template-areas:"solo";}
+#welcome-preview.wv-solo .wp-tile{grid-area:solo;justify-self:center;}
+/* Lines up with the bottom of the Grid/Ring tiles, right beside their own turn rows. */
+.wp-allturn{grid-area:mid;align-self:end;justify-self:center;padding-bottom:1px;}
+.wp-allturn button{writing-mode:horizontal-tb;white-space:nowrap;padding:3px 6px;font-size:12px;}
 #welcome-preview canvas{width:100%;height:auto;display:block;border-radius:8px;background:#0c0e1a;}
 #welcome-cv-grid,#welcome-cv-ring{aspect-ratio:1 / 1;}
 #welcome-cv-cayley{aspect-ratio:2 / 1;}
@@ -1636,8 +1647,12 @@ walk anyway.</p>
   <div class="export-box" style="max-width:660px;">
     <div class="export-hd">
       <span>The Opener &middot; Strip Arithmetic II</span>
-      <button class="btn" onclick="closeWelcomeModal()" title="Close">&times;</button>
+      <span style="display:inline-flex;align-items:center;gap:8px;">
+        <button class="chip tl on" id="welcome-music-btn" onclick="toggleOpenerMusic()" title="Riemann Zeta Function, by Vince Rubinetti &mdash; the track written for 3Blue1Brown's own zeta function video. Plays while the opener is open.">&#9835; Music</button>
+        <button class="btn" onclick="closeWelcomeModal()" title="Close">&times;</button>
+      </span>
     </div>
+    <div id="welcome-music-slot" style="height:0;overflow:hidden;"></div>
     <div class="pnote" style="padding:2px 0 12px;line-height:1.7;">
       Back on <a href="https://wessengetachew.github.io/smith/page5.html" target="_blank" rel="noopener">Page 5</a>
       of the <a href="https://wessengetachew.github.io/smith/" target="_blank" rel="noopener">C(n) framework</a>,
@@ -1652,8 +1667,12 @@ walk anyway.</p>
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
+      <button class="chip" onclick="stepOpenerG(-1)" title="G &minus; 1">&minus;</button>
+      <button class="chip" onclick="stepOpenerG(1)" title="G + 1">+</button>
+      <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
+      <button class="chip" onclick="stepOpenerGPrime(1)" title="Next prime G">p&#9654;</button>
       <button class="chip tl on" id="welcome-g-play" onclick="toggleOpenerPlay()" title="Loop the preview lattice from G = 2 up to 100 and back. Plays when the opener opens; dragging the slider stops it.">&#9632; Stop</button>
-      <input type="range" id="welcome-g" min="2" max="256" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 160px;min-width:120px;" title="Size of the preview lattice only, 2 to 256. Doesn't change the G on the page.">
+      <input type="range" id="welcome-g" min="2" max="256" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 256. Doesn't change the G on the page.">
       <span class="hint">preview only</span>
     </div>
     <div class="prow">
@@ -1661,11 +1680,22 @@ walk anyway.</p>
       <input type="range" id="welcome-cz" min="-1.7" max="0.3" step="0.01" value="-0.48" oninput="setOpenerCZ(this.value)" style="flex:1 1 160px;min-width:120px;" title="Zoom the Cayley preview out to reach the points that map far from the centre. Mouse wheel over the Cayley tile does the same; double-click returns to 0.33\u00d7.">
       <span class="hint">zoom out for the far points</span>
     </div>
+    <div class="prow" style="padding:2px 0 6px;">
+      <span class="lbl">view</span>
+      <button class="chip wv-view-btn" data-v="grid" onclick="wvSetView('grid')" title="Just the Grid tile — lighter to redraw and to Play than all three at once.">Grid</button>
+      <button class="chip wv-view-btn" data-v="ring" onclick="wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
+      <button class="chip wv-view-btn" data-v="cayley" onclick="wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
+      <button class="chip wv-view-btn on" data-v="all3" onclick="wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
+      <span class="hint">one view at a time redraws faster</span>
+    </div>
     <div id="welcome-preview">
       <div class="wp-tile wp-grid">
         <canvas id="welcome-cv-grid"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">GRID</div>
         <div class="wcrot wturn" title="Turn the Grid preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('g',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crg-v" style="min-width:30px;text-align:center;">0&deg;</span><button class="chip" onclick="openerTurn('g',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+      </div>
+      <div class="wp-allturn">
+        <button class="chip tl" onclick="openerTurnAll(90)" title="Turn Grid, Ring, and the Cayley z axis all by +90&deg; at once. Preview only.">&#8634;<br>90&deg;<br>all</button>
       </div>
       <div class="wp-tile wp-ring">
         <canvas id="welcome-cv-ring"></canvas>
@@ -1725,6 +1755,25 @@ walk anyway.</p>
       <div class="subbody"><div id="ol-math"></div></div>
     </div>
     <div id="welcome-work"></div>
+    <div class="subtoggle collapsed" id="oe-toggle" onclick="toggleSub(this)"><span class="car">&#9662;</span><span>Export</span></div>
+    <div class="subbody">
+      <div class="prow">
+        <span class="lbl">view</span>
+        <button class="chip oe-view-btn" data-v="grid" onclick="oeSetView('grid')" title="Just the Grid tile, 4096&times;4096.">Grid</button>
+        <button class="chip oe-view-btn" data-v="ring" onclick="oeSetView('ring')" title="Just the Ring tile, 4096&times;4096.">Ring</button>
+        <button class="chip oe-view-btn" data-v="cayley" onclick="oeSetView('cayley')" title="Just the Cayley tile, at the ratio chosen below.">Cayley</button>
+        <button class="chip oe-view-btn on" data-v="all3" onclick="oeSetView('all3')" title="Grid and Ring side by side on top, Cayley the same size below, clipped to its tile so it can't spill into the row above &mdash; legend panels fill the space either side, 4096px wide.">All 3</button>
+      </div>
+      <div class="prow" id="oe-cay-row">
+        <span class="lbl">Cayley ratio</span>
+        <button class="chip oe-ratio-btn" data-r="2:1" onclick="oeSetRatio('2:1')" title="Matches the opener's own Cayley tile.">2:1</button>
+        <button class="chip oe-ratio-btn on" data-r="1:1" onclick="oeSetRatio('1:1')" title="Square, matching Grid and Ring \u2014 the default.">1:1</button>
+      </div>
+      <div class="prow">
+        <button class="btn" id="oe-go-btn" onclick="runOpenerExport()" title="Compose the selected view(s) at 4096px wide, with a title, subtitle and legend reading the opener's current settings, and download a PNG.">&#8681; Download 4K PNG</button>
+        <span id="oe-msg" class="hint"></span>
+      </div>
+    </div>
     <div class="ctrls" style="margin-top:16px;">
       <label style="display:inline-flex;align-items:center;gap:5px;color:var(--cream2);cursor:pointer;">
         <input type="checkbox" id="welcome-noshow-chk"> Don't show this again
@@ -3176,9 +3225,36 @@ const OPENER_CZ_DEFAULT = 0.33;
 let OPENER_RHO0 = 0.4, OPENER_RHOD = 1.8;
 let OPENER_RING_HOLE = 0;   // Ring preview's inner radius, 0..1 &mdash; the page's own "hole" control, mirrored here
 let OPENER_CZ = OPENER_CZ_DEFAULT;   // Cayley preview zoom; below 1 zooms out
+/* Opener's own gcd=1 bitset, built once for the full 2..256 range the preview
+   slider covers -- same sieve-and-clear approach as the page's own buildCoprime,
+   just small enough (256x256 = 65536 cells, 8 KB) to build synchronously with no
+   chunking or progress bar. Every G from 2 to 256 then just indexes into this one
+   array instead of rebuilding, and openerColor stops paying for a fresh gcd() per
+   point per redraw -- the thing that made Play / rotation / large G laggy. */
+const OPENER_COP_MAX = 256;
+let OPENER_COP = null;
+function buildOpenerCop() {
+  if (OPENER_COP) return;
+  const g = OPENER_COP_MAX, words = Math.ceil((g * g) / 32);
+  const bits = new Uint32Array(words).fill(0xFFFFFFFF);
+  const ps = (PRIMES || primesUpTo(OPENER_COP_MAX)).filter(p => p <= g);
+  for (const p of ps) {
+    for (let M = p; M <= g; M += p) {
+      const row = (M - 1) * g - 1;
+      for (let r = p; r <= g; r += p) { const idx = row + r; bits[idx >>> 5] &= ~(1 << (idx & 31)); }
+    }
+  }
+  OPENER_COP = bits;
+}
+function openerIsCop(r, M) {
+  if (r < 1 || M < 1 || r > OPENER_COP_MAX || M > OPENER_COP_MAX) return gcd(r, M) === 1;
+  if (!OPENER_COP) buildOpenerCop();
+  const g = OPENER_COP_MAX, idx = (M - 1) * g + (r - 1);
+  return !!((OPENER_COP[idx >>> 5] >>> (idx & 31)) & 1);
+}
 function openerColor(r, M) {
   const mode = $('cmode') ? $('cmode').value : WELCOME_PRESET.cmode;
-  try { return cellRGBA(mode, gcd(r, M) === 1 ? 1 : 0, r, M); } catch (e) { return COPRIME_RGBA; }
+  try { return cellRGBA(mode, openerIsCop(r, M) ? 1 : 0, r, M); } catch (e) { return COPRIME_RGBA; }
 }
 function openerPoints() {
   const pts = [];
@@ -3192,10 +3268,44 @@ function openerSquarePoints() {
   for (let M = 1; M <= OPENER_G; M++) for (let r = 1; r <= OPENER_G; r++) pts.push([r, M]);
   return pts;
 }
+/* Single-view mode for the opener's LIVE preview (separate from the export's
+   own view selector below). Default keeps all three; picking one skips the
+   other two entirely at draw time -- not just hides their canvas -- so Play,
+   rotation and the G slider have a third of the work while it's on. */
+let OPENER_VIEW = 'all3';
+function wvShows(which) { return OPENER_VIEW === 'all3' || OPENER_VIEW === which; }
+function wvSetView(v) {
+  OPENER_VIEW = v;
+  document.querySelectorAll('.wv-view-btn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  const wp = $('welcome-preview'); if (!wp) return;
+  const g = wp.querySelector('.wp-grid'), r = wp.querySelector('.wp-ring'),
+        c = wp.querySelector('.wp-cay'), at = wp.querySelector('.wp-allturn');
+  if (g) g.style.display = wvShows('grid') ? '' : 'none';
+  if (r) r.style.display = wvShows('ring') ? '' : 'none';
+  if (c) c.style.display = wvShows('cayley') ? '' : 'none';
+  if (at) at.style.display = (OPENER_VIEW === 'all3') ? '' : 'none';
+  const solo = OPENER_VIEW !== 'all3';
+  wp.classList.toggle('wv-solo', solo);
+  // Each tile's normal max-width is sized to share the row with the other
+  // two -- with only one showing, let it use roughly double that (Cayley's
+  // cap was already close to the modal's own width, so it grows to fill it).
+  const SOLO_MAXW = { grid: 520, ring: 520, cayley: 600 };
+  [['grid', g], ['ring', r], ['cayley', c]].forEach(([name, el]) => {
+    if (!el) return;
+    el.style.maxWidth = (solo && OPENER_VIEW === name) ? SOLO_MAXW[name] + 'px' : '';
+  });
+  openerRedrawSoon();
+}
 let _openerPts = null, _openerSq = null, _openerRaf = 0;
 function openerRedrawSoon() {
   if (_openerRaf) return;
   _openerRaf = requestAnimationFrame(() => { _openerRaf = 0; renderOpenerPreview(false); });
+}
+function stepOpenerG(delta) { stopOpenerPlay(); setOpenerG(OPENER_G + delta); }
+function stepOpenerGPrime(dir) {
+  stopOpenerPlay();
+  const q = dir > 0 ? nextPrime(OPENER_G) : prevPrime(OPENER_G);
+  setOpenerG(q);
 }
 function setOpenerG(v) {
   OPENER_G = Math.max(2, Math.min(256, Math.round(+v) || 13));
@@ -3213,6 +3323,20 @@ function setOpenerG(v) {
    chain are on by default. */
 const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true };
 function openerLiftN() { return Math.max(0, Math.min(OPENER_G - 1, OL.n)); }
+/* Three states, shared by the chain and the +-n path: 'dead' once a saturated prime
+   (p <= n+1) already divides it -- gone for good, so only its point remains, no line.
+   'warn' if the very NEXT prime to saturate (p = n+2, when n+2 happens to be prime)
+   divides it -- still connected right now, but it is what n=0 -> 1 (or whichever step
+   comes next) is about to take out, so it draws red while everything else stays teal/gold.
+   'safe' otherwise. Stepping n by 1 often leaves the set unchanged (n+2 composite adds no
+   new prime); the picture only moves on the steps where n+2 is itself prime. */
+function olClassify(r, n) {
+  const spf = spfOf(r);
+  if (!spf) return 'safe';
+  if (spf <= n + 1) return 'dead';
+  if (spf === n + 2) return 'warn';
+  return 'safe';
+}
 function olSpiral(ctx, xy, G, dot, lw) {
   const p = OL.p;
   if (p > G || !OL.surv) return;
@@ -3239,32 +3363,40 @@ function olSpiral(ctx, xy, G, dot, lw) {
   }
 }
 // n = 0 is the M/2 diagonal itself (+n and -n path coincide there); n >= 1 splits into two paths.
+// A step is "broken" the same way the chain overlay defines it: a saturated prime (p <= n+1)
+// divides this rHalf, so it's doomed regardless of M. n = 0 to n = 1 is the very first step
+// where anything can break (p = 2 saturates), so that's where the first red segments appear.
 function olNPath(ctx, xy, G, n, dot, lw) {
   const signs = n === 0 ? [1] : [1, -1];
   for (let si = 0; si < signs.length; si++) {
     const sign = signs[si], pts = [];
     for (let M = 2; M <= G; M++) {
       const rHalf = (M + sign * n) / 2;
-      if (rHalf < 1 || rHalf >= M || Math.round(rHalf) !== rHalf) continue;
+      if (rHalf < 1 || rHalf >= M || Math.round(rHalf) !== rHalf || gcd(rHalf, M) !== 1) continue;
       const pt = xy(rHalf, M); if (!pt) continue;
-      pts.push({ pt: pt, cop: gcd(rHalf, M) === 1 });
+      pts.push({ pt: pt, cls: olClassify(rHalf, n) });
     }
-    ctx.strokeStyle = sign > 0 ? 'rgba(200,168,74,.95)' : 'rgba(155,127,232,.9)';
+    const survColor = sign > 0 ? 'rgba(200,168,74,.95)' : 'rgba(155,127,232,.9)';
     ctx.lineWidth = lw; ctx.setLineDash([3, 3]);
-    let started = false;
+    let started = false, curCls = null;
+    // 'dead' never gets a line -- only its dot, drawn below -- so it always breaks a run.
     for (let i = 0; i < pts.length; i++) {
-      const show = pts[i].cop ? OL.surv : OL.broken;
-      if (!show) { if (started) ctx.stroke(); started = false; continue; }
+      const cls = pts[i].cls;
+      const show = cls === 'safe' ? OL.surv : cls === 'warn' ? OL.broken : false;
+      if (!show || cls !== curCls) { if (started) ctx.stroke(); started = false; }
+      if (!show) { curCls = null; continue; }
+      ctx.strokeStyle = cls === 'warn' ? 'rgba(224,80,96,.9)' : survColor;
       if (!started) { ctx.beginPath(); ctx.moveTo(pts[i].pt[0], pts[i].pt[1]); started = true; }
       else ctx.lineTo(pts[i].pt[0], pts[i].pt[1]);
+      curCls = cls;
     }
     if (started) ctx.stroke();
     ctx.setLineDash([]);
     for (let i = 0; i < pts.length; i++) {
-      const cop = pts[i].cop;
-      if (cop ? !OL.surv : !OL.broken) continue;
-      ctx.fillStyle = cop ? (sign > 0 ? 'rgba(200,168,74,.9)' : 'rgba(155,127,232,.9)') : 'rgba(224,80,96,.55)';
-      ctx.beginPath(); ctx.arc(pts[i].pt[0], pts[i].pt[1], cop ? dot : dot * 0.7, 0, TAU); ctx.fill();
+      const cls = pts[i].cls;
+      if ((cls === 'safe' && !OL.surv) || (cls !== 'safe' && !OL.broken)) continue;
+      ctx.fillStyle = cls === 'safe' ? (sign > 0 ? 'rgba(200,168,74,.9)' : 'rgba(155,127,232,.9)') : 'rgba(224,80,96,.7)';
+      ctx.beginPath(); ctx.arc(pts[i].pt[0], pts[i].pt[1], cls === 'safe' ? dot : dot * 0.7, 0, TAU); ctx.fill();
     }
   }
 }
@@ -3291,20 +3423,21 @@ function olConnect(ctx, xy, G, n, lw) {
 // LINE the moment it is caught — there is nothing left for it to connect to — but its point stays,
 // as a red dot, so you can watch the doomed set spread without the plate emptying out.
 function olChain(ctx, xy, G, n, lw) {
-  const pathLift = new Path2D();
+  const pathSafe = new Path2D(), pathWarn = new Path2D();
   const dieDots = [];
-  const lim = n + 1;
   for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
     if (gcd(r, M) !== 1) continue;
     const A = xy(r, M); if (!A) continue;
-    const spf = spfOf(r), broken = spf !== 0 && spf <= lim;
-    if (broken) { if (OL.broken) dieDots.push(A); continue; }
+    const cls = olClassify(r, n);
+    if (cls === 'dead') { if (OL.broken) dieDots.push(A); continue; }
     const B = xy(r, M + 1); if (!B) continue;
-    if (OL.surv) { pathLift.moveTo(A[0], A[1]); pathLift.lineTo(B[0], B[1]); }
+    if (cls === 'warn') { if (OL.broken) { pathWarn.moveTo(A[0], A[1]); pathWarn.lineTo(B[0], B[1]); } }
+    else if (OL.surv) { pathSafe.moveTo(A[0], A[1]); pathSafe.lineTo(B[0], B[1]); }
   }
   ctx.lineWidth = lw;
-  if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathLift); }
+  if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathSafe); }
   if (OL.broken) {
+    ctx.strokeStyle = 'rgba(224,80,96,.85)'; ctx.stroke(pathWarn);
     ctx.fillStyle = 'rgba(224,80,96,.7)';
     const rad = Math.max(0.6, lw * 0.85);
     for (let i = 0; i < dieDots.length; i++) { const p = dieDots[i]; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, TAU); ctx.fill(); }
@@ -3328,7 +3461,7 @@ function openerOverlaySoon() {
   _olRaf = requestAnimationFrame(() => {
     _olRaf = 0;
     if (_openerAnimHandle || !_openerPts) return;
-    openerDrawGrid(1); openerDrawRing(1); openerDrawCayley(1);
+    if (wvShows('grid')) openerDrawGrid(1); if (wvShows('ring')) openerDrawRing(1); if (wvShows('cayley')) openerDrawCayley(1);
   });
 }
 function olRedraw() { olSyncUI(); openerOverlaySoon(); }
@@ -3453,9 +3586,9 @@ function openerRotSoon(axis) {
     _openerRotRaf = 0;
     const d = _openerRotDirty; _openerRotDirty = {};
     if (_openerAnimHandle || !_openerPts) return;
-    if (d.grid) openerDrawGrid(1);
-    if (d.ring) openerDrawRing(1);
-    if (d.cay) openerDrawCayley(1);
+    if (d.grid && wvShows('grid')) openerDrawGrid(1);
+    if (d.ring && wvShows('ring')) openerDrawRing(1);
+    if (d.cay && wvShows('cayley')) openerDrawCayley(1);
   });
 }
 function setOpenerRot(axis, v, fromInput) {
@@ -3495,6 +3628,331 @@ function toggleOpenerRotPlay(axis) {
 // to whole degrees and rewrites the box, which would eat what was just typed.
 function openerRotInput(axis, el) { const v = el.value; stopOpenerRotPlay(axis); setOpenerRot(axis, v, true); }
 // Grid / Ring: +-90 per click, always landing on a multiple of 90.
+/* ── Opener export: a 4096px-wide PNG of the current preview state ─────── */
+const OE = { view: 'all3', cayRatio: '1:1' };
+function oeSetView(v) {
+  OE.view = v;
+  document.querySelectorAll('.oe-view-btn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  // All 3 now always draws Cayley as a square the same size as Grid/Ring, so
+  // the ratio picker only matters for a standalone Cayley export.
+  const row = $('oe-cay-row'); if (row) row.style.display = (v === 'cayley') ? '' : 'none';
+}
+function oeSetRatio(r) {
+  OE.cayRatio = r;
+  document.querySelectorAll('.oe-ratio-btn').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+}
+// Reads back everything the preview is currently doing, so the exported PNG's
+// title/subtitle/legend can never drift from what the picture actually shows.
+function oeSummary() {
+  const sel = $('cmode'), coloring = (sel && sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
+  const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
+  let lift = 'Lift: ' + modeLabel + ' \u00b7 n=' + openerLiftN() + ' \u00b7 p=' + OL.p;
+  if (OL.chain) lift += ' \u00b7 r\u2192r mod(M+1) on';
+  if (!OL.surv) lift += ' \u00b7 surviving off';
+  if (!OL.broken) lift += ' \u00b7 broken off';
+  const rot = [];
+  if (OPENER_ROT.x) rot.push('x ' + Math.round(OPENER_ROT.x) + '\u00b0');
+  if (OPENER_ROT.y) rot.push('y ' + Math.round(OPENER_ROT.y) + '\u00b0');
+  if (OPENER_ROT.z) rot.push('z ' + Math.round(OPENER_ROT.z) + '\u00b0');
+  if (OPENER_ROT.g) rot.push('grid ' + Math.round(OPENER_ROT.g) + '\u00b0');
+  if (OPENER_ROT.r) rot.push('ring ' + Math.round(OPENER_ROT.r) + '\u00b0');
+  let rho = 'Cayley \u03c1 = ' + OPENER_RHO0.toFixed(2) + ' + ' + OPENER_RHOD.toFixed(2) + '\u00b7M/G';
+  if (OPENER_RING_HOLE) rho += ' \u00b7 ring hole ' + OPENER_RING_HOLE.toFixed(2);
+  return { g: OPENER_G, coloring: coloring, lift: lift, rot: rot.length ? 'Rotation: ' + rot.join(' \u00b7 ') : '', rho: rho };
+}
+// Letter-spaced caps for the eyebrow line, the way the page's own export does it by
+// hand: "slope width" -> "S L O P E   W I D T H" (single space within a word, three
+// between words) -- canvas has no letter-spacing property, so this is done in the string.
+// Same tally renderOpenerWork computes for the on-screen table (band counts for the
+// current coloring mode), returned as data instead of HTML so the export can draw it.
+function oeTallyData() {
+  const mode = $('cmode').value, G = OPENER_G;
+  try { gaussSieve(Math.max(COP_G, G)); } catch (e) {}
+  const map = new Map(); let total = 0, cop = 0;
+  for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) {
+    total++; if (gcd(r, M) === 1) cop++;
+    const c = openerClass(mode, r, M);
+    let e = map.get(c.l);
+    if (!e) { e = { l: c.l, k: c.k, n: 0, r, M }; map.set(c.l, e); }
+    e.n++;
+  }
+  let rows = [...map.values()].sort((a, b) => a.k - b.k || b.n - a.n);
+  let more = null;
+  if (rows.length > 10) { const rest = rows.slice(9); more = { classes: rest.length, n: rest.reduce((t, e) => t + e.n, 0) }; rows = rows.slice(0, 9); }
+  const pct = n => (100 * n / total).toFixed(n * 1000 < total ? 2 : 1) + '%';
+  const swatch = e => { let col; try { col = openerColor(e.r, e.M); } catch (x) { col = COPRIME_RGBA; } return col[3] === 0 ? null : 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (col[3] / 255).toFixed(2) + ')'; };
+  const sum = rows.reduce((t, e) => t + e.n, 0) + (more ? more.n : 0);
+  const ph = openerPhiTerms(G);
+  return {
+    rule: openerRule(mode),
+    header: 'the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2',
+    rows: rows.map(e => ({ sw: swatch(e), label: e.l, n: e.n, pct: pct(e.n) })),
+    more: more ? { label: '+ ' + more.classes + ' more classes', n: more.n, pct: pct(more.n) } : null,
+    sumOk: sum === total, sum: sum, total: total,
+    gcdLine: 'gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' + (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum,
+    gcdOk: cop === ph.sum,
+    bandLine: (mode === 'ethiopia' || mode === 'ethiodepth' || mode === 'ethioinv') ? 'each band tends to G\u00b2/6 = ' + (G * G / 6).toFixed(1) + ' cells as G grows' : null
+  };
+}
+// Measures the tally table's height before the canvas exists (same two-pass approach as
+// the categorized legend below it), wrapping a long label rather than letting it clip.
+function oeLayoutTally(data, W) {
+  const mctx = document.createElement('canvas').getContext('2d'), px = 24, lh = 36, sw = 26, numW = 220;
+  mctx.font = px + 'px ' + MONO;
+  const wrap = (text, maxW) => { const words = text.split(' '), lines = []; let cur = ''; for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; } if (cur) lines.push(cur); return lines; };
+  const labelW = W - sw - 14 - numW;
+  const allRows = data.rows.concat(data.more ? [data.more] : []);
+  const laid = allRows.map(r => ({ ...r, lines: wrap(r.label, labelW) }));
+  const rowsH = laid.reduce((t, r) => t + Math.max(1, r.lines.length) * lh, 0);
+  const footLines = [data.sumOk ? null : 'sum mismatch', data.gcdLine, data.bandLine].filter(Boolean).length;
+  const h = 30 + 28 + rowsH + 20 + footLines * 28 + 30;
+  return { h: h, px: px, lh: lh, sw: sw, numW: numW, laid: laid };
+}
+function oeDrawTally(ctx, data, L, x, y, W) {
+  ctx.save(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = PAL.cream3; ctx.font = '15px ' + MONO;
+  ctx.fillText(data.rule, x, y + 20);
+  ctx.fillText(data.header, x, y + 46);
+  let cy = y + 46 + 40;
+  L.laid.forEach(r => {
+    if (r.sw) { ctx.fillStyle = r.sw; ctx.fillRect(x, cy - L.px * 0.72, L.sw * 0.6, L.sw * 0.6); }
+    ctx.fillStyle = PAL.cream2; ctx.font = L.px + 'px ' + MONO;
+    r.lines.forEach((line, i) => ctx.fillText(line, x + L.sw, cy + i * L.lh));
+    ctx.textAlign = 'right'; ctx.fillStyle = PAL.cream; ctx.font = '600 ' + L.px + 'px ' + MONO;
+    ctx.fillText(String(r.n), x + W - L.numW * 0.42, cy);
+    ctx.fillStyle = PAL.cream3; ctx.font = L.px + 'px ' + MONO;
+    ctx.fillText(r.pct, x + W, cy);
+    ctx.textAlign = 'left';
+    cy += Math.max(1, r.lines.length) * L.lh;
+  });
+  cy += 24;
+  ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x, cy - 12); ctx.lineTo(x + W, cy - 12); ctx.stroke();
+  ctx.font = '15px ' + MONO;
+  if (!data.sumOk) { ctx.fillStyle = PAL.coral; ctx.fillText('classes sum to ' + data.sum + ' \u2260 ' + data.total, x, cy); cy += 28; }
+  ctx.fillStyle = PAL.cream3; ctx.fillText(data.gcdLine + (data.gcdOk ? ' \u2713' : ' \u2260'), x, cy); cy += 28;
+  if (data.bandLine) { ctx.fillText(data.bandLine, x, cy); cy += 28; }
+  ctx.restore();
+}
+function oeSpacedCaps(s) { return s.toUpperCase().split(' ').map(w => w.split('').join(' ')).join('   '); }
+function oeViewTitle() {
+  return { grid: 'The Grid View', ring: 'The Ring View', cayley: 'The Cayley View', all3: 'Grid, Ring & Cayley' }[OE.view];
+}
+// [swatch color or null, text] pairs, grouped the way the page's own export legend is:
+// a VIEW section (coloring, rotation, rho/hole) and, when anything is on, a LIFT DYNAMICS
+// section (mode, n, p, chain, saturated primes, D(n)/C(n)) -- same shape, opener's own facts.
+function oeLegendSections() {
+  const sel = $('cmode'), coloring = (sel && sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
+  const vi = [{ c: null, t: 'coloring ' + coloring }];
+  const rot = [];
+  if (OPENER_ROT.x) rot.push('x ' + Math.round(OPENER_ROT.x) + '\u00b0');
+  if (OPENER_ROT.y) rot.push('y ' + Math.round(OPENER_ROT.y) + '\u00b0');
+  if (OPENER_ROT.z) rot.push('z ' + Math.round(OPENER_ROT.z) + '\u00b0');
+  if (OPENER_ROT.g) rot.push('grid ' + Math.round(OPENER_ROT.g) + '\u00b0');
+  if (OPENER_ROT.r) rot.push('ring ' + Math.round(OPENER_ROT.r) + '\u00b0');
+  if (rot.length) vi.push({ c: null, t: 'turn ' + rot.join(', ') });
+  vi.push({ c: PAL.gold, t: 'Cayley \u03c1 = ' + OPENER_RHO0.toFixed(2) + ' + ' + OPENER_RHOD.toFixed(2) + '\u00b7M/G' + (OPENER_CZ !== OPENER_CZ_DEFAULT ? ' \u00b7 zoom ' + OPENER_CZ.toFixed(2) + '\u00d7' : '') });
+  if (OPENER_RING_HOLE) vi.push({ c: null, t: 'ring hole ' + OPENER_RING_HOLE.toFixed(2) + (OPENER_RING_HOLE >= 0.5 ? ' \u00b7 roots-of-unity reading on' : '') });
+  const out = [{ title: 'VIEW', items: vi }];
+  const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
+  if (OL.mode !== 'none' || OL.chain) {
+    const n = openerLiftN(), li = [{ c: null, t: 'mode ' + modeLabel + ' \u00b7 n = ' + n + ' \u00b7 block length ' + (n + 1) }];
+    if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect')
+      li.push({ c: PAL.teal, t: 'spiral r = ' + (OL.p === 1 ? '1 (locked residue)' : 'p = ' + OL.p) + ' \u00b7 teal above p/M = 0.5, coral below' });
+    if (OL.mode === 'npath' || OL.mode === 'both' || OL.mode === 'connect')
+      li.push({ c: PAL.amber, t: '\u00b1n path r = (M\u00b1' + n + ')/2' });
+    if (OL.mode === 'connect') li.push({ c: PAL.cream3, t: 'connectors joining spiral and \u00b1n path at shared rings' });
+    if (OL.chain) li.push({ c: PAL.teal, t: 'r \u2192 r mod(M+1) \u00b7 teal survives, red dot dies' });
+    li.push({ c: null, t: 'showing ' + [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both off)' });
+    let D = NaN; try { D = Dn(n); } catch (e) {}
+    const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
+    li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') });
+    if (isFinite(D)) li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
+    out.push({ title: 'LIFT DYNAMICS', items: li });
+  }
+  return out;
+}
+// Word-wraps each item into its column and measures the total height before the
+// canvas exists, the same two-pass approach the page's own detail band uses, so the
+// export grows to fit the legend instead of clipping it.
+function oeLayoutLegend(sections, W) {
+  if (!sections.length) return { h: 0, cols: [], colW: 0 };
+  const mctx = document.createElement('canvas').getContext('2d');
+  const px = 22, lh = 32, gap = 40, swW = 22;
+  mctx.font = px + 'px ' + MONO;
+  // W arrives already inset by the caller's own pad (same as the page's own
+  // drawDetailBand) -- subtracting a second pad here left the columns each
+  // narrow and pushed toward the middle, with wide dead space left and right.
+  const ncol = Math.min(sections.length, 2), innerW = W;
+  const colW = (innerW - gap * (ncol - 1)) / ncol;
+  const wrap = (text, maxW) => {
+    const words = text.split(' '), lines = []; let cur = '';
+    for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur);
+    return lines;
+  };
+  const cols = Array.from({ length: ncol }, () => ({ blocks: [], h: 0 }));
+  sections.forEach((sec, i) => {
+    const lay = sec.items.map(it => ({ c: it.c, lines: wrap(it.t, colW - swW - 14) }));
+    const nLines = lay.reduce((a, b) => a + b.lines.length, 0);
+    const h = 46 + nLines * lh + lay.length * 6 + 16;
+    cols[Math.min(i, ncol - 1)].blocks.push({ title: sec.title, lay, h });
+    cols[Math.min(i, ncol - 1)].h += h;
+  });
+  return { h: Math.max.apply(null, cols.map(c => c.h)) + 64, cols, colW, gap, px, lh, swW };
+}
+function oeDrawLegend(ctx, L, x, y, W) {
+  if (!L.h) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + W, y); ctx.stroke();
+  ctx.fillStyle = PAL.gold; ctx.font = '22px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('LEGEND \u00b7 WHAT\u2019S ON, RIGHT NOW', x, y + 34);
+  L.cols.forEach((col, ci) => {
+    let cy = y + 78;
+    const cx = x + ci * (L.colW + L.gap);
+    col.blocks.forEach(b => {
+      ctx.fillStyle = PAL.cream3; ctx.font = '13.5px ' + MONO;
+      ctx.fillText(b.title, cx, cy); cy += 26;
+      b.lay.forEach(it => {
+        if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(cx, cy - L.px * 0.78, L.swW * 0.5, L.swW * 0.5); }
+        ctx.fillStyle = PAL.cream2; ctx.font = L.px + 'px ' + MONO;
+        it.lines.forEach((line, li) => { ctx.fillText(line, cx + L.swW, cy); cy += L.lh; });
+        cy += 6;
+      });
+      cy += 12;
+    });
+  });
+  ctx.restore();
+}
+// Word-wraps a legend section into lines for a narrow side panel -- same
+// measuring approach as oeLayoutLegend/layoutDetailBand, just one column wide.
+function oeSidePanelLines(section, w) {
+  if (!section) return null;
+  const mctx = document.createElement('canvas').getContext('2d');
+  const px = 20, lh = 28, swW = 20;
+  mctx.font = px + 'px ' + MONO;
+  const wrap = (text, maxW) => {
+    const words = text.split(' '), lines = []; let cur = '';
+    for (const wd of words) { const t = cur ? cur + ' ' + wd : wd; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = wd; } else cur = t; }
+    if (cur) lines.push(cur);
+    return lines;
+  };
+  return { title: section.title, lay: section.items.map(it => ({ c: it.c, lines: wrap(it.t, Math.max(40, w - swW - 12)) })), px, lh, swW };
+}
+function oeDrawSidePanel(ctx, panel, x, y, w) {
+  if (!panel) return;
+  ctx.save(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = PAL.gold; ctx.font = '20px ' + MONO;
+  ctx.fillText(panel.title, x, y);
+  let cy = y + 36;
+  panel.lay.forEach(it => {
+    if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(x, cy - panel.px * 0.78, panel.swW * 0.55, panel.swW * 0.55); }
+    ctx.fillStyle = PAL.cream2; ctx.font = panel.px + 'px ' + MONO;
+    it.lines.forEach(line => { ctx.fillText(line, x + panel.swW, cy); cy += panel.lh; });
+    cy += 8;
+  });
+  ctx.restore();
+}
+async function runOpenerExport() {
+  const msg = $('oe-msg'), btn = $('oe-go-btn');
+  if (msg) msg.textContent = 'Rendering\u2026';
+  if (btn) btn.disabled = true;
+  await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));   // let "Rendering..." actually paint
+  try {
+    const W = 4096, pad = 64, gap = 28, ratio = OE.cayRatio === '1:1' ? 1 : 2;
+    const viewLabel = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley', all3: 'Grid \u00b7 Ring \u00b7 Cayley' }[OE.view];
+    stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay();
+    // Header, same shape as the page's own export: a letter-spaced eyebrow, a serif
+    // title, then measured-lattice stats right-aligned against the title -- computed
+    // here from the actual point set, so it can never drift from the picture.
+    const cop = _openerSq.filter(p => gcd(p[0], p[1]) === 1).length, cells = OPENER_G * OPENER_G;
+    const pct = 100 * cop / cells, target = 100 * 6 / (Math.PI * Math.PI), delta = pct - target;
+    const headerH = 172;
+    const tallyData = oeTallyData();
+    const tallyL = oeLayoutTally(tallyData, W - pad * 2);
+    const sections = oeLegendSections();
+    const legendW = W - pad * 2;
+    const tileW = (W - gap) / 2;
+    // Three views: Cayley is now a square the same size as Grid/Ring (never
+    // stretched to the full 4096px width, which is what let its points --
+    // unbounded near the Mobius pole -- spill past its own tile into Grid/Ring's
+    // row above). The width that used to be spent stretching it wide is spent
+    // on legend panels flanking it instead, the same trade the page's own
+    // export makes for its lone third tile: description/colour key on the
+    // left, live parameters on the right, in the space the tile doesn't need.
+    const useSidePanels = (OE.view === 'all3');
+    const legendL = useSidePanels ? { h: 0, cols: [] } : oeLayoutLegend(sections, legendW);
+    const footerH = 46;
+    let plateH;
+    if (OE.view === 'all3') plateH = tileW + gap + tileW;
+    else if (OE.view === 'cayley') plateH = W / ratio;
+    else plateH = W;
+    const sidePanelW = useSidePanels ? Math.max(0, (W - tileW) / 2 - pad - gap) : 0;
+    const sidePanels = useSidePanels ? [oeSidePanelLines(sections[0], sidePanelW), oeSidePanelLines(sections[1], sidePanelW)] : null;
+    const H = Math.round(headerH + plateH + 40 + tallyL.h + legendL.h + footerH);
+    const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold; ctx.font = '17px ' + MONO;
+    ctx.fillText(oeSpacedCaps('Strip II \u00b7 Opener Preview \u00b7 Wessen Getachew \u00b7 2026'), W / 2, 52);
+    ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream; ctx.font = '56px ' + DISP;
+    ctx.fillText(oeViewTitle(), pad, 128);
+    ctx.textAlign = 'right'; ctx.font = '17px ' + MONO; ctx.fillStyle = PAL.cream3;
+    ctx.fillText('G = ' + OPENER_G + '   \u00b7   G\u00b2 = ' + cells.toLocaleString() + ' pts   \u00b7   ' + viewLabel, W - pad, 112);
+    ctx.fillText('gcd=1: ' + cop.toLocaleString() + '/' + cells.toLocaleString() + ' = ' + pct.toFixed(2) +
+      '%   \u00b7   \u0394 6/\u03c0\u00b2 (' + target.toFixed(2) + '%): ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '%', W - pad, 146);
+    let y = headerH;
+    // Every tile is clipped to its own box before drawing. Cayley's points come
+    // from a Mobius map that blows up near its pole, so without a clip a wide
+    // zoom can paint well outside the rectangle it was asked to fill -- straight
+    // into a neighbouring tile. Grid and Ring can't run over their own box, but
+    // clipping them too costs nothing and keeps the rule uniform.
+    if (OE.view === 'all3') {
+      ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
+      openerDrawGrid(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
+      ctx.save(); ctx.translate(tileW + gap, y); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
+      openerDrawRing(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
+      const cayX = (W - tileW) / 2, cayY = y + tileW + gap;
+      ctx.save(); ctx.translate(cayX, cayY); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
+      openerDrawCayley(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
+      oeDrawSidePanel(ctx, sidePanels[0], pad, cayY + 34, sidePanelW);
+      oeDrawSidePanel(ctx, sidePanels[1], cayX + tileW + gap, cayY + 34, sidePanelW);
+      y = cayY + tileW;
+    } else if (OE.view === 'grid') {
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawGrid(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
+    } else if (OE.view === 'ring') {
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawRing(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
+    } else {
+      const cayH = W / ratio;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, cayH); ctx.clip(); openerDrawCayley(1, { ctx: ctx, w: W, h: cayH }); ctx.restore(); y += cayH;
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(pad, y + 20); ctx.lineTo(W - pad, y + 20); ctx.stroke();
+    oeDrawTally(ctx, tallyData, tallyL, pad, y + 40, W - pad * 2);
+    y += 40 + tallyL.h;
+    if (!useSidePanels) { oeDrawLegend(ctx, legendL, pad, y + 20, legendW); y += 20 + legendL.h; }
+    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(221,216,204,.45)'; ctx.font = '18px ' + MONO;
+    ctx.fillText('wessengetachew.github.io \u00b7 opener preview, not the live plate', pad, y + footerH * 0.5);
+    canvas.toBlob(blob => {
+      const a = document.createElement('a'), url = URL.createObjectURL(blob);
+      a.href = url; a.download = 'strip2-opener-' + OE.view + '-' + Date.now() + '.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      if (msg) msg.textContent = 'Done \u2014 4096\u00d7' + H;
+    }, 'image/png');
+  } catch (e) {
+    if (msg) msg.textContent = 'Export failed: ' + (e && e.message || e);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+function openerTurnAll(delta) {
+  openerTurn('g', delta); openerTurn('r', delta);
+  stopOpenerRotPlay('z'); setOpenerRot('z', openerNormDeg(OPENER_ROT.z + delta));
+}
 function openerTurn(axis, delta) {
   const d = openerNormDeg(Math.round((OPENER_ROT[axis] + delta) / 90) * 90);
   setOpenerRot(axis, d);
@@ -3552,8 +4010,8 @@ function openerPointAlpha(i, t, n) {
   const start = (i / n) * 0.7, span = 0.3;
   return Math.max(0, Math.min(1, (t - start) / span));
 }
-function openerDrawGrid(t) {
-  const c = openerDPRCanvas('welcome-cv-grid'); if (!c) return;
+function openerDrawGrid(t, forceC) {
+  const c = forceC || openerDPRCanvas('welcome-cv-grid'); if (!c) return;
   const ctx = c.ctx, cell = Math.min(c.w, c.h) / OPENER_G, dot = Math.max(0.45, cell * 0.34);
   ctx.save();
   if (OPENER_ROT.g) { ctx.translate(c.w / 2, c.h / 2); ctx.rotate(-OPENER_ROT.g * Math.PI / 180); ctx.translate(-c.w / 2, -c.h / 2); }
@@ -3569,8 +4027,8 @@ function openerDrawGrid(t) {
   if (t >= 1) openerDrawLift(ctx, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], Math.min(c.w, c.h));
   ctx.restore();
 }
-function openerDrawRing(t) {
-  const c = openerDPRCanvas('welcome-cv-ring'); if (!c) return;
+function openerDrawRing(t, forceC) {
+  const c = forceC || openerDPRCanvas('welcome-cv-ring'); if (!c) return;
   const ctx = c.ctx, S = Math.min(c.w, c.h), cx = c.w / 2, cy = c.h / 2;
   const outer = S / 2 * 0.92, dot = Math.max(0.5, Math.min(S * 0.018, outer / OPENER_G * 0.6));
   const holeR = outer * OPENER_RING_HOLE, holeSpan = outer - holeR;   // rings 1..G pack into [holeR, outer]
@@ -3667,8 +4125,8 @@ function openerCayleyXY(r, M, cx, cy, Rc) {
   const x = cx + u * Rc, y = cy - v * Rc;
   return (isFinite(x) && isFinite(y)) ? [x, y] : null;
 }
-function openerDrawCayley(t) {
-  const c = openerDPRCanvas('welcome-cv-cayley'); if (!c) return;
+function openerDrawCayley(t, forceC) {
+  const c = forceC || openerDPRCanvas('welcome-cv-cayley'); if (!c) return;
   const ctx = c.ctx, cx = c.w / 2, cy = c.h / 2;
   const Rc = Math.min(c.w, c.h) * 0.44 * OPENER_CZ, dot = Math.max(0.5, Math.min(c.w, c.h) * 0.018 * Math.min(1, 13 / OPENER_G));
   _openerPts.forEach((p, i) => {
@@ -3688,11 +4146,11 @@ function renderOpenerPreview(animate) {
   _openerPts = openerPoints(); _openerSq = openerSquarePoints();
   renderOpenerWork();
   if (_openerAnimHandle) { cancelAnimationFrame(_openerAnimHandle); _openerAnimHandle = null; }
-  if (!animate) { openerDrawGrid(1); openerDrawRing(1); openerDrawCayley(1); return; }
+  if (!animate) { if (wvShows('grid')) openerDrawGrid(1); if (wvShows('ring')) openerDrawRing(1); if (wvShows('cayley')) openerDrawCayley(1); return; }
   const dur = 550, t0 = performance.now();
   const step = (now) => {
     const t = Math.min(1, (now - t0) / dur);
-    openerDrawGrid(t); openerDrawRing(t); openerDrawCayley(t);
+    if (wvShows('grid')) openerDrawGrid(t); if (wvShows('ring')) openerDrawRing(t); if (wvShows('cayley')) openerDrawCayley(t);
     _openerAnimHandle = t < 1 ? requestAnimationFrame(step) : null;
   };
   _openerAnimHandle = requestAnimationFrame(step);
@@ -3702,6 +4160,41 @@ function applyWelcomePreset() {
   $('lens-lbl').value = WELCOME_PRESET.label; lensRelabel();
   syncWelcomeUI(); renderOpenerPreview(false);
 }
+/* Opener soundtrack: Vince Rubinetti's "Riemann Zeta Function" -- the piece
+   he wrote for 3b1b's own zeta function video -- fitting company for the
+   coprimality/zeta ((2) = pi^2/6) work the opener is itself an intro to.
+   Embedded via SoundCloud's plain iframe player (no API key needed, just its
+   public track URL). Built fresh each time the opener opens and torn down on
+   close, so it never keeps playing -- or keeps a live connection -- in the
+   background once the modal is gone. Autoplay is attempted but browsers can
+   block audio that wasn't started by a click (e.g. the opener's own
+   auto-open on page load): the Music chip stays on-screen either way, so a
+   blocked attempt is just one tap to start rather than a silent failure. */
+const OPENER_TRACK_URL = 'https://soundcloud.com/vincerubinetti/riemann-zeta-function';
+let _openerMusicOn = true;
+function openerMusicSrc() {
+  return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(OPENER_TRACK_URL) +
+    '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false&single_active=true';
+}
+function startOpenerMusic() {
+  if (!_openerMusicOn) return;
+  const slot = $('welcome-music-slot'); if (!slot) return;
+  if (!slot.querySelector('iframe')) {
+    const f = document.createElement('iframe');
+    f.width = '1'; f.height = '1'; f.style.border = '0'; f.allow = 'autoplay';
+    f.src = openerMusicSrc();
+    slot.appendChild(f);
+  }
+}
+function stopOpenerMusic() {
+  const slot = $('welcome-music-slot'); if (!slot) return;
+  slot.innerHTML = '';   // dropping the iframe is the reliable way to actually stop SoundCloud audio
+}
+function toggleOpenerMusic() {
+  _openerMusicOn = !_openerMusicOn;
+  const b = $('welcome-music-btn'); if (b) { b.classList.toggle('on', _openerMusicOn); b.textContent = (_openerMusicOn ? '\u266b' : '\u266a') + ' Music'; }
+  if (_openerMusicOn) startOpenerMusic(); else stopOpenerMusic();
+}
 function openWelcomeModal() {
   syncWelcomeUI();
   $('welcome-modal').style.display = 'flex';
@@ -3709,9 +4202,11 @@ function openWelcomeModal() {
   // actually be in the layout — hence display is set first, this after.
   renderOpenerPreview(true);
   startOpenerPlay(700);   // plays by default, once the 550 ms reveal has finished
+  startOpenerMusic();
 }
 function closeWelcomeModal() {
   stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay();
+  stopOpenerMusic();
   if ($('welcome-noshow-chk') && $('welcome-noshow-chk').checked) {
     try { localStorage.setItem('stripII_welcome_seen', '1'); } catch (e) {}
   }
@@ -11430,6 +11925,7 @@ function boot() {
   const top = 300000;
   SPF = buildSPF(top);
   PRIMES = primesUpTo(10000);
+  buildOpenerCop();   // precompute gcd=1 for the opener's full 2..256 range up front
   $('b-strip').classList.add('on');
   document.addEventListener('keydown', onKey);
   wireLens();
