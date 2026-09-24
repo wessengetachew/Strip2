@@ -98,6 +98,30 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
    render tree, which is enough for the browser to replay a CSS animation
    without any JS timer to keep in sync. */
 #welcome-modal .export-box{animation:welcomePop .5s cubic-bezier(.2,.9,.25,1);}
+/* Mobile: the generic export-modal pins every box to the top with a flat 40px
+   of padding, which is exactly what put the opener's own header -- Music, the
+   close X -- flush against the browser's own address bar/toolbar, effectively
+   off-screen. Center the opener instead on small screens, with padding that
+   respects a notch/status bar; it still scrolls to the top for a tall opener,
+   it just no longer starts pinned there. Scoped to #welcome-modal alone so
+   every other export-box (Export, presets, etc.) keeps its normal top pin. */
+@media (max-width:680px){
+  /* align-items:center was tried here first, but centering an overflowing
+     flex child clips its start edge with no way to scroll back up to it in
+     Chrome/Safari -- that's what made Grid and Ring (further down than the
+     header) disappear off the top with no way back. flex-start keeps the
+     box always scrollable from its true top; only the padding needed to
+     change, down from the generic 40px to just enough to clear the toolbar. */
+  #welcome-modal{align-items:flex-start;
+    padding:max(14px, env(safe-area-inset-top)) 10px max(14px, env(safe-area-inset-bottom));}
+}
+/* Desktop: the opener's own box gets more room than the generic export-box --
+   wider, and with extra side padding -- so the three previews and their rows
+   of controls aren't as cramped as a 640px modal makes them. */
+#welcome-modal .export-box{max-width:660px;}
+@media (min-width:900px){
+  #welcome-modal .export-box{max-width:880px;padding:22px 34px;}
+}
 #welcome-color-now{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;
   color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:7px 10px;margin:6px 0 10px;background:var(--gold2);}
 #welcome-color-now .sws{display:inline-flex;gap:2px;}
@@ -1644,7 +1668,7 @@ walk anyway.</p>
 </div>
 
 <div id="welcome-modal" class="export-modal" style="display:none;" onclick="if(event.target===this)closeWelcomeModal()">
-  <div class="export-box" style="max-width:660px;">
+  <div class="export-box">
     <div class="export-hd">
       <span>The Opener &middot; Strip Arithmetic II</span>
       <span style="display:inline-flex;align-items:center;gap:8px;">
@@ -1653,17 +1677,45 @@ walk anyway.</p>
       </span>
     </div>
     <div id="welcome-music-slot" style="height:0;overflow:hidden;"></div>
-    <div class="pnote" style="padding:2px 0 12px;line-height:1.7;">
-      Back on <a href="https://wessengetachew.github.io/smith/page5.html" target="_blank" rel="noopener">Page 5</a>
-      of the <a href="https://wessengetachew.github.io/smith/" target="_blank" rel="noopener">C(n) framework</a>,
-      the Gap Diagonal Identity split the lattice into diagonal strips and handed off a side quest: follow one
-      strip at a time instead of the whole triangle. <a href="https://wessengetachew.github.io/Partition/" target="_blank" rel="noopener">Strip I</a>
-      picked it up first. This is Strip II &mdash; <i>Visualizing Partitio Numerorum</i>. What's below is the
-      foundational layer underneath all of it: the G lattice in Grid, Ring and Cayley, its coloring, and the
-      lift dynamics &mdash; D(n), the residue spiral, the &plusmn;n path. Strip II built its slope a/b &middot;
-      offset s &middot; width w dynamic on top of this &mdash; the walk that becomes block-coprime density C(n)
-      at slope +1, and is home to the Goldbach strips and partition overlays at slope &minus;1. Pick how you
-      want to see the geometry, or jump straight in.
+    <div class="subtoggle collapsed" id="welcome-note-toggle" onclick="toggleSub(this)">
+      <span class="car">&#9662;</span><span>What to know before exploring this framework</span>
+    </div>
+    <div class="subbody">
+      <div class="pnote" style="padding:2px 0 12px;line-height:1.7;">
+        This is Strip II of the C(n) framework &mdash; <i>Visualizing Partitio Numerorum</i>. On
+        <a href="https://wessengetachew.github.io/smith/page5.html" target="_blank" rel="noopener">Page 5</a>
+        of the <a href="https://wessengetachew.github.io/smith/" target="_blank" rel="noopener">C(n) framework</a>,
+        the Gap Diagonal Identity split the lattice into diagonal strips, each pursued as its own strip rather
+        than as part of the whole triangle. <a href="https://wessengetachew.github.io/Partition/" target="_blank" rel="noopener">Strip I</a>
+        took up the first of these.
+        <br><br>
+        What follows below is the foundational layer underlying both strips: the G lattice in Grid, Ring and
+        Cayley form, its coloring, and its lift dynamics &mdash; D(n), the residue spiral, and the &plusmn;n
+        path. Strip II builds its slope a/b &middot; offset s &middot; width w dynamic on top of this layer:
+        at slope +1 it becomes the block-coprime density C(n), and at slope &minus;1 it is home to the
+        Goldbach strips and partition overlays.
+        <br><br>
+        Use the controls below to choose how the geometry is viewed, or close this note and jump straight in.
+      </div>
+    </div>
+    <div class="subtoggle collapsed" id="welcome-strip2-toggle" onclick="toggleSub(this)">
+      <span class="car">&#9662;</span><span>What this page adds &mdash; slope, width &amp; the Singular Series</span>
+    </div>
+    <div class="subbody">
+      <div class="pnote" style="padding:2px 0 12px;line-height:1.7;">
+        On top of the foundational layer above, Strip II walks one strip at a time: the lattice points
+        $(r, M)$ with $s \le b\,r - a\,M < s + w$, for a slope $a/b$, an offset $s$, and a width $w$. Slope
+        and width are dials on the same picture &mdash; different settings surface different classical
+        densities, all from one residue count.
+        <br><br>
+        At <b>slope +1</b>, width $n{+}1$ read as a block &mdash; every column ANDed together, not averaged
+        within the strip &mdash; is <b>block-coprime density</b> $C(n) = \prod_p\!\left(1 - \tfrac{\min(n+1,p)}{p^2}\right)$.
+        <br><br>
+        At <b>slope &minus;1</b>, width 1 is the Goldbach anti-diagonal $r + M = N$, and how often every
+        point on it is prime is the <b>Hardy&ndash;Littlewood Singular Series</b>
+        $\mathfrak{S}(N) = 2C_2 \prod_{p \mid N,\, p>2} \tfrac{p-1}{p-2}$. The partition overlays below walk
+        that anti-diagonal one Goldbach decomposition of $N$ at a time.
+      </div>
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
@@ -1675,10 +1727,10 @@ walk anyway.</p>
       <input type="range" id="welcome-g" min="2" max="256" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 256. Doesn't change the G on the page.">
       <span class="hint">preview only</span>
     </div>
-    <div class="prow">
-      <span class="plabel">Cayley zoom &middot; <b id="welcome-cz-v">0.33&times;</b></span>
-      <input type="range" id="welcome-cz" min="-1.7" max="0.3" step="0.01" value="-0.48" oninput="setOpenerCZ(this.value)" style="flex:1 1 160px;min-width:120px;" title="Zoom the Cayley preview out to reach the points that map far from the centre. Mouse wheel over the Cayley tile does the same; double-click returns to 0.33\u00d7.">
-      <span class="hint">zoom out for the far points</span>
+    <div class="prow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
+      <span class="lbl">hole</span>
+      <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
+      <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
     </div>
     <div class="prow" style="padding:2px 0 6px;">
       <span class="lbl">view</span>
@@ -1686,6 +1738,10 @@ walk anyway.</p>
       <button class="chip wv-view-btn" data-v="ring" onclick="wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
       <button class="chip wv-view-btn" data-v="cayley" onclick="wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
       <button class="chip wv-view-btn on" data-v="all3" onclick="wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
+      <span class="lbl" title="Print a small label at every point, on Grid, Ring and Cayley alike. Only while G &le; 31 &mdash; past that there isn't room to read them; stepping the mode has no visible effect until G comes back down.">labels</span>
+      <button class="chip" onclick="stepOpenerLabelMode(-1)" title="Previous label mode">&#9650;</button>
+      <button class="chip" onclick="stepOpenerLabelMode(1)" title="Next label mode">&#9660;</button>
+      <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="No per-point labels.">off</span>
       <span class="hint">one view at a time redraws faster</span>
     </div>
     <div id="welcome-preview">
@@ -1716,10 +1772,10 @@ walk anyway.</p>
       <span class="val" id="welcome-rhod-v" style="min-width:32px;">1.80</span>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,2)" title="&rho; runs 0 &rarr; 2, starting at the origin. The innermost rings pile up near &Gamma;(0) = &minus;1.">0&middot;2</button>
     </div>
-    <div class="prow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
-      <span class="lbl">hole</span>
-      <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
-      <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
+    <div class="prow">
+      <span class="plabel">Cayley zoom &middot; <b id="welcome-cz-v">0.33&times;</b></span>
+      <input type="range" id="welcome-cz" min="-1.7" max="0.3" step="0.01" value="-0.48" oninput="setOpenerCZ(this.value)" style="flex:1 1 160px;min-width:120px;" title="Zoom the Cayley preview out to reach the points that map far from the centre. Mouse wheel over the Cayley tile does the same; double-click returns to 0.33\u00d7.">
+      <span class="hint">zoom out for the far points</span>
     </div>
         <div class="prow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
@@ -3268,6 +3324,56 @@ function openerSquarePoints() {
   for (let M = 1; M <= OPENER_G; M++) for (let r = 1; r <= OPENER_G; r++) pts.push([r, M]);
   return pts;
 }
+/* Point labels for the opener previews -- off by default (the "collapsed"
+   state the closed <select> starts in), and even once a mode is picked,
+   only actually drawn up to G = 31: past that there are too many points for
+   text next to each one to stay readable, so the select just has no visible
+   effect rather than the picture turning to noise. One mode covers Grid,
+   Ring and Cayley alike, since all three read the same underlying points.
+   Each option's own text is the explanation -- same convention as the main
+   plate's #lens-lbl select -- so there's nothing to remember, just read. */
+const OPENER_LABEL_MODES = [
+  { id: 'off', short: 'off',       t: 'No per-point labels.' },
+  { id: 'rM',  short: 'r/M',       t: 'Both coordinates, r over M.' },
+  { id: 'r',   short: 'r',         t: 'The row coordinate alone.' },
+  { id: 'M',   short: 'M',         t: 'The ring/column coordinate alone.' },
+  { id: 'res', short: 'r mod M',   t: 'The residue: r mod M.' },
+  { id: 'gcd', short: 'gcd(r,M)',  t: 'gcd(r,M) \u2014 1 marks a coprime cell.' }
+];
+let _openerLblIdx = 0;
+let OPENER_LABEL_MODE = OPENER_LABEL_MODES[0].id;
+const OPENER_LABELS_MAXG = 31;
+function openerLabelsShow() { return OPENER_LABEL_MODE !== 'off' && OPENER_G <= OPENER_LABELS_MAXG; }
+function openerLabelText(mode, r, M) {
+  return mode === 'r'   ? '' + r
+    : mode === 'M'   ? '' + M
+    : mode === 'res' ? '' + (M > 0 ? r % M : 0)
+    : mode === 'gcd' ? '' + gcd(r, M)
+    :                  r + '/' + M;   // 'rM', and the fallback
+}
+function stepOpenerLabelMode(d) {
+  const n = OPENER_LABEL_MODES.length;
+  _openerLblIdx = ((_openerLblIdx + d) % n + n) % n;
+  const m = OPENER_LABEL_MODES[_openerLblIdx];
+  OPENER_LABEL_MODE = m.id;
+  const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = m.short; v.title = m.t; }
+  renderOpenerPreview(false);
+}
+function openerDrawLabels(ctx, xy, pts, fontPx) {
+  if (!openerLabelsShow()) return;
+  ctx.save();
+  ctx.font = fontPx + 'px "JetBrains Mono",monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(1, fontPx * 0.28); ctx.lineJoin = 'round';
+  for (let i = 0; i < pts.length; i++) {
+    const r = pts[i][0], M = pts[i][1];
+    const pt = xy(r, M); if (!pt) continue;
+    const txt = openerLabelText(OPENER_LABEL_MODE, r, M), ly = pt[1] - fontPx * 0.95;
+    ctx.strokeStyle = 'rgba(4,4,13,.85)'; ctx.strokeText(txt, pt[0], ly);
+    ctx.fillStyle = 'rgba(238,232,220,.85)'; ctx.fillText(txt, pt[0], ly);
+  }
+  ctx.restore();
+}
 /* Single-view mode for the opener's LIVE preview (separate from the export's
    own view selector below). Default keeps all three; picking one skips the
    other two entirely at draw time -- not just hides their canvas -- so Play,
@@ -4024,7 +4130,11 @@ function openerDrawGrid(t, forceC) {
     else { ctx.beginPath(); ctx.arc((r - 0.5) * cell, (M - 0.5) * cell, dot, 0, TAU); ctx.fill(); }
   });
   ctx.globalAlpha = 1;
-  if (t >= 1) openerDrawLift(ctx, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], Math.min(c.w, c.h));
+  if (t >= 1) {
+    const gxy = (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell];
+    openerDrawLift(ctx, gxy, Math.min(c.w, c.h));
+    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)));
+  }
   ctx.restore();
 }
 function openerDrawRing(t, forceC) {
@@ -4046,10 +4156,14 @@ function openerDrawRing(t, forceC) {
     ctx.beginPath(); ctx.arc(x, y, dot, 0, TAU); ctx.fill();
   });
   ctx.globalAlpha = 1;
-  if (t >= 1) openerDrawLift(ctx, (r, M) => {
-    const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
-    return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
-  }, S);
+  if (t >= 1) {
+    const rxy = (r, M) => {
+      const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
+      return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
+    };
+    openerDrawLift(ctx, rxy, S);
+    openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)));
+  }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
 }
@@ -4139,7 +4253,11 @@ function openerDrawCayley(t, forceC) {
     ctx.beginPath(); ctx.arc(xy[0], xy[1], dot, 0, TAU); ctx.fill();
   });
   ctx.globalAlpha = 1;
-  if (t >= 1) openerDrawLift(ctx, (r, M) => openerCayleyXY(r, M, cx, cy, Rc), Math.min(c.w, c.h));
+  if (t >= 1) {
+    const cxy = (r, M) => openerCayleyXY(r, M, cx, cy, Rc);
+    openerDrawLift(ctx, cxy, Math.min(c.w, c.h));
+    openerDrawLabels(ctx, cxy, _openerPts, Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)));
+  }
 }
 let _openerAnimHandle = null;
 function renderOpenerPreview(animate) {
@@ -4182,6 +4300,11 @@ function startOpenerMusic() {
   if (!slot.querySelector('iframe')) {
     const f = document.createElement('iframe');
     f.width = '1'; f.height = '1'; f.style.border = '0'; f.allow = 'autoplay';
+    // Sandboxed with no allow-top-navigation / allow-popups: this is what stops
+    // SoundCloud's widget from hijacking the tab into its app or the app store
+    // on mobile. allow-scripts + allow-same-origin is still enough for the
+    // player itself to run.
+    f.sandbox = 'allow-scripts allow-same-origin';
     f.src = openerMusicSrc();
     slot.appendChild(f);
   }
