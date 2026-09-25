@@ -1812,7 +1812,7 @@ walk anyway.</p>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="For every coprime r on every ring M, a line from r to r mod(M+1). Teal = the lift survives, coral = it breaks."><input type="checkbox" id="ol-chain-chk" checked onchange="olToggleChain(this.checked)"> r &rarr; r mod(M+1)</label>
       </div>
       <div class="prow">
-        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--gold);cursor:pointer;font-size:11.5px;" title="Highlight the band s &le; b&middot;r &minus; a&middot;M &lt; s+w &mdash; the same slope a/b &middot; offset s &middot; width w strip from the main page, drawn on the three preview canvases only.">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="The band b&middot;r &minus; a&middot;M in [s, s+w) as a see-through teal region, on all three preview canvases -- Grid draws it as a straight band like the main page; Ring and Cayley bend it through their own coordinates instead, which the main page's Strip never has to do.">
           <input type="checkbox" id="ol-strip-chk" onchange="olToggleStrip(this.checked)"> Strip
         </label>
         <span class="lbl">slope a</span>
@@ -1821,17 +1821,27 @@ walk anyway.</p>
         <div class="stepper"><button class="sbtn" onclick="olStepSlopeB(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-b" type="number" min="1" step="1" value="1" onchange="olSetSlopeB(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeB(1)" title="+1">+</button></div>
         <span class="lbl">offset</span>
         <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="0" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
+        <button class="chip" onclick="olResetOffset()" title="Back to s = 0.">reset s=0</button>
         <span class="lbl">width</span>
         <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="1" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
+        <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
+        <button class="chip" onclick="olFullWidth()" title="Widen the band to cover the whole lattice.">full width</button>
+        <span class="hint" id="ol-strip-note">&mdash;</span>
       </div>
       <div class="prow">
-        <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw the strip lines (c: r+M=g, d: r+M=s, a: M&minus;r=g) for one Goldbach pair (g, N&minus;g) of N &mdash; the largest even number that fits the preview lattice &mdash; at a time, on loop.">&#9654; Play Goldbach pairs</button>
+        <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
+        <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
+        <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above by 50%, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop 50%</label>
         <span class="hint" id="ol-gb-note">N = &ndash;</span>
       </div>
       <div class="prow">
         <span class="lbl" style="flex-basis:100%;font-size:10px;color:rgba(232,227,219,.5);" title="Shared by Spiral, &plusmn;n path, Connect and the r-chain.">Spiral / &plusmn;n path / Connect / r-chain &mdash;</span>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift survives"><input type="checkbox" id="ol-surv-chk" checked onchange="olSetSurv(this.checked)"> Surviving</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--coral);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift breaks"><input type="checkbox" id="ol-broken-chk" checked onchange="olSetBroken(this.checked)"> Broken</label>
+        <span class="lbl">thickness</span>
+        <input type="range" id="ol-survbroken-thick" min="0" max="1" step="0.01" value="0.5" oninput="olSetSurvBrokenThick(this.value)" style="max-width:100px;" title="Line/dot thickness for the Spiral, &plusmn;n path and r-chain overlays &mdash; the ones Surviving/Broken above gate.">
+        <span class="val" id="ol-survbroken-thick-v">0.50</span>
       </div>
       <div class="subtoggle collapsed" id="ol-math-toggle" onclick="toggleSub(this);olSyncUI()"><span class="car">&#9662;</span><span>the math</span></div>
       <div class="subbody"><div id="ol-math"></div></div>
@@ -3456,7 +3466,7 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
              stripOn: false, slopeA: 1, slopeB: 1, offset: 0, width: 1,
-             gbOn: false, gbIdx: 0 };
+             gbOn: false, gbIdx: 0, gbDim: false, survBrokenThick: 0.5 };
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
 // one shared pair, not two identical-looking ones. Mirror is a separate overlay and is
 // never gated by surv/broken: toggling Surviving off used to also blank the spiral's
@@ -3640,94 +3650,125 @@ function olChain(ctx, xy, G, n, lw) {
     for (let i = 0; i < dieDots.length; i++) { const p = dieDots[i]; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, TAU); ctx.fill(); }
   }
 }
-// Strip overlay, ported from the main page's slope a/b · offset s · width w band:
-// s <= b*r - a*M < s+w, over the same triangular 1<=r<=M lattice the spiral and
-// +-n path already draw on. Drawn as connected paths (one per integer v in the
-// band) rather than ringed points, so a wide band reads as a filled swath and a
-// width-1 band reads as one clean diagonal, matching the main page's strip look.
+// Strip overlay, ported exactly from the main page's drawStripOverlay: the band
+// between two parallel edges r=(s+a*M)/b and r=(s+w+a*M)/b, filled as one
+// translucent polygon (teal wash, dark outline, bright teal edge) rather than
+// individual dots -- points at any single slope/offset/width read as sparse
+// yellow specks that vanish into the rest of the coloring; a see-through
+// region reads at a glance regardless of what else is lit up underneath it.
 function olStrip(ctx, xy, G, lw) {
   const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
-  ctx.save();
-  ctx.strokeStyle = 'rgba(242,200,96,.55)'; ctx.lineWidth = Math.max(0.7, lw);
-  if (b !== 0) {
-    // v = b*r - a*M  =>  M = (b*r - v) / a  (a swept row per v), or r = (v + a*M)/b (a swept column) when a = 0.
-    for (let v = Math.ceil(s); v < s + w; v++) {
-      ctx.beginPath();
-      let started = false;
-      if (a === 0) {
-        const r = v / b;
-        if (Number.isInteger(r) && r >= 1) {
-          for (let M = r; M <= G; M++) {
-            const pt = xy(r, M); if (!pt) { started = false; continue; }
-            if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
-          }
-        }
-      } else {
-        for (let r = 1; r <= G; r++) {
-          const M = (b * r - v) / a;
-          if (!Number.isInteger(M) || M < r || M > G || M < 1) { started = false; continue; }
-          const pt = xy(r, M); if (!pt) { started = false; continue; }
-          if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
-        }
-      }
-      if (started) ctx.stroke();
+  if (!b) return;
+  const edge = (off) => {
+    const p = [];
+    for (let M = 0; M <= G; M++) {
+      const pt = xy((off + a * M) / b, M);
+      if (pt && isFinite(pt[0]) && isFinite(pt[1])) p.push(pt);   // M=0 divides by zero in Ring's r/M angle; drop any non-finite result rather than let it corrupt the path
     }
-  }
+    return p;
+  };
+  const lo = edge(s), hi = edge(s + w);
+  if (lo.length < 2 || hi.length < 2) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(lo[0][0], lo[0][1]);
+  for (const q of lo) ctx.lineTo(q[0], q[1]);
+  for (let i = hi.length - 1; i >= 0; i--) ctx.lineTo(hi[i][0], hi[i][1]);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(61,200,184,.16)';
+  ctx.fill();
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(4,4,13,.72)'; ctx.lineWidth = lw * 2.6; ctx.stroke();
+  ctx.strokeStyle = 'rgba(61,200,184,1)'; ctx.lineWidth = lw; ctx.stroke();
   ctx.restore();
 }
-// One line M = sign*r + c, r restricted to 1<=r<=M<=G to match the triangular
-// half this preview already draws (the spiral and mirror overlays do the same) --
-// drawn as a connected stroke, not point-by-point, so it reads as a path.
-function olGoldbachLine(ctx, xy, G, sign, c, rgb, lw) {
-  ctx.strokeStyle = rgb; ctx.lineWidth = lw;
-  ctx.beginPath();
-  let started = false;
-  for (let r = 1; r <= G; r++) {
-    const M = sign * r + c;
-    if (M < r || M > G || M < 1) { started = false; continue; }
-    const pt = xy(r, M);
-    if (!pt) { started = false; continue; }
-    if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
+// Coprime/total point count for the same band, kept separately for the live
+// readout and export legend -- the polygon above no longer plots these itself.
+function olStripPoints(G) {
+  const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
+  const pts = []; let total = 0, cop = 0;
+  if (!b) return { pts, total, cop };
+  for (let M = 1; M <= G; M++) {
+    const lo = Math.ceil((s + a * M) / b), hi = Math.ceil((s + w + a * M) / b) - 1;
+    for (let r = Math.max(1, lo); r <= Math.min(G, hi); r++) {
+      total++;
+      if (gcd(r, M) === 1) { cop++; pts.push([r, M]); }
+    }
   }
-  if (started) ctx.stroke();
+  return { pts, total, cop };
 }
-// N for the opener's own Goldbach play: the largest even number that still fits the
-// preview lattice, so every pair it steps through lands on a visible point.
-function olGoldbachN() { const G = OPENER_G; return Math.max(4, G % 2 === 0 ? G : G - 1); }
+// E = 2(G+1), read off the live preview lattice -- exactly the main page's
+// Goldbach-partitions formula, just fed OPENER_G instead of COP_G, so the
+// same g/s/E numbers you'd see there show up here at the preview's own size.
+function olGoldbachN() { return 2 * (OPENER_G + 1); }
 function olGoldbachPairs() {
   const N = olGoldbachN(), out = [];
   for (let g = 2; g <= N / 2; g++) if (isPrime(g) && isPrime(N - g)) out.push(g);
   return out;
 }
-// Play Goldbach pairs: draws the strip lines for the current pair (g, N-g), not just
-// its point -- c: r+M=g and d: r+M=s are the sum pair the Goldbach verdict reads
-// (ported straight from the main page's Partitions panel); a: M-r=g is its difference
-// twin. b: r-M=g would need r>M, which never happens on this triangular half, the
-// same reason the spiral and mirror overlays above only ever show their r<=M side.
-function olGoldbach(ctx, xy, G, dot, lw) {
+// The four Strip I lines for one gap g (partner s = E-g), same construction as
+// the main page's partStripList/add(): one r-range and M = sign*r+c per line.
+// a and b are transposes (M-r=g and r-M=g); c and d are the sum pair the
+// Goldbach verdict actually reads -- c is fully coprime exactly when g is
+// prime, d exactly when s is prime, which is what "fully lit" means below.
+function olGoldbachDescriptors(g, s, G) {
+  const out = [];
+  const push = (rLo, rHi, sign, c, rgb) => { if (rHi >= rLo) out.push({ rLo: rLo, rHi: rHi, sign: sign, c: c, rgb: rgb }); };
+  push(Math.max(1, g - G), Math.min(G, g - 1), -1, g, 'rgba(200,168,74,.95)');              // c: r+M=g  (gold)
+  if (s !== g) push(Math.max(1, s - G), Math.min(G, s - 1), -1, s, 'rgba(224,80,96,.95)');   // d: r+M=s  (coral)
+  push(1, G - g, 1, g, 'rgba(61,200,184,.95)');                                             // a: M-r=g  (teal)
+  push(g + 1, G, 1, -g, 'rgba(155,127,232,.95)');                                            // b: r-M=g  (violet)
+  return out;
+}
+function olGoldbach(ctx, xy, G, dot) {
   const N = olGoldbachN(), pairs = olGoldbachPairs();
   if (!pairs.length) return;
   const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0));
   const g = pairs[idx], s = N - g;
   ctx.save();
-  olGoldbachLine(ctx, xy, G, -1, g, 'rgba(242,200,96,.9)', lw);              // c
-  if (s !== g) olGoldbachLine(ctx, xy, G, -1, s, 'rgba(224,150,224,.85)', lw); // d
-  olGoldbachLine(ctx, xy, G, 1, g, 'rgba(120,190,255,.65)', lw);             // a
+  for (const d of olGoldbachDescriptors(g, s, G)) {
+    ctx.fillStyle = d.rgb;
+    for (let r = d.rLo; r <= d.rHi; r++) {
+      const M = d.sign * r + d.c;
+      if (M < 1 || M > G || gcd(r, M) !== 1) continue;   // off-gcd defaults to 0 on the main page too: misses stay hidden
+      const pt = xy(r, M); if (!pt) continue;
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], dot, 0, TAU); ctx.fill();
+    }
+  }
+  // Dark halo first so the gold marker still pops against a bright cell even
+  // with the Dim option off and every other overlay lit up underneath it.
   const r = Math.min(g, s), M = Math.max(g, s), pt = xy(r, M);
-  if (pt) { ctx.fillStyle = 'rgba(242,200,96,.95)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.6, 0, TAU); ctx.fill(); }
+  if (pt) {
+    ctx.fillStyle = 'rgba(4,4,13,.75)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 2.4, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.4, 0, TAU); ctx.fill();
+  }
   ctx.restore();
 }
-function openerDrawLift(ctx, xy, S) {
+function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
   if (m === 'none' && !OL.chain && !OL.stripOn && !OL.gbOn) return;
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));   // line and dot sizes follow the cell, so G = 256 doesn't turn to felt
+  const tk = Math.max(0.04, OL.survBrokenThick * 2);      // thickness slider: 0.5 default = unchanged size, 0..1 = 0x..2x
   ctx.save();
-  if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2), cl(cell * 0.24, 0.6, 1.8));
-  if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2), cl(cell * 0.3, 0.7, 2.2));
+  if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.24, 0.6, 1.8) * tk);
+  if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.3, 0.7, 2.2) * tk);
   if (m === 'connect') olConnect(ctx, xy, G, n, cl(cell * 0.2, 0.5, 1.4));
-  if (OL.chain) olChain(ctx, xy, G, n, cl(cell * 0.25, 0.4, 1.5));
-  if (OL.stripOn) olStrip(ctx, xy, G, cl(cell * 0.15, 0.6, 2));
-  if (OL.gbOn) olGoldbach(ctx, xy, G, cl(cell * 0.42, 1, 2.2), cl(cell * 0.3, 0.7, 2));
+  if (OL.chain) olChain(ctx, xy, G, n, cl(cell * 0.25, 0.4, 1.5) * tk);
+  // Strip is Grid-only, same as the main page (drawStripOverlay is only ever called
+  // from the Grid draw path there too) -- Ring/Cayley's angle/Mobius maps would turn
+  // the band's straight edges into something that doesn't read as a "region" at all.
+  // Grid, Ring and Cayley all get the band now -- Ring/Cayley use the same edge
+  // formula run through their own r,M -> xy map, so it comes out as a spoke/
+  // spiral-shaped region there instead of the straight one Grid draws, which
+  // is the honest result of the same math under those views' own coordinates.
+  if (OL.stripOn) olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12));
+  if (OL.gbOn) {
+    // Dim the base plate AND every other overlay above -- drawn so far, on this
+    // same canvas -- by 50%, so the Goldbach pair reads clearly even with the
+    // spiral, chain, mirror etc. all lit up at once instead of blinking under them.
+    if (OL.gbDim) { ctx.fillStyle = 'rgba(4,4,13,.5)'; ctx.fillRect(0, 0, cw || S, ch || S); }
+    olGoldbach(ctx, xy, G, cl(cell * 0.4, 1, 2.2));
+  }
   ctx.restore();
 }
 // The lift settings only move the overlays, so redraw the three tiles and leave the tally alone.
@@ -3775,6 +3816,13 @@ function olTogglePPlay() {
 function olToggleChain(v) { OL.chain = !!v; olRedraw(); }
 function olSetSurv(v) { OL.surv = !!v; olRedraw(); }
 function olSetBroken(v) { OL.broken = !!v; olRedraw(); }
+// 0..1 slider, default .5 -> multiplier 1 (unchanged from the old fixed sizes); scales
+// the Spiral, +-n path and r-chain line/dot sizes only -- the overlays Surviving/Broken gate.
+function olSetSurvBrokenThick(v) {
+  const t = Number(v); OL.survBrokenThick = isFinite(t) ? Math.max(0, Math.min(1, t)) : 0.5;
+  const lbl = $('ol-survbroken-thick-v'); if (lbl) lbl.textContent = OL.survBrokenThick.toFixed(2);
+  olRedraw();
+}
 function olToggleAllP(v) { OL.allP = !!v; olRedraw(); }
 function olToggleMirror(v) { OL.mirror = !!v; olRedraw(); }
 function olToggleDropout(v) { OL.dropout = !!v; olRedraw(); }
@@ -3789,6 +3837,9 @@ function olStepSlopeA(d) { OL.slopeA = (Number(OL.slopeA) || 0) + d; olRedraw();
 function olStepSlopeB(d) { const nb = (Number(OL.slopeB) || 1) + d; OL.slopeB = nb === 0 ? (d > 0 ? 1 : -1) : nb; olRedraw(); }
 function olStepOffset(d) { OL.offset = (Number(OL.offset) || 0) + d; olRedraw(); }
 function olStepWidth(d) { OL.width = Math.max(1, (Number(OL.width) || 1) + d); olRedraw(); }
+function olResetOffset() { OL.offset = 0; olRedraw(); }
+function olResetWidth() { OL.width = 1; olRedraw(); }
+function olFullWidth() { OL.width = OPENER_G * 2; olRedraw(); }
 // Play Goldbach pairs -- steps OL.gbIdx through olGoldbachPairs() on loop.
 let _olGbTimer = 0;
 function olSyncGbPlayChip() {
@@ -3797,6 +3848,15 @@ function olSyncGbPlayChip() {
   b.classList.toggle('on', !!_olGbTimer);
 }
 function olStopGbPlay() { if (_olGbTimer) { clearInterval(_olGbTimer); _olGbTimer = 0; } olSyncGbPlayChip(); }
+function olStepGb(d) {
+  const pairs = olGoldbachPairs();
+  if (!pairs.length) return;
+  olStopGbPlay();
+  OL.gbOn = true;
+  OL.gbIdx = (((OL.gbIdx || 0) + d) % pairs.length + pairs.length) % pairs.length;
+  olRedraw();
+}
+function olToggleGbDim(v) { OL.gbDim = !!v; olRedraw(); }
 function olToggleGbPlay() {
   if (_olGbTimer) { olStopGbPlay(); return; }
   OL.gbOn = true;
@@ -3821,8 +3881,17 @@ function olSyncUI() {
   chk('ol-allp-chk', OL.allP); chk('ol-mirror-chk', OL.mirror);
   chk('ol-dropout-chk', OL.dropout); chk('ol-dropoutlbl-chk', OL.dropoutLbl);
   chk('ol-strip-chk', OL.stripOn);
+  chk('ol-gbdim-chk', OL.gbDim);
+  const thumb = $('ol-survbroken-thick');
+  if (thumb && document.activeElement !== thumb) thumb.value = OL.survBrokenThick;
+  const thickLbl = $('ol-survbroken-thick-v'); if (thickLbl) thickLbl.textContent = OL.survBrokenThick.toFixed(2);
   const setInp = (id, v) => { const el = $(id); if (el && document.activeElement !== el) el.value = v; };
   setInp('ol-sl-a', OL.slopeA); setInp('ol-sl-b', OL.slopeB); setInp('ol-off', OL.offset); setInp('ol-w', OL.width);
+  const stripNote = $('ol-strip-note');
+  if (stripNote) {
+    const sc = olStripPoints(OPENER_G);
+    stripNote.textContent = sc.total ? (sc.cop + ' / ' + sc.total + ' coprime') : 'no points in band';
+  }
   const gbNote = $('ol-gb-note');
   if (gbNote) {
     const N = olGoldbachN(), pairs = olGoldbachPairs();
@@ -4083,7 +4152,7 @@ function oeLegendSections() {
   if (OPENER_RING_HOLE) vi.push({ c: null, t: 'ring hole ' + OPENER_RING_HOLE.toFixed(2) + (OPENER_RING_HOLE >= 0.5 ? ' \u00b7 roots-of-unity reading on' : '') });
   const out = [{ title: 'VIEW', items: vi }];
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
-  if (OL.mode !== 'none' || OL.chain) {
+  if (OL.mode !== 'none' || OL.chain || OL.stripOn || OL.gbOn) {
     const n = openerLiftN(), li = [{ c: null, t: 'mode ' + modeLabel + ' \u00b7 n = ' + n + ' \u00b7 block length ' + (n + 1) }];
     if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') {
       li.push({ c: PAL.teal, t: 'spiral r = ' + (OL.allP ? 'p, all primes p \u2264 G' : OL.p === 1 ? '1 (locked residue)' : 'p = ' + OL.p) + ' \u00b7 teal above p/M = 0.5, coral below' });
@@ -4101,6 +4170,24 @@ function oeLegendSections() {
     const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
     li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') });
     if (isFinite(D)) li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
+    if (OL.stripOn) {
+      const sc = olStripPoints(OPENER_G);
+      li.push({ c: PAL.teal, t: 'strip b\u00b7r \u2212 a\u00b7M \u2208 [s, s+w) \u00b7 a=' + OL.slopeA + ', b=' + OL.slopeB + ', s=' + OL.offset + ', w=' + OL.width + ' \u00b7 ' + sc.cop + '/' + sc.total + ' coprime' });
+    }
+    if (OL.gbOn) {
+      const N = olGoldbachN(), pairs = olGoldbachPairs();
+      li.push({ c: null, t: 'Goldbach partitions \u00b7 E = 2(G+1) = ' + N });
+      li.push({ c: PAL.gold, t: 'c: r+M=g' });
+      li.push({ c: PAL.coral, t: 'd: r+M=s' });
+      li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
+      li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 c,d fully lit \u21d4 g,s both prime' });
+      if (pairs.length) {
+        const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0)), g = pairs[idx], s = N - g;
+        li.push({ c: null, t: 'showing ' + g + ' + ' + s + ' = ' + N + ' \u00b7 ' + pairs.length + ' Goldbach pair' + (pairs.length === 1 ? '' : 's') + ' of ' + N + ' total' });
+      } else {
+        li.push({ c: null, t: 'no Goldbach pairs of ' + N + ' fit at this G' });
+      }
+    }
     out.push({ title: 'LIFT DYNAMICS', items: li });
   }
   return out;
@@ -4370,7 +4457,7 @@ function openerDrawGrid(t, forceC) {
   ctx.globalAlpha = 1;
   if (t >= 1) {
     const gxy = (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell];
-    openerDrawLift(ctx, gxy, Math.min(c.w, c.h));
+    openerDrawLift(ctx, gxy, Math.min(c.w, c.h), c.w, c.h, 'grid');
     openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)));
   }
   ctx.restore();
@@ -4399,7 +4486,7 @@ function openerDrawRing(t, forceC) {
       const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
       return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
     };
-    openerDrawLift(ctx, rxy, S);
+    openerDrawLift(ctx, rxy, S, c.w, c.h, 'ring');
     openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)));
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
@@ -4493,7 +4580,7 @@ function openerDrawCayley(t, forceC) {
   ctx.globalAlpha = 1;
   if (t >= 1) {
     const cxy = (r, M) => openerCayleyXY(r, M, cx, cy, Rc);
-    openerDrawLift(ctx, cxy, Math.min(c.w, c.h));
+    openerDrawLift(ctx, cxy, Math.min(c.w, c.h), c.w, c.h, 'cayley');
     openerDrawLabels(ctx, cxy, _openerPts, Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)));
   }
 }
