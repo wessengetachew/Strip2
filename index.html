@@ -1803,7 +1803,33 @@ walk anyway.</p>
         <button class="chip tl" id="ol-p-play" onclick="olTogglePPlay()" title="Step p through every prime up to the preview G, on loop. The range follows the G slider live.">&#9654; Play</button>
       </div>
       <div class="prow">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.75);cursor:pointer;font-size:11.5px;" title="Overlay the spiral of every prime p &le; G at once. Denser, and slower, on big previews."><input type="checkbox" id="ol-allp-chk" onchange="olToggleAllP(this.checked)"> All p</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(155,127,232,.9);cursor:pointer;font-size:11.5px;" title="Mirror conjugate &sigma;(r) = M &minus; r, drawn alongside the spiral."><input type="checkbox" id="ol-mirror-chk" onchange="olToggleMirror(this.checked)"> Mirror &sigma;(r)=M&minus;r</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.9);cursor:pointer;font-size:11.5px;" title="Highlight the dropout ring M=p, where the residue vanishes."><input type="checkbox" id="ol-dropout-chk" onchange="olToggleDropout(this.checked)"> Dropout M=p</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.7);cursor:pointer;font-size:11.5px;" title="Label the dropout ring with p=&hellip;"><input type="checkbox" id="ol-dropoutlbl-chk" onchange="olToggleDropoutLbl(this.checked)"> p lbl</label>
+      </div>
+      <div class="prow">
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="For every coprime r on every ring M, a line from r to r mod(M+1). Teal = the lift survives, coral = it breaks."><input type="checkbox" id="ol-chain-chk" checked onchange="olToggleChain(this.checked)"> r &rarr; r mod(M+1)</label>
+      </div>
+      <div class="prow">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--gold);cursor:pointer;font-size:11.5px;" title="Highlight the band s &le; b&middot;r &minus; a&middot;M &lt; s+w &mdash; the same slope a/b &middot; offset s &middot; width w strip from the main page, drawn on the three preview canvases only.">
+          <input type="checkbox" id="ol-strip-chk" onchange="olToggleStrip(this.checked)"> Strip
+        </label>
+        <span class="lbl">slope a</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepSlopeA(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-a" type="number" step="1" value="1" onchange="olSetSlopeA(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeA(1)" title="+1">+</button></div>
+        <span class="lbl">/ b</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepSlopeB(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-b" type="number" min="1" step="1" value="1" onchange="olSetSlopeB(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeB(1)" title="+1">+</button></div>
+        <span class="lbl">offset</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="0" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
+        <span class="lbl">width</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="1" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
+      </div>
+      <div class="prow">
+        <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw the strip lines (c: r+M=g, d: r+M=s, a: M&minus;r=g) for one Goldbach pair (g, N&minus;g) of N &mdash; the largest even number that fits the preview lattice &mdash; at a time, on loop.">&#9654; Play Goldbach pairs</button>
+        <span class="hint" id="ol-gb-note">N = &ndash;</span>
+      </div>
+      <div class="prow">
+        <span class="lbl" style="flex-basis:100%;font-size:10px;color:rgba(232,227,219,.5);" title="Shared by Spiral, &plusmn;n path, Connect and the r-chain.">Spiral / &plusmn;n path / Connect / r-chain &mdash;</span>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift survives"><input type="checkbox" id="ol-surv-chk" checked onchange="olSetSurv(this.checked)"> Surviving</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--coral);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift breaks"><input type="checkbox" id="ol-broken-chk" checked onchange="olSetBroken(this.checked)"> Broken</label>
       </div>
@@ -3427,7 +3453,15 @@ function setOpenerG(v) {
    lift survives and coral where it breaks. Preview only, like G and the
    Cayley tilt: it doesn't touch the Lift panel on the page. Connect and the
    chain are on by default. */
-const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true };
+const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
+             allP: false, mirror: false, dropout: false, dropoutLbl: false,
+             stripOn: false, slopeA: 1, slopeB: 1, offset: 0, width: 1,
+             gbOn: false, gbIdx: 0 };
+// NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
+// one shared pair, not two identical-looking ones. Mirror is a separate overlay and is
+// never gated by surv/broken: toggling Surviving off used to also blank the spiral's
+// Mirror dots (and the whole spiral, safe or broken) because the old code used OL.surv
+// as an on/off switch for the spiral loop instead of a per-point filter.
 function openerLiftN() { return Math.max(0, Math.min(OPENER_G - 1, OL.n)); }
 /* Three states, shared by the chain and the +-n path: 'dead' once a saturated prime
    (p <= n+1) already divides it -- gone for good, so only its point remains, no line.
@@ -3443,28 +3477,85 @@ function olClassify(r, n) {
   if (spf === n + 2) return 'warn';
   return 'safe';
 }
+// Traces r = 1..p-1 at the fixed ring M = p and strokes it dashed. This is the ring
+// where the spiral prime's own modulus makes the residue vanish (p mod p = 0), so it
+// exits (Z/MZ)*. Works unmodified on all three preview canvases because it only calls
+// the view's own xy(r, M) -- a near-full arc on Ring, a horizontal row on Grid, the
+// boundary loop on Cayley.
+function olDropoutRing(ctx, xy, p, lw) {
+  if (p < 2) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(224,80,96,.6)'; ctx.lineWidth = Math.max(1, lw); ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  let first = true, labelXY = null;
+  for (let r = 1; r < p; r++) {
+    const pt = xy(r, p); if (!pt) continue;
+    if (first) { ctx.moveTo(pt[0], pt[1]); first = false; } else ctx.lineTo(pt[0], pt[1]);
+    if (!labelXY) labelXY = pt;
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  if (OL.dropoutLbl && labelXY) {
+    ctx.fillStyle = 'rgba(224,80,96,.85)';
+    ctx.font = '9px "JetBrains Mono",monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('p=' + p, labelXY[0] + 4, labelXY[1] - 6);
+  }
+  ctx.restore();
+}
 function olSpiral(ctx, xy, G, dot, lw) {
-  const p = OL.p;
-  if (p > G || !OL.surv) return;
-  let lastTop = null, lastBot = null;
+  const primes = OL.allP ? (PRIMES || []).filter(function (q) { return q <= G; }) : [OL.p];
   ctx.lineWidth = lw;
-  for (let M = p + 1; M <= G; M++) {
-    if (gcd(p, M) !== 1) continue;                 // p's own multiples: the residue vanishes
-    const lifts = gcd(p, M + 1) === 1, isTop = p / M > 0.5;
-    const pt = xy(p, M); if (!pt) continue;
-    if (isTop) {
-      if (lastTop) { ctx.strokeStyle = 'rgba(61,200,184,.9)'; ctx.beginPath(); ctx.moveTo(lastTop[0], lastTop[1]); ctx.lineTo(pt[0], pt[1]); ctx.stroke(); }
-      lastTop = pt;
-    } else {
-      if (lastBot) { ctx.strokeStyle = 'rgba(255,140,105,.9)'; ctx.beginPath(); ctx.moveTo(lastBot[0], lastBot[1]); ctx.lineTo(pt[0], pt[1]); ctx.stroke(); }
-      lastBot = pt;
+  for (let pi = 0; pi < primes.length; pi++) {
+    const p = primes[pi];
+    // "All p" draws every prime's spiral at once; Play (which steps OL.p) needs to stand
+    // out against that crowd instead of disappearing into it, so the one prime Play is
+    // currently on draws full brightness/size and everything else fades and thins.
+    const isActive = !OL.allP || p === OL.p;
+    const pDot = isActive ? dot : dot * 0.55, pLw = isActive ? lw : lw * 0.5, fade = isActive ? 1 : 0.38;
+    if (p > G) { if (OL.dropout && isActive) olDropoutRing(ctx, xy, p, lw); continue; }
+    let lastTop = null, lastBot = null;
+    for (let M = p + 1; M <= G; M++) {
+      if (gcd(p, M) !== 1) continue;                 // p's own multiples: the residue vanishes
+      const lifts = gcd(p, M + 1) === 1, isTop = p / M > 0.5;
+      if (lifts ? !OL.surv : !OL.broken) {            // filter this point by its own survival status
+        if (isTop) lastTop = null; else lastBot = null;
+        continue;
+      }
+      const pt = xy(p, M); if (!pt) continue;
+      ctx.lineWidth = pLw;
+      if (isTop) {
+        if (lastTop) { ctx.strokeStyle = 'rgba(61,200,184,' + (0.9 * fade).toFixed(2) + ')'; ctx.beginPath(); ctx.moveTo(lastTop[0], lastTop[1]); ctx.lineTo(pt[0], pt[1]); ctx.stroke(); }
+        lastTop = pt;
+      } else {
+        if (lastBot) { ctx.strokeStyle = 'rgba(255,140,105,' + (0.9 * fade).toFixed(2) + ')'; ctx.beginPath(); ctx.moveTo(lastBot[0], lastBot[1]); ctx.lineTo(pt[0], pt[1]); ctx.stroke(); }
+        lastBot = pt;
+      }
+      ctx.fillStyle = isTop ? (isActive ? '#4ecdc4' : 'rgba(78,205,196,.42)') : (isActive ? '#ff8c69' : 'rgba(255,140,105,.42)');
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], pDot, 0, TAU); ctx.fill();
+      if (isActive && OL.allP) {                      // gold ring marks the prime Play is currently stepping through
+        ctx.strokeStyle = 'rgba(242,200,96,.9)'; ctx.lineWidth = Math.max(0.8, pLw * 0.9);
+        ctx.beginPath(); ctx.arc(pt[0], pt[1], pDot * 1.9, 0, TAU); ctx.stroke();
+      }
+      if (!lifts) {                                   // ringed where it will not survive one more step, to M+1
+        ctx.strokeStyle = 'rgba(224,80,96,' + (0.75 * fade).toFixed(2) + ')'; ctx.lineWidth = Math.max(0.6, pLw * 0.8);
+        ctx.beginPath(); ctx.arc(pt[0], pt[1], pDot * 1.7, 0, TAU); ctx.stroke();
+        ctx.lineWidth = pLw;
+      }
     }
-    ctx.fillStyle = isTop ? '#4ecdc4' : '#ff8c69';
-    ctx.beginPath(); ctx.arc(pt[0], pt[1], dot, 0, TAU); ctx.fill();
-    if (!lifts && OL.broken) {                      // ringed where it will not survive one more step, to M+1
-      ctx.strokeStyle = 'rgba(224,80,96,.75)'; ctx.lineWidth = Math.max(0.6, lw * 0.8);
-      ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.7, 0, TAU); ctx.stroke();
-      ctx.lineWidth = lw;
+    if (OL.dropout && isActive) olDropoutRing(ctx, xy, p, lw);
+  }
+  // Mirror conjugate sigma(r) = M - r is one dynamic path, tied to the single active
+  // prime OL.p only -- not one mirror overlay per prime when "All p" is on, which used
+  // to bloom into a mirror dot for every prime at once and read as noise, not a path.
+  if (OL.mirror && OL.p <= G) {
+    const p = OL.p;
+    ctx.fillStyle = 'rgba(155,127,232,.85)';
+    for (let M = p + 1; M <= G; M++) {
+      if (gcd(p, M) !== 1) continue;
+      const rM = M - p; if (rM < 1) continue;
+      const mpt = xy(rM, M);
+      if (mpt) { ctx.beginPath(); ctx.arc(mpt[0], mpt[1], dot * 0.85, 0, TAU); ctx.fill(); }
     }
   }
 }
@@ -3549,15 +3640,94 @@ function olChain(ctx, xy, G, n, lw) {
     for (let i = 0; i < dieDots.length; i++) { const p = dieDots[i]; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, TAU); ctx.fill(); }
   }
 }
+// Strip overlay, ported from the main page's slope a/b · offset s · width w band:
+// s <= b*r - a*M < s+w, over the same triangular 1<=r<=M lattice the spiral and
+// +-n path already draw on. Drawn as connected paths (one per integer v in the
+// band) rather than ringed points, so a wide band reads as a filled swath and a
+// width-1 band reads as one clean diagonal, matching the main page's strip look.
+function olStrip(ctx, xy, G, lw) {
+  const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(242,200,96,.55)'; ctx.lineWidth = Math.max(0.7, lw);
+  if (b !== 0) {
+    // v = b*r - a*M  =>  M = (b*r - v) / a  (a swept row per v), or r = (v + a*M)/b (a swept column) when a = 0.
+    for (let v = Math.ceil(s); v < s + w; v++) {
+      ctx.beginPath();
+      let started = false;
+      if (a === 0) {
+        const r = v / b;
+        if (Number.isInteger(r) && r >= 1) {
+          for (let M = r; M <= G; M++) {
+            const pt = xy(r, M); if (!pt) { started = false; continue; }
+            if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
+          }
+        }
+      } else {
+        for (let r = 1; r <= G; r++) {
+          const M = (b * r - v) / a;
+          if (!Number.isInteger(M) || M < r || M > G || M < 1) { started = false; continue; }
+          const pt = xy(r, M); if (!pt) { started = false; continue; }
+          if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
+        }
+      }
+      if (started) ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+// One line M = sign*r + c, r restricted to 1<=r<=M<=G to match the triangular
+// half this preview already draws (the spiral and mirror overlays do the same) --
+// drawn as a connected stroke, not point-by-point, so it reads as a path.
+function olGoldbachLine(ctx, xy, G, sign, c, rgb, lw) {
+  ctx.strokeStyle = rgb; ctx.lineWidth = lw;
+  ctx.beginPath();
+  let started = false;
+  for (let r = 1; r <= G; r++) {
+    const M = sign * r + c;
+    if (M < r || M > G || M < 1) { started = false; continue; }
+    const pt = xy(r, M);
+    if (!pt) { started = false; continue; }
+    if (!started) { ctx.moveTo(pt[0], pt[1]); started = true; } else ctx.lineTo(pt[0], pt[1]);
+  }
+  if (started) ctx.stroke();
+}
+// N for the opener's own Goldbach play: the largest even number that still fits the
+// preview lattice, so every pair it steps through lands on a visible point.
+function olGoldbachN() { const G = OPENER_G; return Math.max(4, G % 2 === 0 ? G : G - 1); }
+function olGoldbachPairs() {
+  const N = olGoldbachN(), out = [];
+  for (let g = 2; g <= N / 2; g++) if (isPrime(g) && isPrime(N - g)) out.push(g);
+  return out;
+}
+// Play Goldbach pairs: draws the strip lines for the current pair (g, N-g), not just
+// its point -- c: r+M=g and d: r+M=s are the sum pair the Goldbach verdict reads
+// (ported straight from the main page's Partitions panel); a: M-r=g is its difference
+// twin. b: r-M=g would need r>M, which never happens on this triangular half, the
+// same reason the spiral and mirror overlays above only ever show their r<=M side.
+function olGoldbach(ctx, xy, G, dot, lw) {
+  const N = olGoldbachN(), pairs = olGoldbachPairs();
+  if (!pairs.length) return;
+  const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0));
+  const g = pairs[idx], s = N - g;
+  ctx.save();
+  olGoldbachLine(ctx, xy, G, -1, g, 'rgba(242,200,96,.9)', lw);              // c
+  if (s !== g) olGoldbachLine(ctx, xy, G, -1, s, 'rgba(224,150,224,.85)', lw); // d
+  olGoldbachLine(ctx, xy, G, 1, g, 'rgba(120,190,255,.65)', lw);             // a
+  const r = Math.min(g, s), M = Math.max(g, s), pt = xy(r, M);
+  if (pt) { ctx.fillStyle = 'rgba(242,200,96,.95)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.6, 0, TAU); ctx.fill(); }
+  ctx.restore();
+}
 function openerDrawLift(ctx, xy, S) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
-  if (m === 'none' && !OL.chain) return;
+  if (m === 'none' && !OL.chain && !OL.stripOn && !OL.gbOn) return;
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));   // line and dot sizes follow the cell, so G = 256 doesn't turn to felt
   ctx.save();
   if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2), cl(cell * 0.24, 0.6, 1.8));
   if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2), cl(cell * 0.3, 0.7, 2.2));
   if (m === 'connect') olConnect(ctx, xy, G, n, cl(cell * 0.2, 0.5, 1.4));
   if (OL.chain) olChain(ctx, xy, G, n, cl(cell * 0.25, 0.4, 1.5));
+  if (OL.stripOn) olStrip(ctx, xy, G, cl(cell * 0.15, 0.6, 2));
+  if (OL.gbOn) olGoldbach(ctx, xy, G, cl(cell * 0.42, 1, 2.2), cl(cell * 0.3, 0.7, 2));
   ctx.restore();
 }
 // The lift settings only move the overlays, so redraw the three tiles and leave the tally alone.
@@ -3605,6 +3775,40 @@ function olTogglePPlay() {
 function olToggleChain(v) { OL.chain = !!v; olRedraw(); }
 function olSetSurv(v) { OL.surv = !!v; olRedraw(); }
 function olSetBroken(v) { OL.broken = !!v; olRedraw(); }
+function olToggleAllP(v) { OL.allP = !!v; olRedraw(); }
+function olToggleMirror(v) { OL.mirror = !!v; olRedraw(); }
+function olToggleDropout(v) { OL.dropout = !!v; olRedraw(); }
+function olToggleDropoutLbl(v) { OL.dropoutLbl = !!v; olRedraw(); }
+// Strip (slope a/b, offset, width) -- ported control surface, opener preview only.
+function olToggleStrip(v) { OL.stripOn = !!v; olRedraw(); }
+function olSetSlopeA(v) { OL.slopeA = Number(v); if (!isFinite(OL.slopeA)) OL.slopeA = 1; olRedraw(); }
+function olSetSlopeB(v) { const b = Number(v); OL.slopeB = isFinite(b) && b !== 0 ? b : 1; olRedraw(); }
+function olSetOffset(v) { OL.offset = Number(v); if (!isFinite(OL.offset)) OL.offset = 0; olRedraw(); }
+function olSetWidth(v) { const w = Math.round(Number(v)); OL.width = isFinite(w) && w >= 1 ? w : 1; olRedraw(); }
+function olStepSlopeA(d) { OL.slopeA = (Number(OL.slopeA) || 0) + d; olRedraw(); }
+function olStepSlopeB(d) { const nb = (Number(OL.slopeB) || 1) + d; OL.slopeB = nb === 0 ? (d > 0 ? 1 : -1) : nb; olRedraw(); }
+function olStepOffset(d) { OL.offset = (Number(OL.offset) || 0) + d; olRedraw(); }
+function olStepWidth(d) { OL.width = Math.max(1, (Number(OL.width) || 1) + d); olRedraw(); }
+// Play Goldbach pairs -- steps OL.gbIdx through olGoldbachPairs() on loop.
+let _olGbTimer = 0;
+function olSyncGbPlayChip() {
+  const b = $('ol-gb-play'); if (!b) return;
+  b.innerHTML = _olGbTimer ? '&#9632; Stop' : '&#9654; Play Goldbach pairs';
+  b.classList.toggle('on', !!_olGbTimer);
+}
+function olStopGbPlay() { if (_olGbTimer) { clearInterval(_olGbTimer); _olGbTimer = 0; } olSyncGbPlayChip(); }
+function olToggleGbPlay() {
+  if (_olGbTimer) { olStopGbPlay(); return; }
+  OL.gbOn = true;
+  _olGbTimer = setInterval(() => {
+    if (!openerModalOpen()) { olStopGbPlay(); return; }
+    const pairs = olGoldbachPairs();
+    if (!pairs.length) { olStopGbPlay(); return; }
+    OL.gbIdx = ((OL.gbIdx || 0) + 1) % pairs.length;
+    olRedraw();
+  }, 500);
+  olSyncGbPlayChip(); olRedraw();
+}
 // The header carries D(n) live; the table under "the math" is only rebuilt while it is open.
 function olSyncUI() {
   const n = openerLiftN(), ZETA2 = Math.PI * Math.PI / 6;
@@ -3614,6 +3818,21 @@ function olSyncUI() {
   const p1 = $('ol-p1'); if (p1) p1.classList.toggle('on', OL.p === 1);
   const chk = (id, v) => { const el = $(id); if (el && el.checked !== v) el.checked = v; };
   chk('ol-chain-chk', OL.chain); chk('ol-surv-chk', OL.surv); chk('ol-broken-chk', OL.broken);
+  chk('ol-allp-chk', OL.allP); chk('ol-mirror-chk', OL.mirror);
+  chk('ol-dropout-chk', OL.dropout); chk('ol-dropoutlbl-chk', OL.dropoutLbl);
+  chk('ol-strip-chk', OL.stripOn);
+  const setInp = (id, v) => { const el = $(id); if (el && document.activeElement !== el) el.value = v; };
+  setInp('ol-sl-a', OL.slopeA); setInp('ol-sl-b', OL.slopeB); setInp('ol-off', OL.offset); setInp('ol-w', OL.width);
+  const gbNote = $('ol-gb-note');
+  if (gbNote) {
+    const N = olGoldbachN(), pairs = olGoldbachPairs();
+    let txt = 'N = ' + N + ' \u00b7 ' + pairs.length + ' pair' + (pairs.length === 1 ? '' : 's');
+    if (pairs.length) {
+      const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0)), g = pairs[idx], s = N - g;
+      txt += (OL.gbOn ? ' \u00b7 showing ' : ' \u00b7 ') + g + ' + ' + s + ' = ' + N;
+    }
+    gbNote.textContent = txt;
+  }
   let D = NaN;
   try { D = Dn(n); } catch (e) {}
   set('ol-dn-head', isFinite(D) ? D.toFixed(6) : '\u2013');
@@ -3752,7 +3971,9 @@ function oeSetRatio(r) {
 function oeSummary() {
   const sel = $('cmode'), coloring = (sel && sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
-  let lift = 'Lift: ' + modeLabel + ' \u00b7 n=' + openerLiftN() + ' \u00b7 p=' + OL.p;
+  let lift = 'Lift: ' + modeLabel + ' \u00b7 n=' + openerLiftN() + ' \u00b7 p=' + (OL.allP ? 'all' : OL.p);
+  if (OL.mirror) lift += ' \u00b7 mirror on';
+  if (OL.dropout) lift += ' \u00b7 dropout on';
   if (OL.chain) lift += ' \u00b7 r\u2192r mod(M+1) on';
   if (!OL.surv) lift += ' \u00b7 surviving off';
   if (!OL.broken) lift += ' \u00b7 broken off';
@@ -3802,24 +4023,25 @@ function oeTallyData() {
 }
 // Measures the tally table's height before the canvas exists (same two-pass approach as
 // the categorized legend below it), wrapping a long label rather than letting it clip.
-function oeLayoutTally(data, W) {
-  const mctx = document.createElement('canvas').getContext('2d'), px = 24, lh = 36, sw = 26, numW = 220;
+function oeLayoutTally(data, W, S) {
+  const mctx = document.createElement('canvas').getContext('2d'), px = 24 * S, lh = 36 * S, sw = 26 * S, numW = 220 * S;
   mctx.font = px + 'px ' + MONO;
   const wrap = (text, maxW) => { const words = text.split(' '), lines = []; let cur = ''; for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; } if (cur) lines.push(cur); return lines; };
-  const labelW = W - sw - 14 - numW;
+  const labelW = W - sw - 14 * S - numW;
   const allRows = data.rows.concat(data.more ? [data.more] : []);
   const laid = allRows.map(r => ({ ...r, lines: wrap(r.label, labelW) }));
   const rowsH = laid.reduce((t, r) => t + Math.max(1, r.lines.length) * lh, 0);
   const footLines = [data.sumOk ? null : 'sum mismatch', data.gcdLine, data.bandLine].filter(Boolean).length;
-  const h = 30 + 28 + rowsH + 20 + footLines * 28 + 30;
-  return { h: h, px: px, lh: lh, sw: sw, numW: numW, laid: laid };
+  const h = (30 + 28) * S + rowsH + 20 * S + footLines * 28 * S + 30 * S;
+  return { h: h, px: px, lh: lh, sw: sw, numW: numW, laid: laid, S: S };
 }
 function oeDrawTally(ctx, data, L, x, y, W) {
+  const S = L.S || 1;
   ctx.save(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = PAL.cream3; ctx.font = '15px ' + MONO;
-  ctx.fillText(data.rule, x, y + 20);
-  ctx.fillText(data.header, x, y + 46);
-  let cy = y + 46 + 40;
+  ctx.fillStyle = PAL.cream3; ctx.font = (15 * S) + 'px ' + MONO;
+  ctx.fillText(data.rule, x, y + 20 * S);
+  ctx.fillText(data.header, x, y + 46 * S);
+  let cy = y + (46 + 40) * S;
   L.laid.forEach(r => {
     if (r.sw) { ctx.fillStyle = r.sw; ctx.fillRect(x, cy - L.px * 0.72, L.sw * 0.6, L.sw * 0.6); }
     ctx.fillStyle = PAL.cream2; ctx.font = L.px + 'px ' + MONO;
@@ -3831,13 +4053,13 @@ function oeDrawTally(ctx, data, L, x, y, W) {
     ctx.textAlign = 'left';
     cy += Math.max(1, r.lines.length) * L.lh;
   });
-  cy += 24;
-  ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(x, cy - 12); ctx.lineTo(x + W, cy - 12); ctx.stroke();
-  ctx.font = '15px ' + MONO;
-  if (!data.sumOk) { ctx.fillStyle = PAL.coral; ctx.fillText('classes sum to ' + data.sum + ' \u2260 ' + data.total, x, cy); cy += 28; }
-  ctx.fillStyle = PAL.cream3; ctx.fillText(data.gcdLine + (data.gcdOk ? ' \u2713' : ' \u2260'), x, cy); cy += 28;
-  if (data.bandLine) { ctx.fillText(data.bandLine, x, cy); cy += 28; }
+  cy += 24 * S;
+  ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1 * S;
+  ctx.beginPath(); ctx.moveTo(x, cy - 12 * S); ctx.lineTo(x + W, cy - 12 * S); ctx.stroke();
+  ctx.font = (15 * S) + 'px ' + MONO;
+  if (!data.sumOk) { ctx.fillStyle = PAL.coral; ctx.fillText('classes sum to ' + data.sum + ' \u2260 ' + data.total, x, cy); cy += 28 * S; }
+  ctx.fillStyle = PAL.cream3; ctx.fillText(data.gcdLine + (data.gcdOk ? ' \u2713' : ' \u2260'), x, cy); cy += 28 * S;
+  if (data.bandLine) { ctx.fillText(data.bandLine, x, cy); cy += 28 * S; }
   ctx.restore();
 }
 function oeSpacedCaps(s) { return s.toUpperCase().split(' ').map(w => w.split('').join(' ')).join('   '); }
@@ -3863,13 +4085,18 @@ function oeLegendSections() {
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
   if (OL.mode !== 'none' || OL.chain) {
     const n = openerLiftN(), li = [{ c: null, t: 'mode ' + modeLabel + ' \u00b7 n = ' + n + ' \u00b7 block length ' + (n + 1) }];
-    if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect')
-      li.push({ c: PAL.teal, t: 'spiral r = ' + (OL.p === 1 ? '1 (locked residue)' : 'p = ' + OL.p) + ' \u00b7 teal above p/M = 0.5, coral below' });
+    if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') {
+      li.push({ c: PAL.teal, t: 'spiral r = ' + (OL.allP ? 'p, all primes p \u2264 G' : OL.p === 1 ? '1 (locked residue)' : 'p = ' + OL.p) + ' \u00b7 teal above p/M = 0.5, coral below' });
+      if (OL.mirror) li.push({ c: PAL.violet, t: 'mirror \u03c3(r) = M \u2212 r' });
+      if (OL.dropout) li.push({ c: PAL.coral, t: 'dropout ring M = p' + (OL.dropoutLbl ? ' (labelled)' : '') });
+    }
     if (OL.mode === 'npath' || OL.mode === 'both' || OL.mode === 'connect')
       li.push({ c: PAL.amber, t: '\u00b1n path r = (M\u00b1' + n + ')/2' });
     if (OL.mode === 'connect') li.push({ c: PAL.cream3, t: 'connectors joining spiral and \u00b1n path at shared rings' });
-    if (OL.chain) li.push({ c: PAL.teal, t: 'r \u2192 r mod(M+1) \u00b7 teal survives, red dot dies' });
-    li.push({ c: null, t: 'showing ' + [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both off)' });
+    if (OL.mode !== 'none' || OL.chain) li.push({ c: null, t: 'showing ' + ([OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both off)') });
+    if (OL.chain) {
+      li.push({ c: PAL.teal, t: 'r \u2192 r mod(M+1) \u00b7 teal survives, red dot dies' });
+    }
     let D = NaN; try { D = Dn(n); } catch (e) {}
     const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
     li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') });
@@ -3881,10 +4108,10 @@ function oeLegendSections() {
 // Word-wraps each item into its column and measures the total height before the
 // canvas exists, the same two-pass approach the page's own detail band uses, so the
 // export grows to fit the legend instead of clipping it.
-function oeLayoutLegend(sections, W) {
+function oeLayoutLegend(sections, W, S) {
   if (!sections.length) return { h: 0, cols: [], colW: 0 };
   const mctx = document.createElement('canvas').getContext('2d');
-  const px = 22, lh = 32, gap = 40, swW = 22;
+  const px = 22 * S, lh = 32 * S, gap = 40 * S, swW = 22 * S;
   mctx.font = px + 'px ' + MONO;
   // W arrives already inset by the caller's own pad (same as the page's own
   // drawDetailBand) -- subtracting a second pad here left the columns each
@@ -3899,44 +4126,45 @@ function oeLayoutLegend(sections, W) {
   };
   const cols = Array.from({ length: ncol }, () => ({ blocks: [], h: 0 }));
   sections.forEach((sec, i) => {
-    const lay = sec.items.map(it => ({ c: it.c, lines: wrap(it.t, colW - swW - 14) }));
+    const lay = sec.items.map(it => ({ c: it.c, lines: wrap(it.t, colW - swW - 14 * S) }));
     const nLines = lay.reduce((a, b) => a + b.lines.length, 0);
-    const h = 46 + nLines * lh + lay.length * 6 + 16;
+    const h = 46 * S + nLines * lh + lay.length * 6 * S + 16 * S;
     cols[Math.min(i, ncol - 1)].blocks.push({ title: sec.title, lay, h });
     cols[Math.min(i, ncol - 1)].h += h;
   });
-  return { h: Math.max.apply(null, cols.map(c => c.h)) + 64, cols, colW, gap, px, lh, swW };
+  return { h: Math.max.apply(null, cols.map(c => c.h)) + 64 * S, cols, colW, gap, px, lh, swW, S: S };
 }
 function oeDrawLegend(ctx, L, x, y, W) {
   if (!L.h) return;
+  const S = L.S || 1;
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5 * S;
   ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + W, y); ctx.stroke();
-  ctx.fillStyle = PAL.gold; ctx.font = '22px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillText('LEGEND \u00b7 WHAT\u2019S ON, RIGHT NOW', x, y + 34);
+  ctx.fillStyle = PAL.gold; ctx.font = (22 * S) + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('LEGEND \u00b7 WHAT\u2019S ON, RIGHT NOW', x, y + 34 * S);
   L.cols.forEach((col, ci) => {
-    let cy = y + 78;
+    let cy = y + 78 * S;
     const cx = x + ci * (L.colW + L.gap);
     col.blocks.forEach(b => {
-      ctx.fillStyle = PAL.cream3; ctx.font = '13.5px ' + MONO;
-      ctx.fillText(b.title, cx, cy); cy += 26;
+      ctx.fillStyle = PAL.cream3; ctx.font = (13.5 * S) + 'px ' + MONO;
+      ctx.fillText(b.title, cx, cy); cy += 26 * S;
       b.lay.forEach(it => {
         if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(cx, cy - L.px * 0.78, L.swW * 0.5, L.swW * 0.5); }
         ctx.fillStyle = PAL.cream2; ctx.font = L.px + 'px ' + MONO;
         it.lines.forEach((line, li) => { ctx.fillText(line, cx + L.swW, cy); cy += L.lh; });
-        cy += 6;
+        cy += 6 * S;
       });
-      cy += 12;
+      cy += 12 * S;
     });
   });
   ctx.restore();
 }
 // Word-wraps a legend section into lines for a narrow side panel -- same
 // measuring approach as oeLayoutLegend/layoutDetailBand, just one column wide.
-function oeSidePanelLines(section, w) {
+function oeSidePanelLines(section, w, S) {
   if (!section) return null;
   const mctx = document.createElement('canvas').getContext('2d');
-  const px = 20, lh = 28, swW = 20;
+  const px = 20 * S, lh = 28 * S, swW = 20 * S;
   mctx.font = px + 'px ' + MONO;
   const wrap = (text, maxW) => {
     const words = text.split(' '), lines = []; let cur = '';
@@ -3944,19 +4172,20 @@ function oeSidePanelLines(section, w) {
     if (cur) lines.push(cur);
     return lines;
   };
-  return { title: section.title, lay: section.items.map(it => ({ c: it.c, lines: wrap(it.t, Math.max(40, w - swW - 12)) })), px, lh, swW };
+  return { title: section.title, lay: section.items.map(it => ({ c: it.c, lines: wrap(it.t, Math.max(40 * S, w - swW - 12 * S)) })), px, lh, swW, S: S };
 }
 function oeDrawSidePanel(ctx, panel, x, y, w) {
   if (!panel) return;
+  const S = panel.S || 1;
   ctx.save(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = PAL.gold; ctx.font = '20px ' + MONO;
+  ctx.fillStyle = PAL.gold; ctx.font = (20 * S) + 'px ' + MONO;
   ctx.fillText(panel.title, x, y);
-  let cy = y + 36;
+  let cy = y + 36 * S;
   panel.lay.forEach(it => {
     if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(x, cy - panel.px * 0.78, panel.swW * 0.55, panel.swW * 0.55); }
     ctx.fillStyle = PAL.cream2; ctx.font = panel.px + 'px ' + MONO;
     it.lines.forEach(line => { ctx.fillText(line, x + panel.swW, cy); cy += panel.lh; });
-    cy += 8;
+    cy += 8 * S;
   });
   ctx.restore();
 }
@@ -3966,7 +4195,13 @@ async function runOpenerExport() {
   if (btn) btn.disabled = true;
   await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));   // let "Rendering..." actually paint
   try {
-    const W = 4096, pad = 64, gap = 28, ratio = OE.cayRatio === '1:1' ? 1 : 2;
+    const W = 4096, ratio = OE.cayRatio === '1:1' ? 1 : 2;
+    // Same width-to-scale convention the page's own export uses (S = px/1920),
+    // so every font size, margin and gap below grows with the canvas the same
+    // way the main plate's export does, instead of the fixed pixel values that
+    // used to read small and cramped next to it at the same 4096px width.
+    const S = W / 1920;
+    const pad = 64 * S, gap = 28 * S;
     const viewLabel = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley', all3: 'Grid \u00b7 Ring \u00b7 Cayley' }[OE.view];
     stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay();
     // Header, same shape as the page's own export: a letter-spaced eyebrow, a serif
@@ -3974,9 +4209,9 @@ async function runOpenerExport() {
     // here from the actual point set, so it can never drift from the picture.
     const cop = _openerSq.filter(p => gcd(p[0], p[1]) === 1).length, cells = OPENER_G * OPENER_G;
     const pct = 100 * cop / cells, target = 100 * 6 / (Math.PI * Math.PI), delta = pct - target;
-    const headerH = 172;
+    const headerH = 172 * S;
     const tallyData = oeTallyData();
-    const tallyL = oeLayoutTally(tallyData, W - pad * 2);
+    const tallyL = oeLayoutTally(tallyData, W - pad * 2, S);
     const sections = oeLegendSections();
     const legendW = W - pad * 2;
     const tileW = (W - gap) / 2;
@@ -3988,33 +4223,36 @@ async function runOpenerExport() {
     // export makes for its lone third tile: description/colour key on the
     // left, live parameters on the right, in the space the tile doesn't need.
     const useSidePanels = (OE.view === 'all3');
-    const legendL = useSidePanels ? { h: 0, cols: [] } : oeLayoutLegend(sections, legendW);
-    const footerH = 46;
+    const legendL = useSidePanels ? { h: 0, cols: [] } : oeLayoutLegend(sections, legendW, S);
+    const footerH = 46 * S;
     let plateH;
     if (OE.view === 'all3') plateH = tileW + gap + tileW;
     else if (OE.view === 'cayley') plateH = W / ratio;
     else plateH = W;
     const sidePanelW = useSidePanels ? Math.max(0, (W - tileW) / 2 - pad - gap) : 0;
-    const sidePanels = useSidePanels ? [oeSidePanelLines(sections[0], sidePanelW), oeSidePanelLines(sections[1], sidePanelW)] : null;
-    const H = Math.round(headerH + plateH + 40 + tallyL.h + legendL.h + footerH);
+    const sidePanels = useSidePanels ? [oeSidePanelLines(sections[0], sidePanelW, S), oeSidePanelLines(sections[1], sidePanelW, S)] : null;
+    const H = Math.round(headerH + plateH + 40 * S + tallyL.h + legendL.h + footerH);
     const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold; ctx.font = '17px ' + MONO;
-    ctx.fillText(oeSpacedCaps('Strip II \u00b7 Opener Preview \u00b7 Wessen Getachew \u00b7 2026'), W / 2, 52);
-    ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream; ctx.font = '56px ' + DISP;
-    ctx.fillText(oeViewTitle(), pad, 128);
-    ctx.textAlign = 'right'; ctx.font = '17px ' + MONO; ctx.fillStyle = PAL.cream3;
-    ctx.fillText('G = ' + OPENER_G + '   \u00b7   G\u00b2 = ' + cells.toLocaleString() + ' pts   \u00b7   ' + viewLabel, W - pad, 112);
+    ctx.textAlign = 'center'; ctx.fillStyle = PAL.gold; ctx.font = (17 * S) + 'px ' + MONO;
+    ctx.fillText(oeSpacedCaps('Strip II \u00b7 Opener Preview \u00b7 Wessen Getachew \u00b7 2026'), W / 2, 52 * S);
+    ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream; ctx.font = (56 * S) + 'px ' + DISP;
+    ctx.fillText(oeViewTitle(), pad, 128 * S);
+    ctx.textAlign = 'right'; ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
+    ctx.fillText('G = ' + OPENER_G + '   \u00b7   G\u00b2 = ' + cells.toLocaleString() + ' pts   \u00b7   ' + viewLabel, W - pad, 112 * S);
     ctx.fillText('gcd=1: ' + cop.toLocaleString() + '/' + cells.toLocaleString() + ' = ' + pct.toFixed(2) +
-      '%   \u00b7   \u0394 6/\u03c0\u00b2 (' + target.toFixed(2) + '%): ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '%', W - pad, 146);
+      '%   \u00b7   \u0394 6/\u03c0\u00b2 (' + target.toFixed(2) + '%): ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '%', W - pad, 146 * S);
     let y = headerH;
-    // Every tile is clipped to its own box before drawing. Cayley's points come
-    // from a Mobius map that blows up near its pole, so without a clip a wide
-    // zoom can paint well outside the rectangle it was asked to fill -- straight
-    // into a neighbouring tile. Grid and Ring can't run over their own box, but
-    // clipping them too costs nothing and keeps the rule uniform.
+    // Every tile is clipped to its own box before drawing, AND translated down
+    // past the header first -- the single-view branches used to skip this
+    // translate and paint straight over the header text at canvas row 0.
+    // Cayley's points come from a Mobius map that blows up near its pole, so
+    // without the clip a wide zoom can paint well outside the rectangle it
+    // was asked to fill -- straight into a neighbouring tile. Grid and Ring
+    // can't run over their own box, but clipping them too costs nothing and
+    // keeps the rule uniform.
     if (OE.view === 'all3') {
       ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
       openerDrawGrid(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
@@ -4023,24 +4261,24 @@ async function runOpenerExport() {
       const cayX = (W - tileW) / 2, cayY = y + tileW + gap;
       ctx.save(); ctx.translate(cayX, cayY); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
       openerDrawCayley(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
-      oeDrawSidePanel(ctx, sidePanels[0], pad, cayY + 34, sidePanelW);
-      oeDrawSidePanel(ctx, sidePanels[1], cayX + tileW + gap, cayY + 34, sidePanelW);
+      oeDrawSidePanel(ctx, sidePanels[0], pad, cayY + 34 * S, sidePanelW);
+      oeDrawSidePanel(ctx, sidePanels[1], cayX + tileW + gap, cayY + 34 * S, sidePanelW);
       y = cayY + tileW;
     } else if (OE.view === 'grid') {
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawGrid(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
+      ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawGrid(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
     } else if (OE.view === 'ring') {
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawRing(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
+      ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawRing(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
     } else {
       const cayH = W / ratio;
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, cayH); ctx.clip(); openerDrawCayley(1, { ctx: ctx, w: W, h: cayH }); ctx.restore(); y += cayH;
+      ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, W, cayH); ctx.clip(); openerDrawCayley(1, { ctx: ctx, w: W, h: cayH }); ctx.restore(); y += cayH;
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(pad, y + 20); ctx.lineTo(W - pad, y + 20); ctx.stroke();
-    oeDrawTally(ctx, tallyData, tallyL, pad, y + 40, W - pad * 2);
-    y += 40 + tallyL.h;
-    if (!useSidePanels) { oeDrawLegend(ctx, legendL, pad, y + 20, legendW); y += 20 + legendL.h; }
-    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(221,216,204,.45)'; ctx.font = '18px ' + MONO;
+    ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5 * S;
+    ctx.beginPath(); ctx.moveTo(pad, y + 20 * S); ctx.lineTo(W - pad, y + 20 * S); ctx.stroke();
+    oeDrawTally(ctx, tallyData, tallyL, pad, y + 40 * S, W - pad * 2);
+    y += 40 * S + tallyL.h;
+    if (!useSidePanels) { oeDrawLegend(ctx, legendL, pad, y + 20 * S, legendW); y += 20 * S + legendL.h; }
+    ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(221,216,204,.45)'; ctx.font = (18 * S) + 'px ' + MONO;
     ctx.fillText('wessengetachew.github.io \u00b7 opener preview, not the live plate', pad, y + footerH * 0.5);
     canvas.toBlob(blob => {
       const a = document.createElement('a'), url = URL.createObjectURL(blob);
