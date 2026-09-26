@@ -1731,6 +1731,9 @@ walk anyway.</p>
       <span class="lbl">hole</span>
       <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
       <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
+      <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.85);cursor:pointer;font-size:11.5px;" title="Fills the hole with |sin(N&theta;/2)/sin(&theta;/2)| &mdash; the same exponential-sum magnitude the classical circle method studies, radiating outward from the centre (N=0) to the full lattice size G at the rim. It peaks at rational angles p/q (the &quot;major arcs&quot;), which is what gives it that spiky, orange-at-the-edge look. Fades in with the hole slider &mdash; nothing shows until hole &gt; 0, full strength at hole = 1.">
+        <input type="checkbox" id="cm-toggle" onchange="setOpenerCircleMethod(this.checked)"> circle method
+      </label>
     </div>
     <div class="prow" style="padding:2px 0 6px;">
       <span class="lbl">view</span>
@@ -3316,6 +3319,7 @@ const OPENER_CZ_DEFAULT = 0.33;
    ranges as the Cayley panel on the page, but its own sliders. */
 let OPENER_RHO0 = 0.4, OPENER_RHOD = 1.8;
 let OPENER_RING_HOLE = 0;   // Ring preview's inner radius, 0..1 &mdash; the page's own "hole" control, mirrored here
+let OPENER_CIRCLE_METHOD = false;   // "circle method" fill in the ring's hole, opt-in, strength follows OPENER_RING_HOLE
 let OPENER_CZ = OPENER_CZ_DEFAULT;   // Cayley preview zoom; below 1 zooms out
 /* Opener's own gcd=1 bitset, built once for the full 2..256 range the preview
    slider covers -- same sieve-and-clear approach as the page's own buildCoprime,
@@ -3684,26 +3688,43 @@ function olStrip(ctx, xy, G, lw) {
 }
 // Coprime/total point count for the same band, kept separately for the live
 // readout and export legend -- the polygon above no longer plots these itself.
+// Memoized on its own inputs -- this used to get recomputed from scratch (a fresh
+// O(G) scan) up to twice per redraw (once for the live count, once inside olStrip
+// itself on whichever view draws it), and again for every canvas when it was still
+// point-based. One redraw, one scan now; only a genuine slope/offset/width/G change
+// invalidates it.
+let _olStripCache = null, _olStripKey = '';
 function olStripPoints(G) {
   const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
+  const key = G + '|' + a + '|' + b + '|' + s + '|' + w;
+  if (_olStripCache && _olStripKey === key) return _olStripCache;
   const pts = []; let total = 0, cop = 0;
-  if (!b) return { pts, total, cop };
-  for (let M = 1; M <= G; M++) {
-    const lo = Math.ceil((s + a * M) / b), hi = Math.ceil((s + w + a * M) / b) - 1;
-    for (let r = Math.max(1, lo); r <= Math.min(G, hi); r++) {
-      total++;
-      if (gcd(r, M) === 1) { cop++; pts.push([r, M]); }
+  if (b) {
+    for (let M = 1; M <= G; M++) {
+      const lo = Math.ceil((s + a * M) / b), hi = Math.ceil((s + w + a * M) / b) - 1;
+      for (let r = Math.max(1, lo); r <= Math.min(G, hi); r++) {
+        total++;
+        if (gcd(r, M) === 1) { cop++; pts.push([r, M]); }
+      }
     }
   }
-  return { pts, total, cop };
+  _olStripKey = key; _olStripCache = { pts, total, cop };
+  return _olStripCache;
 }
 // E = 2(G+1), read off the live preview lattice -- exactly the main page's
 // Goldbach-partitions formula, just fed OPENER_G instead of COP_G, so the
 // same g/s/E numbers you'd see there show up here at the preview's own size.
 function olGoldbachN() { return 2 * (OPENER_G + 1); }
+// Memoized on G: this used to redo the whole trial-division sieve up to four times
+// per redraw (once in olSyncUI for the note, once more inside olGoldbach for every
+// canvas that draws it) -- one redraw, one sieve now, unless G actually changed.
+let _olGbCache = null, _olGbCacheN = -1;
 function olGoldbachPairs() {
-  const N = olGoldbachN(), out = [];
+  const N = olGoldbachN();
+  if (_olGbCache && _olGbCacheN === N) return _olGbCache;
+  const out = [];
   for (let g = 2; g <= N / 2; g++) if (isPrime(g) && isPrime(N - g)) out.push(g);
+  _olGbCacheN = N; _olGbCache = out;
   return out;
 }
 // The four Strip I lines for one gap g (partner s = E-g), same construction as
@@ -4149,7 +4170,7 @@ function oeLegendSections() {
   if (OPENER_ROT.r) rot.push('ring ' + Math.round(OPENER_ROT.r) + '\u00b0');
   if (rot.length) vi.push({ c: null, t: 'turn ' + rot.join(', ') });
   vi.push({ c: PAL.gold, t: 'Cayley \u03c1 = ' + OPENER_RHO0.toFixed(2) + ' + ' + OPENER_RHOD.toFixed(2) + '\u00b7M/G' + (OPENER_CZ !== OPENER_CZ_DEFAULT ? ' \u00b7 zoom ' + OPENER_CZ.toFixed(2) + '\u00d7' : '') });
-  if (OPENER_RING_HOLE) vi.push({ c: null, t: 'ring hole ' + OPENER_RING_HOLE.toFixed(2) + (OPENER_RING_HOLE >= 0.5 ? ' \u00b7 roots-of-unity reading on' : '') });
+  if (OPENER_RING_HOLE) vi.push({ c: null, t: 'ring hole ' + OPENER_RING_HOLE.toFixed(2) + (OPENER_RING_HOLE >= 0.5 ? ' \u00b7 roots-of-unity reading on' : '') + (OPENER_CIRCLE_METHOD ? ' \u00b7 circle method fill on' : '') });
   const out = [{ title: 'VIEW', items: vi }];
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
   if (OL.mode !== 'none' || OL.chain || OL.stripOn || OL.gbOn) {
@@ -4417,6 +4438,11 @@ function setOpenerRingHole(pct) {
   const l = $('welcome-ring-hole-v'); if (l) l.textContent = OPENER_RING_HOLE.toFixed(2);
   openerRotSoon('r');   // Ring tile only
 }
+function setOpenerCircleMethod(v) {
+  OPENER_CIRCLE_METHOD = !!v;
+  const chk = $('cm-toggle'); if (chk && chk.checked !== OPENER_CIRCLE_METHOD) chk.checked = OPENER_CIRCLE_METHOD;
+  openerRotSoon('r');
+}
 function openerCayleyWheel(e) {
   e.preventDefault();
   const sl = $('welcome-cz');
@@ -4492,12 +4518,94 @@ function openerDrawRing(t, forceC) {
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
 }
+/* Circle-method fill for the ring's hole: |sin(N*theta/2)/sin(theta/2)|, N growing
+   linearly from 0 at the centre to G at the rim. That is the plain exponential sum
+   |sum_{n=1}^{N} e(n*theta/2pi)| the classical circle method studies -- its peaks sit
+   exactly at rational angles p/q (the "major arcs"), tallest at the smallest q, which
+   is what gives it that spiky, edge-brightened look. An illustration of the underlying
+   idea via a closed-form formula, not a reproduction of any specific talk's own
+   numerics or color choices. Rendered at low resolution into an offscreen canvas
+   (cached until N or the pixel size actually changes) and scaled up, since a per-
+   pixel loop at full canvas resolution every redraw would be the real lag risk here. */
+let _cmCanvas = null, _cmSize = 0, _cmKey = '';
+function openerCMColor(v) {
+  // blue (background, minor arcs) -> green -> orange/red (major arcs, low denominator)
+  const stops = [[32, 58, 158], [54, 168, 108], [238, 128, 52]];
+  const t = Math.max(0, Math.min(1, v)) * 2, seg = Math.min(1, Math.floor(t)), f = t - seg;
+  const a = stops[seg], b = stops[Math.min(2, seg + 1)];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+function openerCircleMethodTexture(N, size) {
+  const key = N + '|' + size;
+  if (_cmCanvas && _cmKey === key) return _cmCanvas;
+  if (!_cmCanvas || _cmSize !== size) { _cmCanvas = document.createElement('canvas'); _cmCanvas.width = _cmCanvas.height = size; _cmSize = size; }
+  const cctx = _cmCanvas.getContext('2d');
+  const img = cctx.createImageData(size, size);
+  const cx = size / 2, cy = size / 2, R = size / 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x + 0.5 - cx, dy = y + 0.5 - cy, rho = Math.hypot(dx, dy) / R;
+      const idx = (y * size + x) * 4;
+      if (rho > 1) { img.data[idx + 3] = 0; continue; }
+      const theta = Math.atan2(dy, dx), Neff = Math.max(0.001, rho * N), half = theta / 2, s = Math.sin(half);
+      const v = Math.min(1, Math.abs(s) < 1e-6 ? 1 : Math.abs(Math.sin(Neff * half) / (Neff * s)));
+      const c = openerCMColor(v);
+      img.data[idx] = c[0]; img.data[idx + 1] = c[1]; img.data[idx + 2] = c[2]; img.data[idx + 3] = 255;
+    }
+  }
+  cctx.putImageData(img, 0, 0);
+  _cmKey = key;
+  return _cmCanvas;
+}
+function openerDrawCircleMethod(ctx, cx, cy, R, strength) {
+  if (R < 4) return;
+  // N drives how many oscillations the Dirichlet kernel makes around the rim. My last
+  // pass overcorrected: 220+ oscillations rendered into a ~48-160px texture is well past
+  // the pixel grid's own resolution (Nyquist), so instead of a fractal picture it came out
+  // as aliased noise -- that's the "got worse." The reference image itself only has a
+  // handful of orange cusps around the edge, not hundreds -- consistent with a small N,
+  // not a huge one. Capped low and tied lightly to G; texture size bumped up to keep
+  // even this modest oscillation count smooth rather than jagged.
+  const N = Math.max(6, Math.min(22, Math.round(OPENER_G * 0.6) + 6)), size = Math.max(96, Math.min(220, Math.round(R * 1.8)));
+  const tex = openerCircleMethodTexture(N, size);
+  ctx.save();
+  ctx.globalAlpha = strength;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+  ctx.drawImage(tex, cx - R, cy - R, R * 2, R * 2);
+  ctx.restore();
+  openerDrawFareyArcs(ctx, cx, cy, R, N, strength);
+}
+// The classical circle method's actual dissection: an arc of the rim around every
+// rational p/q with q <= Qmax, width ~ 1/(q(Qmax+q)) -- the standard Farey/Hardy-
+// Littlewood major-arc width, widest at the simplest fractions (1/1, 1/2, 1/3...) and
+// shrinking fast as q grows. Bright, on the boundary, "arching" rather than the
+// straight centre-to-rim spokes the roots-of-unity reading already draws -- this is
+// what actually marks which points the color peaks underneath belong to.
+function openerDrawFareyArcs(ctx, cx, cy, R, N, strength) {
+  const Qmax = Math.max(3, Math.min(24, Math.round(Math.sqrt(N) / 2)));
+  ctx.save();
+  ctx.lineCap = 'round';
+  for (let q = 1; q <= Qmax; q++) {
+    const half = 1 / (q * (Qmax + q));
+    for (let p = 0; p < q; p++) {
+      if (q > 1 && gcd(p, q) !== 1) continue;
+      const theta = TAU * p / q;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 0.985, theta - half, theta + half);
+      ctx.strokeStyle = 'rgba(255,255,255,' + (strength * Math.min(0.95, 0.18 + 0.75 / q)).toFixed(2) + ')';
+      ctx.lineWidth = Math.max(1, (R / 26) / q);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
 /* Ring hole >= 0.5: the roots-of-unity reading the page shows once the ring fully
    collapses (there at hole >= 0.9). Order M is the lift dropdown's own p stepper, so
    there is one fewer control to add. Ticks are every M-th root, the teal spokes are
    the primitive ones, and the gold arrow is their vector sum = mu(M): it can only land
    on 1, on -1, or at the centre, by the same three-way argument as the main page. */
 function openerDrawVoid(ctx, cx, cy, R, rot) {
+  if (OPENER_CIRCLE_METHOD && OPENER_RING_HOLE > 0) openerDrawCircleMethod(ctx, cx, cy, R, OPENER_RING_HOLE);
   if (OPENER_RING_HOLE < 0.5 || R < 8) return;
   const M = Math.max(1, Math.min(256, OL.p));
   ctx.save();
