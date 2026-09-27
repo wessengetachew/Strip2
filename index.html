@@ -398,11 +398,22 @@ select{cursor:pointer;}
    width it uses when sharing the row with the other two. One column, one
    area, and a wider cap on whichever tile is actually showing fixes all three. */
 #welcome-preview.wv-solo{grid-template-columns:1fr;grid-template-areas:"solo";}
+/* "Lock canvas" -- sticks the preview tile(s) to the top of the opener's own
+   scroll container (the modal itself scrolls, since .export-box doesn't) so
+   the canvas stays on screen, hovering above the controls, while the rest of
+   the opener's panel scrolls underneath it. Mainly for mobile, where there's
+   no room to see both the canvas and a control far down the page at once. */
+#welcome-preview.wp-locked{position:sticky;top:0;z-index:40;background:var(--bg1);
+  padding:8px 8px 4px;margin-left:-8px;margin-right:-8px;
+  box-shadow:0 8px 16px -6px rgba(0,0,0,.5);}
+@media (min-width:900px){
+  #welcome-preview.wp-locked{margin-left:-34px;margin-right:-34px;padding-left:34px;padding-right:34px;}
+}
 #welcome-preview.wv-solo .wp-tile{grid-area:solo;justify-self:center;}
 /* Lines up with the bottom of the Grid/Ring tiles, right beside their own turn rows. */
 .wp-allturn{grid-area:mid;align-self:end;justify-self:center;padding-bottom:1px;}
 .wp-allturn button{writing-mode:horizontal-tb;white-space:nowrap;padding:3px 6px;font-size:12px;}
-#welcome-preview canvas{width:100%;height:auto;display:block;border-radius:8px;background:#0c0e1a;}
+#welcome-preview canvas{width:100%;height:auto;display:block;border-radius:8px;background:#0c0e1a;touch-action:none;cursor:grab;}
 #welcome-cv-grid,#welcome-cv-ring{aspect-ratio:1 / 1;}
 #welcome-cv-cayley{aspect-ratio:2 / 1;}
 .wcrot{display:flex;flex-wrap:wrap;align-items:center;gap:3px 7px;margin-left:auto;max-width:100%;
@@ -1237,6 +1248,9 @@ walk anyway.</p>
     <span class="lbl">hole</span>
     <input type="range" id="ring-hole" min="0" max="100" step="1" value="0" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
     <span class="val" id="ring-hole-v">0.00</span>
+    <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.85);cursor:pointer;font-size:11.5px;" title="Fills the hole with |sin(N&theta;/2)/sin(&theta;/2)| &mdash; the same exponential-sum magnitude the classical circle method studies, radiating outward from the centre (N=0) to G at the rim. Peaks at rational angles p/q (the &quot;major arcs&quot;). Fades in with the hole slider &mdash; nothing shows until hole &gt; 0, full strength at hole = 1. Ported from the opener.">
+      <input type="checkbox" id="cm-toggle-main" onchange="setCircleMethod(this.checked)"> circle method
+    </label>
     <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
     <span class="lbl">order M</span>
     <div class="stepper">
@@ -1500,7 +1514,7 @@ walk anyway.</p>
     </div>
   </div>
 
-  <div class="panel collapsed" style="margin:14px 0 0;">
+  <div class="panel collapsed" id="lift-panel" style="margin:14px 0 0;">
     <div class="ptitle" onclick="togglePanel(this)"><span>Lift dynamics &mdash; residue spiral, mirror &amp; &plusmn;n path, ported from the opener</span><span class="car">&#9662;</span></div>
     <div class="pbody">
 
@@ -1727,7 +1741,7 @@ walk anyway.</p>
       <input type="range" id="welcome-g" min="2" max="256" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 256. Doesn't change the G on the page.">
       <span class="hint">preview only</span>
     </div>
-    <div class="prow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
+    <div class="prow" id="welcome-holerow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
       <span class="lbl">hole</span>
       <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
       <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
@@ -1741,11 +1755,21 @@ walk anyway.</p>
       <button class="chip wv-view-btn" data-v="ring" onclick="wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
       <button class="chip wv-view-btn" data-v="cayley" onclick="wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
       <button class="chip wv-view-btn on" data-v="all3" onclick="wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
+      <button class="chip" id="welcome-lock-btn" onclick="toggleOpenerLock()" title="Pin the canvas(es) to the top of this panel so they stay on screen while you scroll the controls below them. Handy on a phone, where the canvas and a control further down don't otherwise fit on screen together.">⛶ Lock canvas</button>
       <span class="lbl" title="Print a small label at every point, on Grid, Ring and Cayley alike. Only while G &le; 31 &mdash; past that there isn't room to read them; stepping the mode has no visible effect until G comes back down.">labels</span>
       <button class="chip" onclick="stepOpenerLabelMode(-1)" title="Previous label mode">&#9650;</button>
       <button class="chip" onclick="stepOpenerLabelMode(1)" title="Next label mode">&#9660;</button>
       <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="No per-point labels.">off</span>
+      <span class="lbl">size</span>
+      <input type="range" id="ol-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="olSetLblScale(this.value)" style="max-width:90px;" title="Label text size, Grid/Ring/Cayley alike.">
+      <span class="val" id="ol-lbl-sz-v">1.0&times;</span>
       <span class="hint">one view at a time redraws faster</span>
+    </div>
+    <div class="prow" style="padding:2px 0 6px;">
+      <span class="lbl" title="Dot size on the Ring and Cayley previews. Grid sizes its dots off the cell instead, so it isn't included.">point size</span>
+      <input type="range" id="ol-pt-sz" min="0.3" max="3" step="0.1" value="1" oninput="olSetPtScale(this.value)" style="max-width:110px;">
+      <span class="val" id="ol-pt-sz-v">1.0&times;</span>
+      <span class="hint">Ring &amp; Cayley only</span>
     </div>
     <div id="welcome-preview">
       <div class="wp-tile wp-grid">
@@ -1766,7 +1790,7 @@ walk anyway.</p>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">CAYLEY</div>
       </div>
     </div>
-    <div class="prow" style="padding:6px 0;" title="Cayley map A: z = &rho;&middot;e^{i&theta;}, &Gamma;(z) = (z&minus;1)/(z+1), &rho; = &rho;&#8320; + &rho;<sub>D</sub>&middot;M/G. Preview only.">
+    <div class="prow" id="welcome-rhorow" style="padding:6px 0;" title="Cayley map A: z = &rho;&middot;e^{i&theta;}, &Gamma;(z) = (z&minus;1)/(z+1), &rho; = &rho;&#8320; + &rho;<sub>D</sub>&middot;M/G. Preview only.">
       <span class="lbl">&rho;&#8320;</span>
       <input type="range" id="welcome-rho0" min="0" max="4" step="0.05" value="0.4" oninput="setOpenerRho0(+this.value)" style="flex:1 1 60px;min-width:50px;">
       <span class="val" id="welcome-rho0-v" style="min-width:32px;">0.40</span>
@@ -1775,7 +1799,7 @@ walk anyway.</p>
       <span class="val" id="welcome-rhod-v" style="min-width:32px;">1.80</span>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,2)" title="&rho; runs 0 &rarr; 2, starting at the origin. The innermost rings pile up near &Gamma;(0) = &minus;1.">0&middot;2</button>
     </div>
-    <div class="prow">
+    <div class="prow" id="welcome-czrow">
       <span class="plabel">Cayley zoom &middot; <b id="welcome-cz-v">0.33&times;</b></span>
       <input type="range" id="welcome-cz" min="-1.7" max="0.3" step="0.01" value="-0.48" oninput="setOpenerCZ(this.value)" style="flex:1 1 160px;min-width:120px;" title="Zoom the Cayley preview out to reach the points that map far from the centre. Mouse wheel over the Cayley tile does the same; double-click returns to 0.33\u00d7.">
       <span class="hint">zoom out for the far points</span>
@@ -1832,10 +1856,13 @@ walk anyway.</p>
         <span class="hint" id="ol-strip-note">&mdash;</span>
       </div>
       <div class="prow">
+        <button class="chip" id="ol-gap-play" onclick="olToggleGapPlay()" title="Walk every partition g = 1..N/2 of N and back, drawing all four Strip I lines live — same sweep as the main page's Play g. Most partitions are NOT Goldbach pairs.">&#9654; Play g</button>
         <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
         <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
         <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
-        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above by 50%, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop 50%</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop</label>
+        <input type="range" id="ol-gbdim-amt" min="0" max="100" step="1" value="50" oninput="olSetGbDimAmt(this.value)" style="max-width:100px;" title="Dim amount, 0–100%. Starts at 50% when Dim backdrop is switched on.">
+        <span class="val" id="ol-gbdim-amt-v">50%</span>
         <span class="hint" id="ol-gb-note">N = &ndash;</span>
       </div>
       <div class="prow">
@@ -1875,6 +1902,7 @@ walk anyway.</p>
       </label>
       <span style="flex:1 1 auto;"></span>
       <button class="btn" onclick="applyWelcomePreset()" title="Reset the coloring to the recommended default.">&#9733; Use creator's presets</button>
+      <button class="btn tl" onclick="sendOpenerToMainAndClose()" title="Push G, view, ring hole, circle method, Cayley &rho;/tilt, the slope&#47;offset&#47;width strip, and the whole Lift dynamics panel down onto the main page below, then jump to it. Not carried over: the opener's own per-tile turn animation, Cayley zoom&#47;z-tilt, point labels, and the Goldbach-pair step-through &mdash; those stay opener-only.">&#8681; Send to main page</button>
       <button class="btn" onclick="closeWelcomeModal()">Start exploring &rarr;</button>
     </div>
   </div>
@@ -2440,6 +2468,7 @@ let rafId = null;
 let viewMode = 'grid';             // 'grid' | 'ring' | 'cayley'
 let ringRot = 0;                   // radians, applied as a draw transform
 let ringHole = 0;                  // inner radius as a fraction of R
+let circleMethodOn = false;        // circle-method fill in the ring's hole, ported from the opener
 let ringGuides = true;
 /* Point size for the two forward-plotted views. Ring and Cayley stamp one
    dot per sampled cell, and the old fixed S*0.0026 was tuned on a desktop
@@ -3440,6 +3469,16 @@ function wvSetView(v) {
     if (!el) return;
     el.style.maxWidth = (solo && OPENER_VIEW === name) ? SOLO_MAXW[name] + 'px' : '';
   });
+  // Solo Cayley reads better tall -- double its usual 2:1 aspect (so it's
+  // twice as tall for the same width) instead of the flat letterbox shape.
+  const cayCv = $('welcome-cv-cayley');
+  if (cayCv) cayCv.style.aspectRatio = (OPENER_VIEW === 'cayley') ? '1 / 1' : '';
+  // Hole (Ring-only) and rho/Cayley-zoom (Cayley-only) controls only matter
+  // for the view(s) currently on screen -- hide them otherwise.
+  const holeRow = $('welcome-holerow'), rhoRow = $('welcome-rhorow'), czRow = $('welcome-czrow');
+  if (holeRow) holeRow.style.display = wvShows('ring') ? '' : 'none';
+  if (rhoRow) rhoRow.style.display = wvShows('cayley') ? '' : 'none';
+  if (czRow) czRow.style.display = wvShows('cayley') ? '' : 'none';
   openerRedrawSoon();
 }
 let _openerPts = null, _openerSq = null, _openerRaf = 0;
@@ -3470,7 +3509,8 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
              stripOn: false, slopeA: 1, slopeB: 1, offset: 0, width: 1,
-             gbOn: false, gbIdx: 0, gbDim: false, survBrokenThick: 0.5 };
+             gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, survBrokenThick: 0.5,
+             ptScale: 1, lblScale: 1 };
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
 // one shared pair, not two identical-looking ones. Mirror is a separate overlay and is
 // never gated by surv/broken: toggling Surviving off used to also blank the spiral's
@@ -3742,10 +3782,9 @@ function olGoldbachDescriptors(g, s, G) {
   return out;
 }
 function olGoldbach(ctx, xy, G, dot) {
-  const N = olGoldbachN(), pairs = olGoldbachPairs();
-  if (!pairs.length) return;
-  const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0));
-  const g = pairs[idx], s = N - g;
+  const N = olGoldbachN(), maxG = Math.floor(N / 2);
+  if (maxG < 1) return;
+  const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
   ctx.save();
   for (const d of olGoldbachDescriptors(g, s, G)) {
     ctx.fillStyle = d.rgb;
@@ -3785,9 +3824,13 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   if (OL.stripOn) olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12));
   if (OL.gbOn) {
     // Dim the base plate AND every other overlay above -- drawn so far, on this
-    // same canvas -- by 50%, so the Goldbach pair reads clearly even with the
-    // spiral, chain, mirror etc. all lit up at once instead of blinking under them.
-    if (OL.gbDim) { ctx.fillStyle = 'rgba(4,4,13,.5)'; ctx.fillRect(0, 0, cw || S, ch || S); }
+    // same canvas -- by the slider's amount, so the Goldbach pair reads clearly
+    // even with the spiral, chain, mirror etc. all lit up at once instead of
+    // blinking under them. Slider defaults to 50%, matching the old fixed value.
+    if (OL.gbDim) {
+      const dimA = (OL.gbDimAmt != null ? OL.gbDimAmt : 50) / 100;
+      ctx.fillStyle = 'rgba(4,4,13,' + dimA + ')'; ctx.fillRect(0, 0, cw || S, ch || S);
+    }
     olGoldbach(ctx, xy, G, cl(cell * 0.4, 1, 2.2));
   }
   ctx.restore();
@@ -3844,6 +3887,20 @@ function olSetSurvBrokenThick(v) {
   const lbl = $('ol-survbroken-thick-v'); if (lbl) lbl.textContent = OL.survBrokenThick.toFixed(2);
   olRedraw();
 }
+// Dot size for the Ring and Cayley previews (Grid sizes itself off the cell
+// instead, so it's left out). 1x = the old fixed sizes.
+function olSetPtScale(v) {
+  const n = Number(v); OL.ptScale = isFinite(n) ? Math.max(0.3, Math.min(3, n)) : 1;
+  const lbl = $('ol-pt-sz-v'); if (lbl) lbl.textContent = OL.ptScale.toFixed(1) + '\u00d7';
+  openerOverlaySoon();
+}
+// Font-size multiplier for the per-point labels (r / M / res / gcd / r/M),
+// on Grid, Ring and Cayley alike. 1x = the old fixed sizes.
+function olSetLblScale(v) {
+  const n = Number(v); OL.lblScale = isFinite(n) ? Math.max(0.5, Math.min(3, n)) : 1;
+  const lbl = $('ol-lbl-sz-v'); if (lbl) lbl.textContent = OL.lblScale.toFixed(1) + '\u00d7';
+  openerOverlaySoon();
+}
 function olToggleAllP(v) { OL.allP = !!v; olRedraw(); }
 function olToggleMirror(v) { OL.mirror = !!v; olRedraw(); }
 function olToggleDropout(v) { OL.dropout = !!v; olRedraw(); }
@@ -3861,7 +3918,7 @@ function olStepWidth(d) { OL.width = Math.max(1, (Number(OL.width) || 1) + d); o
 function olResetOffset() { OL.offset = 0; olRedraw(); }
 function olResetWidth() { OL.width = 1; olRedraw(); }
 function olFullWidth() { OL.width = OPENER_G * 2; olRedraw(); }
-// Play Goldbach pairs -- steps OL.gbIdx through olGoldbachPairs() on loop.
+// Play Goldbach pairs -- steps OL.gbG through olGoldbachPairs() on loop.
 let _olGbTimer = 0;
 function olSyncGbPlayChip() {
   const b = $('ol-gb-play'); if (!b) return;
@@ -3869,26 +3926,68 @@ function olSyncGbPlayChip() {
   b.classList.toggle('on', !!_olGbTimer);
 }
 function olStopGbPlay() { if (_olGbTimer) { clearInterval(_olGbTimer); _olGbTimer = 0; } olSyncGbPlayChip(); }
-function olStepGb(d) {
+function olStepGb(dir) {
   const pairs = olGoldbachPairs();
   if (!pairs.length) return;
-  olStopGbPlay();
+  olStopGbPlay(); olStopGapPlay();
   OL.gbOn = true;
-  OL.gbIdx = (((OL.gbIdx || 0) + d) % pairs.length + pairs.length) % pairs.length;
+  const cur = OL.gbG || pairs[0];
+  let next = dir > 0 ? pairs.find(x => x > cur) : [...pairs].reverse().find(x => x < cur);
+  if (next === undefined) next = dir > 0 ? pairs[0] : pairs[pairs.length - 1];
+  OL.gbG = next;
   olRedraw();
 }
 function olToggleGbDim(v) { OL.gbDim = !!v; olRedraw(); }
+function olSetGbDimAmt(v) {
+  const n = Number(v);
+  OL.gbDimAmt = isFinite(n) ? Math.max(0, Math.min(100, n)) : 50;
+  const lbl = $('ol-gbdim-amt-v'); if (lbl) lbl.textContent = Math.round(OL.gbDimAmt) + '%';
+  olRedraw();
+}
 function olToggleGbPlay() {
   if (_olGbTimer) { olStopGbPlay(); return; }
+  olStopGapPlay();
+  const pairs = olGoldbachPairs();
+  if (!pairs.length) return;
   OL.gbOn = true;
+  let i = pairs.findIndex(x => x >= (OL.gbG || 1));
+  if (i < 0) i = 0;
+  OL.gbG = pairs[i];
   _olGbTimer = setInterval(() => {
     if (!openerModalOpen()) { olStopGbPlay(); return; }
-    const pairs = olGoldbachPairs();
-    if (!pairs.length) { olStopGbPlay(); return; }
-    OL.gbIdx = ((OL.gbIdx || 0) + 1) % pairs.length;
+    const live = olGoldbachPairs();
+    if (!live.length) { olStopGbPlay(); return; }
+    i = (i + 1) % live.length;
+    OL.gbG = live[i];
     olRedraw();
   }, 500);
   olSyncGbPlayChip(); olRedraw();
+}
+// Play g -- walks every partition g = 1..N/2 of N and back, pair or not, same
+// bounce sweep as the main page's Play g (togglePlayGap): most partitions are
+// NOT Goldbach pairs, this is what makes that visible in the preview too.
+let _olGapTimer = 0, _olGapDir = 1;
+function olSyncGapPlayChip() {
+  const b = $('ol-gap-play'); if (!b) return;
+  b.innerHTML = _olGapTimer ? '&#9632; Stop' : '&#9654; Play g';
+  b.classList.toggle('on', !!_olGapTimer);
+}
+function olStopGapPlay() { if (_olGapTimer) { clearInterval(_olGapTimer); _olGapTimer = 0; } olSyncGapPlayChip(); }
+function olToggleGapPlay() {
+  if (_olGapTimer) { olStopGapPlay(); return; }
+  olStopGbPlay();
+  OL.gbOn = true;
+  _olGapDir = 1; OL.gbG = 1;
+  _olGapTimer = setInterval(() => {
+    if (!openerModalOpen()) { olStopGapPlay(); return; }
+    const hi = Math.max(1, Math.floor(olGoldbachN() / 2)), step = Math.max(1, Math.round((hi - 1) / 90));
+    let n = (OL.gbG || 1) + _olGapDir * step;
+    if (n >= hi) { n = hi; _olGapDir = -1; }
+    else if (n <= 1) { n = 1; _olGapDir = 1; }
+    OL.gbG = n;
+    olRedraw();
+  }, 120);
+  olSyncGapPlayChip(); olRedraw();
 }
 // The header carries D(n) live; the table under "the math" is only rebuilt while it is open.
 function olSyncUI() {
@@ -3903,6 +4002,15 @@ function olSyncUI() {
   chk('ol-dropout-chk', OL.dropout); chk('ol-dropoutlbl-chk', OL.dropoutLbl);
   chk('ol-strip-chk', OL.stripOn);
   chk('ol-gbdim-chk', OL.gbDim);
+  const gbDimAmt = $('ol-gbdim-amt');
+  if (gbDimAmt && document.activeElement !== gbDimAmt) gbDimAmt.value = OL.gbDimAmt != null ? OL.gbDimAmt : 50;
+  const gbDimAmtLbl = $('ol-gbdim-amt-v'); if (gbDimAmtLbl) gbDimAmtLbl.textContent = Math.round(OL.gbDimAmt != null ? OL.gbDimAmt : 50) + '%';
+  const ptSl = $('ol-pt-sz');
+  if (ptSl && document.activeElement !== ptSl) ptSl.value = OL.ptScale;
+  const ptLbl = $('ol-pt-sz-v'); if (ptLbl) ptLbl.textContent = (OL.ptScale || 1).toFixed(1) + '\u00d7';
+  const lblSl = $('ol-lbl-sz');
+  if (lblSl && document.activeElement !== lblSl) lblSl.value = OL.lblScale;
+  const lblSzLbl = $('ol-lbl-sz-v'); if (lblSzLbl) lblSzLbl.textContent = (OL.lblScale || 1).toFixed(1) + '\u00d7';
   const thumb = $('ol-survbroken-thick');
   if (thumb && document.activeElement !== thumb) thumb.value = OL.survBrokenThick;
   const thickLbl = $('ol-survbroken-thick-v'); if (thickLbl) thickLbl.textContent = OL.survBrokenThick.toFixed(2);
@@ -3915,10 +4023,10 @@ function olSyncUI() {
   }
   const gbNote = $('ol-gb-note');
   if (gbNote) {
-    const N = olGoldbachN(), pairs = olGoldbachPairs();
+    const N = olGoldbachN(), pairs = olGoldbachPairs(), maxG = Math.floor(N / 2);
     let txt = 'N = ' + N + ' \u00b7 ' + pairs.length + ' pair' + (pairs.length === 1 ? '' : 's');
-    if (pairs.length) {
-      const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0)), g = pairs[idx], s = N - g;
+    if (maxG >= 1) {
+      const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
       txt += (OL.gbOn ? ' \u00b7 showing ' : ' \u00b7 ') + g + ' + ' + s + ' = ' + N;
     }
     gbNote.textContent = txt;
@@ -4190,7 +4298,15 @@ function oeLegendSections() {
     let D = NaN; try { D = Dn(n); } catch (e) {}
     const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
     li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') });
-    if (isFinite(D)) li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
+    if (isFinite(D)) {
+      li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
+      // D(0) collapses to plain gcd(r,M)=1 density, 6/pi^2 -- the same "global"
+      // baseline the header stat compares against -- so D(n) at any n reads
+      // naturally as a multiple of it: how much a block of n+1 narrows the
+      // plain 2D coprime density.
+      const globalCop = 6 / (Math.PI * Math.PI), ratioD = D / globalCop, deltaD = 100 * (ratioD - 1);
+      li.push({ c: null, t: 'D(n) / (6/\u03c0\u00b2) = ' + ratioD.toFixed(4) + '\u00d7 global pair density \u00b7 \u0394 ' + (deltaD >= 0 ? '+' : '') + deltaD.toFixed(2) + '%' });
+    }
     if (OL.stripOn) {
       const sc = olStripPoints(OPENER_G);
       li.push({ c: PAL.teal, t: 'strip b\u00b7r \u2212 a\u00b7M \u2208 [s, s+w) \u00b7 a=' + OL.slopeA + ', b=' + OL.slopeB + ', s=' + OL.offset + ', w=' + OL.width + ' \u00b7 ' + sc.cop + '/' + sc.total + ' coprime' });
@@ -4202,11 +4318,12 @@ function oeLegendSections() {
       li.push({ c: PAL.coral, t: 'd: r+M=s' });
       li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
       li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 c,d fully lit \u21d4 g,s both prime' });
-      if (pairs.length) {
-        const idx = Math.max(0, Math.min(pairs.length - 1, OL.gbIdx || 0)), g = pairs[idx], s = N - g;
+      const maxG = Math.floor(N / 2);
+      if (maxG >= 1) {
+        const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
         li.push({ c: null, t: 'showing ' + g + ' + ' + s + ' = ' + N + ' \u00b7 ' + pairs.length + ' Goldbach pair' + (pairs.length === 1 ? '' : 's') + ' of ' + N + ' total' });
       } else {
-        li.push({ c: null, t: 'no Goldbach pairs of ' + N + ' fit at this G' });
+        li.push({ c: null, t: 'no partitions of ' + N + ' fit at this G' });
       }
     }
     out.push({ title: 'LIFT DYNAMICS', items: li });
@@ -4311,11 +4428,19 @@ async function runOpenerExport() {
     const S = W / 1920;
     const pad = 64 * S, gap = 28 * S;
     const viewLabel = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley', all3: 'Grid \u00b7 Ring \u00b7 Cayley' }[OE.view];
-    stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay();
+    stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay(); olStopGbPlay(); olStopGapPlay();
     // Header, same shape as the page's own export: a letter-spaced eyebrow, a serif
     // title, then measured-lattice stats right-aligned against the title -- computed
     // here from the actual point set, so it can never drift from the picture.
-    const cop = _openerSq.filter(p => gcd(p[0], p[1]) === 1).length, cells = OPENER_G * OPENER_G;
+    // Grid draws the full G×G square; Ring and Cayley fold r > M onto the r ≤ M
+    // wedge (see openerSquarePoints), so their true point count is G·(G+1)/2, not
+    // G² -- using the square's count there would silently double-report what's on
+    // the plate. all3 shows all of the above at once, so it reads by the tighter
+    // wedge figure, which is the number Ring/Cayley on that canvas actually hold to.
+    const isWedgeView = OE.view === 'ring' || OE.view === 'cayley' || OE.view === 'all3';
+    const cop = (isWedgeView ? _openerPts : _openerSq).filter(p => gcd(p[0], p[1]) === 1).length;
+    const cells = isWedgeView ? OPENER_G * (OPENER_G + 1) / 2 : OPENER_G * OPENER_G;
+    const cellsLabel = isWedgeView ? 'G\u00b7(G+1)/2' : 'G\u00b2';
     const pct = 100 * cop / cells, target = 100 * 6 / (Math.PI * Math.PI), delta = pct - target;
     const headerH = 172 * S;
     const tallyData = oeTallyData();
@@ -4349,7 +4474,7 @@ async function runOpenerExport() {
     ctx.textAlign = 'left'; ctx.fillStyle = PAL.cream; ctx.font = (56 * S) + 'px ' + DISP;
     ctx.fillText(oeViewTitle(), pad, 128 * S);
     ctx.textAlign = 'right'; ctx.font = (17 * S) + 'px ' + MONO; ctx.fillStyle = PAL.cream3;
-    ctx.fillText('G = ' + OPENER_G + '   \u00b7   G\u00b2 = ' + cells.toLocaleString() + ' pts   \u00b7   ' + viewLabel, W - pad, 112 * S);
+    ctx.fillText('G = ' + OPENER_G + '   \u00b7   ' + cellsLabel + ' = ' + cells.toLocaleString() + ' pts   \u00b7   ' + viewLabel, W - pad, 112 * S);
     ctx.fillText('gcd=1: ' + cop.toLocaleString() + '/' + cells.toLocaleString() + ' = ' + pct.toFixed(2) +
       '%   \u00b7   \u0394 6/\u03c0\u00b2 (' + target.toFixed(2) + '%): ' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '%', W - pad, 146 * S);
     let y = headerH;
@@ -4411,6 +4536,116 @@ function openerTurn(axis, delta) {
   const el = $('welcome-cr' + axis + '-v'); if (el) el.textContent = d + '\u00b0';
 }
 function openerRotZero(axis) { stopOpenerRotPlay(axis); setOpenerRot(axis, 0); }
+/* Click-drag zoom for the opener's three preview canvases, mirroring the main
+   plate's pan/zoom (drag to pan once zoomed in, wheel or pinch to zoom,
+   double-click to reset) -- but as a real canvas-coordinate transform applied
+   inside each draw function (openerApplyZoomXform), not a CSS scale, so it
+   stays crisp on redraw. Cayley keeps its own wheel binding (rho-zoom, CZ)
+   -- this only adds drag-pan and pinch-zoom there, no wheel. */
+const OPENER_ZOOM = { grid: { k: 1, x: 0, y: 0 }, ring: { k: 1, x: 0, y: 0 }, cayley: { k: 1, x: 0, y: 0 } };
+const OPENER_ZOOM_MIN = 1, OPENER_ZOOM_MAX = 10;
+function openerApplyZoomXform(ctx, key, w, h) {
+  const z = OPENER_ZOOM[key];
+  if (z.k === 1 && !z.x && !z.y) return;
+  ctx.translate(z.x, z.y);
+  ctx.translate(w / 2, h / 2); ctx.scale(z.k, z.k); ctx.translate(-w / 2, -h / 2);
+}
+function openerZoomClamp(key) {
+  const z = OPENER_ZOOM[key];
+  z.k = Math.max(OPENER_ZOOM_MIN, Math.min(OPENER_ZOOM_MAX, z.k));
+  if (z.k <= 1.001) { z.k = 1; z.x = 0; z.y = 0; return; }
+  const maxOff = 4000;   // loose leash -- redraw keeps the lattice centred, this just stops runaway drags
+  z.x = Math.max(-maxOff, Math.min(maxOff, z.x));
+  z.y = Math.max(-maxOff, Math.min(maxOff, z.y));
+}
+function openerRedrawTile(key) {
+  if (key === 'grid') openerDrawGrid(1);
+  else if (key === 'ring') openerDrawRing(1);
+  else openerDrawCayley(1);
+}
+function openerZoomAt(key, newK, ax, ay, S) {
+  const z = OPENER_ZOOM[key], oldK = z.k;
+  newK = Math.max(OPENER_ZOOM_MIN, Math.min(OPENER_ZOOM_MAX, newK));
+  if (newK === oldK) return;
+  const cx = ax - S / 2, cy = ay - S / 2;
+  z.x = cx - (cx - z.x) * (newK / oldK);
+  z.y = cy - (cy - z.y) * (newK / oldK);
+  z.k = newK;
+  openerZoomClamp(key);
+  openerRedrawTile(key);
+}
+function openerZoomReset(key) {
+  OPENER_ZOOM[key] = { k: 1, x: 0, y: 0 };
+  openerRedrawTile(key);
+}
+function wireOpenerTileZoom(canvasId, key, opts) {
+  opts = opts || {};
+  const cv = $(canvasId); if (!cv) return;
+  const pts = new Map();
+  let pinch0 = 0, pinchK0 = 1, travel = 0;
+  const PAN_SLOP = 6;
+  const canPan = () => OPENER_ZOOM[key].k > 1;
+  cv.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    travel = 0;
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()];
+      pinch0 = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      pinchK0 = OPENER_ZOOM[key].k;
+    }
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return;
+    const prev = pts.get(e.pointerId);
+    const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const r = cv.getBoundingClientRect(), S = r.width;
+    if (pts.size >= 2) {
+      const [a, b] = [...pts.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      const midx = (a.x + b.x) / 2 - r.left, midy = (a.y + b.y) / 2 - r.top;
+      openerZoomAt(key, pinchK0 * (d / pinch0), midx, midy, S);
+      travel = 999;
+    } else {
+      travel += Math.abs(dx) + Math.abs(dy);
+      if (travel <= PAN_SLOP || !canPan()) return;
+      const z = OPENER_ZOOM[key];
+      z.x += dx; z.y += dy;
+      openerZoomClamp(key);
+      openerRedrawTile(key);
+    }
+  });
+  const endPan = e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.delete(e.pointerId);
+    if (pts.size < 2) pinch0 = 0;
+    if (!pts.size) travel = 0;
+  };
+  cv.addEventListener('pointerup', endPan);
+  cv.addEventListener('pointercancel', endPan);
+  cv.addEventListener('lostpointercapture', endPan);
+  if (opts.wheel !== false) {
+    cv.addEventListener('wheel', e => {
+      e.preventDefault();
+      const r = cv.getBoundingClientRect();
+      openerZoomAt(key, OPENER_ZOOM[key].k * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX - r.left, e.clientY - r.top, r.width);
+    }, { passive: false });
+  }
+  cv.addEventListener('dblclick', () => openerZoomReset(key));
+}
+function toggleOpenerLock() {
+  const wp = $('welcome-preview'); if (!wp) return;
+  const on = wp.classList.toggle('wp-locked');
+  const btn = $('welcome-lock-btn');
+  if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '⤫ Unlock canvas' : '⛶ Lock canvas'; }
+}
+function wireOpenerZooms() {
+  wireOpenerTileZoom('welcome-cv-grid', 'grid');
+  wireOpenerTileZoom('welcome-cv-ring', 'ring');
+  wireOpenerTileZoom('welcome-cv-cayley', 'cayley', { wheel: false });
+}
 function setOpenerCZ(x, reset) {
   x = reset ? Math.log10(OPENER_CZ_DEFAULT) : Math.max(-1.7, Math.min(0.3, +x || 0));
   OPENER_CZ = reset ? OPENER_CZ_DEFAULT : Math.pow(10, x);
@@ -4471,6 +4706,7 @@ function openerDrawGrid(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-grid'); if (!c) return;
   const ctx = c.ctx, cell = Math.min(c.w, c.h) / OPENER_G, dot = Math.max(0.45, cell * 0.34);
   ctx.save();
+  openerApplyZoomXform(ctx, 'grid', c.w, c.h);
   if (OPENER_ROT.g) { ctx.translate(c.w / 2, c.h / 2); ctx.rotate(-OPENER_ROT.g * Math.PI / 180); ctx.translate(-c.w / 2, -c.h / 2); }
   _openerSq.forEach((p, i) => {
     const a = openerPointAlpha(i, t, _openerSq.length); if (a <= 0) return;
@@ -4484,16 +4720,17 @@ function openerDrawGrid(t, forceC) {
   if (t >= 1) {
     const gxy = (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell];
     openerDrawLift(ctx, gxy, Math.min(c.w, c.h), c.w, c.h, 'grid');
-    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)));
+    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1));
   }
   ctx.restore();
 }
 function openerDrawRing(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-ring'); if (!c) return;
   const ctx = c.ctx, S = Math.min(c.w, c.h), cx = c.w / 2, cy = c.h / 2;
-  const outer = S / 2 * 0.92, dot = Math.max(0.5, Math.min(S * 0.018, outer / OPENER_G * 0.6));
+  const outer = S / 2 * 0.92, dot = Math.max(0.5, Math.min(S * 0.018, outer / OPENER_G * 0.6) * (OL.ptScale || 1));
   const holeR = outer * OPENER_RING_HOLE, holeSpan = outer - holeR;   // rings 1..G pack into [holeR, outer]
   ctx.save();
+  openerApplyZoomXform(ctx, 'ring', c.w, c.h);
   if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
   _openerPts.forEach((p, i) => {
     const a = openerPointAlpha(i, t); if (a <= 0) return;
@@ -4513,7 +4750,7 @@ function openerDrawRing(t, forceC) {
       return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
     };
     openerDrawLift(ctx, rxy, S, c.w, c.h, 'ring');
-    openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)));
+    openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1));
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
@@ -4557,8 +4794,9 @@ function openerCircleMethodTexture(N, size) {
   _cmKey = key;
   return _cmCanvas;
 }
-function openerDrawCircleMethod(ctx, cx, cy, R, strength) {
+function openerDrawCircleMethod(ctx, cx, cy, R, strength, G) {
   if (R < 4) return;
+  if (G === undefined) G = OPENER_G;   // opener's own call site omits this — same lattice as before
   // N drives how many oscillations the Dirichlet kernel makes around the rim. My last
   // pass overcorrected: 220+ oscillations rendered into a ~48-160px texture is well past
   // the pixel grid's own resolution (Nyquist), so instead of a fractal picture it came out
@@ -4566,7 +4804,7 @@ function openerDrawCircleMethod(ctx, cx, cy, R, strength) {
   // handful of orange cusps around the edge, not hundreds -- consistent with a small N,
   // not a huge one. Capped low and tied lightly to G; texture size bumped up to keep
   // even this modest oscillation count smooth rather than jagged.
-  const N = Math.max(6, Math.min(22, Math.round(OPENER_G * 0.6) + 6)), size = Math.max(96, Math.min(220, Math.round(R * 1.8)));
+  const N = Math.max(6, Math.min(22, Math.round(G * 0.6) + 6)), size = Math.max(96, Math.min(220, Math.round(R * 1.8)));
   const tex = openerCircleMethodTexture(N, size);
   ctx.save();
   ctx.globalAlpha = strength;
@@ -4675,7 +4913,9 @@ function openerCayleyXY(r, M, cx, cy, Rc) {
 function openerDrawCayley(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-cayley'); if (!c) return;
   const ctx = c.ctx, cx = c.w / 2, cy = c.h / 2;
-  const Rc = Math.min(c.w, c.h) * 0.44 * OPENER_CZ, dot = Math.max(0.5, Math.min(c.w, c.h) * 0.018 * Math.min(1, 13 / OPENER_G));
+  ctx.save();
+  openerApplyZoomXform(ctx, 'cayley', c.w, c.h);
+  const Rc = Math.min(c.w, c.h) * 0.44 * OPENER_CZ, dot = Math.max(0.5, Math.min(c.w, c.h) * 0.018 * Math.min(1, 13 / OPENER_G) * (OL.ptScale || 1));
   _openerPts.forEach((p, i) => {
     const a = openerPointAlpha(i, t); if (a <= 0) return;
     const r = p[0], M = p[1];
@@ -4689,8 +4929,9 @@ function openerDrawCayley(t, forceC) {
   if (t >= 1) {
     const cxy = (r, M) => openerCayleyXY(r, M, cx, cy, Rc);
     openerDrawLift(ctx, cxy, Math.min(c.w, c.h), c.w, c.h, 'cayley');
-    openerDrawLabels(ctx, cxy, _openerPts, Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)));
+    openerDrawLabels(ctx, cxy, _openerPts, Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)) * (OL.lblScale || 1));
   }
+  ctx.restore();
 }
 let _openerAnimHandle = null;
 function renderOpenerPreview(animate) {
@@ -4761,12 +5002,78 @@ function openWelcomeModal() {
   startOpenerMusic();
 }
 function closeWelcomeModal() {
-  stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay();
+  stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay(); olStopGbPlay(); olStopGapPlay();
   stopOpenerMusic();
   if ($('welcome-noshow-chk') && $('welcome-noshow-chk').checked) {
     try { localStorage.setItem('stripII_welcome_seen', '1'); } catch (e) {}
   }
   $('welcome-modal').style.display = 'none';
+}
+/* Pushes the opener's live-preview state onto the main page's own controls,
+   so what was assembled in the sandbox actually renders at full fidelity
+   below -- not capped at the opener's 256-cell preview ceiling, and not
+   just the coloring choice, which used to be the only thing that crossed
+   over (via "Use creator's presets"). Covers G, view/multi, ring hole and
+   circle method, Cayley rho0/rhoD and x/y tilt, the slope/offset/width
+   strip, and the whole Lift dynamics panel (mode, spiral p, all-p, mirror,
+   dropout + label, surviving/broken, thickness, r-chain and its depth).
+   Not covered, because the main page has no matching control: the opener's
+   independent per-tile turn animation, its continuous Cayley zoom and
+   z-tilt, per-point labels, and the Goldbach-pair step-through -- those
+   stay opener-only for now. */
+function sendOpenerToMainPage() {
+  // G first — no 256 ceiling here, that was only ever the preview's own limit.
+  onG(OPENER_G);
+
+  // View: opener's "all3" maps to Multi on; a single view maps to Multi off
+  // plus that view, carrying over its quarter-turn where one applies.
+  if (OPENER_VIEW === 'all3') {
+    if (!MULTI_ON) toggleMulti();
+  } else {
+    if (MULTI_ON) toggleMulti();
+    setView(OPENER_VIEW);
+    if (OPENER_VIEW === 'grid') setViewQuarter(Math.round(OPENER_ROT.g / 90));
+    else if (OPENER_VIEW === 'ring') setViewQuarter(Math.round(OPENER_ROT.r / 90));
+  }
+
+  // Ring hole (+ circle method) and Cayley radius/tilt — same units and
+  // range on both sides, so these carry straight across.
+  setRingHole(Math.round(OPENER_RING_HOLE * 100));
+  setCircleMethod(OPENER_CIRCLE_METHOD);
+  setRho0(OPENER_RHO0); setRhoD(OPENER_RHOD);
+  setCayleyRotX(((Math.round(OPENER_ROT.x) % 360) + 360) % 360);
+  setCayleyRotY(((Math.round(OPENER_ROT.y) % 360) + 360) % 360);
+
+  // The band itself: slope a/b, offset, width — applyStrip is the same
+  // routine the page's own preset chips use, so it lands exactly as a
+  // preset would.
+  if (OL.stripOn) applyStrip({ a: OL.slopeA, b: OL.slopeB, s: OL.offset, w: OL.width, walk: 'strip' });
+  if (!showStrip) toggleStrip();
+
+  // Lift dynamics — open the panel and set every control the opener's
+  // overlay exposes. Toggle functions don't sync their own checkbox, so
+  // that's done by hand alongside each one.
+  const lp = $('lift-panel'); if (lp) lp.classList.remove('collapsed');
+  if (!liftOn) liftToggleOn();
+  liftSetMode(OL.mode);
+  liftSetSpiralP(OL.p);
+  liftToggleAllP(OL.allP); { const c = $('lift-allp-chk'); if (c) c.checked = OL.allP; }
+  liftToggleMirror(OL.mirror); { const c = $('lift-mirror-chk'); if (c) c.checked = OL.mirror; }
+  liftToggleDropout(OL.dropout); { const c = $('lift-dropout-chk'); if (c) c.checked = OL.dropout; }
+  liftToggleDropoutLbl(OL.dropoutLbl); { const c = $('lift-dropoutlbl-chk'); if (c) c.checked = OL.dropoutLbl; }
+  liftSetSurv(OL.surv); { const c = $('lift-surv-chk'); if (c) c.checked = OL.surv; }
+  liftSetBroken(OL.broken); { const c = $('lift-broken-chk'); if (c) c.checked = OL.broken; }
+  liftSetThick(Math.max(0.2, Math.min(6, (OL.survBrokenThick || 0.5) * 6)));
+  liftToggleChain(OL.chain); { const c = $('lift-chain-chk'); if (c) c.checked = OL.chain; }
+  liftSetChainN(openerLiftN());
+
+  redraw(true);
+}
+function sendOpenerToMainAndClose() {
+  sendOpenerToMainPage();
+  closeWelcomeModal();
+  const cv = $('cv');
+  if (cv && cv.scrollIntoView) cv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 function maybeAutoOpenWelcome() {
   try { if (localStorage.getItem('stripII_welcome_seen')) return; } catch (e) {}
@@ -5719,6 +6026,7 @@ function paintViewInner(ctx, S, cap) {
     if (walkMode === 'band') drawRingBand(ctx, S);
     if (showStrip) drawRingStrip(ctx, S);
     if (ringGuides) drawRingGuides(ctx, S);
+    drawRingCircleMethodFill(ctx, S);
     drawUnitVoid(ctx, S);
     drawPartitionsOverlay(ctx, S);
     drawLiftOverlay(ctx, S);
@@ -8410,6 +8718,17 @@ function setRingHole(pct) {
   ringKey = '';                      // the radial map moved — buffer is stale
   redraw(false);
 }
+function setCircleMethod(v) {
+  circleMethodOn = !!v;
+  const c = $('cm-toggle-main'); if (c) c.checked = circleMethodOn;
+  redraw(false);
+}
+/* Same fill as the opener's ring hole, at the page's own G and hole radius. */
+function drawRingCircleMethodFill(ctx, S) {
+  if (!circleMethodOn || ringHole <= 0) return;
+  const c = S / 2, R = ringOuter(S) * ringHole;
+  openerDrawCircleMethod(ctx, c, c, R, ringHole, COP_G);
+}
 /* Point size invalidates both cached plates, so it goes through redraw with
    a rebuild — the caches key on ptScale, so a stale buffer cannot survive. */
 function setPtScale(v) {
@@ -9135,6 +9454,10 @@ function exportDetailSections(views) {
       (liftDimOn ? ' \u00b7 base plate dimmed to ' + liftDimPct + '%' : '') });
     li.push({ rgb: null, text: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') + ' (' + cd.sat + ')' });
     li.push({ rgb: null, text: 'D(n) = ' + fmt(cd.D, 6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + fmt(cd.C, 6) });
+    {
+      const globalCop = 6 / (Math.PI * Math.PI), ratioD = cd.D / globalCop, deltaD = 100 * (ratioD - 1);
+      li.push({ rgb: null, text: 'D(n) / (6/\u03c0\u00b2) = ' + ratioD.toFixed(4) + '\u00d7 global pair density \u00b7 \u0394 ' + (deltaD >= 0 ? '+' : '') + deltaD.toFixed(2) + '%' });
+    }
     out.push({ title: 'LIFT DYNAMICS', items: li });
   }
 
@@ -12485,6 +12808,7 @@ function boot() {
   $('b-strip').classList.add('on');
   document.addEventListener('keydown', onKey);
   wireLens();
+  wireOpenerZooms();
   setLensZoom(3); setLensPin('auto');
   buildPhi(4096);
   // All three views open turned by −i (VQ). Counts are unaffected by the turn either
