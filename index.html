@@ -1275,15 +1275,18 @@ walk anyway.</p>
   <div class="prow vrow" id="row-cay-a">
     <span class="plabel">&rho; = &rho;&#8320;+&rho;<sub>D</sub>&middot;M/G</span>
     <span class="lbl">&rho;&#8320;</span>
-    <input type="range" id="sl-rho0" min="0" max="3" step="0.05" value="0.4" oninput="setRho0(+this.value)">
+    <input type="range" id="sl-rho0" min="0" max="4" step="0.05" value="0.4" oninput="setRho0(+this.value)">
     <span class="val" id="v-rho0">0.40</span>
     <span class="lbl">&rho;<sub>D</sub></span>
-    <input type="range" id="sl-rhoD" min="0.05" max="3" step="0.05" value="1.8" oninput="setRhoD(+this.value)">
+    <input type="range" id="sl-rhoD" min="0.05" max="4" step="0.05" value="1.8" oninput="setRhoD(+this.value)">
     <span class="val" id="v-rhoD">1.80</span>
     <button class="chip" onclick="setRhoPair(0.4,1.8)" title="Default. ρ runs 0.40 → 2.20, so most rings land outside the unit circle.">0.4&middot;1.8</button>
     <button class="chip" onclick="setRhoPair(0.5,1.5)" title="ρ runs 0.50 → 2.00 — reciprocal endpoints, so the inside-the-disk and outside-the-disk halves are mirror images of each other.">0.5&middot;1.5&nbsp;&#8644;</button>
     <button class="chip" onclick="setRhoPair(0,2)" title="ρ runs 0 → 2, starting at the origin. The innermost rings pile up near Γ(0) = −1.">0&middot;2</button>
     <button class="chip" onclick="setRhoPair(0,1)" title="ρ runs 0 → 1, staying inside the unit circle the whole way — the innermost rings start at the origin and the outermost just reach the rim.">0&middot;1</button>
+    <button class="chip" onclick="setRhoPair(0.4,0.6)" title="ρ₀ 0.40, ρ_D 0.60: ρ runs 0.4 → 1.0, inside the unit circle.">.4&middot;.6</button>
+    <button class="chip" onclick="setRhoPair(1,1)" title="ρ runs 1 → 2: starts on the unit circle and moves outside it.">1&rarr;2</button>
+    <button class="chip" onclick="setRhoPair(0,4)" title="ρ runs 0 → 4, the widest range the sliders allow.">0&rarr;4</button>
   </div>
   <div class="prow vrow" id="row-cay-b" style="display:none">
     <span class="plabel">a (Blaschke)</span>
@@ -1669,6 +1672,22 @@ walk anyway.</p>
       <button class="chip erchip" data-er="4096" onclick="setExportRes(4096)" title="4096px per row. Print size.">4K</button>
       <button class="chip erchip" data-er="8192" onclick="setExportRes(8192)" title="8192px per row. Large; expect a pause while it composes.">8K</button>
     </div>
+    <div class="prow">
+      <span class="plabel">Math sheet</span>
+      <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="Also download a second PNG: the mathematics of this export typeset like a short paper, computed from the exact parameters above.">
+        <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> Also download the math behind this export (PNG)
+      </label>
+      <button class="chip ms-th on" data-th="paper" onclick="msSetTheme('paper')" title="Light page, dark ink">Paper</button>
+      <button class="chip ms-th" data-th="night" onclick="msSetTheme('night')" title="Dark page, matching the site">Night</button>
+    </div>
+    <div class="prow">
+      <span class="plabel">Full PDF</span>
+      <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="A third download: one multi-page PDF with the plate on page 1 and the whole math sheet on A4 pages after it, so a long sheet never becomes one enormous image.">
+        <input type="checkbox" class="ms-pdf-chk" onchange="msSetPdf(this.checked)"> PDF &mdash; plate + full math, multi-page
+      </label>
+    </div>
+    <div class="pnote" style="padding:2px 0 8px;">The math sheet is a second PNG saved beside the plate: the lattice, the coordinate map that draws each view, the colouring rule, the strip or block measurement and its prediction &mdash; for exactly these parameters, every number computed at export time.</div>
+    <div id="ms-links-main" class="hint" style="display:none;margin-bottom:8px;"></div>
     <div class="export-preview-wrap">
       <div class="pnote" id="export-preview-note" style="padding:4px 0;">Preview</div>
       <div id="export-preview-slot"></div>
@@ -1798,6 +1817,10 @@ walk anyway.</p>
       <input type="range" id="welcome-rhod" min="0" max="4" step="0.05" value="1.8" oninput="setOpenerRhoD(+this.value)" style="flex:1 1 60px;min-width:50px;">
       <span class="val" id="welcome-rhod-v" style="min-width:32px;">1.80</span>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,2)" title="&rho; runs 0 &rarr; 2, starting at the origin. The innermost rings pile up near &Gamma;(0) = &minus;1.">0&middot;2</button>
+      <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0.4,0.6)" title="&rho;&#8320; 0.40, &rho;<sub>D</sub> 0.60: &rho; runs 0.4 &rarr; 1.0, inside the unit circle.">.4&middot;.6</button>
+      <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,1)" title="&rho; runs 0 &rarr; 1, inside the unit circle the whole way.">0&rarr;1</button>
+      <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(1,1)" title="&rho; runs 1 &rarr; 2: starts on the unit circle and moves outside it.">1&rarr;2</button>
+      <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,4)" title="&rho; runs 0 &rarr; 4, the widest range the sliders allow.">0&rarr;4</button>
     </div>
     <div class="prow" id="welcome-czrow">
       <span class="plabel">Cayley zoom &middot; <b id="welcome-cz-v">0.33&times;</b></span>
@@ -1839,33 +1862,6 @@ walk anyway.</p>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="For every coprime r on every ring M, a line from r to r mod(M+1). Teal = the lift survives, coral = it breaks."><input type="checkbox" id="ol-chain-chk" checked onchange="olToggleChain(this.checked)"> r &rarr; r mod(M+1)</label>
       </div>
       <div class="prow">
-        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="The band b&middot;r &minus; a&middot;M in [s, s+w) as a see-through teal region, on all three preview canvases -- Grid draws it as a straight band like the main page; Ring and Cayley bend it through their own coordinates instead, which the main page's Strip never has to do.">
-          <input type="checkbox" id="ol-strip-chk" onchange="olToggleStrip(this.checked)"> Strip
-        </label>
-        <span class="lbl">slope a</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepSlopeA(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-a" type="number" step="1" value="1" onchange="olSetSlopeA(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeA(1)" title="+1">+</button></div>
-        <span class="lbl">/ b</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepSlopeB(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-b" type="number" min="1" step="1" value="1" onchange="olSetSlopeB(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeB(1)" title="+1">+</button></div>
-        <span class="lbl">offset</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="0" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
-        <button class="chip" onclick="olResetOffset()" title="Back to s = 0.">reset s=0</button>
-        <span class="lbl">width</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="1" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
-        <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
-        <button class="chip" onclick="olFullWidth()" title="Widen the band to cover the whole lattice.">full width</button>
-        <span class="hint" id="ol-strip-note">&mdash;</span>
-      </div>
-      <div class="prow">
-        <button class="chip" id="ol-gap-play" onclick="olToggleGapPlay()" title="Walk every partition g = 1..N/2 of N and back, drawing all four Strip I lines live — same sweep as the main page's Play g. Most partitions are NOT Goldbach pairs.">&#9654; Play g</button>
-        <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
-        <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
-        <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
-        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop</label>
-        <input type="range" id="ol-gbdim-amt" min="0" max="100" step="1" value="50" oninput="olSetGbDimAmt(this.value)" style="max-width:100px;" title="Dim amount, 0–100%. Starts at 50% when Dim backdrop is switched on.">
-        <span class="val" id="ol-gbdim-amt-v">50%</span>
-        <span class="hint" id="ol-gb-note">N = &ndash;</span>
-      </div>
-      <div class="prow">
         <span class="lbl" style="flex-basis:100%;font-size:10px;color:rgba(232,227,219,.5);" title="Shared by Spiral, &plusmn;n path, Connect and the r-chain.">Spiral / &plusmn;n path / Connect / r-chain &mdash;</span>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift survives"><input type="checkbox" id="ol-surv-chk" checked onchange="olSetSurv(this.checked)"> Surviving</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:var(--coral);cursor:pointer;font-size:11.5px;" title="Lines and dots where the lift breaks"><input type="checkbox" id="ol-broken-chk" checked onchange="olSetBroken(this.checked)"> Broken</label>
@@ -1873,6 +1869,39 @@ walk anyway.</p>
         <input type="range" id="ol-survbroken-thick" min="0" max="1" step="0.01" value="0.5" oninput="olSetSurvBrokenThick(this.value)" style="max-width:100px;" title="Line/dot thickness for the Spiral, &plusmn;n path and r-chain overlays &mdash; the ones Surviving/Broken above gate.">
         <span class="val" id="ol-survbroken-thick-v">0.50</span>
       </div>
+      <div class="prow">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--teal);cursor:pointer;font-size:11.5px;" title="The band b&middot;r &minus; a&middot;M in [s, s+w) as a see-through teal region, on all three preview canvases -- Grid draws it as a straight band like the main page; Ring and Cayley bend it through their own coordinates instead, which the main page's Strip never has to do.">
+          <input type="checkbox" id="ol-strip-chk" checked onchange="olToggleStrip(this.checked)"> Strip
+        </label>
+        <span class="lbl">slope a</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepSlopeA(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-a" type="number" step="1" value="1" onchange="olSetSlopeA(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeA(1)" title="+1">+</button></div>
+        <span class="lbl">/ b</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepSlopeB(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-b" type="number" min="1" step="1" value="2" onchange="olSetSlopeB(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeB(1)" title="+1">+</button></div>
+        <span class="lbl">offset</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="-1" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
+        <button class="chip" onclick="olResetOffset()" title="Back to s = 0.">reset s=0</button>
+        <span class="lbl">width</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="2" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
+        <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
+        <button class="chip" onclick="olFullWidth()" title="Widen the band to cover the whole lattice.">full width</button>
+        <span class="hint" id="ol-strip-note">&mdash;</span>
+        <button class="chip" id="ol-strip-dots-btn" onclick="olToggleStripDots()" title="Draw every lattice point inside the band on the plate: coprime ones bright, misses dim.">show points</button>
+        <button class="chip" id="ol-strip-list-btn" onclick="olToggleStripList()" title="List the lattice points in the band. Click one to mark it on the plate.">point list &#9662;</button>
+      </div>
+      <div id="ol-strip-list" style="display:none;padding:2px 0 8px;"></div>
+      <div class="prow">
+        <button class="chip" id="ol-gap-play" onclick="olToggleGapPlay()" title="Walk every partition g = 1..N/2 of N and back, drawing all four Strip I lines live — same sweep as the main page's Play g. Most partitions are NOT Goldbach pairs.">&#9654; Play g</button>
+        <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
+        <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
+        <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
+        <button class="chip" id="ol-gb-dir" onclick="olToggleGbDir()" title="Direction Play Goldbach pairs walks: forward (small g to large) or backward.">dir: &#9654;</button>
+        <button class="chip" id="ol-gb-list-btn" onclick="olToggleGbList()" title="Show every Goldbach pair of N as a list. Click one to draw it on the plate.">all pairs &#9662;</button>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop</label>
+        <input type="range" id="ol-gbdim-amt" min="0" max="100" step="1" value="50" oninput="olSetGbDimAmt(this.value)" style="max-width:100px;" title="Dim amount, 0–100%. Starts at 50% when Dim backdrop is switched on.">
+        <span class="val" id="ol-gbdim-amt-v">50%</span>
+        <span class="hint" id="ol-gb-note">N = &ndash;</span>
+      </div>
+      <div id="ol-gb-list" style="display:none;padding:2px 0 8px;"></div>
       <div class="subtoggle collapsed" id="ol-math-toggle" onclick="toggleSub(this);olSyncUI()"><span class="car">&#9662;</span><span>the math</span></div>
       <div class="subbody"><div id="ol-math"></div></div>
     </div>
@@ -1892,8 +1921,23 @@ walk anyway.</p>
         <button class="chip oe-ratio-btn on" data-r="1:1" onclick="oeSetRatio('1:1')" title="Square, matching Grid and Ring \u2014 the default.">1:1</button>
       </div>
       <div class="prow">
+        <span class="lbl">math sheet</span>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;font-size:11.5px;" title="Also download a second PNG: the mathematics behind this opener export, typeset like a short paper.">
+          <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> also download the math behind this export
+        </label>
+        <button class="chip ms-th on" data-th="paper" onclick="msSetTheme('paper')" title="Light page, dark ink">Paper</button>
+        <button class="chip ms-th" data-th="night" onclick="msSetTheme('night')" title="Dark page, matching the site">Night</button>
+      </div>
+      <div class="prow">
+        <span class="plabel">Full PDF</span>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="A third download: one multi-page PDF with the plate on page 1 and the whole math sheet on A4 pages after it, so a long sheet never becomes one enormous image.">
+          <input type="checkbox" class="ms-pdf-chk" onchange="msSetPdf(this.checked)"> PDF &mdash; plate + full math, multi-page
+        </label>
+      </div>
+      <div class="prow">
         <button class="btn" id="oe-go-btn" onclick="runOpenerExport()" title="Compose the selected view(s) at 4096px wide, with a title, subtitle and legend reading the opener's current settings, and download a PNG.">&#8681; Download 4K PNG</button>
         <span id="oe-msg" class="hint"></span>
+        <div id="ms-links-open" class="hint" style="display:none;flex:1 1 100%;"></div>
       </div>
     </div>
     <div class="ctrls" style="margin-top:16px;">
@@ -3508,7 +3552,7 @@ function setOpenerG(v) {
    chain are on by default. */
 const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
-             stripOn: false, slopeA: 1, slopeB: 1, offset: 0, width: 1,
+             stripOn: true, slopeA: 1, slopeB: 2, offset: -1, width: 2,
              gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1 };
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
@@ -3738,17 +3782,19 @@ function olStripPoints(G) {
   const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
   const key = G + '|' + a + '|' + b + '|' + s + '|' + w;
   if (_olStripCache && _olStripKey === key) return _olStripCache;
-  const pts = []; let total = 0, cop = 0;
+  const pts = [], all = []; let total = 0, cop = 0;
   if (b) {
     for (let M = 1; M <= G; M++) {
       const lo = Math.ceil((s + a * M) / b), hi = Math.ceil((s + w + a * M) / b) - 1;
       for (let r = Math.max(1, lo); r <= Math.min(G, hi); r++) {
         total++;
-        if (gcd(r, M) === 1) { cop++; pts.push([r, M]); }
+        const ok = gcd(r, M) === 1;
+        all.push([r, M, ok]);
+        if (ok) { cop++; pts.push([r, M]); }
       }
     }
   }
-  _olStripKey = key; _olStripCache = { pts, total, cop };
+  _olStripKey = key; _olStripCache = { pts, all, total, cop };
   return _olStripCache;
 }
 // E = 2(G+1), read off the live preview lattice -- exactly the main page's
@@ -3821,7 +3867,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   // formula run through their own r,M -> xy map, so it comes out as a spoke/
   // spiral-shaped region there instead of the straight one Grid draws, which
   // is the honest result of the same math under those views' own coordinates.
-  if (OL.stripOn) olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12));
+  if (OL.stripOn) { olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12)); if (OL.stripDots || OL.stripPick) olStripDots(ctx, xy, G, cl(cell * 0.4, 1.2, 2.6)); }
   if (OL.gbOn) {
     // Dim the base plate AND every other overlay above -- drawn so far, on this
     // same canvas -- by the slider's amount, so the Goldbach pair reads clearly
@@ -3847,7 +3893,12 @@ function openerOverlaySoon() {
 }
 function olRedraw() { olSyncUI(); openerOverlaySoon(); }
 function olSetMode(m) { OL.mode = m; olRedraw(); }
-function olStepN(d) { OL.n = Math.max(0, Math.min(255, openerLiftN() + d)); olRedraw(); }
+function olStepN(d) {
+  OL.n = Math.max(0, Math.min(255, openerLiftN() + d));
+  // while p is playing, a p that n has just saturated jumps at once to the next active prime
+  if (_olPTimer) { const act = olActivePrimes(); if (act.length && act.indexOf(OL.p) < 0) OL.p = act.find(q => q > OL.p) || act[0]; }
+  olRedraw();
+}
 // p runs 1, 2, 3, 5, 7 ...: 1 is not a prime but it is the residue every ring has, so it sits before 2.
 function olStepP(dir) {
   olStopPPlay();
@@ -3867,15 +3918,27 @@ function olStopPPlay() {
   if (_olPTimer) { clearInterval(_olPTimer); _olPTimer = 0; }
   olSyncPPlayChip();
 }
+// n gates the spiral: a prime p <= n+1 is saturated (it breaks every block of length n+1),
+// so Play walks only the ACTIVE primes, n+1 < p <= G. Raising n while it plays retires primes
+// from the loop; the walk then wraps to the smallest prime that is still active.
+function olActivePrimes() {
+  const lo = openerLiftN() + 1, out = [];
+  for (let q = 2; q <= OPENER_G; q = nextPrime(q)) if (q > lo) out.push(q);
+  return out;
+}
 function olTogglePPlay() {
   if (_olPTimer) { olStopPPlay(); return; }
+  const first = olActivePrimes();
+  if (!first.length) return;                       // every prime <= G is saturated at this n
+  if (!(OL.p > openerLiftN() + 1) || first.indexOf(OL.p) < 0) OL.p = first.find(q => q >= OL.p) || first[0];
   _olPTimer = setInterval(() => {
     if (!openerModalOpen()) { olStopPPlay(); return; }
-    let q = nextPrime(OL.p);
-    if (q > OPENER_G) q = 2;
-    OL.p = q; olRedraw();
+    const act = olActivePrimes();
+    if (!act.length) { olStopPPlay(); return; }    // n saturated everything: nothing left to loop
+    OL.p = act.find(q => q > OL.p) || act[0];
+    olRedraw();
   }, 140);
-  olSyncPPlayChip();
+  olSyncPPlayChip(); olRedraw();
 }
 function olToggleChain(v) { OL.chain = !!v; olRedraw(); }
 function olSetSurv(v) { OL.surv = !!v; olRedraw(); }
@@ -3957,7 +4020,7 @@ function olToggleGbPlay() {
     if (!openerModalOpen()) { olStopGbPlay(); return; }
     const live = olGoldbachPairs();
     if (!live.length) { olStopGbPlay(); return; }
-    i = (i + 1) % live.length;
+    i = (i + (OL.gbDir || 1) + live.length) % live.length;
     OL.gbG = live[i];
     olRedraw();
   }, 500);
@@ -3989,8 +4052,90 @@ function olToggleGapPlay() {
   }, 120);
   olSyncGapPlayChip(); olRedraw();
 }
+
+// ---- v2: Goldbach direction + pair list, strip point list ------------------
+OL.gbDir = 1; OL.stripDots = false; OL.stripPick = null;
+let _olGbListOpen = false, _olStripListOpen = false;
+function olToggleGbDir() {
+  OL.gbDir = OL.gbDir > 0 ? -1 : 1;
+  const b = $('ol-gb-dir'); if (b) b.innerHTML = 'dir: ' + (OL.gbDir > 0 ? '&#9654;' : '&#9664;');
+  if (_olGbTimer) { olStopGbPlay(); olToggleGbPlay(); }
+}
+function olPickGb(g) {
+  olStopGbPlay(); olStopGapPlay();
+  OL.gbOn = true; OL.gbG = g; olRedraw();
+}
+function olToggleGbList() {
+  _olGbListOpen = !_olGbListOpen;
+  const b = $('ol-gb-list-btn'); if (b) b.innerHTML = 'all pairs ' + (_olGbListOpen ? '&#9652;' : '&#9662;');
+  olRedraw();
+}
+function olToggleStripDots() { OL.stripDots = !OL.stripDots; if (OL.stripDots) OL.stripOn = true; olRedraw(); }
+function olToggleStripList() {
+  _olStripListOpen = !_olStripListOpen;
+  const b = $('ol-strip-list-btn'); if (b) b.innerHTML = 'point list ' + (_olStripListOpen ? '&#9652;' : '&#9662;');
+  olRedraw();
+}
+function olPickStripPt(r, M) {
+  const same = OL.stripPick && OL.stripPick[0] === r && OL.stripPick[1] === M;
+  OL.stripPick = same ? null : [r, M];
+  if (!same) OL.stripOn = true;
+  olRedraw();
+}
+function olSyncLists() {
+  const gl = $('ol-gb-list');
+  if (gl) {
+    gl.style.display = _olGbListOpen ? '' : 'none';
+    if (_olGbListOpen) {
+      const N = olGoldbachN(), pairs = olGoldbachPairs();
+      let h = '<div class="hint" style="padding:0 0 4px;">' + pairs.length + ' pairs of N = ' + N + ' &mdash; tap one to draw it</div><div style="display:flex;flex-wrap:wrap;gap:4px;max-height:170px;overflow:auto;">';
+      pairs.forEach(g => {
+        const on = OL.gbOn && OL.gbG === g;
+        h += '<button class="chip' + (on ? ' on' : '') + '" style="font-size:11px;padding:3px 7px;" onclick="olPickGb(' + g + ')">' + g + ' + ' + (N - g) + '</button>';
+      });
+      gl.innerHTML = h + '</div>';
+    }
+  }
+  const sl = $('ol-strip-list');
+  if (sl) {
+    sl.style.display = _olStripListOpen ? '' : 'none';
+    if (_olStripListOpen) {
+      const sp = olStripPoints(OPENER_G), CAP = 400;
+      const list = sp.all;
+      let h = '<div class="hint" style="padding:0 0 4px;">' + sp.cop + ' coprime of ' + sp.total + ' lattice points in the band (r, M) &mdash; tap one to mark it' + (list.length > CAP ? '; first ' + CAP + ' shown' : '') + '</div><div style="display:flex;flex-wrap:wrap;gap:4px;max-height:190px;overflow:auto;">';
+      list.slice(0, CAP).forEach(q => {
+        const on = OL.stripPick && OL.stripPick[0] === q[0] && OL.stripPick[1] === q[1];
+        h += '<button class="chip' + (on ? ' on' : '') + '" style="font-size:11px;padding:3px 7px;' + (q[2] ? '' : 'opacity:.55;color:var(--coral);') + '" onclick="olPickStripPt(' + q[0] + ',' + q[1] + ')">(' + q[0] + ',' + q[1] + ')</button>';
+      });
+      sl.innerHTML = h + '</div>';
+    }
+  }
+  const d = $('ol-strip-dots-btn'); if (d) d.classList.toggle('on', !!OL.stripDots);
+}
+function olStripDots(ctx, xy, G, dot) {
+  const sp = olStripPoints(G);
+  ctx.save();
+  if (OL.stripDots) {
+    for (const q of sp.all) {
+      const pt = xy(q[0], q[1]); if (!pt) continue;
+      ctx.fillStyle = q[2] ? 'rgba(242,200,96,.95)' : 'rgba(224,80,96,.45)';
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], q[2] ? dot : dot * 0.7, 0, TAU); ctx.fill();
+    }
+  }
+  if (OL.stripPick) {
+    const pt = xy(OL.stripPick[0], OL.stripPick[1]);
+    if (pt) {
+      ctx.fillStyle = 'rgba(4,4,13,.8)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 3, 0, TAU); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = Math.max(1.2, dot * 0.6);
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 3, 0, TAU); ctx.stroke();
+      ctx.fillStyle = 'rgba(242,200,96,1)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.5, 0, TAU); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
 // The header carries D(n) live; the table under "the math" is only rebuilt while it is open.
 function olSyncUI() {
+  olSyncLists();
   const n = openerLiftN(), ZETA2 = Math.PI * Math.PI / 6;
   document.querySelectorAll('.ol-mode-btn').forEach(b => b.classList.toggle('on', b.dataset.m === OL.mode));
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
@@ -4318,13 +4463,8 @@ function oeLegendSections() {
       li.push({ c: PAL.coral, t: 'd: r+M=s' });
       li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
       li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 c,d fully lit \u21d4 g,s both prime' });
-      const maxG = Math.floor(N / 2);
-      if (maxG >= 1) {
-        const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
-        li.push({ c: null, t: 'showing ' + g + ' + ' + s + ' = ' + N + ' \u00b7 ' + pairs.length + ' Goldbach pair' + (pairs.length === 1 ? '' : 's') + ' of ' + N + ' total' });
-      } else {
-        li.push({ c: null, t: 'no partitions of ' + N + ' fit at this G' });
-      }
+      if (Math.floor(N / 2) >= 1) gbLegendLines(OPENER_G, OL.gbG, true).forEach(t => li.push({ c: null, t: t }));
+      else li.push({ c: null, t: 'no partitions of ' + N + ' fit at this G' });
     }
     out.push({ title: 'LIFT DYNAMICS', items: li });
   }
@@ -4333,6 +4473,42 @@ function oeLegendSections() {
 // Word-wraps each item into its column and measures the total height before the
 // canvas exists, the same two-pass approach the page's own detail band uses, so the
 // export grows to fit the legend instead of clipping it.
+/* Legend balancing, shared by the opener export and the main-page export. Entries are the
+   individual legend rows (already word-wrapped and measured); they are cut into ncol
+   columns at row boundaries so the columns come out the same height, and a section that
+   is split across a cut gets its title repeated with "(cont.)". Nothing is drawn here. */
+function balanceLegend(entries, ncol, titleH, tailH) {
+  const n = entries.length;
+  const build = (a, b) => {
+    const blocks = []; let h = 0;
+    for (let i = a; i < b; i++) {
+      const e = entries[i]; let blk = blocks[blocks.length - 1];
+      if (!blk || blk.sec !== e.sec) {
+        blk = { sec: e.sec, title: e.title + (e.first ? '' : ' (cont.)'), lay: [], h: titleH + tailH };
+        blocks.push(blk); h += titleH + tailH;
+      }
+      blk.lay.push(e.lay); blk.h += e.h; h += e.h;
+    }
+    return { blocks: blocks, h: h };
+  };
+  const cum = [0]; for (let i = 0; i < n; i++) cum.push(cum[i] + entries[i].h);
+  let cuts = [0, n];
+  if (ncol === 2) {
+    let best = Infinity, bk = n;
+    for (let k = 1; k <= n; k++) { const m = Math.max(cum[k] + titleH, cum[n] - cum[k] + titleH); if (m < best) { best = m; bk = k; } }
+    cuts = [0, bk, n];
+  } else if (ncol >= 3) {
+    let best = Infinity, b1 = n, b2 = n;
+    for (let k1 = 1; k1 <= n; k1++) for (let k2 = k1; k2 <= n; k2++) {
+      const m = Math.max(cum[k1], cum[k2] - cum[k1], cum[n] - cum[k2]);
+      if (m < best) { best = m; b1 = k1; b2 = k2; }
+    }
+    cuts = [0, b1, b2, n];
+  }
+  const cols = [];
+  for (let c = 0; c + 1 < cuts.length; c++) cols.push(build(cuts[c], cuts[c + 1]));
+  return cols;
+}
 function oeLayoutLegend(sections, W, S) {
   if (!sections.length) return { h: 0, cols: [], colW: 0 };
   const mctx = document.createElement('canvas').getContext('2d');
@@ -4349,14 +4525,12 @@ function oeLayoutLegend(sections, W, S) {
     if (cur) lines.push(cur);
     return lines;
   };
-  const cols = Array.from({ length: ncol }, () => ({ blocks: [], h: 0 }));
-  sections.forEach((sec, i) => {
-    const lay = sec.items.map(it => ({ c: it.c, lines: wrap(it.t, colW - swW - 14 * S) }));
-    const nLines = lay.reduce((a, b) => a + b.lines.length, 0);
-    const h = 46 * S + nLines * lh + lay.length * 6 * S + 16 * S;
-    cols[Math.min(i, ncol - 1)].blocks.push({ title: sec.title, lay, h });
-    cols[Math.min(i, ncol - 1)].h += h;
-  });
+  const entries = [];
+  sections.forEach(sec => sec.items.forEach((it, i) => {
+    const lines = wrap(it.t, colW - swW - 14 * S);
+    entries.push({ sec: sec.title, title: sec.title, first: i === 0, lay: { c: it.c, lines: lines }, h: lines.length * lh + 6 * S });
+  }));
+  const cols = balanceLegend(entries, ncol, 46 * S, 16 * S);
   return { h: Math.max.apply(null, cols.map(c => c.h)) + 64 * S, cols, colW, gap, px, lh, swW, S: S };
 }
 function oeDrawLegend(ctx, L, x, y, W) {
@@ -4384,33 +4558,51 @@ function oeDrawLegend(ctx, L, x, y, W) {
   });
   ctx.restore();
 }
-// Word-wraps a legend section into lines for a narrow side panel -- same
-// measuring approach as oeLayoutLegend/layoutDetailBand, just one column wide.
-function oeSidePanelLines(section, w, S) {
-  if (!section) return null;
+// Side panels flanking the Cayley tile: the WHOLE legend is poured into two panels of
+// equal height (cut at row boundaries), and the type shrinks a step at a time until both
+// fit beside the tile. If even the smallest step is too tall, the export grows instead --
+// the caller reads .h and makes room, so nothing is ever cut off or drawn over the tally.
+function oeSidePanelsBalanced(sections, w, S, maxH) {
   const mctx = document.createElement('canvas').getContext('2d');
-  const px = 20 * S, lh = 28 * S, swW = 20 * S;
-  mctx.font = px + 'px ' + MONO;
-  const wrap = (text, maxW) => {
-    const words = text.split(' '), lines = []; let cur = '';
-    for (const wd of words) { const t = cur ? cur + ' ' + wd : wd; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = wd; } else cur = t; }
-    if (cur) lines.push(cur);
-    return lines;
-  };
-  return { title: section.title, lay: section.items.map(it => ({ c: it.c, lines: wrap(it.t, Math.max(40 * S, w - swW - 12 * S)) })), px, lh, swW, S: S };
+  let res = null;
+  for (const k of [1, 0.92, 0.85, 0.78, 0.72]) {
+    const px = 20 * S * k, lh = 28 * S * k, swW = 20 * S * k;
+    mctx.font = px + 'px ' + MONO;
+    const maxW = Math.max(40 * S, w - swW - 12 * S);
+    const wrap = (text) => {
+      const words = text.split(' '), lines = []; let cur = '';
+      for (const wd of words) { const t = cur ? cur + ' ' + wd : wd; if (cur && mctx.measureText(t).width > maxW) { lines.push(cur); cur = wd; } else cur = t; }
+      if (cur) lines.push(cur);
+      return lines;
+    };
+    const entries = [];
+    sections.forEach(sec => sec.items.forEach((it, i) => {
+      const lines = wrap(it.t);
+      entries.push({ sec: sec.title, title: sec.title, first: i === 0, lay: { c: it.c, lines: lines }, h: lines.length * lh + 8 * S * k });
+    }));
+    const cols = balanceLegend(entries, 2, 36 * S * k, 22 * S * k);
+    const h = Math.max(cols[0].h, cols[1] ? cols[1].h : 0);
+    res = { panels: cols.map(c => ({ blocks: c.blocks, px, lh, swW, k, S })), h: h };
+    if (h <= maxH) break;
+  }
+  return res;
 }
 function oeDrawSidePanel(ctx, panel, x, y, w) {
   if (!panel) return;
-  const S = panel.S || 1;
+  const S = panel.S || 1, k = panel.k || 1;
   ctx.save(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = PAL.gold; ctx.font = (20 * S) + 'px ' + MONO;
-  ctx.fillText(panel.title, x, y);
-  let cy = y + 36 * S;
-  panel.lay.forEach(it => {
-    if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(x, cy - panel.px * 0.78, panel.swW * 0.55, panel.swW * 0.55); }
-    ctx.fillStyle = PAL.cream2; ctx.font = panel.px + 'px ' + MONO;
-    it.lines.forEach(line => { ctx.fillText(line, x + panel.swW, cy); cy += panel.lh; });
-    cy += 8 * S;
+  let cy = y;
+  panel.blocks.forEach(b => {
+    ctx.fillStyle = PAL.gold; ctx.font = (20 * S * k) + 'px ' + MONO;
+    ctx.fillText(b.title, x, cy);
+    cy += 36 * S * k;
+    b.lay.forEach(it => {
+      if (it.c) { ctx.fillStyle = it.c; ctx.fillRect(x, cy - panel.px * 0.78, panel.swW * 0.55, panel.swW * 0.55); }
+      ctx.fillStyle = PAL.cream2; ctx.font = panel.px + 'px ' + MONO;
+      it.lines.forEach(line => { ctx.fillText(line, x + panel.swW, cy); cy += panel.lh; });
+      cy += 8 * S * k;
+    });
+    cy += 22 * S * k;
   });
   ctx.restore();
 }
@@ -4463,7 +4655,12 @@ async function runOpenerExport() {
     else if (OE.view === 'cayley') plateH = W / ratio;
     else plateH = W;
     const sidePanelW = useSidePanels ? Math.max(0, (W - tileW) / 2 - pad - gap) : 0;
-    const sidePanels = useSidePanels ? [oeSidePanelLines(sections[0], sidePanelW, S), oeSidePanelLines(sections[1], sidePanelW, S)] : null;
+    const panelTop = 34 * S;
+    const sidePack = useSidePanels ? oeSidePanelsBalanced(sections, sidePanelW, S, tileW - panelTop - 12 * S) : null;
+    // The Cayley row is as tall as the tile OR the panels, whichever is taller, so the panels
+    // can never run into the tally row below or off the bottom of the canvas.
+    const cayRowH = useSidePanels ? Math.max(tileW, panelTop + sidePack.h + 16 * S) : 0;
+    if (useSidePanels) plateH = tileW + gap + cayRowH;
     const H = Math.round(headerH + plateH + 40 * S + tallyL.h + legendL.h + footerH);
     const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
@@ -4494,9 +4691,9 @@ async function runOpenerExport() {
       const cayX = (W - tileW) / 2, cayY = y + tileW + gap;
       ctx.save(); ctx.translate(cayX, cayY); ctx.beginPath(); ctx.rect(0, 0, tileW, tileW); ctx.clip();
       openerDrawCayley(1, { ctx: ctx, w: tileW, h: tileW }); ctx.restore();
-      oeDrawSidePanel(ctx, sidePanels[0], pad, cayY + 34 * S, sidePanelW);
-      oeDrawSidePanel(ctx, sidePanels[1], cayX + tileW + gap, cayY + 34 * S, sidePanelW);
-      y = cayY + tileW;
+      oeDrawSidePanel(ctx, sidePack.panels[0], pad, cayY + panelTop, sidePanelW);
+      oeDrawSidePanel(ctx, sidePack.panels[1], cayX + tileW + gap, cayY + panelTop, sidePanelW);
+      y = cayY + cayRowH;
     } else if (OE.view === 'grid') {
       ctx.save(); ctx.translate(0, y); ctx.beginPath(); ctx.rect(0, 0, W, W); ctx.clip(); openerDrawGrid(1, { ctx: ctx, w: W, h: W }); ctx.restore(); y += W;
     } else if (OE.view === 'ring') {
@@ -4513,13 +4710,28 @@ async function runOpenerExport() {
     if (!useSidePanels) { oeDrawLegend(ctx, legendL, pad, y + 20 * S, legendW); y += 20 * S + legendL.h; }
     ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(221,216,204,.45)'; ctx.font = (18 * S) + 'px ' + MONO;
     ctx.fillText('wessengetachew.github.io \u00b7 opener preview, not the live plate', pad, y + footerH * 0.5);
-    canvas.toBlob(blob => {
+    await new Promise(done => canvas.toBlob(blob => {
       const a = document.createElement('a'), url = URL.createObjectURL(blob);
       a.href = url; a.download = 'strip2-opener-' + OE.view + '-' + Date.now() + '.png';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
       if (msg) msg.textContent = 'Done \u2014 4096\u00d7' + H;
-    }, 'image/png');
+      done();
+    }, 'image/png'));
+    if (MS.on) {
+      if (msg) msg.textContent = 'Typesetting the math sheet\u2026';
+      try {
+        const r = await msExportOpener();
+        if (msg) msg.textContent = 'Done \u2014 plate 4096\u00d7' + H + (r.ok ? ' + math sheet ' + r.w + '\u00d7' + r.h : ' (math sheet could not be encoded)');
+      } catch (e) { if (msg) msg.textContent = 'Plate saved; math sheet failed: ' + (e && e.message || e); }
+    }
+    if (MS.pdf) {
+      if (msg) msg.textContent = 'Building the multi-page PDF\u2026';
+      try {
+        const r2 = await msExportPdfOpener(canvas);
+        if (msg) msg.textContent = 'Done \u2014 PDF ' + r2.pages + ' pages, ' + r2.mb.toFixed(1) + ' MB';
+      } catch (e) { if (msg) msg.textContent = 'PDF failed: ' + (e && e.message || e); }
+    }
   } catch (e) {
     if (msg) msg.textContent = 'Export failed: ' + (e && e.message || e);
   } finally {
@@ -9468,6 +9680,7 @@ function exportDetailSections(views) {
     pi.push({ rgb: CG, text: 'partition mode ' + partMode + ' \u00b7 E = ' + partE() + ' \u00b7 r(E) = ' + goldbachGaps().length + ' pairs' });
     pi.push({ rgb: null, text: 'drawn ' + shown.length + ' gap' + (shown.length === 1 ? '' : 's') + ': ' +
       shown.slice(0, 24).join(', ') + (shown.length > 24 ? ', \u2026' : '') });
+    gbLegendLines(COP_G, partG, partMode === 'single').forEach(t => pi.push({ rgb: null, text: t }));
     pi.push({ rgb: null, text: 'families ' + [partShow.diff ? 'difference |M\u2212r|' : '', partShow.sum ? 'sum r+M' : ''].filter(Boolean).join(' + ') +
       (partSlopeLock ? ' \u00b7 main strip locked to pairs' : '') + ' \u00b7 backdrop \u00d7' + partBgBoost.toFixed(2) });
   }
@@ -9497,14 +9710,12 @@ function layoutDetailBand(sections, W, S) {
     if (cur) lines.push(cur);
     return lines;
   };
-  const cols = Array.from({ length: ncol }, () => ({ blocks: [], h: 0 }));
-  sections.forEach(sec => {
-    const lay = sec.items.map(it => ({ rgb: it.rgb, lines: wrapTo(it.text, colW - swW - 10 * S) }));
-    const nLines = lay.reduce((a, b) => a + b.lines.length, 0);
-    const h = 30 * S + nLines * lh + lay.length * 5 * S + 12 * S;
-    let tgt = cols[0]; cols.forEach(c => { if (c.h < tgt.h) tgt = c; });
-    tgt.blocks.push({ title: sec.title, lay, h }); tgt.h += h;
-  });
+  const entries = [];
+  sections.forEach(sec => sec.items.forEach((it, i) => {
+    const lines = wrapTo(it.text, colW - swW - 10 * S);
+    entries.push({ sec: sec.title, title: sec.title, first: i === 0, lay: { rgb: it.rgb, lines: lines }, h: lines.length * lh + 5 * S });
+  }));
+  const cols = balanceLegend(entries, ncol, 30 * S, 12 * S);
   return { h: Math.max.apply(null, cols.map(c => c.h)) + 44 * S, cols, colW, gap, px, lh, swW };
 }
 function drawDetailBand(ctx, L, x, y, W, S) {
@@ -9898,6 +10109,7 @@ async function exportPNG(pxReq, views) {
   ctx.textAlign = 'right'; ctx.fillStyle = PAL.cream3; ctx.font = (15.5 * S) + 'px ' + MONO;
   ctx.fillText('wessengetachew.github.io', px - m, fy + 81 * S);
 
+  MS.lastPlate = cv;
   dl(cv, 'strips2-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' +
       slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G +
       '-' + views.join('+') + '-' + cvW + '.png');
@@ -10059,6 +10271,16 @@ async function runExport() {
   guardFSForExport();
   try {
     await exportPNG(exportRes, orderedExportViews());
+    if (MS.on) {
+      btn.textContent = 'Typesetting math\u2026';
+      try { await msExportMain(orderedExportViews()); }
+      catch (e) { exportFail('The plate saved, but the math sheet failed: ' + (e && e.message ? e.message : e)); }
+    }
+    if (MS.pdf) {
+      btn.textContent = 'Building PDF\u2026';
+      try { await msExportPdfMain(orderedExportViews()); }
+      catch (e) { exportFail('The plate saved, but the PDF failed: ' + (e && e.message ? e.message : e)); }
+    }
   } catch (e) {
     exportFail('Export failed: ' + (e && e.message ? e.message : e));
   } finally {
@@ -12842,5 +13064,841 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else boot();
 </script>
 
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   MATH SHEET — a second PNG that travels with every export.
+
+   The plate is a picture; this is the page of mathematics it is a picture OF.
+   For the exact parameters of the export it sits beside, it writes out, like a
+   short paper: the lattice, the maps that turn (r, M) into pixels (so the
+   canvas itself is stated as a formula), the colouring rule, the counts, and
+   the identities they satisfy — with every number COMPUTED from live state at
+   the moment of export, never typed in.
+
+   Typesetting: MathJax's SVG output, run in a hidden sandboxed iframe (the page
+   itself loads the CHTML output, whose webfonts cannot be rasterised), each
+   formula returned as a self-contained SVG and drawn onto the canvas. If that
+   is unreachable (offline, blocked CDN) the sheet still exports, with each
+   formula set in plain Unicode instead of failing.
+   ══════════════════════════════════════════════════════════════════════════ */
+const MS = { on: true, pdf: false, lastPlate: null, theme: 'paper', W: 2480, minH: 3508, seq: 0, pend: new Map(), cache: new Map(), frame: null, ready: null, usedFallback: false };
+const SERIF = '"Spectral",serif';
+const MS_THEMES = {
+  paper: { bg: '#f7f3ea', ink: '#15151c', mute: '#5f5a50', acc: '#7a5f16', rule: 'rgba(20,20,28,.24)', soft: 'rgba(122,95,22,.10)', edge: 'rgba(20,20,28,.30)' },
+  night: { bg: '#04040d', ink: '#ddd8cc', mute: '#89837a', acc: '#c8a84a', rule: 'rgba(255,255,255,.16)', soft: 'rgba(200,168,74,.09)', edge: 'rgba(255,255,255,.22)' }
+};
+function msSetOn(v) {
+  MS.on = !!v;
+  document.querySelectorAll('.ms-chk').forEach(c => { c.checked = MS.on; });
+}
+function msSetPdf(v) {
+  MS.pdf = !!v;
+  document.querySelectorAll('.ms-pdf-chk').forEach(c => { c.checked = MS.pdf; });
+}
+function msSetTheme(t) {
+  MS.theme = MS_THEMES[t] ? t : 'paper';
+  document.querySelectorAll('.ms-th').forEach(b => b.classList.toggle('on', b.dataset.th === MS.theme));
+}
+
+/* ── typesetter: MathJax SVG in a sandboxed iframe ─────────────────────── */
+function msFrameReady() {
+  if (MS.ready) return MS.ready;
+  MS.ready = new Promise(resolve => {
+    let done = false;
+    const f = document.createElement('iframe');
+    const finish = ok => {
+      if (done) return; done = true;
+      if (!ok) { try { f.remove(); } catch (e) {} MS.ready = null; MS.frame = null; }
+      resolve(ok);
+    };
+    f.setAttribute('sandbox', 'allow-scripts');
+    f.setAttribute('aria-hidden', 'true');
+    f.style.cssText = 'position:fixed;left:-99999px;top:0;width:8px;height:8px;border:0;visibility:hidden;pointer-events:none;';
+    const S = 'script';
+    const inner =
+      '(function(){' +
+      'function up(m){parent.postMessage(m,"*");}' +
+      'var t0=Date.now();' +
+      '(function wait(){' +
+      ' if(window.MathJax&&MathJax.startup&&MathJax.startup.promise&&MathJax.tex2svgPromise){MathJax.startup.promise.then(function(){up({msReady:true});},function(){up({msReady:false});});return;}' +
+      ' if(Date.now()-t0>12000){up({msReady:false});return;}' +
+      ' setTimeout(wait,40);' +
+      '})();' +
+      'window.addEventListener("message",function(e){' +
+      ' var d=e.data;if(!d||d.msTex==null)return;' +
+      ' MathJax.tex2svgPromise(d.msTex,{display:!!d.display}).then(function(node){' +
+      '  var svg=node.querySelector("svg");' +
+      '  up({msId:d.msId,svg:svg.outerHTML,wex:parseFloat(svg.getAttribute("width")),hex:parseFloat(svg.getAttribute("height"))});' +
+      ' }).catch(function(err){up({msId:d.msId,err:String(err&&err.message||err)});});' +
+      '});' +
+      '})();';
+    const html = '<!doctype html><html><head><meta charset="utf-8"><' + S + '>window.MathJax={svg:{fontCache:"none"},startup:{typeset:false}};</' + S + '>' +
+      '<' + S + ' src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" onerror="parent.postMessage({msReady:false},\'*\')"></' + S + '>' +
+      '</head><body><' + S + '>' + inner + '</' + S + '></body></html>';
+    window.addEventListener('message', e => {
+      if (!f.contentWindow || e.source !== f.contentWindow) return;
+      const d = e.data || {};
+      if (d.msReady !== undefined) { finish(!!d.msReady); return; }
+      if (d.msId != null && MS.pend.has(d.msId)) { const cb = MS.pend.get(d.msId); MS.pend.delete(d.msId); cb(d); }
+    });
+    f.srcdoc = html;
+    document.body.appendChild(f);
+    MS.frame = f;
+    setTimeout(() => finish(false), 15000);
+  });
+  return MS.ready;
+}
+function msRasterise(d, fontPx, ink) {
+  return new Promise((resolve, reject) => {
+    const ex = fontPx / 2, wpx = d.wex * ex, hpx = d.hex * ex;
+    if (!(wpx > 0 && hpx > 0)) { reject(new Error('empty svg')); return; }
+    let svg = String(d.svg).replace(/currentColor/g, ink);
+    svg = svg.replace(/^<svg\b[^>]*>/, tag => {
+      tag = tag.replace(/\swidth="[^"]*"/, '').replace(/\sheight="[^"]*"/, '').replace(/\sstyle="[^"]*"/, '');
+      if (!/xmlns=/.test(tag)) tag = tag.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      return tag.replace('<svg', '<svg width="' + wpx.toFixed(2) + '" height="' + hpx.toFixed(2) + '"');
+    });
+    const img = new Image();
+    img.onload = () => resolve({ img: img, w: wpx, h: hpx });
+    img.onerror = () => reject(new Error('svg decode failed'));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+}
+async function msTypeset(tex, fontPx, ink) {
+  const key = tex + '|' + ink + '|' + fontPx;
+  if (MS.cache.has(key)) return MS.cache.get(key);
+  let out = null;
+  try {
+    if (await msFrameReady()) {
+      const id = ++MS.seq;
+      const d = await new Promise(res => {
+        MS.pend.set(id, res);
+        MS.frame.contentWindow.postMessage({ msId: id, msTex: tex, display: true }, '*');
+        setTimeout(() => { if (MS.pend.has(id)) { MS.pend.delete(id); res({ err: 'timeout' }); } }, 8000);
+      });
+      if (d && d.svg && !d.err) out = await msRasterise(d, fontPx, ink);
+    }
+  } catch (e) { out = null; }
+  if (out) MS.cache.set(key, out);
+  return out;
+}
+
+/* Plain-Unicode stand-in for a formula, used only when typesetting is not
+   available. Readable rather than pretty. */
+const MS_SYM = { alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', varphi: 'φ', phi: 'φ', pi: 'π', theta: 'θ', vartheta: 'ϑ', rho: 'ρ', sigma: 'σ', mu: 'μ', nu: 'ν',
+  omega: 'ω', Omega: 'Ω', zeta: 'ζ', kappa: 'κ', lambda: 'λ', chi: 'χ', cdot: '·', cdots: '⋯', ldots: '…', dots: '…', le: '≤', leq: '≤', ge: '≥', neq: '≠',
+  equiv: '≡', in: '∈', pm: '±', to: '→', mapsto: '↦', Rightarrow: '⇒', prod: '∏', sum: '∑', infty: '∞', approx: '≈', times: '×', mid: '∣', parallel: '∥',
+  lfloor: '⌊', rfloor: '⌋', lceil: '⌈', rceil: '⌉', ast: '*', quad: '  ', qquad: '    ', bmod: ' mod ', sim: '∼', varnothing: '∅', checkmark: '✓', longmapsto: '⟼', Longrightarrow: '⟹', iff: '⟺', varrho: 'ϱ', Sigma: 'Σ', Phi: 'Φ', min: 'min', max: 'max', lim: 'lim', gcd: 'gcd', ell: 'ℓ', bar: '', cap_: '', ',': ' ', ';': ' ', ':': ' ', '!': '',
+  '{': '{', '}': '}', '%': '%', '&': '&' };
+function msPlain(tex) {
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻', 'n': 'ⁿ' };
+  const SUB = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉', '+': '₊', '-': '₋' };
+  const conv = (str, map) => (str.length && str.split('').every(ch => map[ch])) ? str.split('').map(ch => map[ch]).join('') : null;
+  let s = String(tex);
+  s = s.replace(/\\\{/g, '\u0001').replace(/\\\}/g, '\u0002').replace(/\\mathbf\s+1/g, '1');
+  for (let i = 0; i < 10; i++) {
+    const before = s;
+    s = s.replace(/\\(?:mathrm|mathbf|mathcal|mathfrak|mathbb|text|operatorname|overline|bar)\s*\{([^{}]*)\}/g, (m, a, off, str) => (/[A-Za-z]$/.test(str.slice(0, off)) ? ' ' : '') + a);
+    s = s.replace(/\\(?:tfrac|dfrac|frac)\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, (m, a, b) => '(' + a + ')/(' + b + ')');
+    s = s.replace(/\\sqrt\s*\{([^{}]*)\}/g, '√($1)');
+    s = s.replace(/\^\{([^{}]*)\}/g, (m, a) => conv(a, SUP) || '^(' + a + ')');
+    s = s.replace(/_\{([^{}]*)\}/g, (m, a) => conv(a, SUB) || '_(' + a + ')');
+    if (s === before) break;
+  }
+  s = s.replace(/\\(?:mathrm|mathbf|mathcal|mathfrak|mathbb|text|operatorname|bar)\s*([A-Za-z0-9])/g, (m, a, off, str) => (/[A-Za-z]$/.test(str.slice(0, off)) ? ' ' : '') + a);
+  s = s.replace(/\\(?:tfrac|dfrac|frac)\s*([A-Za-z0-9])\s*([A-Za-z0-9])/g, '($1)/($2)');
+  s = s.replace(/\^([0-9n])/g, (m, a) => SUP[a] || m).replace(/_([0-9])/g, (m, a) => SUB[a] || m);
+  s = s.replace(/\\(?:left|right|big|Big|bigg|Bigg)(?![A-Za-z])\s*/g, '');
+  s = s.replace(/\\([A-Za-z]+|.)/g, (m, k) => (MS_SYM[k] !== undefined ? MS_SYM[k] : k));
+  s = s.replace(/\\/g, '').replace(/[{}]/g, '').replace(/\u0001/g, '{').replace(/\u0002/g, '}');
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+/* ── layout + drawing ──────────────────────────────────────────────────── */
+function msSpaced(s) { return String(s).toUpperCase().split(' ').map(w => w.split('').join(' ')).join('   '); }
+async function msRender(doc, theme, opts) {
+  const th = MS_THEMES[theme] || MS_THEMES.paper;
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+  const W = MS.W, MX = 210, TW = W - 2 * MX;
+  const BODY = 38, LH = 1.52, EQ = 46;
+  MS.usedFallback = false;
+  await Promise.all(doc.filter(b => b.t === 'eq').map(async b => { b.ts = await msTypeset(b.tex, EQ, th.ink); if (!b.ts) MS.usedFallback = true; }));
+  const mc = document.createElement('canvas').getContext('2d');
+  const wrap = (text, font, maxW) => {
+    mc.font = font;
+    const lines = []; let cur = '';
+    String(text).split(' ').forEach(w => {
+      const t = cur ? cur + ' ' + w : w;
+      if (cur && mc.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t;
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  };
+  const items = []; let y = 250, eqNo = 0, secNo = 0, curT = '';
+  const add = (h, draw) => { items.push({ y: y, h: h, draw: draw, t: curT }); y += h; };
+  doc.forEach(b => {
+    curT = b.t;
+    if (b.t === 'title') {
+      const tf = '500 88px ' + DISP, tl = wrap(b.title, tf, TW), sf = 'italic 300 42px ' + SERIF, sl = wrap(b.sub || '', sf, TW - 200);
+      const h = 60 + tl.length * 106 + 20 + sl.length * 62 + 44 + 60;
+      add(h, (c, y0) => {
+        c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+        c.fillStyle = th.acc; c.font = '26px ' + MONO; c.fillText(msSpaced(b.eyebrow), W / 2, y0 + 20);
+        c.fillStyle = th.ink; c.font = tf; tl.forEach((l, i) => c.fillText(l, W / 2, y0 + 130 + i * 106));
+        let yy = y0 + 130 + (tl.length - 1) * 106 + 74;
+        c.fillStyle = th.mute; c.font = sf; sl.forEach((l, i) => c.fillText(l, W / 2, yy + i * 62));
+        yy += (sl.length - 1) * 62 + 66;
+        c.font = '24px ' + MONO; c.fillText(b.by, W / 2, yy);
+        c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + h - 20); c.lineTo(W - MX, y0 + h - 20); c.stroke();
+      });
+    } else if (b.t === 'abs') {
+      const f = 'italic 400 ' + (BODY - 2) + 'px ' + SERIF, ls = wrap(b.text, f, TW - 260), lh = (BODY - 2) * LH;
+      const h = 70 + ls.length * lh + 50;
+      add(h, (c, y0) => {
+        c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+        c.fillStyle = th.acc; c.font = '22px ' + MONO; c.fillText(msSpaced('abstract'), W / 2, y0 + 34);
+        c.textAlign = 'left'; c.fillStyle = th.ink; c.font = f;
+        ls.forEach((l, i) => c.fillText(l, MX + 130, y0 + 90 + i * lh));
+      });
+    } else if (b.t === 'h') {
+      const sn = ++secNo;
+      const f = '500 50px ' + DISP;
+      add(150, (c, y0) => {
+        c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+        c.fillStyle = th.acc; c.font = '26px ' + MONO; c.fillText('§ ' + sn, MX, y0 + 78);
+        c.fillStyle = th.ink; c.font = f; c.fillText(b.text, MX + 96, y0 + 82);
+        c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 108); c.lineTo(W - MX, y0 + 108); c.stroke();
+      });
+    } else if (b.t === 'p' || b.t === 'note') {
+      const small = b.t === 'note', px = small ? 30 : BODY, f = (small ? 'italic 300 ' : '400 ') + px + 'px ' + SERIF, ls = wrap(b.text, f, TW), lh = px * LH;
+      add(ls.length * lh + (small ? 26 : 30), (c, y0) => {
+        c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = small ? th.mute : th.ink; c.font = f;
+        ls.forEach((l, i) => c.fillText(l, MX, y0 + px + i * lh));
+      });
+    } else if (b.t === 'eq') {
+      const num = b.num === false ? 0 : ++eqNo;
+      const boxW = TW - 190;
+      let w, h, sc = 1;
+      if (b.ts) { sc = Math.min(1, boxW / b.ts.w); w = b.ts.w * sc; h = b.ts.h * sc; }
+      let pl = null, pf = null;
+      if (!b.ts) {
+        pl = msPlain(b.tex); pf = 40;
+        mc.font = 'italic ' + pf + 'px ' + SERIF;
+        while (pf > 20 && mc.measureText(pl).width > boxW) { pf -= 2; mc.font = 'italic ' + pf + 'px ' + SERIF; }
+        w = Math.min(boxW, mc.measureText(pl).width); h = pf * 1.3;
+      }
+      const cap = b.cap ? wrap(b.cap, 'italic 300 28px ' + SERIF, boxW) : [];
+      const tot = h + 56 + (cap.length ? cap.length * 40 + 6 : 0);
+      add(tot, (c, y0) => {
+        const cy = y0 + 28 + h / 2;
+        if (b.ts) c.drawImage(b.ts.img, MX + (TW - w) / 2, y0 + 28, w, h);
+        else { c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = th.ink; c.font = 'italic ' + pf + 'px ' + SERIF; c.fillText(pl, MX + TW / 2, cy); }
+        c.textBaseline = 'alphabetic';
+        if (num) { c.textAlign = 'right'; c.fillStyle = th.mute; c.font = '32px ' + SERIF; c.fillText('(' + num + ')', W - MX, cy + 11); }
+        if (cap.length) { c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF; cap.forEach((l, i) => c.fillText(l, MX + TW / 2, y0 + 28 + h + 34 + i * 40)); }
+      });
+    } else if (b.t === 'params') {
+      const isLong = kv => String(kv[1]).length > 40;
+      const shortI = b.items.filter(kv => !isLong(kv)), longI = b.items.filter(isLong);
+      const cols = 2, rowH = 46, rows = Math.ceil(shortI.length / cols), cw = TW / cols, lh2 = 36, vw = TW - 300;
+      const longL = longI.map(kv => ({ k: kv[0], ls: wrap(kv[1], '500 25px ' + MONO, vw) }));
+      const longH = longL.reduce((t, l) => t + l.ls.length * lh2 + 10, 0);
+      const boxH = rows * rowH + longH + 24;
+      add(boxH + 16, (c, y0) => {
+        c.fillStyle = th.soft; c.fillRect(MX - 20, y0, TW + 40, boxH);
+        c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+        shortI.forEach((kv, i) => {
+          const col = Math.floor(i / rows), row = i % rows, x = MX + col * cw, yy = y0 + 42 + row * rowH;
+          c.fillStyle = th.mute; c.font = '25px ' + MONO; c.fillText(kv[0], x, yy);
+          c.fillStyle = th.ink; c.font = '500 25px ' + MONO; c.fillText(kv[1], x + 300, yy);
+        });
+        let yy = y0 + 42 + rows * rowH;
+        longL.forEach(l => {
+          c.fillStyle = th.mute; c.font = '25px ' + MONO; c.fillText(l.k, MX, yy);
+          c.fillStyle = th.ink; c.font = '500 25px ' + MONO;
+          l.ls.forEach((t, i) => c.fillText(t, MX + 300, yy + i * lh2));
+          yy += l.ls.length * lh2 + 10;
+        });
+      });
+    } else if (b.t === 'table') {
+      const px = 27, lh = 40, swW = 34, numW = 130, pctW = 170, labW = TW - swW - numW - pctW - 20;
+      const laid = b.rows.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
+      const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
+      add(rowsH + 70, (c, y0) => {
+        c.textBaseline = 'alphabetic';
+        c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8); c.lineTo(W - MX, y0 + 8); c.stroke();
+        let yy = y0 + 50;
+        laid.forEach(l => {
+          if (l.r.sw) { c.fillStyle = l.r.sw; c.fillRect(MX, yy - 24, swW - 8, swW - 8); c.strokeStyle = th.edge; c.lineWidth = 1.5; c.strokeRect(MX + .75, yy - 24 + .75, swW - 9.5, swW - 9.5); }
+          c.textAlign = 'left'; c.fillStyle = th.ink; c.font = px + 'px ' + MONO;
+          l.ls.forEach((t, i) => c.fillText(t, MX + swW, yy + i * lh));
+          c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW, yy);
+          c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX, yy);
+          yy += Math.max(1, l.ls.length) * lh + 8;
+        });
+        c.strokeStyle = th.rule; c.beginPath(); c.moveTo(MX, yy - 22); c.lineTo(W - MX, yy - 22); c.stroke();
+      });
+    } else if (b.t === 'key') {
+      const cols = 2, rowH = 44, rows = Math.ceil(b.items.length / cols), cw = TW / cols;
+      add(rows * rowH + 34, (c, y0) => {
+        c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+        b.items.forEach((it, i) => {
+          const col = Math.floor(i / rows), row = i % rows, x = MX + col * cw, yy = y0 + 36 + row * rowH;
+          c.fillStyle = it.rgb; c.fillRect(x, yy - 24, 30, 30); c.strokeStyle = th.edge; c.lineWidth = 1.5; c.strokeRect(x + .75, yy - 24 + .75, 28.5, 28.5);
+          c.fillStyle = th.ink; c.font = '25px ' + MONO; c.fillText(it.lab, x + 46, yy);
+        });
+      });
+    } else if (b.t === 'gap') { add(b.h || 24, () => {}); }
+  });
+  if (opts && opts.pages) {
+    // Paged: the same items, cut onto A4-proportioned pages (2480 x 3508) at item boundaries, so an
+    // equation, table or paragraph is never sliced. A heading is kept with the item that follows it.
+    const PH = MS.minH, TOP = 250, BOT = PH - 250, groups = [[]]; let py = TOP;
+    items.forEach((it, i) => {
+      let need = it.h;
+      if (it.t === 'h' && items[i + 1]) need += items[i + 1].h;
+      if (py + need > BOT && py > TOP) { groups.push([]); py = TOP; }
+      groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
+    });
+    const N = groups.length;
+    return groups.map((list, pi) => {
+      const pc = document.createElement('canvas'); pc.width = W; pc.height = PH;
+      const g = pc.getContext('2d');
+      g.fillStyle = th.bg; g.fillRect(0, 0, W, PH);
+      g.strokeStyle = th.edge; g.lineWidth = 3; g.strokeRect(84, 84, W - 168, PH - 168);
+      g.lineWidth = 1; g.strokeRect(100, 100, W - 200, PH - 200);
+      if (pi > 0) {
+        g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.fillStyle = th.acc; g.font = '24px ' + MONO;
+        g.fillText(msSpaced('the mathematics of this export'), MX, 190);
+        g.strokeStyle = th.rule; g.lineWidth = 2; g.beginPath(); g.moveTo(MX, 214); g.lineTo(W - MX, 214); g.stroke();
+      }
+      list.forEach(e => { g.save(); e.it.draw(g, e.y); g.restore(); });
+      g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.fillStyle = th.mute; g.font = '23px ' + MONO;
+      g.fillText('Strip Arithmetic II  \u00b7  wessengetachew.github.io', MX, PH - 178);
+      g.textAlign = 'right'; g.fillText('math sheet  \u00b7  page ' + (pi + 1) + ' / ' + N, W - MX, PH - 178);
+      if (MS.usedFallback && pi === N - 1) { g.textAlign = 'left'; g.font = 'italic 22px ' + SERIF; g.fillText('Formulas set in plain Unicode: the typesetter could not be reached from this browser.', MX, PH - 140); }
+      return pc;
+    });
+  }
+  const H = Math.max(MS.minH, Math.round(y + 260));
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = th.bg; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = th.edge; ctx.lineWidth = 3; ctx.strokeRect(84, 84, W - 168, H - 168);
+  ctx.lineWidth = 1; ctx.strokeRect(100, 100, W - 200, H - 200);
+  items.forEach(it => { ctx.save(); it.draw(ctx, it.y); ctx.restore(); });
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left'; ctx.fillStyle = th.mute; ctx.font = '23px ' + MONO;
+  ctx.fillText('Every numeral on this page was computed from the export\'s own parameters at the moment of export.', MX, H - 178);
+  ctx.textAlign = 'right';
+  ctx.fillText('Strip Arithmetic II  ·  wessengetachew.github.io', W - MX, H - 178);
+  if (MS.usedFallback) { ctx.textAlign = 'left'; ctx.fillStyle = th.mute; ctx.font = 'italic 22px ' + SERIF; ctx.fillText('Formulas set in plain Unicode: the typesetter could not be reached from this browser.', MX, H - 140); }
+  return cv;
+}
+
+/* ── shared helpers for the content builders ───────────────────────────── */
+const msf = (x, d) => (isFinite(x) ? (+x).toFixed(d) : '?');
+const msDeg = rad => Math.round(rad * 18000 / Math.PI) / 100;
+const msSafe = fn => { try { return fn() || []; } catch (e) { return []; } };
+const msT = String.raw;
+function msPhiSum(G) {
+  const phi = new Int32Array(G + 1); for (let i = 0; i <= G; i++) phi[i] = i;
+  for (let p = 2; p <= G; p++) if (phi[p] === p) for (let k = p; k <= G; k += p) phi[k] -= phi[k] / p;
+  let sum = 0; const terms = []; for (let m = 1; m <= G; m++) { sum += phi[m]; terms.push(phi[m]); }
+  return { sum: sum, terms: terms };
+}
+function msPhiTex(G, ph) {
+  const head = G <= 16 ? ph.terms.join('+') : msT`\varphi(1)+\varphi(2)+\cdots+\varphi(${G})`;
+  return msT`\#\{\gcd(r,M)=1\}_{M\le ${G}}=\sum_{M=1}^{${G}}\varphi(M)=` + head + '=' + ph.sum;
+}
+/* The rule of the active colouring as a definition, where the definition is
+   unambiguous from the page's own wording; otherwise the page's sentence
+   stands alone (openerRule) and nothing is invented. */
+function msModeTex(mode, n) {
+  const T = {
+    binary: msT`\chi(r,M)=\mathbf 1\!\left[\gcd(r,M)=1\right]`,
+    gcd: msT`g=\gcd(r,M),\qquad \mathrm{hue}=(47\,g)\bmod 360^{\circ}`,
+    spf: msT`g=\gcd(r,M),\qquad \mathrm{hue}=h\big(\mathrm{spf}(g)\big)`,
+    lpf: msT`g=\gcd(r,M),\qquad \mathrm{hue}=h\big(\mathrm{lpf}(g)\big)`,
+    omega: msT`\omega(g)=\#\{p\ \mathrm{prime}:\ p\mid g\},\qquad g=\gcd(r,M)`,
+    bomega: msT`\Omega(g)=\sum_{p^{k}\parallel g}k,\qquad g=\gcd(r,M)`,
+    gcdband: msT`g=\gcd(r,M)\in\{1\},\{2\},\{3\},[4,6],[7,12],[13,\infty)`,
+    depth: msT`d(r,M)=\min\!\Big(K,\ \max\{k:\gcd(r,M+j)=1,\ 0\le j<k\}\Big)`,
+    resmod: msT`\mathrm{hue}=300^{\circ}\cdot\frac{r\bmod M}{M}\qquad(\gcd(r,M)=1)`,
+    moddist: msT`\mathrm{hue}\ \propto\ \frac{\min(r,\,M-r)}{\lfloor M/2\rfloor}\qquad(\gcd(r,M)=1)`,
+    phipos: msT`\mathrm{hue}\ \propto\ \mathrm{rank}\big\{r'\le r:\gcd(r',M)=1\big\}\qquad(\gcd(r,M)=1)`,
+    ethiopia: msT`\tfrac23\le\tfrac rM\le1:\ \mathrm{green};\quad \tfrac13\le\tfrac rM<\tfrac23:\ \mathrm{yellow};\quad \tfrac rM<\tfrac13:\ \mathrm{red}`,
+    ethiodepth: msT`\mathrm{flag}\!\left(\tfrac rM\right)\ \text{on}\ r\le M;\qquad d(r,M)\ \text{on}\ r>M`,
+    ethioinv: msT`\mathrm{flag}\!\left(\tfrac rM\right)\ \text{on}\ r\le M;\qquad \overline{\mathrm{flag}}\ \text{on}\ r>M`,
+    sat: msT`\nu_p=\min(n+1,p);\qquad p\mid r,\ p\le n+1\ \Longrightarrow\ \text{cell dies}\qquad(n=${n})`,
+    failp: msT`j^{\ast}=\min\{\,j\le n:\ \gcd(r,M+j)>1\,\},\qquad \mathrm{colour}=\mathrm{spf}\big(\gcd(r,M+j^{\ast})\big)\qquad(n=${n})`,
+    jstar: msT`j^{\ast}=\min\{\,j\le n:\ \gcd(r,M+j)>1\,\}\qquad(n=${n})`,
+    gprime: msT`z=r+Mi,\qquad N(z)=r^{2}+M^{2}`,
+    gsplit: msT`p\mid r^{2}+M^{2}:\quad p=2\ \text{ramified},\ \ p\equiv1\ (4)\ \text{split},\ \ p\equiv3\ (4)\ \text{inert}`,
+    gomega: msT`\Omega(z)=\Omega_{\mathbb Z[i]}(r+Mi)\ \text{via}\ N=r^{2}+M^{2}`,
+    qres: msT`\exists\,x:\ x^{2}\equiv r\pmod M\qquad(\gcd(r,M)=1)`,
+    sector: msT`s=\left\lfloor\frac Mr\right\rfloor,\qquad S_s\ \text{the Farey bucket of}\ \tfrac rM`
+  };
+  return T[mode] || null;
+}
+function msColouring(nextNumHint) {
+  const sel = $('cmode'), mode = sel.value, label = sel.options[sel.selectedIndex].textContent;
+  const out = [{ t: 'h', text: 'The colouring rule' }];
+  out.push({ t: 'p', text: 'Colouring in force: ' + label + '. The page states the rule as: ' + openerRule(mode) + '.' });
+  const tex = msModeTex(mode, blockN());
+  if (tex) out.push({ t: 'eq', tex: tex });
+  return out;
+}
+/* Lift dynamics, block length, D(n) and C(n): written for a given n and the
+   set of overlays the caller reports as active. */
+function msBlockSection(n, lines) {
+  const out = [{ t: 'h', text: 'The block, the lift and C(n)' }];
+  out.push({ t: 'p', text: 'A block of length n + 1 = ' + (n + 1) + ' asks that r be coprime to every column M, M+1, …, M+n at once. At a prime p a cell is spoiled when p | r and M ≡ −j (mod p) for some j ≤ n: that is min(n+1, p) of the p classes of M, so the share min(n+1, p)/p² of the lattice is removed. ν_p = min(n+1, p) counts those classes.' });
+  const D = Dn(n), C = D * Math.PI * Math.PI / 6;
+  out.push({ t: 'eq', tex: msT`D(n)=\prod_{p}\left(1-\frac{\nu_p}{p^{2}}\right),\qquad \nu_p=\min(n+1,\,p),\qquad C(n)=\zeta(2)\,D(n)` });
+  out.push({ t: 'eq', tex: msT`n=${n}:\qquad D(${n})=${msf(D, 6)},\qquad C(${n})=\tfrac{\pi^{2}}{6}\,D(${n})=${msf(C, 6)}`, cap: 'The product is evaluated over the primes below 200,000; the truncated tail moves D(n) by less than ' + msf((n + 1) * 5e-7, 7) + '.' });
+  const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
+  out.push({ t: 'eq', tex: msT`\{\,p\ \mathrm{prime}:\ p\le n+1\,\}=\{${sat.length ? sat.join(',') : msT`\varnothing`}\}\quad\text{(saturated: }\nu_p=p\text{)}` });
+  return out.concat(lines || []);
+}
+
+/* Shared Goldbach / partition facts for the export legends and the math sheets.
+   G = lattice size, gbG = the gap currently shown. Returns plain numbers/strings so the
+   opener and the main page describe the same thing the same way. */
+function gbDetailFacts(G, gbG) {
+  const E = 2 * (G + 1), half = Math.floor(E / 2);
+  const g = Math.max(1, Math.min(half, gbG || 1)), s = E - g;
+  const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
+  const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
+  const spf = n => { if (n < 2) return n; for (let d = 2; d * d <= n; d++) if (n % d === 0) return d; return n; };
+  const gP = isPrime(g), sP = isPrime(s);
+  let verdict;
+  if (gP && sP) verdict = 'Goldbach pair: g and s both prime' + (g === s ? ' (g = s = E/2)' : '');
+  else if (!gP && !sP) verdict = 'not a pair: g = ' + g + (g === 1 ? ' is a unit' : ' has factor ' + spf(g)) + ', s = ' + s + ' has factor ' + spf(s);
+  else if (!gP) verdict = 'not a pair: g = ' + g + (g === 1 ? ' is a unit' : ' has factor ' + spf(g)) + ' (s = ' + s + ' is prime)';
+  else verdict = 'not a pair: s = ' + s + ' has factor ' + spf(s) + ' (g = ' + g + ' is prime)';
+  // the four Strip I lines, counted on the live lattice: on-grid cells and coprime cells
+  const line = (rLo, rHi, sign, c) => { let tot = 0, cop = 0; for (let r = Math.max(1, rLo); r <= Math.min(G, rHi); r++) { const M = sign * r + c; if (M < 1 || M > G) continue; tot++; if (gcd(r, M) === 1) cop++; } return { tot, cop }; };
+  const L = {
+    c: line(g - G, g - 1, -1, g), d: line(s - G, s - 1, -1, s),
+    a: line(1, G - g, 1, g), b: line(g + 1, G, 1, -g)
+  };
+  let S = NaN, hl = NaN;
+  try { const sp = (typeof SPF !== 'undefined' && SPF && SPF.length > E) ? SPF : buildSPF(E + 1); S = sigma(E, sp); hl = S * li2(E); } catch (e) {}
+  const lnE = Math.log(E);
+  return { E, half, g, s, pairs, ordered, gP, sP, verdict, L, S, hl,
+           share: half > 1 ? pairs.length / (half - 1) : 0,
+           smallest: pairs.length ? pairs[0] : null, nearest: pairs.length ? pairs[pairs.length - 1] : null,
+           halfPrime: isPrime(E / 2), comet: ordered / (E / (lnE * lnE)) };
+}
+// One-line-per-fact strings for the on-screen-style legends (plain text, no TeX).
+function gbLegendLines(G, gbG, showCurrent) {
+  const f = gbDetailFacts(G, gbG), out = [];
+  out.push('E = 2(G+1) = ' + f.E + ' \u00b7 k(E) = ' + f.pairs.length + ' unordered pair' + (f.pairs.length === 1 ? '' : 's') + ' \u00b7 r(E) = ' + f.ordered + ' ordered');
+  out.push('partitions g = 2..E/2: ' + Math.max(0, f.half - 1) + ' \u00b7 ' + f.pairs.length + ' are Goldbach pairs (' + (100 * f.share).toFixed(1) + '%), the rest have a composite g or s');
+  if (f.pairs.length) out.push('pairs: ' + (f.pairs.length <= 24 ? f.pairs.map(q => q + '+' + (f.E - q)).join(', ') : f.pairs.slice(0, 24).map(q => q + '+' + (f.E - q)).join(', ') + ', \u2026 (' + f.pairs.length + ' total)') + ' \u00b7 smallest g ' + f.smallest + ', nearest E/2 ' + f.nearest + (f.halfPrime ? ' \u00b7 E/2 is prime' : ''));
+  if (isFinite(f.S)) out.push('Hardy\u2013Littlewood \u2248 ' + f.hl.toFixed(1) + ' vs actual ' + f.ordered + ' (\ud835\udd16(E) = ' + f.S.toFixed(4) + ') \u00b7 ratio ' + (f.hl ? (f.ordered / f.hl).toFixed(3) : '?'));
+  if (showCurrent) {
+    out.push('showing ' + f.g + ' + ' + f.s + ' = ' + f.E + ' \u00b7 ' + f.verdict);
+    out.push('lattice cells coprime / on grid \u00b7 c ' + f.L.c.cop + '/' + f.L.c.tot + ' \u00b7 d ' + f.L.d.cop + '/' + f.L.d.tot + ' \u00b7 a ' + f.L.a.cop + '/' + f.L.a.tot + ' \u00b7 b ' + f.L.b.cop + '/' + f.L.b.tot + (f.L.c.cop === f.L.c.tot && f.L.c.tot ? ' \u00b7 c fully lit' : '') + (f.L.d.cop === f.L.d.tot && f.L.d.tot ? ' \u00b7 d fully lit' : ''));
+  }
+  return out;
+}
+
+/* Measured detail for every lift setting that is on: spiral prime, +-n path, r-chain, the
+   Surviving / Broken filter and Connect. Shared by the opener and main-page math sheets,
+   so a setting that changes the plate always changes a line here. o = {mode, n, p, allP,
+   mirror, dropout, chain, chainN, surv, broken, dir}. Counted on the live lattice. */
+function msLiftDetail(G, o) {
+  const out = [];
+  const big = G > 3000;
+  const M0 = Math.max(0, o.n | 0);
+  if (o.mode === 'connect') out.push({ t: 'p', text: 'Connect mode draws the spiral and the \u00b1n path together and joins them with a thin line at every ring M they share.' });
+  const ps = o.allP ? (typeof PRIMES !== 'undefined' && PRIMES ? PRIMES.filter(q => q <= G) : []) : [o.p];
+  if ((o.mode === 'spiral' || o.mode === 'both' || o.mode === 'connect') && !big) {
+    if (o.allP) {
+      out.push({ t: 'p', text: 'All-p spiral: every prime p \u2264 G (' + ps.length + ' of them) is traced along r = p. On the column r = p the cell (p, M) survives when p \u2224 M, so p breaks on the ' + '\u230aG/p\u230b \u2212 1 rings that are multiples of p.' });
+    } else if (o.p === 1) {
+      out.push({ t: 'p', text: 'The spiral is locked to the residue r = 1. gcd(1, M) = 1 for every M, so this line never breaks.' });
+    } else if (o.p <= G) {
+      let ok = 0, bad = 0, wrap = 0;
+      for (let M = o.p + 1; M <= G; M++) { if (gcd(o.p, M) === 1) { ok++; if (gcd(o.p, M + 1) !== 1) wrap++; } else bad++; }
+      const pp = o.p;
+      out.push({ t: 'eq', tex: msT`\text{spiral } r=${pp}:\quad \#\{M\in(${pp},${G}]:\ ${pp}\nmid M\}=${ok},\qquad \#\{${pp}\mid M\}=${bad},\qquad \text{surviving share}=${msf(ok + bad ? ok / (ok + bad) : 0, 4)}\ \to\ 1-\tfrac1{${pp}}=${msf(1 - 1 / pp, 4)}`, cap: 'The dropout ring is M = ' + pp + ' itself, where the residue vanishes. ' + wrap + ' of the ' + ok + ' surviving points fail one step later, at M+1, and are ringed on the plate.' });
+    } else {
+      out.push({ t: 'note', text: 'The spiral prime p = ' + o.p + ' is larger than G = ' + G + ', so it is off the plate.' });
+    }
+    if (o.mirror) out.push({ t: 'p', text: 'Mirror conjugate \u03c3(r) = M \u2212 r is drawn beside the spiral: gcd(M \u2212 r, M) = gcd(r, M), so it survives exactly where the spiral does.' });
+  }
+  if (o.mode === 'npath' || o.mode === 'both' || o.mode === 'connect') {
+    if (!big) {
+      let tot = 0, cop = 0;
+      for (let M = 1; M <= G; M++) for (const sg of (o.dir === 'plus' ? [1] : o.dir === 'minus' ? [-1] : [1, -1])) {
+        const t2 = M + sg * M0; if (t2 % 2 || t2 < 2) continue; const r = t2 / 2; if (r < 1 || r > M) continue;
+        tot++; if (gcd(r, M) === 1) cop++;
+      }
+      out.push({ t: 'eq', tex: msT`\pm n\ \text{path}\ (n=${M0}):\quad \#\text{cells}=${tot},\quad \#\{\gcd=1\}=${cop},\quad \text{share}=${msf(tot ? cop / tot : 0, 4)}`, cap: 'Only rings with M \u2261 n (mod 2) carry a path cell, because r = (M \u00b1 n)/2 must be an integer.' });
+    }
+  }
+  if (o.chain && !big) {
+    let ok = 0, dead = 0, satur = 0;
+    for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
+      if (gcd(r, M) !== 1) continue;
+      if (gcd(r, M + 1) === 1) ok++; else { dead++; }
+    }
+    const d = Math.max(0, o.chainN | 0);
+    out.push({ t: 'eq', tex: msT`\text{r-chain, one step } r\to r\bmod(M+1):\quad \text{lift survives}=${ok},\quad \text{breaks}=${dead},\quad \text{survive share}=${msf(ok + dead ? ok / (ok + dead) : 0, 4)}`, cap: 'Counted over every coprime cell with r < M. The r-chain depth gate is n = ' + d + '.' });
+  }
+  out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
+  return out;
+}
+function msGoldbach(G, gbG, title) {
+  const E = 2 * (G + 1), maxG = Math.floor(E / 2), g = Math.max(1, Math.min(maxG, gbG || 1)), s = E - g;
+  const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
+  const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
+  const out = [];
+  out.push({ t: 'p', text: title || 'The Goldbach overlay reads the lattice at E = 2(G+1). For a gap g with partner s = E − g it draws four lines of the same lattice; the pair is fully lit exactly when both g and s are prime.' });
+  out.push({ t: 'eq', tex: msT`E=2(G+1)=${E},\qquad g=${g},\quad s=E-g=${s}` });
+  out.push({ t: 'eq', tex: msT`r+M=g,\qquad r+M=s,\qquad M-r=g,\qquad r-M=g` });
+  out.push({ t: 'eq', tex: msT`k(E)=\#\{\,q\le E/2:\ q,\ E-q\ \mathrm{prime}\,\}=${pairs.length},\qquad r(E)=2k-\mathbf 1[E/2\ \mathrm{prime}]=${ordered}` });
+  const fd = gbDetailFacts(G, gbG);
+  out.push({ t: 'p', text: 'Of the ' + Math.max(0, fd.half - 1) + ' partitions g + s = ' + E + ' with 2 \u2264 g \u2264 E/2, ' + pairs.length + ' are Goldbach pairs (' + (100 * fd.share).toFixed(1) + '%); in every other one g or s is composite, and that shows up on the plate as a punctured line. ' + (pairs.length ? 'The smallest pair has g = ' + fd.smallest + ' and the one nearest the middle has g = ' + fd.nearest + (fd.halfPrime ? '; E/2 = ' + (E / 2) + ' is itself prime, so that pair has g = s' : '') + '.' : 'There is no pair at this E.') });
+  out.push({ t: 'p', text: 'The gap on show is g = ' + g + ', s = ' + s + ': ' + fd.verdict + '.' });
+  out.push({ t: 'eq', tex: msT`\#\{\gcd=1\}\big/\#\text{cells}:\quad c:\ ${fd.L.c.cop}/${fd.L.c.tot},\quad d:\ ${fd.L.d.cop}/${fd.L.d.tot},\quad a:\ ${fd.L.a.cop}/${fd.L.a.tot},\quad b:\ ${fd.L.b.cop}/${fd.L.b.tot}`, cap: 'Counted on the live G \u00d7 G lattice. Line c is entirely coprime exactly when g is prime, and line d exactly when s is prime, once g > \u221aE; a pair is a gap where both are.' });
+  out.push({ t: 'eq', tex: msT`\frac{r(E)}{E/\ln^{2}E}=\frac{${ordered}}{${msf(E / (Math.log(E) ** 2), 2)}}=${msf(fd.comet, 3)}`, cap: 'The Goldbach comet: r(E) scaled by its typical size E/ln\u00b2E. Even E with many small prime factors sit high in the comet, those with few sit low.' });
+  if (pairs.length && pairs.length <= 18) out.push({ t: 'note', text: 'The pairs: ' + pairs.map(q => q + ' + ' + (E - q)).join(', ') + '.' });
+  else if (pairs.length) out.push({ t: 'note', text: 'The first pairs: ' + pairs.slice(0, 18).map(q => q + ' + ' + (E - q)).join(', ') + ', \u2026 (' + pairs.length + ' in all).' });
+  try {
+    const spf = (typeof SPF !== 'undefined' && SPF && SPF.length > E) ? SPF : buildSPF(E + 1);
+    const S = sigma(E, spf), li = li2(E);
+    out.push({ t: 'eq', tex: msT`\mathfrak{S}(E)=2C_{2}\prod_{p\mid E,\ p>2}\frac{p-1}{p-2}=${msf(S, 6)},\qquad C_{2}=0.660162\ldots`, cap: 'Hardy–Littlewood: r(E) ~ 𝔖(E)·li₂(E), here ' + msf(S * li, 2) + ' against the actual ' + ordered + '. The asymptotic is a statement about large E; at this size it is a rough guide.' });
+  } catch (e) {}
+  return out;
+}
+function msStripLines(a, b, s, w) {
+  return [
+    { t: 'eq', tex: msT`v=b\,r-a\,M=${b}\,r-(${a})\,M,\qquad s\le v<s+w\ \ \Longrightarrow\ \ ${s}\le v<${s + w}` },
+    { t: 'eq', tex: msT`\left\lceil\frac{s+aM}{b}\right\rceil\ \le\ r\ \le\ \left\lceil\frac{s+w+aM}{b}\right\rceil-1` }
+  ];
+}
+function msDate() { return new Date().toISOString().slice(0, 10); }
+
+/* ══ OPENER ════════════════════════════════════════════════════════════════ */
+function msBuildOpener() {
+  const G = OPENER_G, view = OE.view, ratio = OE.cayRatio === '1:1' ? 1 : 2;
+  const Wx = 4096, Sx = Wx / 1920, gap = 28 * Sx, tileW = (Wx - gap) / 2;
+  const S = Math.round(view === 'all3' ? tileW : view === 'cayley' ? Wx / ratio : Wx);
+  const sel = $('cmode'), mode = sel.value, label = sel.options[sel.selectedIndex].textContent;
+  const n = openerLiftN();
+  const viewName = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley', all3: 'Grid · Ring · Cayley' }[view];
+  const showGrid = view === 'grid' || view === 'all3', showRing = view === 'ring' || view === 'all3', showCay = view === 'cayley' || view === 'all3';
+  const wedge = view !== 'grid';
+  const cells = wedge ? G * (G + 1) / 2 : G * G;
+  const liftActive = OL.mode !== 'none' || OL.chain || OL.stripOn || OL.gbOn;
+  const doc = [];
+  doc.push({ t: 'title', eyebrow: 'Strip Arithmetic II · The Opener', title: 'The Mathematics of This Export', sub: viewName + ' view of the lattice at G = ' + G, by: 'Wessen Getachew  ·  wessengetachew.github.io  ·  ' + msDate() });
+  doc.push({ t: 'abs', text: 'This page accompanies the exported opener plate. It writes out, for exactly the parameters the plate was drawn with, the finite lattice L_' + G + ' of ' + cells + ' cells, the coordinate maps that carry each cell to a pixel, the rule that colours it, and the counts read off the result. The picture and this page are two renderings of one set of formulas.' });
+
+  // 1 · parameters
+  const P = [['G', String(G)], ['view', viewName], ['tile side S', S + ' px'], ['cells', (wedge ? 'G(G+1)/2' : 'G²') + ' = ' + cells.toLocaleString()], ['colouring', label]];
+  if (showRing) P.push(['ring hole h', msf(OPENER_RING_HOLE, 2) + (OPENER_CIRCLE_METHOD ? ' · circle method on' : '')]);
+  if (showCay) P.push(['Cayley ρ₀, ρ_d', msf(OPENER_RHO0, 2) + ', ' + msf(OPENER_RHOD, 2)], ['Cayley zoom κ', msf(OPENER_CZ, 2) + '×']);
+  const rots = ['x', 'y', 'z', 'g', 'r'].filter(k => OPENER_ROT[k]).map(k => (k === 'g' ? 'grid ' : k === 'r' ? 'ring ' : k + ' ') + Math.round(OPENER_ROT[k]) + '°');
+  P.push(['turns', rots.length ? rots.join(', ') : 'none']);
+  if (liftActive) P.push(['lift mode', OL.mode + ' \u00b7 n = ' + n]);
+  if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') P.push(['spiral p', OL.allP ? 'all p \u2264 G' : String(OL.p)]);
+  if (liftActive) P.push(['showing', [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
+  if (OL.stripOn) P.push(['strip a/b', OL.slopeA + '/' + OL.slopeB], ['offset s', String(OL.offset)], ['width w', String(Math.max(1, OL.width))]);
+  if (OL.gbOn) P.push(['Goldbach g', String(OL.gbG) + ' (E = ' + olGoldbachN() + ')']);
+  doc.push({ t: 'h', text: 'Parameters' });
+  doc.push({ t: 'params', items: P });
+
+  // 2 · lattice
+  doc.push({ t: 'h', text: 'The lattice' });
+  doc.push({ t: 'p', text: (wedge ? 'Ring and Cayley fold r > M onto the wedge r ≤ M, so the set they hold is the triangle below; Grid draws the whole G × G square.' : 'Grid draws the whole G × G square of cells.') });
+  doc.push({ t: 'eq', tex: msT`\mathcal L_{${G}}=\{(r,M)\in\mathbb Z^{2}:\ 1\le r\le M\le ${G}\}` });
+  doc.push({ t: 'eq', tex: msT`|\mathcal L_{${G}}|=\sum_{M=1}^{${G}}M=\frac{${G}\cdot ${G + 1}}{2}=${G * (G + 1) / 2}` + (!wedge ? msT`,\qquad |[1,${G}]^{2}|=${G * G}` : '') });
+
+  // 3 · the canvas
+  doc.push({ t: 'h', text: 'The canvas is a formula' });
+  doc.push({ t: 'p', text: 'Nothing on the plate is stored as an image. Each tile is a function from cells to pixels, evaluated on the lattice, with S the side of the tile in pixels and c = S/2 its centre.' });
+  if (showGrid) {
+    doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right),\qquad \frac SG=\frac{${S}}{${G}}=${msf(S / G, 2)}\ \mathrm{px}` });
+    if (OPENER_ROT.g) doc.push({ t: 'eq', tex: msT`(x,y)\mapsto c+R_{-\alpha}\big((x,y)-c\big),\qquad \alpha=${Math.round(OPENER_ROT.g)}^{\circ}` });
+  }
+  if (showRing) {
+    const R = (0.92 * S / 2), h = OPENER_RING_HOLE;
+    doc.push({ t: 'eq', tex: msT`\rho(M)=R\Big(h+(1-h)\,\frac{M-\frac12}{G}\Big),\qquad R=0.92\cdot\frac S2=${msf(R, 1)},\qquad h=${msf(h, 2)}` });
+    doc.push({ t: 'eq', tex: msT`\theta(r,M)=2\pi\,\min\!\Big(\frac rM,\,1\Big),\qquad \mathrm{Ring}(r,M)=\big(c+\rho\cos\theta,\ \ c+\rho\sin\theta\big)` });
+    if (OPENER_ROT.r) doc.push({ t: 'eq', tex: msT`(x,y)\mapsto c+R_{-\beta}\big((x,y)-c\big),\qquad \beta=${Math.round(OPENER_ROT.r)}^{\circ}` });
+    if (OPENER_CIRCLE_METHOD && h > 0) {
+      const N = Math.max(6, Math.min(22, Math.round(G * 0.6) + 6));
+      doc.push({ t: 'eq', tex: msT`F(\varrho,\vartheta)=\min\!\left(1,\ \left|\frac{\sin(N_{\mathrm{eff}}\,\vartheta/2)}{N_{\mathrm{eff}}\,\sin(\vartheta/2)}\right|\right),\qquad N_{\mathrm{eff}}=\varrho N,\quad N=${N}`, cap: 'The hole is filled with the normalised exponential sum of the circle method; its peaks sit at the rational angles p/q, the major arcs. Strength follows the hole slider.' });
+    }
+  }
+  if (showCay) {
+    const Rc = 0.44 * S * OPENER_CZ;
+    doc.push({ t: 'eq', tex: msT`z=\rho e^{i\theta},\qquad \rho(M)=\rho_{0}+\rho_{d}\,\frac MG=${msf(OPENER_RHO0, 2)}+${msf(OPENER_RHOD, 2)}\,\frac MG,\qquad w=\frac{z-1}{z+1}=u+iv` });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Cay}(r,M)=\big(c+R_c\,u,\ \ c-R_c\,v\big),\qquad R_c=0.44\,S\,\kappa=${msf(Rc, 1)}\ \mathrm{px}`, cap: 'The same θ as Ring, sent through a Möbius map: conformal, so angles survive; the measurement is unchanged, only where the points sit.' });
+    if (OPENER_ROT.x || OPENER_ROT.y) doc.push({ t: 'eq', tex: msT`\Sigma(w)=\Big(\tfrac{2u}{1+|w|^{2}},\ \tfrac{2v}{1+|w|^{2}},\ \tfrac{|w|^{2}-1}{1+|w|^{2}}\Big),\qquad w'=\frac{X+iY}{1-Z}\ \ \text{after}\ R_y(${Math.round(OPENER_ROT.y)}^{\circ})R_x(${Math.round(OPENER_ROT.x)}^{\circ})` });
+    if (OPENER_ROT.z) doc.push({ t: 'eq', tex: msT`w\mapsto e^{i\gamma}\,w,\qquad \gamma=${Math.round(OPENER_ROT.z)}^{\circ}` });
+  }
+
+  // 4 · colouring
+  msColouring().forEach(b => doc.push(b));
+
+  // 5 · counts
+  doc.push({ t: 'h', text: 'What the picture counts' });
+  try {
+    const td = oeTallyData();
+    doc.push({ t: 'p', text: 'Classes of the active colouring over L_' + G + ' (' + td.header + '):' });
+    doc.push({ t: 'table', rows: td.rows.concat(td.more ? [td.more] : []) });
+    doc.push({ t: 'eq', tex: msT`\sum_{c}n_{c}=|\mathcal L_{${G}}|=${td.total}${td.sumOk ? msT`\ \checkmark` : msT`\ \neq\ ${td.sum}`}`, num: false });
+    if (td.bandLine) doc.push({ t: 'note', text: td.bandLine + '.' });
+  } catch (e) {}
+  const ph = msPhiSum(G);
+  doc.push({ t: 'eq', tex: msPhiTex(G, ph) });
+  const cop = wedge ? ph.sum : 2 * ph.sum - 1;
+  const pct = 100 * cop / cells, target = 600 / (Math.PI * Math.PI);
+  doc.push({ t: 'eq', tex: (wedge ? msT`\frac{\Phi(G)}{G(G+1)/2}` : msT`\frac{2\Phi(G)-1}{G^{2}}`) + msT`=\frac{${cop}}{${cells}}=${msf(pct, 4)}\%,\qquad \frac{6}{\pi^{2}}=\frac1{\zeta(2)}=${msf(target, 4)}\%,\qquad \Delta=${msf(pct - target, 4)}\%` });
+  doc.push({ t: 'eq', tex: msT`\lim_{G\to\infty}\ \frac{\#\{(r,M)\in\mathcal L_G:\ \gcd(r,M)=1\}}{|\mathcal L_G|}=\frac{6}{\pi^{2}}` });
+
+  // 6 · lift
+  if (liftActive) {
+    const L = [];
+    if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') {
+      L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${OL.allP ? 'p,\\ p\\le G' : OL.p === 1 ? '1' : 'p=' + OL.p}` + (OL.mirror ? msT`,\qquad \sigma(r)=M-r` : '') + (OL.dropout ? msT`,\qquad \text{dropout ring }M=p` : '') });
+    }
+    if (OL.mode === 'npath' || OL.mode === 'both' || OL.mode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
+    if (OL.chain) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where the lift is unbroken)}` });
+    if (OL.stripOn) {
+      L.push({ t: 'p', text: 'Strip overlay: the band of cells whose v = b·r − a·M falls in [s, s+w), with slope a/b = ' + OL.slopeA + '/' + OL.slopeB + ', offset s = ' + OL.offset + ', width w = ' + Math.max(1, OL.width) + '.' });
+      msStripLines(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width)).forEach(b => L.push(b));
+      try {
+        const sp = olStripPoints(G);
+        L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}` });
+      } catch (e) {}
+    }
+    msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: n, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
+    msBlockSection(n, L).forEach(b => doc.push(b));
+    if (OL.gbOn) { doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG).forEach(b => doc.push(b)); }
+  }
+  return doc;
+}
+
+/* ══ MAIN PLATE ════════════════════════════════════════════════════════════ */
+function msBuildMain(views) {
+  const G = COP_G, a = slopeA, b = slopeB, s = offS, w = widthW;
+  const sel = $('cmode'), label = sel.options[sel.selectedIndex].textContent;
+  const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
+  const vs = names[views[0]] ? views : [viewMode];
+  const vname = vs.map(v => names[v]).join(' · ');
+  const liveLift = (typeof liftOn !== 'undefined' && liftOn && liftMode !== 'none');
+  const pm = (typeof partMode !== 'undefined') ? partMode : 'off';
+  const doc = [];
+  doc.push({ t: 'title', eyebrow: 'Strip Arithmetic II · The Plate', title: 'The Mathematics of This Export', sub: vname + ' · G = ' + G + (walkMode === 'band' ? ' · block band w = ' + w : ' · strip ' + a + '/' + b + ', s = ' + s + ', w = ' + w), by: 'Wessen Getachew  ·  wessengetachew.github.io  ·  ' + msDate() });
+  doc.push({ t: 'abs', text: 'This page accompanies the exported plate. It states, for exactly the parameters the plate was drawn with, the lattice of ' + (G * G).toLocaleString() + ' cells, the coordinate map of each exported view (so that the canvas itself is written as a formula), the colouring rule, the measured strip or block band and the value the theory predicts for it. Every number is computed from the same state that drew the picture.' });
+
+  // 1 · parameters
+  const P = [['G', String(G)], ['views', vname], ['walk', walkMode], ['strip a/b', a + '/' + b], ['offset s', String(s)], ['width w', String(w)], ['colouring', label]];
+  if (vs.includes('ring')) P.push(['θ mode', thetaMode], ['ring turn θ₀', msDeg(ringRot) + '°'], ['ring hole h', msf(ringHole, 2)], ['ring winding', RING_H > 0 ? 'clockwise' : 'counter-clockwise']);
+  if (vs.includes('cayley')) P.push(['Cayley map', cmap + (cmap === 'A' ? '  ρ₀ ' + msf(rho0, 2) + '  ρ_d ' + msf(rhoD, 2) : '  a ' + msf(ba, 2) + '∠' + baAng + '°')], ['Cayley tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']);
+  P.push(['plate turns', vs.map(v => names[v] + ' ' + ((VQ[v] !== undefined ? VQ[v] : viewQuarter) * 90) + '°').join(', ')]);
+  doc.push({ t: 'h', text: 'Parameters' });
+  doc.push({ t: 'params', items: P });
+
+  // 2 · lattice
+  const ph = msPhiSum(G), cop = 2 * ph.sum - 1, pct = 100 * cop / (G * G), target = 600 / (Math.PI * Math.PI);
+  doc.push({ t: 'h', text: 'The lattice' });
+  doc.push({ t: 'p', text: 'The plate holds every cell of the G × G square. Coprime cells are those with gcd(r, M) = 1; by symmetry they number twice the totient sum minus the doubly counted cell (1, 1).' });
+  doc.push({ t: 'eq', tex: msT`\mathcal L=\{1,\dots,${G}\}^{2},\qquad |\mathcal L|=G^{2}=${(G * G).toLocaleString()}` });
+  doc.push({ t: 'eq', tex: msT`\Phi(G)=\sum_{M=1}^{G}\varphi(M)=${ph.sum.toLocaleString()},\qquad \#\{\gcd(r,M)=1\}=2\Phi(G)-1=${cop.toLocaleString()}` });
+  doc.push({ t: 'eq', tex: msT`\frac{2\Phi(G)-1}{G^{2}}=${msf(pct, 4)}\%,\qquad \frac{6}{\pi^{2}}=\frac{1}{\zeta(2)}=${msf(target, 4)}\%,\qquad \Delta=${msf(pct - target, 4)}\%` });
+
+  // 3 · canvas
+  doc.push({ t: 'h', text: 'The canvas is a formula' });
+  doc.push({ t: 'p', text: 'Each exported view is a function from cells to pixels. S is the side of the view in pixels and c = S/2 its centre; the plate is the lattice evaluated through these maps and coloured by the rule in §4.' });
+  if (vs.includes('grid')) doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right)` });
+  if (vs.includes('ring')) {
+    const thetaTex = thetaMode === 'clamp' ? msT`\theta(r,M)=2\pi\min\!\Big(\frac rM,1\Big)` : thetaMode === 'unit' ? msT`\theta(r,M)=2\pi\,\frac{r}{G}` : msT`\theta(r,M)=2\pi\,\frac{r}{M}`;
+    doc.push({ t: 'eq', tex: msT`\rho(M)=R\Big(h+(1-h)\,\frac{M-\frac12}{G}\Big),\qquad R=0.965\cdot\frac S2,\qquad h=${msf(ringHole, 2)}` });
+    doc.push({ t: 'eq', tex: thetaTex + msT`,\qquad \vartheta=\theta_{0}+\theta(r,M),\quad \theta_{0}=${msDeg(ringRot)}^{\circ}`, cap: 'Angle mode: ' + thetaMode + (thetaMode === 'clamp' ? ' (r ≥ M pile up on the seam)' : thetaMode === 'unit' ? ' (r/G, independent of M)' : ' (r/M wraps)') + '.' });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Ring}(r,M)=\big(c+\rho\cos\vartheta,\ \ c+H\,\rho\sin\vartheta\big),\qquad H=${RING_H > 0 ? '+1' : '-1'}` });
+  }
+  if (vs.includes('cayley')) {
+    const zin = Math.max(0.25, cayleyZoomIn), zout = cmap === 'A' ? Math.max(1, cayleyZoomOut) : 1;
+    if (cmap === 'A') doc.push({ t: 'eq', tex: msT`z=\rho e^{i\theta},\quad \rho(M)=\rho_{0}+\rho_{d}\frac MG=${msf(rho0, 2)}+${msf(rhoD, 2)}\frac MG,\qquad w=\frac{z-1}{z+1}=u+iv` });
+    else doc.push({ t: 'eq', tex: msT`z=\rho e^{i\theta},\quad \rho(M)=\frac MG,\qquad w=\frac{z-a}{1-\bar a z},\qquad a=${msf(ba, 2)}\,e^{i\,${baAng}^{\circ}}` });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Cay}(r,M)=\big(c+R_c\,u,\ \ c-R_c\,v\big),\qquad R_c=0.46\,S\,\frac{\kappa_{\mathrm{in}}}{\kappa_{\mathrm{out}}}=0.46\,S\cdot\frac{${msf(zin, 2)}}{${msf(zout, 2)}}`, cap: 'θ is the same map Ring uses. ' + (cmap === 'A' ? 'Map A is unbounded: a pole crosses the plate where ρ passes 1.' : 'Map B is a disc automorphism, bounded: |w| ≤ 1 everywhere.') });
+    if (cayleyRotX || cayleyRotY) doc.push({ t: 'eq', tex: msT`\Sigma(w)=\Big(\tfrac{2u}{1+|w|^{2}},\ \tfrac{2v}{1+|w|^{2}},\ \tfrac{|w|^{2}-1}{1+|w|^{2}}\Big),\qquad w'=\frac{X+iY}{1-Z}\ \ \text{after}\ R_y(${cayleyRotY}^{\circ})R_x(${cayleyRotX}^{\circ})` });
+  }
+
+  // 4 · colouring
+  msColouring().forEach(x => doc.push(x));
+  try {
+    const entries = colourKeyEntries($('cmode').value);
+    if (entries && entries.length) { doc.push({ t: 'p', text: 'Colour key, sampled from the painter itself:' }); doc.push({ t: 'key', items: entries.map(e => ({ rgb: e.rgb, lab: e.lab })) }); }
+  } catch (e) {}
+
+  // 5 · strip / band
+  doc.push({ t: 'h', text: walkMode === 'band' ? 'The block band' : 'The strip' });
+  if (walkMode === 'band') {
+    const n = Math.max(0, w - 1);
+    doc.push({ t: 'p', text: 'C(n) is a conjunction, not a strip average: r survives at M only if it is coprime to every column of the block M, …, M+n. The band below measures exactly that with n = w − 1, on the lattice capped as stated.' });
+    doc.push({ t: 'eq', tex: msT`\mathrm{good}(r,M)\iff \gcd(r,\,M+j)=1\ \ \text{for all}\ 0\le j\le n,\qquad n=w-1=${n}` });
+    try {
+      const st = walkBand(w);
+      doc.push({ t: 'eq', tex: msT`\frac{\#\,\mathrm{good}}{\#\,\mathrm{positions}}=\frac{${st.good.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.good / st.total : 0, 6)}\qquad(\text{lattice capped at }${st.cap})` });
+    } catch (e) {}
+    msBlockSection(n, []).slice(1).forEach(x => doc.push(x));
+  } else {
+    doc.push({ t: 'p', text: 'The strip is the set of cells whose v = b·r − a·M lies in the window [s, s+w). The plate measures the coprime density inside it and compares it with the value the arithmetic predicts.' });
+    msStripLines(a, b, s, w).forEach(x => doc.push(x));
+    try {
+      const st = walkStrip(0);
+      doc.push({ t: 'eq', tex: msT`\#\text{cells}=${st.total.toLocaleString()},\qquad \#\{\gcd=1\}=${st.cop.toLocaleString()},\qquad \delta=\frac{${st.cop.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.cop / st.total : 0, 9)}` });
+      if (a === 1 && b === 1 && w === 1 && s === 0) {
+        doc.push({ t: 'eq', tex: msT`r=M\ \Longrightarrow\ \gcd(r,M)=M,\ \text{coprime only at }M=1\ \Longrightarrow\ \delta=\frac1G=\frac1{${G}}=${msf(1 / G, 9)}` });
+      } else if (a === 1 && b === 1 && w === 1 && Math.abs(s) >= 1) {
+        const g0 = Math.abs(s), ex = phi(g0, SPF) / g0;
+        doc.push({ t: 'eq', tex: msT`\gcd(r,M)=\gcd(M+s,M)=\gcd(s,M)\ \Longrightarrow\ \delta\to\frac{\varphi(|s|)}{|s|}=\frac{\varphi(${g0})}{${g0}}=${msf(ex, 9)}` });
+      } else if (a === -1 && b === 1 && w === 1 && s >= 2) {
+        doc.push({ t: 'eq', tex: msT`r+M=N\ \Longrightarrow\ \gcd(r,M)=\gcd(r,N)\ \Longrightarrow\ \#\{\gcd=1\}=\varphi(N)=\varphi(${s})=${phi(s, SPF)}` });
+      } else {
+        const sp = stripPredict();
+        if (sp) doc.push({ t: 'eq', tex: msT`\delta_{\mathrm{pred}}=\frac{\sum_{c}\ell_{c}\,\varphi(|c|)/|c|}{\sum_{c}\ell_{c}}=${msf(sp.pred, 6)},\qquad |\delta-\delta_{\mathrm{pred}}|=${msf(Math.abs((st.total ? st.cop / st.total : 0) - sp.pred), 6)}`, cap: 'ℓ_c is the length of the diagonal v = c inside the lattice; the sum runs over c = s, …, s+w−1.' });
+      }
+    } catch (e) {}
+  }
+
+  // 6 · lift + partitions
+  if (liveLift) {
+    const n = liftN();
+    const L = [];
+    if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${liftAllPOn ? 'p,\\ p\\le G' : 'p=' + liftSpiralP}` });
+    if (liftMode === 'npath' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
+    if (liftChainOn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1),\qquad\text{depth}=${liftChainNEff()}` });
+    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: liftChainOn, chainN: liftChainNEff(), surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
+    msBlockSection(n, L).forEach(x => doc.push(x));
+  }
+  if (pm !== 'off') {
+    doc.push({ t: 'h', text: 'Goldbach partitions' });
+    msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.').forEach(x => doc.push(x));
+  }
+  return doc;
+}
+
+/* ══ glue ══════════════════════════════════════════════════════════════════ */
+function msSave(cv, name, host) {
+  return new Promise(resolve => {
+    const go = href => {
+      const el = document.createElement('a'); el.href = href; el.download = name;
+      document.body.appendChild(el); el.click(); el.remove();
+      if (host) {
+        host.innerHTML = '';
+        const l = document.createElement('a'); l.href = href; l.download = name; l.textContent = '\u2b07 Save ' + name;
+        l.style.cssText = 'color:var(--teal);text-decoration:underline;word-break:break-all;';
+        const t = document.createElement('span'); t.textContent = '  \u2014 if the download did not start, tap this';
+        t.style.color = 'var(--cream3)';
+        host.appendChild(l); host.appendChild(t); host.style.display = '';
+      }
+      if (href.indexOf('blob:') === 0) setTimeout(() => URL.revokeObjectURL(href), 180000);
+      resolve(true);
+    };
+    try {
+      cv.toBlob(b => {
+        if (b) { go(URL.createObjectURL(b)); return; }
+        try { go(cv.toDataURL('image/png')); } catch (e) { resolve(false); }
+      }, 'image/png');
+    } catch (e) { try { go(cv.toDataURL('image/png')); } catch (e2) { resolve(false); } }
+  });
+}
+
+/* ── multi-page PDF: the plate, then the whole math sheet on A4 pages ───────
+   No library: each page is a JPEG drawn full-bleed on its own PDF page (DCTDecode), so it is
+   exactly what the PNGs show. Page 1 is the plate at its own proportions; the rest are A4. */
+function msJpegBytes(cv, q) {
+  const b64 = cv.toDataURL('image/jpeg', q || 0.9).split(',')[1], bin = atob(b64), u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+function msPdfBuild(pages, title) {
+  const enc = new TextEncoder(), parts = [], offs = []; let off = 0;
+  const push = u => { parts.push(u); off += u.length; };
+  const str = t => push(enc.encode(t));
+  const N = pages.length, total = 2 + 3 * N;
+  str('%PDF-1.4\n');
+  const obj = (n, fn) => { offs[n] = off; str(n + ' 0 obj\n'); fn(); str('\nendobj\n'); };
+  obj(1, () => str('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => str('<< /Type /Pages /Kids [' + pages.map((_, i) => (5 + 3 * i) + ' 0 R').join(' ') + '] /Count ' + N + ' >>'));
+  pages.forEach((pg, i) => {
+    const jb = msJpegBytes(pg.cv, pg.q), im = 3 + 3 * i, ct = 4 + 3 * i, po = 5 + 3 * i;
+    const w = pg.wPt.toFixed(2), h = pg.hPt.toFixed(2), cs = 'q ' + w + ' 0 0 ' + h + ' 0 0 cm /Im0 Do Q';
+    obj(im, () => { str('<< /Type /XObject /Subtype /Image /Width ' + pg.cv.width + ' /Height ' + pg.cv.height + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jb.length + ' >>\nstream\n'); push(jb); str('\nendstream'); });
+    obj(ct, () => str('<< /Length ' + cs.length + ' >>\nstream\n' + cs + '\nendstream'));
+    obj(po, () => str('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + w + ' ' + h + '] /Resources << /XObject << /Im0 ' + im + ' 0 R >> >> /Contents ' + ct + ' 0 R >>'));
+  });
+  const xr = off;
+  str('xref\n0 ' + (total + 1) + '\n0000000000 65535 f \n');
+  for (let n = 1; n <= total; n++) str(String(offs[n]).padStart(10, '0') + ' 00000 n \n');
+  str('trailer\n<< /Size ' + (total + 1) + ' /Root 1 0 R >>\nstartxref\n' + xr + '\n%%EOF');
+  return new Blob(parts, { type: 'application/pdf' });
+}
+function msSaveBlob(blob, name, host) {
+  const href = URL.createObjectURL(blob);
+  const el = document.createElement('a'); el.href = href; el.download = name;
+  document.body.appendChild(el); el.click(); el.remove();
+  if (host) {
+    host.innerHTML = '';
+    const l = document.createElement('a'); l.href = href; l.download = name; l.textContent = '\u2b07 Save ' + name;
+    l.style.cssText = 'color:var(--teal);text-decoration:underline;word-break:break-all;';
+    const t = document.createElement('span'); t.textContent = '  \u2014 if the download did not start, tap this';
+    t.style.color = 'var(--cream3)';
+    host.appendChild(l); host.appendChild(t); host.style.display = '';
+  }
+  setTimeout(() => URL.revokeObjectURL(href), 300000);
+  return true;
+}
+async function msMakePdf(plateCv, doc, name, host) {
+  const pages = [];
+  if (plateCv && plateCv.width) {
+    const k = Math.min(1, 3400 / plateCv.width), pw = Math.round(plateCv.width * k), ph = Math.round(plateCv.height * k);
+    const c = document.createElement('canvas'); c.width = pw; c.height = ph;
+    const g = c.getContext('2d'); g.fillStyle = '#04040d'; g.fillRect(0, 0, pw, ph); g.drawImage(plateCv, 0, 0, pw, ph);
+    const wPt = 720, hPt = Math.min(14000, wPt * ph / pw);
+    pages.push({ cv: c, wPt: wPt, hPt: hPt, q: 0.92 });
+  }
+  const mp = await msRender(doc, MS.theme, { pages: true });
+  mp.forEach(cv => pages.push({ cv: cv, wPt: 595.28, hPt: 841.89, q: 0.93 }));
+  const blob = msPdfBuild(pages, name);
+  const ok = msSaveBlob(blob, name, host);
+  return { ok: ok, pages: pages.length, mb: blob.size / 1048576 };
+}
+async function msExportPdfOpener(plateCv) {
+  await new Promise(r => setTimeout(r, 350));
+  return msMakePdf(plateCv, msBuildOpener(), 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-full-' + Date.now() + '.pdf', $('ms-links-open'));
+}
+async function msExportPdfMain(views) {
+  await new Promise(r => setTimeout(r, 350));
+  const nm = 'strips2-full-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+') + '.pdf';
+  return msMakePdf(MS.lastPlate, msBuildMain(views), nm, $('ms-links-main'));
+}
+async function msExportOpener() {
+  const doc = msBuildOpener();
+  const cv = await msRender(doc, MS.theme);
+  await new Promise(r => setTimeout(r, 350));   // a beat after the plate, so browsers treat these as two downloads
+  const ok = await msSave(cv, 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-math-' + Date.now() + '.png', $('ms-links-open'));
+  return { ok: ok, w: cv.width, h: cv.height };
+}
+async function msExportMain(views) {
+  const doc = msBuildMain(views);
+  const cv = await msRender(doc, MS.theme);
+  await new Promise(r => setTimeout(r, 350));
+  const nm = 'strips2-math-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+') + '.png';
+  const ok = await msSave(cv, nm, $('ms-links-main'));
+  return { ok: ok, w: cv.width, h: cv.height };
+}
+
+</script>
 </body>
 </html>
