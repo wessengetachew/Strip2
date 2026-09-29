@@ -177,6 +177,26 @@ table.mp-table td.n{text-align:right;font-weight:600;white-space:nowrap;}
 table.mp-table td.pct{text-align:right;color:#6b6558;white-space:nowrap;}
 .mp-key{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0 20px;font-family:var(--mono);font-size:12px;}
 .mp-key-item i{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid rgba(0,0,0,.18);margin-right:6px;vertical-align:-1px;}
+#ms-preview-modal .msp-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;}
+#ms-preview-modal .msp-status{font-family:var(--mono);font-size:10.5px;color:var(--cream3);max-width:240px;text-align:right;}
+#ms-preview-modal .msp-export{background:var(--gold2);border:1px solid var(--gold);color:var(--gold);border-radius:6px;padding:5px 14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;cursor:pointer;}
+#ms-preview-modal .msp-export:hover{background:var(--gold);color:#04040d;}
+#ms-preview-modal .msp-export:disabled{opacity:.5;cursor:default;}
+#ms-preview-modal .msp-links{flex:none;background:#04040d;padding:0 18px 10px;font-family:var(--mono);font-size:11px;
+  color:var(--cream3);max-height:110px;overflow:auto;}
+.mp-plates{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 6px;}
+.mp-plate{margin:0;}
+.mp-plate img{display:block;width:100%;height:auto;border-radius:5px;border:1px solid rgba(0,0,0,.28);background:#04040d;}
+.mp-plate figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#a3833a;margin-top:5px;text-align:center;}
+.mp-plate.solo{grid-column:1 / -1;max-width:520px;margin:0 auto;width:100%;}
+.mp-plate.wide{grid-column:1 / -1;max-width:720px;margin:0 auto;width:100%;}
+.mp-plate.cay{grid-column:1 / -1;width:calc(50% - 6px);margin:0 auto;}
+.chip.ms-prev-btn{border-color:var(--gold);color:var(--gold);background:var(--gold2);font-weight:600;font-size:11px;padding:5px 12px;
+  animation:mspGlow 2.8s ease-in-out infinite;}
+.chip.ms-prev-btn:hover{background:var(--gold);color:#04040d;}
+@keyframes mspGlow{0%,100%{box-shadow:0 0 0 0 rgba(200,168,74,0);}50%{box-shadow:0 0 0 4px rgba(200,168,74,.22),0 0 14px rgba(200,168,74,.35);}}
+@media (prefers-reduced-motion:reduce){.chip.ms-prev-btn{animation:none;box-shadow:0 0 0 2px rgba(200,168,74,.3);}}
 @media (max-width:640px){
   #ms-preview-modal{padding:0;}
   #ms-preview-modal .msp-panel{width:100%;height:100%;max-height:100%;border-radius:0;}
@@ -1724,7 +1744,7 @@ walk anyway.</p>
       <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="Also download the math sheet as PNG pages, broken at section titles: the mathematics of this export typeset like a short paper, computed from the exact parameters above.">
         <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> Also download the math behind this export (PNG pages, split by section)
       </label>
-      <button class="chip" onclick="msPreviewMain()" title="Open the math sheet right here as a scrollable pop-up — the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
+      <button class="chip ms-prev-btn" onclick="msPreviewMain()" title="Open the math sheet right here as a scrollable pop-up — the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
       <button class="chip ms-th on" data-th="paper" onclick="msSetTheme('paper')" title="Light page, dark ink">Paper</button>
       <button class="chip ms-th" data-th="night" onclick="msSetTheme('night')" title="Dark page, matching the site">Night</button>
     </div>
@@ -1800,7 +1820,7 @@ walk anyway.</p>
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
-      <button class="chip" onclick="msPreviewOpener()" title="Open the math sheet right here as a scrollable pop-up &mdash; the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
+      <button class="chip ms-prev-btn" onclick="msPreviewOpener()" title="Open the math sheet right here as a scrollable pop-up &mdash; the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
       <button class="chip" onclick="stepOpenerG(-1)" title="G &minus; 1">&minus;</button>
       <button class="chip" onclick="stepOpenerG(1)" title="G + 1">+</button>
       <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
@@ -13431,6 +13451,29 @@ async function msRender(doc, theme, opts) {
           c.fillStyle = th.ink; c.font = '25px ' + MONO; c.fillText(it.lab, x + 46, yy);
         });
       });
+    } else if (b.t === 'plate') {
+      // The canvases side by side in one row, each at its own aspect, all at the same height: three
+      // squares for Grid/Ring/Cayley, or two squares and a 2:1 Cayley. Capped so a lone tile stays modest.
+      const its = b.items.filter(it => it.cv), gp = 28, cap = 780;
+      if (its.length) {
+        const sumA = its.reduce((a, it) => a + it.cv.width / it.cv.height, 0);
+        const ph = Math.min(cap, (TW - gp * (its.length - 1)) / sumA);
+        const totW = sumA * ph + gp * (its.length - 1);
+        add(ph + 150, (c, y0) => {
+          let x = MX + (TW - totW) / 2;
+          its.forEach(it => {
+            const w = ph * it.cv.width / it.cv.height;
+            c.imageSmoothingQuality = 'high';
+            c.drawImage(it.cv, x, y0 + 12, w, ph);
+            c.strokeStyle = th.edge; c.lineWidth = 2; c.strokeRect(x, y0 + 12, w, ph);
+            c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.fillStyle = th.acc; c.font = '22px ' + MONO;
+            c.fillText(msSpaced(it.label), x + w / 2, y0 + 12 + ph + 42);
+            x += w + gp;
+          });
+          c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
+          c.fillText('The plate this sheet accompanies, redrawn from the same parameters.', MX + TW / 2, y0 + 12 + ph + 96);
+        });
+      }
     } else if (b.t === 'gap') { add(b.h || 24, () => {}); }
   });
   if (opts && opts.pages) {
@@ -13459,7 +13502,7 @@ async function msRender(doc, theme, opts) {
           // between two of those; it waits for the next item that actually starts a new thought
           // (a paragraph, note, table, or heading), even if that means running a little past BOT.
           const midRun = it.t === 'eq' && i > 0 && ch[i - 1].t === 'eq';
-          if (py + need > BOT && py > TOP && !midRun) newPage();
+          if (py + need > BOT && py > TOP && !(midRun && py + need <= BOT + 40)) newPage();   // BOT + 40 stops short of the footer text
           place(it);
         });
       });
@@ -13658,7 +13701,8 @@ function msLiftDetail(G, o) {
       if (gcd(r, M + 1) === 1) ok++; else { dead++; }
     }
     const d = Math.max(0, o.chainN | 0);
-    out.push({ t: 'eq', tex: msT`\text{r-chain, one step } r\to r\bmod(M+1):\quad \text{lift survives}=${ok},\quad \text{breaks}=${dead},\quad \text{survive share}=${msf(ok + dead ? ok / (ok + dead) : 0, 4)}`, cap: 'Counted over every coprime cell with r < M. The r-chain depth gate is n = ' + d + '.' });
+    let offRing = 0; if (G >= 2) for (let r = 1; r < G; r++) if (gcd(r, G) === 1) offRing++;
+    out.push({ t: 'eq', tex: msT`\text{r-chain, one step } r\to r\bmod(M+1):\quad \text{lift survives}=${ok},\quad \text{breaks}=${dead},\quad \text{survive share}=${msf(ok + dead ? ok / (ok + dead) : 0, 4)}`, cap: 'Counted over every coprime cell with r < M on rings 2 \u2026 G\u22121. Ring M = G is left out: its lift lands on ring G+1, off the lattice (' + offRing + ' coprime cells). The r-chain depth gate is n = ' + d + '.' });
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
   return out;
@@ -13675,7 +13719,7 @@ function msGoldbach(G, gbG, title) {
   const fd = gbDetailFacts(G, gbG);
   out.push({ t: 'p', text: 'Of the ' + Math.max(0, fd.half - 1) + ' partitions g + s = ' + E + ' with 2 \u2264 g \u2264 E/2, ' + pairs.length + ' are Goldbach pairs (' + (100 * fd.share).toFixed(1) + '%); in every other one g or s is composite, and that shows up on the plate as a punctured line. ' + (pairs.length ? 'The smallest pair has g = ' + fd.smallest + ' and the one nearest the middle has g = ' + fd.nearest + (fd.halfPrime ? '; E/2 = ' + (E / 2) + ' is itself prime, so that pair has g = s' : '') + '.' : 'There is no pair at this E.') });
   out.push({ t: 'p', text: 'The gap on show is g = ' + g + ', s = ' + s + ': ' + fd.verdict + '.' });
-  out.push({ t: 'eq', tex: msT`\#\{\gcd=1\}\big/\#\text{cells}:\quad c:\ ${fd.L.c.cop}/${fd.L.c.tot},\quad d:\ ${fd.L.d.cop}/${fd.L.d.tot},\quad a:\ ${fd.L.a.cop}/${fd.L.a.tot},\quad b:\ ${fd.L.b.cop}/${fd.L.b.tot}`, cap: 'Counted on the live G \u00d7 G lattice. Line c is entirely coprime exactly when g is prime, and line d exactly when s is prime, once g > \u221aE; a pair is a gap where both are.' });
+  out.push({ t: 'eq', tex: msT`\#\{\gcd=1\}\big/\#\text{cells}:\quad c:\ ${fd.L.c.cop}/${fd.L.c.tot},\quad d:\ ${fd.L.d.cop}/${fd.L.d.tot},\quad a:\ ${fd.L.a.cop}/${fd.L.a.tot},\quad b:\ ${fd.L.b.cop}/${fd.L.b.tot}`, cap: 'Counted on the full G \u00d7 G square (Ring and Cayley show only its r \u2264 M half). Line c is entirely coprime exactly when g is prime, since gcd(r, g \u2212 r) = gcd(r, g). Line d is entirely coprime exactly when s is prime once g > \u221aE, because its g \u2212 1 cells then always reach a multiple of any small factor of s. A pair is a gap where both are.' });
   out.push({ t: 'eq', tex: msT`\frac{r(E)}{E/\ln^{2}E}=\frac{${ordered}}{${msf(E / (Math.log(E) ** 2), 2)}}=${msf(fd.comet, 3)}`, cap: 'The Goldbach comet: r(E) scaled by its typical size E/ln\u00b2E. Even E with many small prime factors sit high in the comet, those with few sit low.' });
   if (pairs.length && pairs.length <= 18) out.push({ t: 'note', text: 'The pairs: ' + pairs.map(q => q + ' + ' + (E - q)).join(', ') + '.' });
   else if (pairs.length) out.push({ t: 'note', text: 'The first pairs: ' + pairs.slice(0, 18).map(q => q + ' + ' + (E - q)).join(', ') + ', \u2026 (' + pairs.length + ' in all).' });
@@ -13692,10 +13736,10 @@ function msStripLines(a, b, s, w) {
     { t: 'eq', tex: msT`\left\lceil\frac{s+aM}{b}\right\rceil\ \le\ r\ \le\ \left\lceil\frac{s+w+aM}{b}\right\rceil-1` }
   ];
 }
-function msDate() { return new Date().toISOString().slice(0, 10); }
+function msDate() { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
 /* ══ OPENER ════════════════════════════════════════════════════════════════ */
-function msBuildOpener() {
+function msBuildOpener(noPlates) {
   const G = OPENER_G, view = OE.view, ratio = OE.cayRatio === '1:1' ? 1 : 2;
   const Wx = 4096, Sx = Wx / 1920, gap = 28 * Sx, tileW = (Wx - gap) / 2;
   const S = Math.round(view === 'all3' ? tileW : view === 'cayley' ? Wx / ratio : Wx);
@@ -13709,6 +13753,7 @@ function msBuildOpener() {
   const doc = [];
   doc.push({ t: 'title', eyebrow: 'Strip Arithmetic II · The Opener', title: 'The Mathematics of This Export', sub: viewName + ' view of the lattice at G = ' + G, by: 'Wessen Getachew  ·  wessengetachew.github.io  ·  ' + msDate() });
   doc.push({ t: 'abs', text: 'This page accompanies the exported opener plate. It writes out, for exactly the parameters the plate was drawn with, the finite lattice L_' + G + ' of ' + cells + ' cells, the coordinate maps that carry each cell to a pixel, the rule that colours it, and the counts read off the result. The picture and this page are two renderings of one set of formulas.' });
+  if (!noPlates) { try { msAddPlates(doc, msOpenerPlateImages()); } catch (e) {} }
 
   // 1 · parameters
   const P = [['G', String(G)], ['view', viewName], ['tile side S', S + ' px'], ['cells', (wedge ? 'G(G+1)/2' : 'G²') + ' = ' + cells.toLocaleString()], ['colouring', label]];
@@ -13781,7 +13826,7 @@ function msBuildOpener() {
       L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${OL.allP ? 'p,\\ p\\le G' : OL.p === 1 ? '1' : 'p=' + OL.p}` + (OL.mirror ? msT`,\qquad \sigma(r)=M-r` : '') + (OL.dropout ? msT`,\qquad \text{dropout ring }M=p` : '') });
     }
     if (OL.mode === 'npath' || OL.mode === 'both' || OL.mode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
-    if (OL.chain) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where the lift is unbroken)}` });
+    if (OL.chain) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)}` });
     if (OL.stripOn) {
       L.push({ t: 'p', text: 'Strip overlay: the band of cells whose v = b·r − a·M falls in [s, s+w), with slope a/b = ' + OL.slopeA + '/' + OL.slopeB + ', offset s = ' + OL.offset + ', width w = ' + Math.max(1, OL.width) + '.' });
       msStripLines(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width)).forEach(b => L.push(b));
@@ -13798,7 +13843,7 @@ function msBuildOpener() {
 }
 
 /* ══ MAIN PLATE ════════════════════════════════════════════════════════════ */
-function msBuildMain(views) {
+function msBuildMain(views, noPlates) {
   const G = COP_G, a = slopeA, b = slopeB, s = offS, w = widthW;
   const sel = $('cmode'), label = sel.options[sel.selectedIndex].textContent;
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
@@ -13809,6 +13854,7 @@ function msBuildMain(views) {
   const doc = [];
   doc.push({ t: 'title', eyebrow: 'Strip Arithmetic II · The Plate', title: 'The Mathematics of This Export', sub: vname + ' · G = ' + G + (walkMode === 'band' ? ' · block band w = ' + w : ' · strip ' + a + '/' + b + ', s = ' + s + ', w = ' + w), by: 'Wessen Getachew  ·  wessengetachew.github.io  ·  ' + msDate() });
   doc.push({ t: 'abs', text: 'This page accompanies the exported plate. It states, for exactly the parameters the plate was drawn with, the lattice of ' + (G * G).toLocaleString() + ' cells, the coordinate map of each exported view (so that the canvas itself is written as a formula), the colouring rule, the measured strip or block band and the value the theory predicts for it. Every number is computed from the same state that drew the picture.' });
+  if (!noPlates) { try { msAddPlates(doc, msMainPlateImages(vs)); } catch (e) {} }
 
   // 1 · parameters
   const P = [['G', String(G)], ['views', vname], ['walk', walkMode], ['strip a/b', a + '/' + b], ['offset s', String(s)], ['width w', String(w)], ['colouring', label]];
@@ -13888,7 +13934,7 @@ function msBuildMain(views) {
     const L = [];
     if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${liftAllPOn ? 'p,\\ p\\le G' : 'p=' + liftSpiralP}` });
     if (liftMode === 'npath' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
-    if (liftChainOn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1),\qquad\text{depth}=${liftChainNEff()}` });
+    if (liftChainOn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1),\qquad\text{survives where }\gcd(r,M+1)=1,\qquad\text{depth}=${liftChainNEff()}` });
     msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: liftChainOn, chainN: liftChainNEff(), surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
     msBlockSection(n, L).forEach(x => doc.push(x));
   }
@@ -14014,12 +14060,12 @@ async function msMakePdf(plateCv, doc, name, host) {
 }
 async function msExportPdfOpener(plateCv) {
   await new Promise(r => setTimeout(r, 350));
-  return msMakePdf(plateCv, msBuildOpener(), 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-full-' + Date.now() + '.pdf', $('ms-links-open'));
+  return msMakePdf(plateCv, msBuildOpener(true), 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-full-' + Date.now() + '.pdf', $('ms-links-open'));
 }
 async function msExportPdfMain(views) {
   await new Promise(r => setTimeout(r, 350));
   const nm = 'strips2-full-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+') + '.pdf';
-  return msMakePdf(MS.lastPlate, msBuildMain(views), nm, $('ms-links-main'));
+  return msMakePdf(MS.lastPlate, msBuildMain(views, true), nm, $('ms-links-main'));
 }
 function msEsc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 /* Renders the same doc[] array msRender paints onto canvas pages, but as scrollable HTML for the
@@ -14064,6 +14110,9 @@ function msDocToHtml(doc) {
       h += '<div class="mp-key">';
       b.items.forEach(it => { h += '<span class="mp-key-item"><i style="background:' + it.rgb + '"></i>' + msEsc(it.lab) + '</span>'; });
       h += '</div>';
+    } else if (b.t === 'plate') {
+      h += '<div class="mp-plates">' + b.items.map(it => '<figure class="mp-plate ' + it.cls + '"><img alt="' + msEsc(it.label) + ' view of the plate" src="' + it.cv.toDataURL('image/jpeg', 0.88) + '"><figcaption>' + msEsc(it.label) + '</figcaption></figure>').join('') +
+        '</div><div class="mp-cap">The plate this sheet accompanies, redrawn here from the same parameters.</div>';
     } else if (b.t === 'gap') {
       h += '<div style="height:' + (b.h || 24) + 'px"></div>';
     }
@@ -14073,6 +14122,8 @@ function msDocToHtml(doc) {
 function msOpenPreview(doc) {
   const body = $('ms-preview-body'), modal = $('ms-preview-modal');
   if (!body || !modal) return;
+  const st = $('msp-status'), lk = $('msp-links'), eb = $('msp-export');
+  if (st) st.textContent = ''; if (lk) { lk.innerHTML = ''; lk.style.display = 'none'; } if (eb) eb.disabled = false;
   body.innerHTML = msDocToHtml(doc);
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -14084,23 +14135,94 @@ function msClosePreview() {
   modal.style.display = 'none';
   document.body.style.overflow = '';
 }
-function msPreviewOpener() { try { msOpenPreview(msBuildOpener()); } catch (e) {} }
-function msPreviewMain() { try { msOpenPreview(msBuildMain(orderedExportViews())); } catch (e) {} }
+/* Images of the canvases for the preview: drawn offscreen by the very functions that paint the
+   plate, so they can never disagree with the export. Preview only; the PNG pages are unchanged. */
+const MS_PREV = { kind: null };
+function msPlateShot(w, h, paint) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, w, h);
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
+  try { paint(ctx); } finally { ctx.restore(); }
+  return cv;
+}
+function msOpenerPlateImages() {
+  if (!_openerSq || !_openerPts) return [];
+  const view = OE.view, ratio = OE.cayRatio === '1:1' ? 1 : 2, S = 900;
+  const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
+  const draw = { grid: openerDrawGrid, ring: openerDrawRing, cayley: openerDrawCayley };
+  const vs = view === 'all3' ? ['grid', 'ring', 'cayley'] : [view];
+  return vs.map(v => {
+    const wideCay = v === 'cayley' && view === 'cayley' && ratio === 2;
+    const w = S, h = wideCay ? S / 2 : S;
+    const cv = msPlateShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
+    return { label: names[v], cv: cv, cls: view === 'all3' ? (v === 'cayley' ? 'cay' : '') : (wideCay ? 'wide' : 'solo') };
+  });
+}
+function msMainPlateImages(views) {
+  const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = 900, out = [];
+  const vmWas = viewMode, lsWas = labelScale, vqWas = viewQuarter;
+  try {
+    views.forEach(v => {
+      const wide = v === 'cayley' && exportCayWide, w = wide ? side * 2 : side;
+      viewMode = v;
+      labelScale = LS[v] !== undefined ? LS[v] : lsWas;
+      viewQuarter = VQ[v] !== undefined ? VQ[v] : vqWas;
+      const cv = msPlateShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side));
+      out.push({ label: names[v] || v, cv: cv, cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
+    });
+  } finally { viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
+  return out;
+}
+/* The plate block sits right after the abstract, in the doc itself, so the on-screen preview, the
+   PNG pages and the PDF all carry the same canvases. */
+function msAddPlates(doc, items) {
+  if (!items || !items.length) return doc;
+  const i = doc.findIndex(b => b.t === 'abs');
+  doc.splice(i >= 0 ? i + 1 : 1, 0, { t: 'plate', items: items });
+  return doc;
+}
+function msPreviewOpener() {
+  try {
+    MS_PREV.kind = 'opener';
+    msOpenPreview(msBuildOpener());
+  } catch (e) {}
+}
+function msPreviewMain() {
+  try {
+    MS_PREV.kind = 'main';
+    const vs = orderedExportViews();
+    msOpenPreview(msBuildMain(vs));
+  } catch (e) {}
+}
+/* Export button at the top of the pop-up: the same PNG pages the export panel writes (current
+   Paper / Night choice), without needing to close this and press the big download button. */
+async function msExportFromPreview() {
+  const btn = $('msp-export'), st = $('msp-status'), lk = $('msp-links');
+  if (btn) btn.disabled = true;
+  if (st) st.textContent = 'Typesetting the math sheet\u2026';
+  try {
+    const r = MS_PREV.kind === 'opener' ? await msExportOpener(lk) : await msExportMain(orderedExportViews(), lk);
+    if (st) st.textContent = r.ok ? 'Saved ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Could not encode the pages.';
+  } catch (e) {
+    if (st) st.textContent = 'Export failed: ' + (e && e.message || e);
+  } finally { if (btn) btn.disabled = false; }
+}
 document.addEventListener('keydown', e => { if (e.key === 'Escape') msClosePreview(); });
 
-async function msExportOpener() {
+async function msExportOpener(host) {
   const doc = msBuildOpener();
   const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
   await new Promise(r => setTimeout(r, 350));   // a beat after the plate, so browsers treat these as separate downloads
-  const ok = await msSavePages(pgs, 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-math-' + Date.now(), $('ms-links-open'));
+  const ok = await msSavePages(pgs, 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-math-' + Date.now(), host || $('ms-links-open'));
   return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
 }
-async function msExportMain(views) {
+async function msExportMain(views, host) {
   const doc = msBuildMain(views);
   const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
   await new Promise(r => setTimeout(r, 350));
   const nm = 'strips2-math-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+');
-  const ok = await msSavePages(pgs, nm, $('ms-links-main'));
+  const ok = await msSavePages(pgs, nm, host || $('ms-links-main'));
   return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
 }
 
@@ -14108,7 +14230,9 @@ async function msExportMain(views) {
 <div id="ms-preview-modal">
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
-    <div class="msp-head"><span>The math behind this export</span><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div>
+    <div class="msp-head"><span>The math behind this export</span>
+      <div class="msp-tools"><div class="msp-status" id="msp-status"></div><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+    <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
 </div>
