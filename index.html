@@ -127,7 +127,7 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
 #welcome-color-now .sws{display:inline-flex;gap:2px;}
 #welcome-color-now .sws i{display:inline-block;width:9px;height:9px;border-radius:2px;}
 #welcome-work{font-family:var(--mono);font-size:11px;color:var(--cream2);line-height:1.55;margin:0 0 14px;}
-#welcome-work .rule{color:var(--cream);margin-bottom:6px;}
+#welcome-work .rule{color:var(--cream);height:auto;background:none;margin:0 0 6px;}   /* the page-wide .rule is a 1px divider; without this the wrapped rule text spilled over the line below it */
 #welcome-work .hd{color:var(--cream3);margin:6px 0 2px;}
 #welcome-work table{border-collapse:collapse;width:100%;}
 #welcome-work td{padding:2px 8px 2px 0;vertical-align:middle;}
@@ -137,6 +137,53 @@ li{font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--cream2
 #welcome-work .foot{color:var(--cream3);margin-top:4px;}
 #welcome-work .ok{color:var(--teal);}
 #welcome-work .bad{color:var(--coral);}
+#ms-preview-modal{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:22px;}
+#ms-preview-modal .msp-backdrop{position:absolute;inset:0;background:rgba(2,2,8,.78);}
+#ms-preview-modal .msp-panel{position:relative;width:min(900px,100%);max-height:92vh;display:flex;flex-direction:column;
+  background:#f6f1e6;color:#1c1a15;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.55);overflow:hidden;}
+#ms-preview-modal .msp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 18px;background:#04040d;color:var(--cream);flex:none;}
+#ms-preview-modal .msp-head span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+#ms-preview-modal .msp-close{background:transparent;border:1px solid var(--edge2);color:var(--cream2);
+  border-radius:6px;padding:5px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;}
+#ms-preview-modal .msp-close:hover{color:var(--gold);border-color:var(--gold);}
+#ms-preview-modal .msp-body{overflow-y:auto;padding:36px 42px 52px;font-family:var(--serif);}
+.mp-eyebrow{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#a3833a;}
+.mp-title{text-align:center;font-family:var(--disp);font-weight:500;font-size:2rem;margin:10px 0 6px;}
+.mp-sub{text-align:center;font-style:italic;font-weight:300;color:#4a4436;margin-bottom:8px;}
+.mp-by{text-align:center;font-family:var(--mono);font-size:11px;color:#6b6558;margin-bottom:18px;}
+.mp-rule{border:none;border-top:1px solid rgba(0,0,0,.14);margin:0 0 22px;}
+.mp-rule2{border:none;border-top:1px solid rgba(0,0,0,.14);margin:4px 0 18px;}
+.mp-abs{border:1px solid rgba(0,0,0,.14);border-radius:6px;padding:16px 22px;margin:0 0 28px;}
+.mp-abs-label{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#a3833a;margin-bottom:8px;}
+.mp-abs p{font-style:italic;line-height:1.55;margin:0;}
+.mp-h{display:flex;align-items:baseline;gap:14px;font-family:var(--disp);font-weight:500;font-size:1.35rem;margin:30px 0 2px;}
+.mp-h .mp-sec{font-family:var(--mono);font-size:11px;color:#a3833a;font-weight:400;}
+.mp-p{line-height:1.6;margin:0 0 14px;}
+.mp-note{line-height:1.5;margin:0 0 14px;font-style:italic;font-size:.9em;color:#6b6558;}
+.mp-eq{position:relative;text-align:center;margin:18px 0 4px;padding:6px 60px;}
+.mp-eq-num{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:var(--serif);font-style:italic;color:#6b6558;font-size:.85em;}
+.mp-cap{text-align:center;font-style:italic;font-size:.82em;color:#6b6558;margin:0 0 14px;}
+.mp-params{background:rgba(0,0,0,.05);border-radius:6px;padding:10px 18px;margin:8px 0 20px;}
+.mp-params table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+.mp-params td{padding:4px 10px 4px 0;vertical-align:top;}
+.mp-params td.k{color:#6b6558;white-space:nowrap;}
+.mp-params td.v{color:#1c1a15;font-weight:500;}
+table.mp-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:6px 0 18px;border-top:1px solid rgba(0,0,0,.14);}
+table.mp-table td{padding:5px 8px 5px 0;vertical-align:middle;border-bottom:1px solid rgba(0,0,0,.06);}
+table.mp-table td.sw{width:18px;padding-right:4px;}
+table.mp-table td.sw i{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid rgba(0,0,0,.18);}
+table.mp-table td.n{text-align:right;font-weight:600;white-space:nowrap;}
+table.mp-table td.pct{text-align:right;color:#6b6558;white-space:nowrap;}
+.mp-key{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0 20px;font-family:var(--mono);font-size:12px;}
+.mp-key-item i{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid rgba(0,0,0,.18);margin-right:6px;vertical-align:-1px;}
+@media (max-width:640px){
+  #ms-preview-modal{padding:0;}
+  #ms-preview-modal .msp-panel{width:100%;height:100%;max-height:100%;border-radius:0;}
+  #ms-preview-modal .msp-body{padding:24px 18px 40px;}
+  .mp-title{font-size:1.5rem;}
+  .mp-eq{padding:6px 10px;}
+}
 @keyframes welcomePop{
   0%{opacity:0;transform:scale(.93) translateY(12px);filter:brightness(1.5) saturate(1.3);}
   55%{opacity:1;}
@@ -1674,9 +1721,10 @@ walk anyway.</p>
     </div>
     <div class="prow">
       <span class="plabel">Math sheet</span>
-      <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="Also download a second PNG: the mathematics of this export typeset like a short paper, computed from the exact parameters above.">
-        <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> Also download the math behind this export (PNG)
+      <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;" title="Also download the math sheet as PNG pages, broken at section titles: the mathematics of this export typeset like a short paper, computed from the exact parameters above.">
+        <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> Also download the math behind this export (PNG pages, split by section)
       </label>
+      <button class="chip" onclick="msPreviewMain()" title="Open the math sheet right here as a scrollable pop-up — the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
       <button class="chip ms-th on" data-th="paper" onclick="msSetTheme('paper')" title="Light page, dark ink">Paper</button>
       <button class="chip ms-th" data-th="night" onclick="msSetTheme('night')" title="Dark page, matching the site">Night</button>
     </div>
@@ -1686,7 +1734,7 @@ walk anyway.</p>
         <input type="checkbox" class="ms-pdf-chk" onchange="msSetPdf(this.checked)"> PDF &mdash; plate + full math, multi-page
       </label>
     </div>
-    <div class="pnote" style="padding:2px 0 8px;">The math sheet is a second PNG saved beside the plate: the lattice, the coordinate map that draws each view, the colouring rule, the strip or block measurement and its prediction &mdash; for exactly these parameters, every number computed at export time.</div>
+    <div class="pnote" style="padding:2px 0 8px;">The math sheet is saved beside the plate as a few PNG pages, broken at section titles: the lattice, the coordinate map that draws each view, the colouring rule, the strip or block measurement and its prediction &mdash; for exactly these parameters, every number computed at export time.</div>
     <div id="ms-links-main" class="hint" style="display:none;margin-bottom:8px;"></div>
     <div class="export-preview-wrap">
       <div class="pnote" id="export-preview-note" style="padding:4px 0;">Preview</div>
@@ -1752,6 +1800,7 @@ walk anyway.</p>
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
+      <button class="chip" onclick="msPreviewOpener()" title="Open the math sheet right here as a scrollable pop-up &mdash; the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
       <button class="chip" onclick="stepOpenerG(-1)" title="G &minus; 1">&minus;</button>
       <button class="chip" onclick="stepOpenerG(1)" title="G + 1">+</button>
       <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
@@ -1788,6 +1837,9 @@ walk anyway.</p>
       <span class="lbl" title="Dot size on the Ring and Cayley previews. Grid sizes its dots off the cell instead, so it isn't included.">point size</span>
       <input type="range" id="ol-pt-sz" min="0.3" max="3" step="0.1" value="1" oninput="olSetPtScale(this.value)" style="max-width:110px;">
       <span class="val" id="ol-pt-sz-v">1.0&times;</span>
+      <span class="lbl" style="margin-left:8px;" title="Which way &theta; sweeps on the Ring and Cayley previews, since Cayley is built from the same &theta; as Ring. Doesn't touch the live plate.">turn</span>
+      <button class="chip ol-ringdir-btn on" data-dir="ccw" onclick="olSetRingDir(true)" title="&theta; = 0 at the right, increasing counter-clockwise &mdash; the default.">&#8634; CCW</button>
+      <button class="chip ol-ringdir-btn" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise.">&#8635; CW</button>
       <span class="hint">Ring &amp; Cayley only</span>
     </div>
     <div id="welcome-preview">
@@ -1833,7 +1885,7 @@ walk anyway.</p>
       <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
     </div>
     <div id="welcome-color-now"></div>
-    <div class="subtoggle" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
+    <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
       <span class="car">&#9662;</span><span>Lift &middot; <span style="text-transform:none;">D(n) = <b id="ol-dn-head" style="color:var(--gold);font-weight:500;">&ndash;</b></span></span>
     </div>
     <div class="subbody" id="ol-body">
@@ -1880,6 +1932,8 @@ walk anyway.</p>
         <span class="lbl">offset</span>
         <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="-1" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
         <button class="chip" onclick="olResetOffset()" title="Back to s = 0.">reset s=0</button>
+        <button class="chip" onclick="olPresetDiag()" title="Main diagonal: slope 1/1, offset 0, width 1 (r &minus; M = 0).">diagonal</button>
+        <button class="chip" onclick="olPresetAnti()" title="Goldbach anti-diagonal: slope &minus;1/1, width 1, offset s = N = 2(G+1), so the band is r + M = N.">anti-diagonal</button>
         <span class="lbl">width</span>
         <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="2" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
         <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
@@ -1922,8 +1976,8 @@ walk anyway.</p>
       </div>
       <div class="prow">
         <span class="lbl">math sheet</span>
-        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;font-size:11.5px;" title="Also download a second PNG: the mathematics behind this opener export, typeset like a short paper.">
-          <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> also download the math behind this export
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;font-size:11.5px;" title="Also download the math sheet as PNG pages, broken at section titles: the mathematics behind this opener export, typeset like a short paper.">
+          <input type="checkbox" class="ms-chk" checked onchange="msSetOn(this.checked)"> also download the math behind this export (PNG pages, split by section)
         </label>
         <button class="chip ms-th on" data-th="paper" onclick="msSetTheme('paper')" title="Light page, dark ink">Paper</button>
         <button class="chip ms-th" data-th="night" onclick="msSetTheme('night')" title="Dark page, matching the site">Night</button>
@@ -3472,18 +3526,29 @@ function stepOpenerLabelMode(d) {
   const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = m.short; v.title = m.t; }
   renderOpenerPreview(false);
 }
-function openerDrawLabels(ctx, xy, pts, fontPx) {
+function openerDrawLabels(ctx, xy, pts, fontPx, rotDeg) {
+  // rotDeg: the global-rotation angle already baked into ctx's own transform (Grid's OPENER_ROT.g,
+  // Ring's OPENER_ROT.r) — cancelled locally per point so the text itself stays upright on screen
+  // even while its position turns with the rest of the plate. Centred on the point, not offset above
+  // it, so a label never blocks the point beside it.
   if (!openerLabelsShow()) return;
   ctx.save();
   ctx.font = fontPx + 'px "JetBrains Mono",monospace';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.lineWidth = Math.max(1, fontPx * 0.28); ctx.lineJoin = 'round';
+  const rot = rotDeg ? rotDeg * Math.PI / 180 : 0;
   for (let i = 0; i < pts.length; i++) {
     const r = pts[i][0], M = pts[i][1];
     const pt = xy(r, M); if (!pt) continue;
-    const txt = openerLabelText(OPENER_LABEL_MODE, r, M), ly = pt[1] - fontPx * 0.95;
-    ctx.strokeStyle = 'rgba(4,4,13,.85)'; ctx.strokeText(txt, pt[0], ly);
-    ctx.fillStyle = 'rgba(238,232,220,.85)'; ctx.fillText(txt, pt[0], ly);
+    const txt = openerLabelText(OPENER_LABEL_MODE, r, M);
+    ctx.strokeStyle = 'rgba(4,4,13,.85)'; ctx.fillStyle = 'rgba(238,232,220,.85)';
+    if (rot) {
+      ctx.save(); ctx.translate(pt[0], pt[1]); ctx.rotate(rot);
+      ctx.strokeText(txt, 0, 0); ctx.fillText(txt, 0, 0);
+      ctx.restore();
+    } else {
+      ctx.strokeText(txt, pt[0], pt[1]); ctx.fillText(txt, pt[0], pt[1]);
+    }
   }
   ctx.restore();
 }
@@ -3554,7 +3619,9 @@ const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: -1, width: 2,
              gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, survBrokenThick: 0.5,
-             ptScale: 1, lblScale: 1 };
+             ptScale: 1, lblScale: 1, ringCCW: true };
+// ringCCW: sweep direction of theta on the Ring and Cayley previews — true (default) turns
+// theta counter-clockwise on screen; false keeps the original clockwise sweep. Preview only.
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
 // one shared pair, not two identical-looking ones. Mirror is a separate overlay and is
 // never gated by surv/broken: toggling Surviving off used to also blank the spiral's
@@ -3957,6 +4024,11 @@ function olSetPtScale(v) {
   const lbl = $('ol-pt-sz-v'); if (lbl) lbl.textContent = OL.ptScale.toFixed(1) + '\u00d7';
   openerOverlaySoon();
 }
+function olSetRingDir(ccw) {
+  OL.ringCCW = !!ccw;
+  document.querySelectorAll('.ol-ringdir-btn').forEach(b => b.classList.toggle('on', (b.dataset.dir === 'ccw') === OL.ringCCW));
+  openerOverlaySoon();
+}
 // Font-size multiplier for the per-point labels (r / M / res / gcd / r/M),
 // on Grid, Ring and Cayley alike. 1x = the old fixed sizes.
 function olSetLblScale(v) {
@@ -3979,6 +4051,13 @@ function olStepSlopeB(d) { const nb = (Number(OL.slopeB) || 1) + d; OL.slopeB = 
 function olStepOffset(d) { OL.offset = (Number(OL.offset) || 0) + d; olRedraw(); }
 function olStepWidth(d) { OL.width = Math.max(1, (Number(OL.width) || 1) + d); olRedraw(); }
 function olResetOffset() { OL.offset = 0; olRedraw(); }
+function olPresetStrip(a, b, s, w) {
+  OL.slopeA = a; OL.slopeB = b; OL.offset = s; OL.width = w; OL.stripOn = true;
+  const chk = $('ol-strip-chk'); if (chk) chk.checked = true;
+  olRedraw();
+}
+function olPresetDiag() { olPresetStrip(1, 1, 0, 1); }
+function olPresetAnti() { olPresetStrip(-1, 1, olGoldbachN(), 1); }
 function olResetWidth() { OL.width = 1; olRedraw(); }
 function olFullWidth() { OL.width = OPENER_G * 2; olRedraw(); }
 // Play Goldbach pairs -- steps OL.gbG through olGoldbachPairs() on loop.
@@ -4722,7 +4801,7 @@ async function runOpenerExport() {
       if (msg) msg.textContent = 'Typesetting the math sheet\u2026';
       try {
         const r = await msExportOpener();
-        if (msg) msg.textContent = 'Done \u2014 plate 4096\u00d7' + H + (r.ok ? ' + math sheet ' + r.w + '\u00d7' + r.h : ' (math sheet could not be encoded)');
+        if (msg) msg.textContent = 'Done \u2014 plate 4096\u00d7' + H + (r.ok ? ' + math sheet, ' + r.pages + ' PNG pages' : ' (math sheet could not be encoded)');
       } catch (e) { if (msg) msg.textContent = 'Plate saved; math sheet failed: ' + (e && e.message || e); }
     }
     if (MS.pdf) {
@@ -4932,7 +5011,7 @@ function openerDrawGrid(t, forceC) {
   if (t >= 1) {
     const gxy = (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell];
     openerDrawLift(ctx, gxy, Math.min(c.w, c.h), c.w, c.h, 'grid');
-    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1));
+    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1), OPENER_ROT.g);
   }
   ctx.restore();
 }
@@ -4944,11 +5023,12 @@ function openerDrawRing(t, forceC) {
   ctx.save();
   openerApplyZoomXform(ctx, 'ring', c.w, c.h);
   if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
+  const ringDir = OL.ringCCW ? -1 : 1;
   _openerPts.forEach((p, i) => {
     const a = openerPointAlpha(i, t); if (a <= 0) return;
     const r = p[0], M = p[1];
     const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G);
-    const th = TAU * Math.min(r / M, 1);   // canonical 'clamp' angle, independent of the live plate's own mode
+    const th = ringDir * TAU * Math.min(r / M, 1);   // canonical 'clamp' angle, independent of the live plate's own mode
     const x = cx + rad * Math.cos(th), y = cy + rad * Math.sin(th);
     const col = openerColor(r, M);
     ctx.globalAlpha = a * (col[3] / 255);
@@ -4958,11 +5038,11 @@ function openerDrawRing(t, forceC) {
   ctx.globalAlpha = 1;
   if (t >= 1) {
     const rxy = (r, M) => {
-      const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = TAU * Math.min(r / M, 1);
+      const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = ringDir * TAU * Math.min(r / M, 1);
       return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
     };
     openerDrawLift(ctx, rxy, S, c.w, c.h, 'ring');
-    openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1));
+    openerDrawLabels(ctx, rxy, _openerPts, Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1), OPENER_ROT.r);
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
@@ -5089,8 +5169,11 @@ function openerDrawVoid(ctx, cx, cy, R, rot) {
     ctx.beginPath(); ctx.arc(cx, cy, rr, 0, TAU); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx - rr, cy - rr); ctx.lineTo(cx + rr, cy + rr); ctx.moveTo(cx + rr, cy - rr); ctx.lineTo(cx - rr, cy + rr); ctx.stroke();
   }
-  // Text stays upright regardless of the Ring turn: cancel the rotation just for this.
-  ctx.translate(cx, cy); ctx.rotate(-rot);
+  // Text stays upright regardless of the Ring turn: cancel the rotation just for this. ctx is
+  // already turned by -rot (applied by the caller before this function runs), so rotating by
+  // +rot here brings it back to 0 net — rotating by -rot again, as this used to do, doubled the
+  // turn instead of cancelling it, which is why the text spun twice as fast as the ring.
+  ctx.translate(cx, cy); ctx.rotate(rot);
   const fs = Math.max(7, Math.round(R / 8));
   ctx.font = fs + 'px "JetBrains Mono",monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const muTxt = mu === 0 ? '\u03bc=0 \u2014 cancel' : mu > 0 ? '\u03bc=1 \u2014 \u2192 1' : '\u03bc=\u22121 \u2014 \u2192 \u22121';
@@ -5104,7 +5187,7 @@ function openerDrawVoid(ctx, cx, cy, R, rot) {
    the lift overlay both go through it, so they can never sit one projection apart.
    null = off the plate (the pole, or non-finite). */
 function openerCayleyXY(r, M, cx, cy, Rc) {
-  const th = TAU * Math.min(r / M, 1);
+  const th = (OL.ringCCW ? -1 : 1) * TAU * Math.min(r / M, 1);
   const rho = OPENER_RHO0 + OPENER_RHOD * M / OPENER_G;   // the preview's own rho0 / rhoD (defaults 0.4 and 1.8, as on the page)
   const zx = rho * Math.cos(th), zy = rho * Math.sin(th);
   const ar = zx - 1, ai = zy, br = zx + 1, bi = zy, d = br * br + bi * bi;
@@ -13354,12 +13437,40 @@ async function msRender(doc, theme, opts) {
     // Paged: the same items, cut onto A4-proportioned pages (2480 x 3508) at item boundaries, so an
     // equation, table or paragraph is never sliced. A heading is kept with the item that follows it.
     const PH = MS.minH, TOP = 250, BOT = PH - 250, groups = [[]]; let py = TOP;
-    items.forEach((it, i) => {
-      let need = it.h;
-      if (it.t === 'h' && items[i + 1]) need += items[i + 1].h;
-      if (py + need > BOT && py > TOP) { groups.push([]); py = TOP; }
-      groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
-    });
+    if (opts.bySection) {
+      // Section-aware (used by the PNG pages): a section jumps to a fresh page only when doing so
+      // actually saves space (the room left on the current page is small); otherwise it flows onto
+      // the current page and continues past the boundary at ordinary item breaks, same as below, so
+      // pages fill up instead of a short section stranding the rest of the page blank.
+      const FULL = BOT - TOP, SLACK = FULL * 0.35;
+      const place = it => { groups[groups.length - 1].push({ it: it, y: py }); py += it.h; };
+      const newPage = () => { groups.push([]); py = TOP; };
+      const chunks = [];
+      items.forEach(it => { if (it.t === 'h' || !chunks.length) chunks.push([]); chunks[chunks.length - 1].push(it); });
+      chunks.forEach(ch => {
+        const tot = ch.reduce((a, it) => a + it.h, 0);
+        if (py + tot <= BOT) { ch.forEach(place); return; }
+        if (py > TOP && BOT - py < SLACK && tot <= FULL) newPage();
+        if (py === TOP && tot <= FULL) { ch.forEach(place); return; }
+        ch.forEach((it, i) => {
+          let need = it.h; if (it.t === 'h' && ch[i + 1]) need += ch[i + 1].h;
+          // A bare formula right after another bare formula (no paragraph between them) is one
+          // train of thought — e.g. the short one-line facts in §6 — so a page break never lands
+          // between two of those; it waits for the next item that actually starts a new thought
+          // (a paragraph, note, table, or heading), even if that means running a little past BOT.
+          const midRun = it.t === 'eq' && i > 0 && ch[i - 1].t === 'eq';
+          if (py + need > BOT && py > TOP && !midRun) newPage();
+          place(it);
+        });
+      });
+    } else {
+      items.forEach((it, i) => {
+        let need = it.h;
+        if (it.t === 'h' && items[i + 1]) need += items[i + 1].h;
+        if (py + need > BOT && py > TOP) { groups.push([]); py = TOP; }
+        groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
+      });
+    }
     const N = groups.length;
     return groups.map((list, pi) => {
       const pc = document.createElement('canvas'); pc.width = W; pc.height = PH;
@@ -13629,7 +13740,7 @@ function msBuildOpener() {
   if (showRing) {
     const R = (0.92 * S / 2), h = OPENER_RING_HOLE;
     doc.push({ t: 'eq', tex: msT`\rho(M)=R\Big(h+(1-h)\,\frac{M-\frac12}{G}\Big),\qquad R=0.92\cdot\frac S2=${msf(R, 1)},\qquad h=${msf(h, 2)}` });
-    doc.push({ t: 'eq', tex: msT`\theta(r,M)=2\pi\,\min\!\Big(\frac rM,\,1\Big),\qquad \mathrm{Ring}(r,M)=\big(c+\rho\cos\theta,\ \ c+\rho\sin\theta\big)` });
+    doc.push({ t: 'eq', tex: msT`\theta(r,M)=${OL.ringCCW ? '-' : ''}2\pi\,\min\!\Big(\frac rM,\,1\Big),\qquad \mathrm{Ring}(r,M)=\big(c+\rho\cos\theta,\ \ c+\rho\sin\theta\big)`, cap: OL.ringCCW ? 'The minus sign turns \\u03b8 counter-clockwise on screen; drop it for the clockwise sweep.' : undefined });
     if (OPENER_ROT.r) doc.push({ t: 'eq', tex: msT`(x,y)\mapsto c+R_{-\beta}\big((x,y)-c\big),\qquad \beta=${Math.round(OPENER_ROT.r)}^{\circ}` });
     if (OPENER_CIRCLE_METHOD && h > 0) {
       const N = Math.max(6, Math.min(22, Math.round(G * 0.6) + 6));
@@ -13814,6 +13925,33 @@ function msSave(cv, name, host) {
   });
 }
 
+/* Math sheet as separate PNG pages (A4-proportioned), one download each, with every link kept on screen. */
+async function msSavePages(cvs, base, host) {
+  const N = cvs.length; let ok = true;
+  if (host) {
+    host.innerHTML = ''; host.style.display = '';
+    const t = document.createElement('div'); t.style.color = 'var(--cream3)';
+    t.textContent = N + ' pages \u2014 if any download did not start, tap its link:'; host.appendChild(t);
+  }
+  for (let i = 0; i < N; i++) {
+    const name = base + '-p' + String(i + 1).padStart(2, '0') + 'of' + String(N).padStart(2, '0') + '.png';
+    const blob = await new Promise(res => { try { cvs[i].toBlob(b => res(b), 'image/png'); } catch (e) { res(null); } });
+    if (!blob) { ok = false; continue; }
+    const href = URL.createObjectURL(blob);
+    const el = document.createElement('a'); el.href = href; el.download = name;
+    document.body.appendChild(el); el.click(); el.remove();
+    if (host) {
+      const row = document.createElement('div'), l = document.createElement('a');
+      l.href = href; l.download = name; l.textContent = '\u2b07 ' + name;
+      l.style.cssText = 'color:var(--teal);text-decoration:underline;word-break:break-all;';
+      row.appendChild(l); host.appendChild(row);
+    }
+    setTimeout(() => URL.revokeObjectURL(href), 300000);
+    if (i < N - 1) await new Promise(r => setTimeout(r, 400));
+  }
+  return ok;
+}
+
 /* ── multi-page PDF: the plate, then the whole math sheet on A4 pages ───────
    No library: each page is a JPEG drawn full-bleed on its own PDF page (DCTDecode), so it is
    exactly what the PNGs show. Page 1 is the plate at its own proportions; the rest are A4. */
@@ -13883,22 +14021,96 @@ async function msExportPdfMain(views) {
   const nm = 'strips2-full-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+') + '.pdf';
   return msMakePdf(MS.lastPlate, msBuildMain(views), nm, $('ms-links-main'));
 }
+function msEsc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+/* Renders the same doc[] array msRender paints onto canvas pages, but as scrollable HTML for the
+   on-screen preview modal - same content, same order, same numbers; MathJax typesets the \[...\]
+   blocks in place instead of the sandboxed-iframe SVG route the PNG/PDF export uses. */
+function msDocToHtml(doc) {
+  let secNo = 0, eqNo = 0, h = '';
+  doc.forEach(b => {
+    if (b.t === 'title') {
+      h += '<div class="mp-eyebrow">' + msEsc(b.eyebrow) + '</div>' +
+        '<h1 class="mp-title">' + msEsc(b.title) + '</h1>' +
+        (b.sub ? '<div class="mp-sub">' + msEsc(b.sub) + '</div>' : '') +
+        '<div class="mp-by">' + msEsc(b.by) + '</div><hr class="mp-rule">';
+    } else if (b.t === 'abs') {
+      h += '<div class="mp-abs"><div class="mp-abs-label">Abstract</div><p>' + msEsc(b.text) + '</p></div>';
+    } else if (b.t === 'h') {
+      secNo++;
+      h += '<h2 class="mp-h"><span class="mp-sec">\u00a7 ' + secNo + '</span>' + msEsc(b.text) + '</h2><hr class="mp-rule2">';
+    } else if (b.t === 'p') {
+      h += '<p class="mp-p">' + msEsc(b.text) + '</p>';
+    } else if (b.t === 'note') {
+      h += '<p class="mp-note">' + msEsc(b.text) + '</p>';
+    } else if (b.t === 'eq') {
+      const num = b.num === false ? 0 : ++eqNo;
+      h += '<div class="mp-eq"><div class="mp-eq-tex">\\[' + b.tex + '\\]</div>' +
+        (num ? '<div class="mp-eq-num">(' + num + ')</div>' : '') + '</div>';
+      if (b.cap) h += '<div class="mp-cap">' + msEsc(b.cap) + '</div>';
+    } else if (b.t === 'params') {
+      h += '<div class="mp-params"><table>';
+      b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
+      h += '</table></div>';
+    } else if (b.t === 'table') {
+      h += '<table class="mp-table"><tbody>';
+      b.rows.forEach(r => {
+        h += '<tr><td class="sw">' + (r.sw ? '<i style="background:' + r.sw + '"></i>' : '') + '</td>' +
+          '<td class="lab">' + msEsc(r.label) + '</td>' +
+          '<td class="n">' + msEsc(String(r.n)) + '</td>' +
+          '<td class="pct">' + msEsc(r.pct) + '</td></tr>';
+      });
+      h += '</tbody></table>';
+    } else if (b.t === 'key') {
+      h += '<div class="mp-key">';
+      b.items.forEach(it => { h += '<span class="mp-key-item"><i style="background:' + it.rgb + '"></i>' + msEsc(it.lab) + '</span>'; });
+      h += '</div>';
+    } else if (b.t === 'gap') {
+      h += '<div style="height:' + (b.h || 24) + 'px"></div>';
+    }
+  });
+  return h;
+}
+function msOpenPreview(doc) {
+  const body = $('ms-preview-body'), modal = $('ms-preview-modal');
+  if (!body || !modal) return;
+  body.innerHTML = msDocToHtml(doc);
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  body.scrollTop = 0;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(() => {});
+}
+function msClosePreview() {
+  const modal = $('ms-preview-modal'); if (!modal) return;
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function msPreviewOpener() { try { msOpenPreview(msBuildOpener()); } catch (e) {} }
+function msPreviewMain() { try { msOpenPreview(msBuildMain(orderedExportViews())); } catch (e) {} }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') msClosePreview(); });
+
 async function msExportOpener() {
   const doc = msBuildOpener();
-  const cv = await msRender(doc, MS.theme);
-  await new Promise(r => setTimeout(r, 350));   // a beat after the plate, so browsers treat these as two downloads
-  const ok = await msSave(cv, 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-math-' + Date.now() + '.png', $('ms-links-open'));
-  return { ok: ok, w: cv.width, h: cv.height };
+  const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
+  await new Promise(r => setTimeout(r, 350));   // a beat after the plate, so browsers treat these as separate downloads
+  const ok = await msSavePages(pgs, 'strip2-opener-' + OE.view + '-G' + OPENER_G + '-math-' + Date.now(), $('ms-links-open'));
+  return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
 }
 async function msExportMain(views) {
   const doc = msBuildMain(views);
-  const cv = await msRender(doc, MS.theme);
+  const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
   await new Promise(r => setTimeout(r, 350));
-  const nm = 'strips2-math-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+') + '.png';
-  const ok = await msSave(cv, nm, $('ms-links-main'));
-  return { ok: ok, w: cv.width, h: cv.height };
+  const nm = 'strips2-math-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+');
+  const ok = await msSavePages(pgs, nm, $('ms-links-main'));
+  return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
 }
 
 </script>
+<div id="ms-preview-modal">
+  <div class="msp-backdrop" onclick="msClosePreview()"></div>
+  <div class="msp-panel">
+    <div class="msp-head"><span>The math behind this export</span><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div>
+    <div class="msp-body" id="ms-preview-body"></div>
+  </div>
+</div>
 </body>
 </html>
