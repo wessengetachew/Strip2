@@ -503,6 +503,17 @@ select{cursor:pointer;}
 .wcrot input[type=number]{width:30px;font-size:10.5px;padding:1px 3px;text-align:right;-moz-appearance:textfield;appearance:textfield;}
 .wcrot input[type=number]::-webkit-inner-spin-button,.wcrot input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .wcrot .chip{font-size:9.5px;padding:2px 5px;}
+/* Coloring row: the up / down chips and the x / y / z turns share one line on a phone. */
+@media (max-width:600px){
+  #welcome-colrow{flex-wrap:nowrap;gap:4px;}
+  #welcome-colrow .plabel{display:none;}
+  #welcome-colrow > .chip{padding:2px 6px;}
+  #welcome-colrow .wcrot{flex:1 1 auto;min-width:0;flex-wrap:nowrap;justify-content:space-between;gap:0 3px;margin-left:4px;}
+  #welcome-colrow .wcrot .rw{gap:2px;}
+  #welcome-colrow .wcrot label{gap:1px;font-size:10px;}
+  #welcome-colrow .wcrot .chip{font-size:9px;padding:1px 3px;}
+  #welcome-colrow .wcrot input[type=number]{width:22px;font-size:10px;padding:1px 2px;}
+}
 .chip.cr{border-color:rgba(224,80,96,.35);color:var(--coral);}
 .chip.cr:hover,.chip.cr.on{background:rgba(224,80,96,.14);border-color:var(--coral);}
 .keyhint{font-family:var(--mono);font-size:10px;color:var(--cream3);margin-top:10px;
@@ -1782,13 +1793,13 @@ walk anyway.</p>
 
 <div id="welcome-modal" class="export-modal" style="display:none;" onclick="if(event.target===this)closeWelcomeModal()">
   <div class="export-box">
-    <div class="export-hd">
-      <span>The Opener &middot; Strip Arithmetic II</span>
-      <span style="display:inline-flex;align-items:center;gap:8px;">
+    <div class="export-hd" style="flex-wrap:wrap;row-gap:4px;">
+      <span style="min-width:0;">The Opener &middot; Strip Arithmetic II</span>
+      <span style="display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;">
         <button class="chip tl on" id="welcome-music-btn" onclick="toggleOpenerMusic()" title="Riemann Zeta Function, by Vince Rubinetti &mdash; the track written for 3Blue1Brown's own zeta function video. Plays while the opener is open.">&#9835; Music</button>
-        <a href="https://soundcloud.com/vincerubinetti/riemann-zeta-function" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);text-decoration:none;white-space:nowrap;" title="Open the track on SoundCloud">Riemann Zeta Function &middot; Vince Rubinetti</a>
         <button class="btn" onclick="closeWelcomeModal()" title="Close">&times;</button>
       </span>
+      <a href="https://soundcloud.com/vincerubinetti/riemann-zeta-function" target="_blank" rel="noopener" style="flex:1 1 100%;order:3;min-width:0;font-family:var(--mono);font-size:10.5px;line-height:1.35;color:var(--cream3);text-decoration:none;overflow-wrap:anywhere;" title="Open the track on SoundCloud">&#9835; Riemann Zeta Function &middot; Vince Rubinetti</a>
     </div>
     <div id="welcome-music-slot" style="height:0;overflow:hidden;"></div>
     <div class="subtoggle collapsed" id="welcome-note-toggle" onclick="toggleSub(this)">
@@ -1878,15 +1889,15 @@ walk anyway.</p>
       <input type="range" id="ol-pt-sz" min="0.3" max="3" step="0.1" value="1" oninput="olSetPtScale(this.value)" style="max-width:110px;">
       <span class="val" id="ol-pt-sz-v">1.0&times;</span>
       <span class="lbl" style="margin-left:8px;" title="Which way &theta; sweeps on the Ring and Cayley previews, since Cayley is built from the same &theta; as Ring. Doesn't touch the live plate.">turn</span>
-      <button class="chip ol-ringdir-btn on" data-dir="ccw" onclick="olSetRingDir(true)" title="&theta; = 0 at the right, increasing counter-clockwise &mdash; the default.">&#8634; CCW</button>
-      <button class="chip ol-ringdir-btn" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise.">&#8635; CW</button>
+      <button class="chip ol-ringdir-btn" data-dir="ccw" onclick="olSetRingDir(true)" title="&theta; = 0 at the right, increasing counter-clockwise.">&#8634; CCW</button>
+      <button class="chip ol-ringdir-btn on" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise &mdash; the default.">&#8635; CW</button>
       <span class="hint">Ring &amp; Cayley only</span>
     </div>
     <div id="welcome-preview">
       <div class="wp-tile wp-grid">
         <canvas id="welcome-cv-grid"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">GRID</div>
-        <div class="wcrot wturn" title="Turn the Grid preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('g',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crg-v" style="min-width:30px;text-align:center;">0&deg;</span><button class="chip" onclick="openerTurn('g',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+        <div class="wcrot wturn" title="Turn the Grid preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('g',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crg-v" style="min-width:30px;text-align:center;">90&deg;</span><button class="chip" onclick="openerTurn('g',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
       </div>
       <div class="wp-allturn">
         <button class="chip tl" onclick="openerTurnAll(90)" title="Turn Grid, Ring, and the Cayley z axis all by +90&deg; at once. Preview only.">&#8634;<br>90&deg;<br>all</button>
@@ -1894,7 +1905,7 @@ walk anyway.</p>
       <div class="wp-tile wp-ring">
         <canvas id="welcome-cv-ring"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">RING</div>
-        <div class="wcrot wturn" title="Turn the Ring preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('r',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crr-v" style="min-width:30px;text-align:center;">0&deg;</span><button class="chip" onclick="openerTurn('r',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+        <div class="wcrot wturn" title="Turn the Ring preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('r',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crr-v" style="min-width:30px;text-align:center;">90&deg;</span><button class="chip" onclick="openerTurn('r',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
       </div>
       <div class="wp-tile wp-cay">
         <canvas id="welcome-cv-cayley" onwheel="openerCayleyWheel(event)" ondblclick="setOpenerCZ(0,true)"></canvas>
@@ -1919,10 +1930,10 @@ walk anyway.</p>
       <input type="range" id="welcome-cz" min="-1.7" max="0.3" step="0.01" value="-0.48" oninput="setOpenerCZ(this.value)" style="flex:1 1 160px;min-width:120px;" title="Zoom the Cayley preview out to reach the points that map far from the centre. Mouse wheel over the Cayley tile does the same; double-click returns to 0.33\u00d7.">
       <span class="hint">zoom out for the far points</span>
     </div>
-        <div class="prow"><span class="plabel">Coloring</span>
+        <div class="prow" id="welcome-colrow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
       <button class="chip" onclick="stepWelcome(1)" title="Next coloring (Down arrow)">&#9660;</button>
-      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
+      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
     </div>
     <div id="welcome-color-now"></div>
     <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
@@ -3679,9 +3690,9 @@ const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: -1, width: 2,
              gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
-             ptScale: 1, lblScale: 1, ringCCW: true };
-// ringCCW: sweep direction of theta on the Ring and Cayley previews — true (default) turns
-// theta counter-clockwise on screen; false keeps the original clockwise sweep. Preview only.
+             ptScale: 1, lblScale: 1, ringCCW: false };
+// ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
+// theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
 // one shared pair, not two identical-looking ones. Mirror is a separate overlay and is
 // never gated by surv/broken: toggling Surviving off used to also blank the spiral's
@@ -4080,12 +4091,23 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
     ctx.strokeStyle = 'rgba(242,200,96,.9)'; ctx.lineWidth = Math.max(1, dot * 0.35);
     ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 2.9, 0, TAU); ctx.stroke();
     if (OL.gbLabel && cw && ch) {
-      const fs = Math.max(9, Math.min(cw, ch) / 46), txt = '(' + mk[0] + ', ' + mk[1] + ')  \u03b8 = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0';
-      ctx.font = fs + 'px ' + MONO; ctx.textBaseline = 'middle';
-      const tw = ctx.measureText(txt).width, offX = pt[0] + dot * 3.6 + tw > cw - 4 ? -(dot * 3.6 + tw) : dot * 3.6;
-      const tx = Math.max(4, Math.min(cw - tw - 4, pt[0] + offX)), ty = Math.max(fs, Math.min(ch - fs, pt[1] - dot * 3.2));
-      ctx.fillStyle = 'rgba(4,4,13,.8)'; ctx.fillRect(tx - 3, ty - fs * 0.7, tw + 6, fs * 1.4);
+      // The label is drawn in DEVICE space, upright, after the plate's own zoom / turn / tilt have been
+      // applied to the marker's position: the point is mapped through the current transform, then text and
+      // its box are laid out with an explicit left alignment. (It used to be drawn inside the turned plate,
+      // so it rotated with it, and inherited whatever textAlign the previous painter left behind, which
+      // shifted the text away from its box.)
+      const tm = ctx.getTransform(), dp = tm.transformPoint(new DOMPoint(pt[0], pt[1]));
+      const kx = Math.hypot(tm.a, tm.b) || 1, cvw = ctx.canvas.width, cvh = ctx.canvas.height, sc = cvw / cw;
+      const fs = Math.max(10 * sc, Math.min(cvw, cvh) / 64), txt = '(' + mk[0] + ', ' + mk[1] + ')  \u03b8 = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0';
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.font = fs + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      const tw = ctx.measureText(txt).width, gap = dot * 3.6 * kx, pad = fs * 0.35;
+      let tx = dp.x + gap; if (tx + tw + pad > cvw - 4) tx = dp.x - gap - tw;
+      tx = Math.max(pad + 2, Math.min(cvw - tw - pad - 2, tx));
+      const ty = Math.max(fs, Math.min(cvh - fs, dp.y - dot * 3.2 * kx));
+      ctx.fillStyle = 'rgba(4,4,13,.82)'; ctx.fillRect(tx - pad, ty - fs * 0.75, tw + 2 * pad, fs * 1.5);
       ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.fillText(txt, tx, ty);
+      ctx.restore();
     }
   } else if (OL.gbLabel && cw && ch && pt === null) {
     // marker has no image here (Cayley pole): say so instead of silently drawing nothing
@@ -4505,7 +4527,9 @@ function toggleOpenerPlay() { if (_openerPlaying) stopOpenerPlay(); else startOp
    is counter-clockwise on screen for z, g and r alike. */
 const OPENER_AXES = ['x', 'y', 'z'];
 const OPENER_ROT_STEP = { x: 2, y: 1.3, z: 1.5 };   // degrees per 60 ms tick while that axis plays
-let OPENER_ROT = { x: 0, y: 0, z: 0, g: 0, r: 0 };
+/* Grid opens at -i, a quarter turn counter-clockwise, exactly as the main page does: M runs left to right and r
+   runs upward, so r = (a/b)M is rise over run and slope 1/1 climbs from bottom-left to top-right. */
+let OPENER_ROT = { x: 0, y: 0, z: 0, g: 90, r: 90 };   // Ring also opens at -i, as on the main page: the seam at the top, winding clockwise
 let _openerRotOn = { x: false, y: false, z: false }, _openerRotTimer = 0, _openerRotRaf = 0, _openerRotDirty = {};
 function openerNormDeg(v) { v = +v; if (!isFinite(v)) v = 0; return ((v % 360) + 360) % 360; }
 // Redraw only the tile the axis belongs to; the reveal animation, if running, already reads the live angles.
@@ -4597,11 +4621,11 @@ function oeSummary() {
 // between words) -- canvas has no letter-spacing property, so this is done in the string.
 // Same tally renderOpenerWork computes for the on-screen table (band counts for the
 // current coloring mode), returned as data instead of HTML so the export can draw it.
-function oeTallyData() {
-  const mode = $('cmode').value, G = OPENER_G;
+function oeTallyData(Gopt, full) {
+  const mode = $('cmode').value, G = Gopt || OPENER_G;
   try { gaussSieve(Math.max(COP_G, G)); } catch (e) {}
   const map = new Map(); let total = 0, cop = 0;
-  for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) {
+  for (let M = 1; M <= G; M++) for (let r = 1; r <= (full ? G : M); r++) {
     total++; if (gcd(r, M) === 1) cop++;
     const c = openerClass(mode, r, M);
     let e = map.get(c.l);
@@ -4617,12 +4641,13 @@ function oeTallyData() {
   const ph = openerPhiTerms(G);
   return {
     rule: openerRule(mode),
-    header: 'the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2',
+    header: full ? 'the full lattice \u00b7 1 \u2264 r, M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b2' : 'the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2',
+    cop: cop, copExpect: full ? 2 * ph.sum - 1 : ph.sum,
     rows: rows.map(e => ({ sw: swatch(e), label: e.l, n: e.n, pct: pct(e.n) })),
     more: more ? { label: '+ ' + more.classes + ' more classes', n: more.n, pct: pct(more.n) } : null,
     sumOk: sum === total, sum: sum, total: total,
-    gcdLine: 'gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' + (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum,
-    gcdOk: cop === ph.sum,
+    gcdLine: full ? 'gcd = 1 cells: ' + cop + ' = 2\u00b7(\u03c6(1)+\u2026+\u03c6(' + G + ')) \u2212 1 = ' + (2 * ph.sum - 1) : 'gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' + (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum,
+    gcdOk: cop === (full ? 2 * ph.sum - 1 : ph.sum),
     bandLine: (mode === 'ethiopia' || mode === 'ethiodepth' || mode === 'ethioinv') ? 'each band tends to G\u00b2/6 = ' + (G * G / 6).toFixed(1) + ' cells as G grows' : null
   };
 }
@@ -4687,6 +4712,14 @@ function oeLegendSections() {
   vi.push({ c: PAL.gold, t: 'Cayley \u03c1 = ' + OPENER_RHO0.toFixed(2) + ' + ' + OPENER_RHOD.toFixed(2) + '\u00b7M/G' + (OPENER_CZ !== OPENER_CZ_DEFAULT ? ' \u00b7 zoom ' + OPENER_CZ.toFixed(2) + '\u00d7' : '') });
   if (OE.view !== 'grid') vi.push({ c: null, t: '\u03b8 mode ' + OL.thetaMode + ' \u00b7 ' + ({ wrap: '2\u03c0r/M, r > M laps the ring', clamp: '2\u03c0\u00b7min(r/M,1)', unit: '2\u03c0r/G' })[OL.thetaMode] });
   if (OPENER_RING_HOLE) vi.push({ c: null, t: 'ring hole ' + OPENER_RING_HOLE.toFixed(2) + (OPENER_RING_HOLE >= 0.5 ? ' \u00b7 roots-of-unity reading on' : '') + (OPENER_CIRCLE_METHOD ? ' \u00b7 circle method fill on' : '') });
+  // the page's own display readouts, so the export shows the numbers you set there
+  {
+    const lm = (OPENER_LABEL_MODES.find(m => m.id === OPENER_LABEL_MODE) || {}).short || OPENER_LABEL_MODE;
+    vi.push({ c: null, t: 'points ' + (OL.ptScale || 1).toFixed(1) + '\u00d7' + (OE.view !== 'grid' ? ' (Ring & Cayley)' : '') });
+    vi.push({ c: null, t: 'labels ' + lm + (OPENER_LABEL_MODE === 'off' ? '' : ' \u00b7 size ' + (OL.lblScale || 1).toFixed(1) + '\u00d7' + (OPENER_G > OPENER_LABELS_MAXG ? ' \u00b7 hidden at this G (shown only while G \u2264 ' + OPENER_LABELS_MAXG + ')' : '')) });
+    if (OL.mode !== 'none' || OL.chain) vi.push({ c: null, t: 'lift thickness ' + (OL.survBrokenThick != null ? OL.survBrokenThick : 0.5).toFixed(2) + ' (0.50 = default size)' });
+    vi.push({ c: null, t: 'grid \u00b7 ' + OPENER_G + '\u00d7' + OPENER_G + ' cells \u00b7 G = ' + OPENER_G + (OL.stripOn ? ' \u00b7 strip on' : '') });
+  }
   const out = [{ title: 'VIEW', items: vi }];
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
   if (OL.mode !== 'none' || OL.chain || OL.stripOn || OL.gbOn) {
@@ -4705,7 +4738,7 @@ function oeLegendSections() {
     }
     let D = NaN; try { D = Dn(n); } catch (e) {}
     const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
-    li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') });
+    li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? (sat.length > 14 ? sat.slice(0, 14).join(', ') + ', \u2026' : sat.join(', ')) + ' \u00b7 count ' + sat.length : 'none') });
     if (isFinite(D)) {
       li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
       // D(0) collapses to plain gcd(r,M)=1 density, 6/pi^2 -- the same "global"
@@ -4726,6 +4759,7 @@ function oeLegendSections() {
       li.push({ c: PAL.coral, t: 'd: r+M=s' });
       li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
       li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 c,d fully lit \u21d4 g,s both prime' });
+      li.push({ c: null, t: 'pair dots ' + (OL.gbThick || 1).toFixed(1) + '\u00d7' + (OL.gbDim ? ' \u00b7 dim backdrop ' + Math.round(OL.gbDimAmt != null ? OL.gbDimAmt : 50) + '%' : ' \u00b7 dim backdrop off') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt != null ? OL.gbSpotAmt : 55) + '%' : ' \u00b7 spotlight off') + (OL.gbLabel ? ' \u00b7 marker label on' : '') + (OL.gbTrail ? ' \u00b7 trail on' : '') });
       { const gg = Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1)), mk = olGbMarker(gg, N - gg);
         li.push({ c: PAL.gold, t: 'gold marker (r, M) = (' + mk[0] + ', ' + mk[1] + ') \u00b7 ring M = s lies past the last ring, G = ' + OPENER_G + ' \u00b7 \u03b8 = 2\u03c0g/s = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0' + (OL.gbTrail ? ' \u00b7 trail joins all pairs' : '') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt) + '%' : '') }); }
       if (Math.floor(N / 2) >= 1) gbLegendLines(OPENER_G, OL.gbG, true).forEach(t => li.push({ c: null, t: t }));
@@ -5013,6 +5047,8 @@ function openerTurn(axis, delta) {
   const el = $('welcome-cr' + axis + '-v'); if (el) el.textContent = d + '\u00b0';
 }
 function openerRotZero(axis) { stopOpenerRotPlay(axis); setOpenerRot(axis, 0); }
+// One click turns the axis a further 45 degrees (a spin in progress is stopped first); the box follows.
+function openerRotStep(axis, delta) { stopOpenerRotPlay(axis); setOpenerRot(axis, openerNormDeg((OPENER_ROT[axis] || 0) + delta)); }
 /* Click-drag zoom for the opener's three preview canvases, mirroring the main
    plate's pan/zoom (drag to pan once zoomed in, wheel or pinch to zoom,
    double-click to reset) -- but as a real canvas-coordinate transform applied
@@ -5550,8 +5586,8 @@ function sendOpenerToMainPage() {
   } else {
     if (MULTI_ON) toggleMulti();
     setView(OPENER_VIEW);
-    if (OPENER_VIEW === 'grid') setViewQuarter(Math.round(OPENER_ROT.g / 90));
-    else if (OPENER_VIEW === 'ring') setViewQuarter(Math.round(OPENER_ROT.r / 90));
+    if (OPENER_VIEW === 'grid') setViewQuarter(-Math.round(OPENER_ROT.g / 90));   // opener +90 = counter-clockwise = main quarter -1
+    else if (OPENER_VIEW === 'ring') { setViewQuarter(-Math.round(OPENER_ROT.r / 90)); try { setRingWinding(OL.ringCCW ? -1 : 1); } catch (e) {} }   // opener +90 = counter-clockwise = main quarter -1
   }
 
   // Ring hole (+ circle method) and Cayley radius/tilt — same units and
@@ -9760,17 +9796,23 @@ function colourKeyEntries(mode) {
              .map(([r, M, l]) => probe(r, M, 'spf \u00b7 ' + l));
     case 'lpf':
       return [[1, 2, 'coprime'], [2, 4, 'p = 2'], [3, 6, 'p = 3'], [5, 10, 'p = 5'],
-              [7, 14, 'p = 7'], [11, 22, 'p = 11'], [13, 26, 'p = 13']]
+              [7, 14, 'p = 7'], [11, 22, 'p = 11'], [13, 26, 'p = 13'], [17, 34, 'p = 17'], [19, 38, 'p = 19']]
              .map(([r, M, l]) => probe(r, M, 'lpf \u00b7 ' + l));
     case 'omega': case 'bomega': {
       const g = [1, 2, 4, 6, 12, 30, 60, 210];
       return g.map(d => probe(d, 2 * d, (mode === 'omega' ? '\u03c9' : '\u03a9') +
         '(' + d + ') = ' + (mode === 'omega' ? pfac(d, SPF).length : bigOmega(d))));
     }
-    case 'sat': case 'failp':
+    case 'sat':
       return [[1, 2, 'survives'], [2, 4, 'p = 2 kills it'], [3, 6, 'p = 3'],
               [5, 10, 'p = 5'], [7, 14, 'p = 7'], [11, 22, 'p = 11']]
              .map(([r, M, l]) => probe(r, M, l));
+    case 'failp':
+      return [[1, 2, 'survives'], [2, 4, 'p = 2 kills it'], [3, 6, 'p = 3'],
+              [5, 10, 'p = 5'], [7, 14, 'p = 7'], [11, 22, 'p = 11'], [13, 26, 'p = 13'],
+              [17, 34, 'p = 17'], [19, 38, 'p = 19'], [23, 46, 'p = 23']]
+             .map(([r, M, l]) => probe(r, M, l))
+             .concat([{ lab: 'larger primes \u00b7 grouped into the classes the counts below list', rgb: cellRGBAstr(mode, 1, 29, 58, 1) }]);
     case 'ethiopia':
       return [probe(5, 6, 'green \u00b7 2/3 \u2264 r/M \u2264 1  (\u2153 of the wedge)'),
               probe(1, 2, 'yellow \u00b7 1/3 \u2264 r/M < 2/3  (\u2153)'),
@@ -9977,6 +10019,21 @@ function exportDetailSections(views) {
       li.push({ rgb: null, text: 'D(n) / (6/\u03c0\u00b2) = ' + ratioD.toFixed(4) + '\u00d7 global pair density \u00b7 \u0394 ' + (deltaD >= 0 ? '+' : '') + deltaD.toFixed(2) + '%' });
     }
     out.push({ title: 'LIFT DYNAMICS', items: li });
+  }
+
+  // ── WHAT THE PICTURE COUNTS ── the colour classes with their cell counts, as in the opener's table
+  if (COP_G && COP_G <= 800) {
+    try {
+      const td = oeTallyData(COP_G, true), ci = [];
+      td.rows.concat(td.more ? [td.more] : []).forEach(r => ci.push({ rgb: r.sw || null, text: r.label + ' \u00b7 ' + r.n.toLocaleString() + ' \u00b7 ' + r.pct }));
+      ci.push({ rgb: null, text: td.header });
+      ci.push({ rgb: null, text: 'classes sum to ' + td.sum.toLocaleString() + (td.sumOk ? ' \u2713' : ' \u2260 ' + td.total.toLocaleString()) });
+      ci.push({ rgb: null, text: td.gcdLine + (td.gcdOk ? ' \u2713' : ' (mismatch)') });
+      if (td.bandLine) ci.push({ rgb: null, text: td.bandLine });
+      out.push({ title: 'WHAT THE PICTURE COUNTS', items: ci });
+    } catch (e) {}
+  } else if (COP_G) {
+    out.push({ title: 'WHAT THE PICTURE COUNTS', items: [{ rgb: null, text: 'class counts skipped above G = 800 (' + (COP_G * COP_G).toLocaleString() + ' cells)' }] });
   }
 
   // ── PARTITION / SECTORS ──
@@ -13718,6 +13775,31 @@ async function msRender(doc, theme, opts) {
         groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
       });
     }
+    // A last page that would carry only a stray line or two is padded from the page before it: whole
+    // "thoughts" (a paragraph with its equations, a table, a heading with what follows it) move onto it
+    // from the end of the previous page, so nothing is sliced and the final page is never close to blank.
+    const balanceTail = () => {
+      if (groups.length < 2) return;
+      const FULL = BOT - TOP, MIN = FULL * 0.34;
+      const used = g => g.length ? g[g.length - 1].y + g[g.length - 1].it.h - TOP : 0;
+      const last = groups[groups.length - 1], prev = groups[groups.length - 2];
+      if (used(last) >= MIN || !last.length) return;
+      const startsThought = k => prev[k].it.t !== 'eq' && prev[k].it.t !== 'gap' && !(k > 0 && prev[k - 1].it.t === 'h');
+      let pick = -1;
+      for (let k = prev.length - 1; k > 0; k--) {
+        if (!startsThought(k)) continue;
+        const suffix = prev.slice(k).reduce((a, e) => a + e.it.h, 0);
+        if (used(last) + suffix > FULL) break;                 // would overflow the last page
+        pick = k;
+        if (used(last) + suffix >= MIN) break;
+      }
+      if (pick < 1) return;
+      const keep = prev.slice(0, pick), moved = prev.slice(pick).concat(last);
+      if (used(keep) < FULL * 0.3) return;                     // do not gut the previous page either
+      let yy = TOP; moved.forEach(e => { e.y = yy; yy += e.it.h; });
+      groups.splice(groups.length - 2, 2, keep, moved);
+    };
+    balanceTail();
     const N = groups.length;
     return groups.map((list, pi) => {
       const pc = document.createElement('canvas'); pc.width = W; pc.height = PH;
@@ -14114,7 +14196,18 @@ function msBuildMain(views, noPlates) {
     if (entries && entries.length) { doc.push({ t: 'p', text: 'Colour key, sampled from the painter itself:' }); doc.push({ t: 'key', items: entries.map(e => ({ rgb: e.rgb, lab: e.lab })) }); }
   } catch (e) {}
 
-  // 5 · strip / band
+  // 5 · counts: the same class table the opener shows, over the full G x G square this plate holds
+  if (G <= 800) try {
+    const td = oeTallyData(G, true);
+    doc.push({ t: 'h', text: 'What the picture counts' });
+    doc.push({ t: 'p', text: 'Classes of the active colouring over the lattice (' + td.header + '):' });
+    doc.push({ t: 'table', rows: td.rows.concat(td.more ? [td.more] : []) });
+    doc.push({ t: 'eq', tex: msT`\sum_{c}n_{c}=|\mathcal L|=G^{2}=${td.total.toLocaleString()}${td.sumOk ? msT`\ \checkmark` : msT`\ \neq\ ${td.sum.toLocaleString()}`}`, num: false });
+    doc.push({ t: 'eq', tex: msT`\#\{\gcd(r,M)=1\}=${td.cop.toLocaleString()}=2\Phi(G)-1=${td.copExpect.toLocaleString()}${td.gcdOk ? msT`\ \checkmark` : msT`\ \text{(mismatch)}`}`, num: false });
+    if (td.bandLine) doc.push({ t: 'note', text: td.bandLine + '.' });
+  } catch (e) {}
+
+  // 6 · strip / band
   doc.push({ t: 'h', text: walkMode === 'band' ? 'The block band' : 'The strip' });
   if (walkMode === 'band') {
     const n = Math.max(0, w - 1);
