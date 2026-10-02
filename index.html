@@ -352,6 +352,26 @@ html.hint-off .subtoggle.collapsed .car{animation:none;}
   .subtoggle.collapsed{border-color:rgba(200,168,74,.5);}
 }
 
+/* The opener's Lift bar hides most of the preview controls, so it gets a louder call than the other folded bars:
+   a gold wash that breathes, a "show controls" tag and a small down arrow that bobs. It keeps going even after
+   some other bar has been opened, and stops for good once this one has been opened (html.dd-seen). */
+@keyframes olDdFlash{
+  0%,100%{background:rgba(200,168,74,.10);border-color:rgba(200,168,74,.45);box-shadow:0 0 0 0 rgba(200,168,74,0);}
+  50%    {background:rgba(200,168,74,.34);border-color:rgba(242,200,96,1);box-shadow:0 0 18px -2px rgba(242,200,96,.6);}
+}
+@keyframes olDdArrow{0%,100%{transform:translateY(-2px);opacity:.75;}50%{transform:translateY(3px);opacity:1;}}
+#ol-dd.collapsed{border-color:rgba(242,200,96,.7);}
+#ol-dd.collapsed .car{order:2;font-size:13px;opacity:1;color:var(--gold);transform:none;}
+#ol-dd.collapsed::after{content:'SHOW CONTROLS';color:var(--gold);border-color:rgba(242,200,96,.7);font-size:8.5px;letter-spacing:.1em;white-space:nowrap;}
+html:not(.dd-seen) #ol-dd.collapsed{animation:olDdFlash 1.9s ease-in-out infinite;}
+html:not(.dd-seen) #ol-dd.collapsed .car{animation:olDdArrow 1.9s ease-in-out infinite;}
+html.dd-seen #ol-dd.collapsed,html.dd-seen #ol-dd.collapsed .car{animation:none;}
+#ol-dd.collapsed:hover{animation:none;}
+@media (prefers-reduced-motion:reduce){
+  html:not(.dd-seen) #ol-dd.collapsed,html:not(.dd-seen) #ol-dd.collapsed .car{animation:none !important;}
+  html:not(.dd-seen) #ol-dd.collapsed{background:rgba(200,168,74,.24);}
+}
+
 .ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px;}
 .cg{display:flex;align-items:center;gap:6px;}
 .lbl{font-family:var(--mono);font-size:11px;color:var(--cream3);white-space:nowrap;}
@@ -1834,7 +1854,7 @@ walk anyway.</p>
         densities, all from one residue count.
         <br><br>
         At <b>slope +1</b>, width $n{+}1$ read as a block &mdash; every column ANDed together, not averaged
-        within the strip &mdash; is <b>block-coprime density</b> $C(n) = \prod_p\!\left(1 - \tfrac{\min(n+1,p)}{p^2}\right)$.
+        within the strip &mdash; is <b>block-coprime density</b>: the raw density $D(n) = \prod_p\!\left(1 - \tfrac{\min(n+1,p)}{p^2}\right)$, and $C(n) = \zeta(2)\,D(n)$ is that density normalised by $1/\zeta(2) = D(0)$, so $C(0) = 1$.
         <br><br>
         At <b>slope &minus;1</b>, width 1 is the Goldbach anti-diagonal $r + M = N$, and how often every
         point on it is prime is the <b>Hardy&ndash;Littlewood Singular Series</b>
@@ -1937,7 +1957,7 @@ walk anyway.</p>
     </div>
     <div id="welcome-color-now"></div>
     <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
-      <span class="car">&#9662;</span><span>Lift &middot; <span style="text-transform:none;">D(n) = <b id="ol-dn-head" style="color:var(--gold);font-weight:500;">&ndash;</b></span></span>
+      <span class="car">&#9662;</span><span style="min-width:0;">Lift &middot; <span style="text-transform:none;">D(n) = <b id="ol-dn-head" style="color:var(--gold);font-weight:500;">&ndash;</b></span></span>
     </div>
     <div class="subbody" id="ol-body">
       <div class="prow">
@@ -3631,6 +3651,8 @@ let OPENER_VIEW = 'all3';
 function wvShows(which) { return OPENER_VIEW === 'all3' || OPENER_VIEW === which; }
 function wvSetView(v) {
   OPENER_VIEW = v;
+  // The export and the math sheet follow whichever view is on screen: Grid only, Ring only, Cayley only, or all three.
+  try { oeSetView(v); } catch (e) {}
   document.querySelectorAll('.wv-view-btn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   const wp = $('welcome-preview'); if (!wp) return;
   const g = wp.querySelector('.wp-grid'), r = wp.querySelector('.wp-ring'),
@@ -4758,7 +4780,7 @@ function oeLegendSections() {
       li.push({ c: PAL.gold, t: 'c: r+M=g' });
       li.push({ c: PAL.coral, t: 'd: r+M=s' });
       li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
-      li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 c,d fully lit \u21d4 g,s both prime' });
+      li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 g,s both prime \u21d2 c,d fully lit \u00b7 converse once g > \u221aE' });
       li.push({ c: null, t: 'pair dots ' + (OL.gbThick || 1).toFixed(1) + '\u00d7' + (OL.gbDim ? ' \u00b7 dim backdrop ' + Math.round(OL.gbDimAmt != null ? OL.gbDimAmt : 50) + '%' : ' \u00b7 dim backdrop off') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt != null ? OL.gbSpotAmt : 55) + '%' : ' \u00b7 spotlight off') + (OL.gbLabel ? ' \u00b7 marker label on' : '') + (OL.gbTrail ? ' \u00b7 trail on' : '') });
       { const gg = Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1)), mk = olGbMarker(gg, N - gg);
         li.push({ c: PAL.gold, t: 'gold marker (r, M) = (' + mk[0] + ', ' + mk[1] + ') \u00b7 ring M = s lies past the last ring, G = ' + OPENER_G + ' \u00b7 \u03b8 = 2\u03c0g/s = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0' + (OL.gbTrail ? ' \u00b7 trail joins all pairs' : '') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt) + '%' : '') }); }
@@ -13106,6 +13128,7 @@ function togglePanel(titleEl) {
 }
 function toggleSub(el) {
   hintSpent();
+  if (el.id === 'ol-dd') { document.documentElement.classList.add('dd-seen'); try { sessionStorage.setItem('wg-dd-seen', '1'); } catch (e) {} }
   el.classList.toggle('collapsed');
 }
 /* Prose sections fold from their own heading. §1 is the one above the canvas,
@@ -13385,6 +13408,7 @@ function boot() {
   // to be taught again on the next page load.
   try {
     if (sessionStorage.getItem('wg-hint-off')) document.documentElement.classList.add('hint-off');
+    if (sessionStorage.getItem('wg-dd-seen')) document.documentElement.classList.add('dd-seen');
   } catch (e) {}
   const top = 300000;
   SPF = buildSPF(top);
@@ -13998,7 +14022,7 @@ function msGoldbach(G, gbG, title) {
   const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
   const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
   const out = [];
-  out.push({ t: 'p', text: title || 'The Goldbach overlay reads the lattice at E = 2(G+1). For a gap g with partner s = E − g it draws four lines of the same lattice; the pair is fully lit exactly when both g and s are prime.' });
+  out.push({ t: 'p', text: title || 'The Goldbach overlay reads the lattice at E = 2(G+1). For a gap g with partner s = E − g it draws four lines of the same lattice; a Goldbach pair is a gap where both g and s are prime. Line c is fully coprime exactly when g is prime; line d exactly when s is prime once g > \u221aE (for smaller g, d can be fully coprime while s is composite, so s is checked directly).' });
   out.push({ t: 'eq', tex: msT`E=2(G+1)=${E},\qquad g=${g},\quad s=E-g=${s}` });
   out.push({ t: 'eq', tex: msT`r+M=g,\qquad r+M=s,\qquad M-r=g,\qquad r-M=g` });
   out.push({ t: 'eq', tex: msT`k(E)=\#\{\,q\le E/2:\ q,\ E-q\ \mathrm{prime}\,\}=${pairs.length},\qquad r(E)=2k-\mathbf 1[E/2\ \mathrm{prime}]=${ordered}` });
@@ -14495,6 +14519,7 @@ function msAddPlates(doc, items) {
 }
 function msPreviewOpener() {
   try {
+    if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
     MS_PREV.kind = 'opener';
     msOpenPreview(msBuildOpener());
   } catch (e) {}
