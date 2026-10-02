@@ -214,6 +214,8 @@ table.mp-table td.pct{text-align:right;color:#6b6558;white-space:nowrap;}
   #ms-preview-modal .msp-panel{width:100%;height:100%;max-height:100%;border-radius:0;}
   #ms-preview-modal .msp-body{padding:24px 18px 40px;}
   .mp-title{font-size:1.5rem;}
+  .mp-plates{grid-template-columns:1fr;}
+  .mp-plate.cay{width:100%;}
   .mp-eq{padding:6px 10px;}
 }
 @keyframes welcomePop{
@@ -1191,11 +1193,11 @@ walk anyway.</p>
         <option value="moddist">modular distance (min(r,M&minus;r))</option>
         <option value="phipos">&phi;(M) progression</option>
         <option value="ethiopia">Ethiopian &mdash; green / yellow / red by slope r/M</option>
-        <option value="ethiodepth" selected>Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
+        <option value="ethiodepth">Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
         <option value="ethioinv">Ethiopian + inverse &mdash; flag at/below diagonal, complementary colors above</option>
       </optgroup>
       <optgroup label="The block &mdash; reads the width slider as n = w&minus;1">
-        <option value="sat">saturation &mdash; smallest prime p &le; n+1 dividing r</option>
+        <option value="sat" selected>saturation &mdash; smallest prime p &le; n+1 dividing r</option>
         <option value="failp">first failing prime in the block</option>
         <option value="jstar">j* &mdash; which slot in the block kills it</option>
       </optgroup>
@@ -1842,6 +1844,15 @@ walk anyway.</p>
         <br><br>
         Use the controls below to choose how the geometry is viewed, or close this note and jump straight in.
       </div>
+      <div class="prow" style="padding:2px 0 4px;border-bottom:none;">
+        <span class="lbl">gap presets</span>
+        <button class="chip ol-gap-btn" data-g="1" onclick="olGapPick(1)" title="The only odd prime gap &mdash; the single pair (2, 3).">1 (2&rarr;3)</button>
+        <button class="chip ol-gap-btn" data-g="2" onclick="olGapPick(2)" title="Twin primes (M, M+2).">2 (twin)</button>
+        <button class="chip ol-gap-btn" data-g="4" onclick="olGapPick(4)" title="Cousin primes (M, M+4).">4 (cousin)</button>
+        <button class="chip ol-gap-btn" data-g="6" onclick="olGapPick(6)" title="Sexy primes (M, M+6).">6 (sexy)</button>
+        <button class="chip ol-gap-btn" data-g="8" onclick="olGapPick(8)" title="Gap-8 prime pairs (M, M+8).">8</button>
+      </div>
+      <div class="pnote ol-gap-cap" style="padding:0 0 10px;line-height:1.6;min-height:1.6em;"></div>
     </div>
     <div class="subtoggle collapsed" id="welcome-strip2-toggle" onclick="toggleSub(this)">
       <span class="car">&#9662;</span><span>What this page adds &mdash; slope, width &amp; the Singular Series</span>
@@ -1861,6 +1872,16 @@ walk anyway.</p>
         $\mathfrak{S}(N) = 2C_2 \prod_{p \mid N,\, p>2} \tfrac{p-1}{p-2}$. The partition overlays below walk
         that anti-diagonal one Goldbach decomposition of $N$ at a time.
       </div>
+      <div class="prow" id="welcome-presets" style="padding:2px 0 4px;border-bottom:none;">
+        <span class="lbl">presets</span>
+        <button class="chip ol-preset-btn" data-p="diag" onclick="olPresetPick('diag')" title="Slope +1, width 1, offset 0: the single diagonal r &minus; M = 0.">diagonal</button>
+        <button class="chip ol-preset-btn" data-p="n1" onclick="olPresetPick('n1')" title="Slope +1, width 2 (n = 1): a block two wide.">block n=1</button>
+        <button class="chip ol-preset-btn" data-p="n2" onclick="olPresetPick('n2')" title="Slope +1, width 3 (n = 2): a block three wide.">block n=2</button>
+        <button class="chip ol-preset-btn" data-p="n4" onclick="olPresetPick('n4')" title="Slope +1, width 5 (n = 4): a block five wide.">block n=4</button>
+        <button class="chip ol-preset-btn" data-p="gb" onclick="olPresetPick('gb')" title="Slope &minus;1, width 1, offset N = 2(G+1): the Goldbach anti-diagonal r + M = N.">Goldbach</button>
+        <button class="chip ol-preset-btn" data-p="half" onclick="olPresetPick('half')" title="Slope 1/2, offset &minus;1, width 2: the page's default strip.">slope &frac12;</button>
+      </div>
+      <div class="pnote ol-preset-cap" style="padding:0 0 10px;line-height:1.6;min-height:1.6em;"></div>
     </div>
     <div class="prow">
       <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
@@ -1968,8 +1989,13 @@ walk anyway.</p>
         <button class="chip ol-mode-btn on" data-m="connect" onclick="olSetMode('connect')" title="Spiral and &plusmn;n path together, with thin lines joining them at every ring M they share.">Connect</button>
       </div>
       <div class="prow">
-        <span class="lbl" title="Lift / block depth n. D(n) is the density of cells that stay coprime across a block of n+1 rings.">n</span>
+        <span class="lbl" title="Path depth n: drives the &plusmn;n path r = (M&plusmn;n)/2 and which primes the spiral skips as saturated.">&plusmn;n path</span>
         <div class="stepper"><button class="sbtn" onclick="olStepN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-n-val">0</span><button class="sbtn" onclick="olStepN(1)" title="+1">+</button></div>
+        <button class="chip tl" id="ol-n-play" onclick="olNPlay()" title="Step the &plusmn;n path n from 0 up to G&minus;1, then loop back to 0.">&#9654;</button>
+        <span class="lbl" style="margin-left:6px;" title="C(n) block depth: the r-chain keeps only r coprime to M, M+1, &hellip;, M+n, and D(n)/C(n) are read at this n.">C(n)</span>
+        <div class="stepper"><button class="sbtn" onclick="olStepCN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-cn-val">0</span><button class="sbtn" onclick="olStepCN(1)" title="+1">+</button></div>
+        <button class="chip tl" id="ol-cn-play" onclick="olCNPlay()" title="Step the C(n) depth from 0 up to G&minus;1, then loop back to 0. While locked it moves both n together.">&#9654;</button>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;margin-left:4px;" title="Lock the C(n) depth to the &plusmn;n path n, so one stepper moves both."><input type="checkbox" id="ol-lockn-chk" onchange="olToggleLockN(this.checked)"> &#128279; lock</label>
         <span class="lbl" style="margin-left:6px;" title="The spiral's prime">p</span>
         <div class="stepper"><button class="sbtn" onclick="olStepP(-1)" title="Previous prime">&#9664;</button><span class="val" id="ol-p-val">2</span><button class="sbtn" onclick="olStepP(1)" title="Next prime">&#9654;</button></div>
         <button class="chip" id="ol-p1" onclick="olLockOne()" title="Lock to residue 1: r = 1 across every ring M. gcd(1, M) = 1 always, so this line never breaks. Stepping &#9664; from p = 2 lands here too.">1</button>
@@ -3329,7 +3355,7 @@ function cycleCMode(dir) {
    Swatches are built from colourKeyEntries, the same probes the export
    LEGEND uses, so a mode's preview here can never drift from what it
    actually draws on the plate. */
-const WELCOME_PRESET = { cmode: 'ethiodepth', label: 'r' };
+const WELCOME_PRESET = { cmode: 'sat', label: 'r' };   // default colouring = option 16, saturation
 function syncWelcomeUI() {
   const now = $('welcome-color-now'), sel = $('cmode');
   if (!now || !sel || sel.selectedIndex < 0) return;
@@ -3590,6 +3616,7 @@ function openerSquarePoints() {
    Ring and Cayley alike, since all three read the same underlying points.
    Each option's own text is the explanation -- same convention as the main
    plate's #lens-lbl select -- so there's nothing to remember, just read. */
+var MS_LBL = { on: false, stats: null };   // math-sheet plates only: M labels, collision-free (see msLblPlace)
 const OPENER_LABEL_MODES = [
   { id: 'off', short: 'off',       t: 'No per-point labels.' },
   { id: 'rM',  short: 'r/M',       t: 'Both coordinates, r over M.' },
@@ -3622,6 +3649,7 @@ function openerDrawLabels(ctx, xy, pts, fontPx, rotDeg) {
   // Ring's OPENER_ROT.r) — cancelled locally per point so the text itself stays upright on screen
   // even while its position turns with the rest of the plate. Centred on the point, not offset above
   // it, so a label never blocks the point beside it.
+  if (typeof MS_LBL !== 'undefined' && MS_LBL && MS_LBL.on) { msLblOpener(ctx, xy, pts); return; }
   if (!openerLabelsShow()) return;
   ctx.save();
   ctx.font = fontPx + 'px "JetBrains Mono",monospace';
@@ -3708,7 +3736,7 @@ function setOpenerG(v) {
    lift survives and coral where it breaks. Preview only, like G and the
    Cayley tilt: it doesn't touch the Lift panel on the page. Connect and the
    chain are on by default. */
-const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
+const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 2, chain: true, surv: true, broken: true,
              allP: false, mirror: false, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: -1, width: 2,
              gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
@@ -3721,6 +3749,10 @@ const OL = { mode: 'connect', n: 0, p: 2, chain: true, surv: true, broken: true,
 // Mirror dots (and the whole spiral, safe or broken) because the old code used OL.surv
 // as an on/off switch for the spiral loop instead of a per-point filter.
 function openerLiftN() { return Math.max(0, Math.min(OPENER_G - 1, OL.n)); }
+/* Second n, for C(n): the block depth the r-chain tests and D(n)/C(n) read. The first n
+   (OL.n) now drives only the +-n path r = (M+-n)/2 and which primes the spiral skips.
+   Locked, the two move together, as before. */
+function openerChainN() { return OL.lockN ? openerLiftN() : Math.max(0, Math.min(OPENER_G - 1, OL.cn)); }
 /* Three states, shared by the chain and the +-n path: 'dead' once a saturated prime
    (p <= n+1) already divides it -- gone for good, so only its point remains, no line.
    'warn' if the very NEXT prime to saturate (p = n+2, when n+2 happens to be prime)
@@ -3878,25 +3910,21 @@ function olConnect(ctx, xy, G, n, lw) {
 // LINE the moment it is caught — there is nothing left for it to connect to — but its point stays,
 // as a red dot, so you can watch the doomed set spread without the plate emptying out.
 function olChain(ctx, xy, G, n, lw) {
-  const pathSafe = new Path2D(), pathWarn = new Path2D();
-  const dieDots = [];
+  // Same rule as the main page's liftDrawChain: only r that stays coprime to M, M+1, ..., M+n
+  // (firstFail finds no break) get a line; it is teal if gcd(r, M+1) = 1, coral if not.
+  // n here is the C(n) depth (openerChainN), not the +-n path's n.
+  const pathLift = new Path2D(), pathDie = new Path2D();
   for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
     if (gcd(r, M) !== 1) continue;
+    if (n > 0 && firstFail(r, M, n, G)[0] !== -1) continue;
     const A = xy(r, M); if (!A) continue;
-    const cls = olClassify(r, n);
-    if (cls === 'dead') { if (OL.broken) dieDots.push(A); continue; }
-    const B = xy(r, M + 1); if (!B) continue;
-    if (cls === 'warn') { if (OL.broken) { pathWarn.moveTo(A[0], A[1]); pathWarn.lineTo(B[0], B[1]); } }
-    else if (OL.surv) { pathSafe.moveTo(A[0], A[1]); pathSafe.lineTo(B[0], B[1]); }
+    const B = xy(r % (M + 1), M + 1); if (!B) continue;
+    const t = gcd(r % (M + 1), M + 1) === 1 ? pathLift : pathDie;
+    t.moveTo(A[0], A[1]); t.lineTo(B[0], B[1]);
   }
   ctx.lineWidth = lw;
-  if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathSafe); }
-  if (OL.broken) {
-    ctx.strokeStyle = 'rgba(224,80,96,.85)'; ctx.stroke(pathWarn);
-    ctx.fillStyle = 'rgba(224,80,96,.7)';
-    const rad = Math.max(0.6, lw * 0.85);
-    for (let i = 0; i < dieDots.length; i++) { const p = dieDots[i]; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, TAU); ctx.fill(); }
-  }
+  if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathLift); }
+  if (OL.broken) { ctx.strokeStyle = 'rgba(224,80,96,.85)'; ctx.stroke(pathDie); }
 }
 // Strip overlay, ported exactly from the main page's drawStripOverlay: the band
 // between two parallel edges r=(s+a*M)/b and r=(s+w+a*M)/b, filled as one
@@ -4145,7 +4173,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.24, 0.6, 1.8) * tk);
   if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.3, 0.7, 2.2) * tk);
   if (m === 'connect') olConnect(ctx, xy, G, n, cl(cell * 0.2, 0.5, 1.4));
-  if (OL.chain) olChain(ctx, xy, G, n, cl(cell * 0.25, 0.4, 1.5) * tk);
+  if (OL.chain) olChain(ctx, xy, G, openerChainN(), cl(cell * 0.25, 0.4, 1.5) * tk);
   // Strip is Grid-only, same as the main page (drawStripOverlay is only ever called
   // from the Grid draw path there too) -- Ring/Cayley's angle/Mobius maps would turn
   // the band's straight edges into something that doesn't read as a "region" at all.
@@ -4179,7 +4207,55 @@ function openerOverlaySoon() {
 }
 function olRedraw() { olSyncUI(); openerOverlaySoon(); }
 function olSetMode(m) { OL.mode = m; olRedraw(); }
+function olStepCN(d) {
+  olStopCNPlay(); if (OL.lockN) olStopNPlay();
+  OL.lockN = false;   // stepping C(n) by hand unlocks it, as on the main page
+  OL.cn = Math.max(0, Math.min(255, openerChainN() + d));
+  olRedraw();
+}
+function olToggleLockN(v) {
+  olStopCNPlay();
+  if (!v) OL.cn = openerChainN();   // unlocking keeps the depth where it is instead of jumping to a stale value
+  OL.lockN = !!v;
+  if (OL.lockN) OL.n = Math.max(0, Math.min(255, OL.cn));   // adopt the C(n) depth on lock, as the main page does
+  olRedraw();
+}
+// Play for the two n's: each runs 0 .. G-1 (read live, so it follows the G slider) and wraps to 0.
+let _olNTimer = 0, _olCNTimer = 0;
+function olSyncNPlayChips() {
+  [['ol-n-play', _olNTimer], ['ol-cn-play', _olCNTimer || (OL.lockN && _olNTimer)]].forEach(([id, on]) => {
+    const b = $(id); if (!b) return;
+    b.innerHTML = on ? '&#9632;' : '&#9654;'; b.classList.toggle('on', !!on);
+  });
+}
+function olStopNPlay() { if (_olNTimer) { clearInterval(_olNTimer); _olNTimer = 0; } olSyncNPlayChips(); }
+function olStopCNPlay() { if (_olCNTimer) { clearInterval(_olCNTimer); _olCNTimer = 0; } olSyncNPlayChips(); }
+function olFixPForN() {
+  if (_olPTimer) { const act = olActivePrimes(); if (act.length && act.indexOf(OL.p) < 0) OL.p = act.find(q => q > OL.p) || act[0]; }
+}
+function olNPlay() {
+  if (_olNTimer) { olStopNPlay(); return; }
+  _olNTimer = setInterval(() => {
+    if (!openerModalOpen()) { olStopNPlay(); return; }
+    const mx = Math.max(0, OPENER_G - 1), cur = openerLiftN();
+    OL.n = cur >= mx ? 0 : cur + 1;
+    olFixPForN(); olRedraw();
+  }, 140);
+  olSyncNPlayChips();
+}
+function olCNPlay() {
+  if (_olCNTimer) { olStopCNPlay(); return; }
+  if (OL.lockN) { olNPlay(); return; }              // locked: one clock moves both n, so just run the shared one
+  _olCNTimer = setInterval(() => {
+    if (!openerModalOpen()) { olStopCNPlay(); return; }
+    const mx = Math.max(0, OPENER_G - 1), cur = openerChainN();
+    OL.cn = cur >= mx ? 0 : cur + 1;
+    olRedraw();
+  }, 140);
+  olSyncNPlayChips();
+}
 function olStepN(d) {
+  olStopNPlay();
   OL.n = Math.max(0, Math.min(255, openerLiftN() + d));
   // while p is playing, a p that n has just saturated jumps at once to the next active prime
   if (_olPTimer) { const act = olActivePrimes(); if (act.length && act.indexOf(OL.p) < 0) OL.p = act.find(q => q > OL.p) || act[0]; }
@@ -4274,6 +4350,51 @@ function olPresetStrip(a, b, s, w) {
   OL.slopeA = a; OL.slopeB = b; OL.offset = s; OL.width = w; OL.stripOn = true;
   const chk = $('ol-strip-chk'); if (chk) chk.checked = true;
   olRedraw();
+}
+/* Named strips for the "What this page adds" note. Each is just a (slope a/b, offset s, width w)
+   setting fed through olPresetStrip, so the steppers, the Strip checkbox and the canvases all follow.
+   Goldbach's offset is N = 2(G+1), which moves with G, so it is a function, not a number. */
+const OL_PRESETS = {
+  diag: { a: 1, b: 1, s: () => 0,              w: 1, t: 'Slope +1, width 1: the single diagonal r \u2212 M = 0.' },
+  n1:   { a: 1, b: 1, s: () => 0,              w: 2, t: 'Slope +1, width 2 (n = 1): a block two wide.' },
+  n2:   { a: 1, b: 1, s: () => 0,              w: 3, t: 'Slope +1, width 3 (n = 2): a block three wide.' },
+  n4:   { a: 1, b: 1, s: () => 0,              w: 5, t: 'Slope +1, width 5 (n = 4): a block five wide.' },
+  gb:   { a: -1, b: 1, s: () => olGoldbachN(), w: 1, t: 'Slope \u22121, width 1, offset N = 2(G+1): the Goldbach anti-diagonal r + M = N.' },
+  half: { a: 1, b: 2, s: () => -1,             w: 2, t: 'Slope 1/2, offset \u22121, width 2: the default strip, shallower than the diagonal.' }
+};
+function olPresetPick(id) {
+  const q = OL_PRESETS[id]; if (!q) return;
+  olPresetStrip(q.a, q.b, q.s(), q.w);
+}
+function olActivePreset() {
+  if (!OL.stripOn) return null;
+  for (const id in OL_PRESETS) {
+    const q = OL_PRESETS[id];
+    if (+OL.slopeA === q.a && +OL.slopeB === q.b && +OL.offset === q.s() && +OL.width === q.w) return id;
+  }
+  return null;
+}
+function olSyncPresets() {
+  const on = olActivePreset();
+  document.querySelectorAll('.ol-preset-btn').forEach(b => b.classList.toggle('on', b.dataset.p === on));
+  document.querySelectorAll('.ol-preset-cap').forEach(c => { c.textContent = on ? OL_PRESETS[on].t : ''; });
+}
+/* Page 2's gap presets (1, 2 twin, 4 cousin, 6 sexy, 8), as strips. Gap g is the diagonal |M - r| = g;
+   the previews plot the r <= M side, so r - M = -g: slope 1/1, offset -g, width 1. The strip walks the
+   pairs (r, r + g), one lattice point per r. One gap at a time here, since the preview carries one strip. */
+const OL_GAP_NAMES = { 1: 'the only odd prime gap, the pair (2, 3)', 2: 'twin primes', 4: 'cousin primes', 6: 'sexy primes', 8: 'gap-8 prime pairs' };
+function olGapPick(g) { olPresetStrip(1, 1, -g, 1); }
+function olActiveGap() {
+  if (!OL.stripOn || +OL.slopeA !== 1 || +OL.slopeB !== 1 || +OL.width !== 1) return null;
+  const g = -(+OL.offset);
+  return OL_GAP_NAMES[g] ? g : null;
+}
+function olSyncGapPresets() {
+  const on = olActiveGap();
+  document.querySelectorAll('.ol-gap-btn').forEach(b => b.classList.toggle('on', on !== null && +b.dataset.g === on));
+  document.querySelectorAll('.ol-gap-cap').forEach(c => {
+    c.textContent = on === null ? '' : 'Gap ' + on + ': ' + OL_GAP_NAMES[on] + '. Slope +1, width 1, offset \u2212' + on + ': the diagonal r \u2212 M = \u2212' + on + ', pairs (r, r+' + on + ').';
+  });
 }
 function olPresetDiag() { olPresetStrip(1, 1, 0, 1); }
 function olPresetAnti() { olPresetStrip(-1, 1, olGoldbachN(), 1); }
@@ -4434,10 +4555,14 @@ function olStripDots(ctx, xy, G, dot) {
 // The header carries D(n) live; the table under "the math" is only rebuilt while it is open.
 function olSyncUI() {
   olSyncLists();
-  const n = openerLiftN(), ZETA2 = Math.PI * Math.PI / 6;
+  olSyncPresets();
+  olSyncGapPresets();
+  const n = openerLiftN(), cn = openerChainN(), ZETA2 = Math.PI * Math.PI / 6;
   document.querySelectorAll('.ol-mode-btn').forEach(b => b.classList.toggle('on', b.dataset.m === OL.mode));
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-  set('ol-n-val', n); set('ol-p-val', OL.p);
+  set('ol-n-val', n); set('ol-cn-val', cn); set('ol-p-val', OL.p);
+  { const lk = $('ol-lockn-chk'); if (lk && lk.checked !== OL.lockN) lk.checked = OL.lockN; }
+  olSyncNPlayChips();
   const p1 = $('ol-p1'); if (p1) p1.classList.toggle('on', OL.p === 1);
   const chk = (id, v) => { const el = $(id); if (el && el.checked !== v) el.checked = v; };
   chk('ol-chain-chk', OL.chain); chk('ol-surv-chk', OL.surv); chk('ol-broken-chk', OL.broken);
@@ -4483,14 +4608,14 @@ function olSyncUI() {
     gbNote.textContent = txt;
   }
   let D = NaN;
-  try { D = Dn(n); } catch (e) {}
+  try { D = Dn(cn); } catch (e) {}
   set('ol-dn-head', isFinite(D) ? D.toFixed(6) : '\u2013');
   const tg = $('ol-math-toggle'), el = $('ol-math');
   if (!el || !tg || tg.classList.contains('collapsed') || !isFinite(D)) return;
-  const sat = (PRIMES || []).filter(q => q <= n + 1);
+  const sat = (PRIMES || []).filter(q => q <= cn + 1);
   const satTxt = !sat.length ? '\u2014 none \u2014' : sat.length > 14 ? sat.slice(0, 14).join(', ') + ', \u2026' : sat.join(', ');
   const rows = [
-    ['n \u2014 lift / block depth', n], ['block length n+1', n + 1], ['spiral prime p', OL.p + (OL.p > OPENER_G ? ' \u2014 off-plate, G < p' : '')],
+    ['n \u2014 \u00b1n path', n], ['n \u2014 C(n) block depth' + (OL.lockN ? ' (locked)' : ''), cn], ['block length n+1', cn + 1], ['spiral prime p', OL.p + (OL.p > OPENER_G ? ' \u2014 off-plate, G < p' : '')],
     ['saturated primes p \u2264 n+1', satTxt], ['count saturated', sat.length],
     ['D(n) \u2014 raw density', D.toFixed(9)], ['C(n) = \u03b6(2)\u00b7D(n)', (D * ZETA2).toFixed(9)],
     ['\u03b6(2) = \u03c0\u00b2/6', ZETA2.toFixed(9)], ['G (preview lattice)', OPENER_G]
@@ -4622,7 +4747,7 @@ function oeSetRatio(r) {
 function oeSummary() {
   const sel = $('cmode'), coloring = (sel && sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : '';
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
-  let lift = 'Lift: ' + modeLabel + ' \u00b7 n=' + openerLiftN() + ' \u00b7 p=' + (OL.allP ? 'all' : OL.p);
+  let lift = 'Lift: ' + modeLabel + ' \u00b7 \u00b1n path n=' + openerLiftN() + ' \u00b7 C(n) n=' + openerChainN() + ' \u00b7 p=' + (OL.allP ? 'all' : OL.p);
   if (OL.mirror) lift += ' \u00b7 mirror on';
   if (OL.dropout) lift += ' \u00b7 dropout on';
   if (OL.chain) lift += ' \u00b7 r\u2192r mod(M+1) on';
@@ -4745,7 +4870,7 @@ function oeLegendSections() {
   const out = [{ title: 'VIEW', items: vi }];
   const modeLabel = { none: 'None', npath: '\u00b1n path', spiral: 'Spiral', both: 'Both', connect: 'Connect' }[OL.mode] || OL.mode;
   if (OL.mode !== 'none' || OL.chain || OL.stripOn || OL.gbOn) {
-    const n = openerLiftN(), li = [{ c: null, t: 'mode ' + modeLabel + ' \u00b7 n = ' + n + ' \u00b7 block length ' + (n + 1) }];
+    const n = openerLiftN(), cn = openerChainN(), li = [{ c: null, t: 'mode ' + modeLabel + ' \u00b7 \u00b1n path n = ' + n + ' \u00b7 C(n) n = ' + cn + ' \u00b7 block length ' + (cn + 1) }];
     if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') {
       li.push({ c: PAL.teal, t: 'spiral r = ' + (OL.allP ? 'p, all primes p \u2264 G' : OL.p === 1 ? '1 (locked residue)' : 'p = ' + OL.p) + ' \u00b7 teal above p/M = 0.5, coral below' });
       if (OL.mirror) li.push({ c: PAL.violet, t: 'mirror \u03c3(r) = M \u2212 r' });
@@ -4756,10 +4881,10 @@ function oeLegendSections() {
     if (OL.mode === 'connect') li.push({ c: PAL.cream3, t: 'connectors joining spiral and \u00b1n path at shared rings' });
     if (OL.mode !== 'none' || OL.chain) li.push({ c: null, t: 'showing ' + ([OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both off)') });
     if (OL.chain) {
-      li.push({ c: PAL.teal, t: 'r \u2192 r mod(M+1) \u00b7 teal survives, red dot dies' });
+      li.push({ c: PAL.teal, t: 'r \u2192 r mod(M+1) \u00b7 only r coprime to M..M+' + cn + ' \u00b7 teal survives, red breaks' });
     }
-    let D = NaN; try { D = Dn(n); } catch (e) {}
-    const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= n + 1) : [];
+    let D = NaN; try { D = Dn(cn); } catch (e) {}
+    const sat = (typeof PRIMES !== 'undefined' && PRIMES) ? PRIMES.filter(q => q <= cn + 1) : [];
     li.push({ c: null, t: 'saturated p \u2264 n+1: ' + (sat.length ? (sat.length > 14 ? sat.slice(0, 14).join(', ') + ', \u2026' : sat.join(', ')) + ' \u00b7 count ' + sat.length : 'none') });
     if (isFinite(D)) {
       li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
@@ -5641,7 +5766,9 @@ function sendOpenerToMainPage() {
   liftSetBroken(OL.broken); { const c = $('lift-broken-chk'); if (c) c.checked = OL.broken; }
   liftSetThick(Math.max(0.2, Math.min(6, (OL.survBrokenThick || 0.5) * 6)));
   liftToggleChain(OL.chain); { const c = $('lift-chain-chk'); if (c) c.checked = OL.chain; }
-  liftSetChainN(openerLiftN());
+  liftLockN = !!OL.lockN;
+  liftNManual = openerLiftN();
+  liftSetChainN(openerChainN());
 
   redraw(true);
 }
@@ -11839,6 +11966,7 @@ function labelText(mode, r, m) {
    the view note says so, rather than the mode appearing broken. */
 let GRID_LABELS_HIDDEN = '';
 function drawGridLabels(ctx, S) {
+  if (typeof MS_LBL !== 'undefined' && MS_LBL && MS_LBL.on) { msLblMain(ctx, S, 'grid'); return; }
   GRID_LABELS_HIDDEN = '';
   const g = COP_G;
   const mode = $('lens-lbl').value;
@@ -11973,6 +12101,7 @@ function drawPinCount(ctx, x, y, fs, k) {
   ctx.lineWidth = fs * LABEL_STROKE;
 }
 function drawRingLabels(ctx, S) {
+  if (typeof MS_LBL !== 'undefined' && MS_LBL && MS_LBL.on) { msLblMain(ctx, S, 'ring'); return; }
   RING_LABELS_HIDDEN = '';
   const g = COP_G;
   const mode = $('lens-lbl').value;
@@ -12019,6 +12148,7 @@ function drawRingLabels(ctx, S) {
 }
 let CAYLEY_LABELS_HIDDEN = '';
 function drawCayleyLabels(ctx, S) {
+  if (typeof MS_LBL !== 'undefined' && MS_LBL && MS_LBL.on) { msLblMain(ctx, S, 'cayley'); return; }
   CAYLEY_LABELS_HIDDEN = '';
   const g = COP_G;
   const mode = $('lens-lbl').value;
@@ -13744,7 +13874,8 @@ async function msRender(doc, theme, opts) {
         const sumA = its.reduce((a, it) => a + it.cv.width / it.cv.height, 0);
         const ph = Math.min(cap, (TW - gp * (its.length - 1)) / sumA);
         const totW = sumA * ph + gp * (its.length - 1);
-        add(ph + 150, (c, y0) => {
+        const lblNote = msLblNote(its);
+        add(ph + 150 + (lblNote ? 44 : 0), (c, y0) => {
           let x = MX + (TW - totW) / 2;
           its.forEach(it => {
             const w = ph * it.cv.width / it.cv.height;
@@ -13757,6 +13888,7 @@ async function msRender(doc, theme, opts) {
           });
           c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
           c.fillText('The plate this sheet accompanies, redrawn from the same parameters.', MX + TW / 2, y0 + 12 + ph + 96);
+          if (lblNote) c.fillText(lblNote, MX + TW / 2, y0 + 12 + ph + 140);
         });
       }
     } else if (b.t === 'gap') { add(b.h || 24, () => {}); }
@@ -14005,14 +14137,47 @@ function msLiftDetail(G, o) {
     }
   }
   if (o.chain && !big) {
-    let ok = 0, dead = 0, satur = 0;
+    // Same rule the plate draws: a coprime cell (r < M) gets a chain line only if it stays coprime
+    // to M, M+1, ..., M+d (d = the C(n) depth); teal if gcd(r, M+1) = 1, coral if not.
+    const d = Math.max(0, o.chainN | 0);
+    let tot = 0, ok = 0, dead = 0;
     for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
       if (gcd(r, M) !== 1) continue;
-      if (gcd(r, M + 1) === 1) ok++; else { dead++; }
+      tot++;
+      if (d > 0 && firstFail(r, M, d, G)[0] !== -1) continue;
+      if (gcd(r, M + 1) === 1) ok++; else dead++;
     }
-    const d = Math.max(0, o.chainN | 0);
+    const kept = ok + dead;
     let offRing = 0; if (G >= 2) for (let r = 1; r < G; r++) if (gcd(r, G) === 1) offRing++;
-    out.push({ t: 'eq', tex: msT`\text{r-chain, one step } r\to r\bmod(M+1):\quad \text{lift survives}=${ok},\quad \text{breaks}=${dead},\quad \text{survive share}=${msf(ok + dead ? ok / (ok + dead) : 0, 4)}`, cap: 'Counted over every coprime cell with r < M on rings 2 \u2026 G\u22121. Ring M = G is left out: its lift lands on ring G+1, off the lattice (' + offRing + ' coprime cells). The r-chain depth gate is n = ' + d + '.' });
+    let Cd = NaN; try { Cd = Dn(d) * Math.PI * Math.PI / 6; } catch (e) {}
+    out.push({ t: 'eq', tex: msT`\text{r-chain, depth } n_C=${d}:\quad \text{coprime cells}=${tot},\quad \text{kept (block-coprime)}=${kept},\quad \text{teal}=${ok},\quad \text{coral}=${dead}`, cap: 'Counted over every coprime cell with r < M on rings 2 \u2026 G\u22121. A cell is kept when gcd(r, M+j) = 1 for every j = 0 \u2026 ' + d + '; teal = its lift to ring M+1 stays coprime, coral = it breaks. For depth 1 or more every kept cell is teal, so coral lines exist only at depth 0. Ring M = G is left out: its lift lands on ring G+1, off the lattice (' + offRing + ' coprime cells).' });
+    if (isFinite(Cd)) out.push({ t: 'eq', tex: msT`\frac{\text{kept}}{\text{coprime}}=\frac{${kept}}{${tot}}=${msf(tot ? kept / tot : 0, 4)}\quad\text{against}\quad C(${d})=\zeta(2)\,D(${d})=${msf(Cd, 4)}`, cap: 'The kept share is the plate\u2019s own measurement of C(n). It tends to C(n) as G grows with the depth fixed; at finite G, and when the depth is a large fraction of G, it differs by sampling and edge effects.' });
+
+    // The ratio as n grows: one pass records each cell's first failing column f (>= 1 since gcd(r, M) = 1),
+    // capped just above the deepest depth listed. A cell is kept at depth n exactly when f > n, so every
+    // depth's count comes from the same histogram, and the kept sets are nested (the ratio never rises).
+    if (tot > 0) {
+      const maxCell = Math.max(1, G - 1);
+      const ds = []; for (let k = 0; k <= Math.min(12, maxCell); k++) ds.push(k);
+      [16, 24, 32, 48, 64, 96, 128].forEach(k => { if (k <= maxCell) ds.push(k); });
+      if (d <= maxCell && ds.indexOf(d) < 0) { ds.push(d); ds.sort((x, y) => x - y); }
+      const top = ds[ds.length - 1], hist = new Array(top + 2).fill(0);
+      for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
+        if (gcd(r, M) !== 1) continue;
+        let f = 1; while (f <= top && gcd(r, M + f) === 1) f++;
+        hist[f]++;                                   // f = first failing j, or top + 1 if none up to top
+      }
+      const rows = []; let above = tot;               // cells with f > n
+      let next = 0;
+      for (let k = 0; k <= top; k++) {
+        while (next <= k) { if (next >= 1) above -= hist[next]; next++; }   // drop cells whose f <= k
+        if (ds.indexOf(k) < 0) continue;
+        let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%' });
+      }
+      out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
+      out.push({ t: 'table', rows: rows });
+    }
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
   return out;
@@ -14054,7 +14219,7 @@ function msBuildOpener(noPlates) {
   const Wx = 4096, Sx = Wx / 1920, gap = 28 * Sx, tileW = (Wx - gap) / 2;
   const S = Math.round(view === 'all3' ? tileW : view === 'cayley' ? Wx / ratio : Wx);
   const sel = $('cmode'), mode = sel.value, label = sel.options[sel.selectedIndex].textContent;
-  const n = openerLiftN();
+  const n = openerLiftN(), cn = openerChainN();
   const viewName = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley', all3: 'Grid · Ring · Cayley' }[view];
   const showGrid = view === 'grid' || view === 'all3', showRing = view === 'ring' || view === 'all3', showCay = view === 'cayley' || view === 'all3';
   const wedge = view !== 'grid' && olIsWedge();
@@ -14072,7 +14237,7 @@ function msBuildOpener(noPlates) {
   if (showCay) P.push(['Cayley ρ₀, ρ_d', msf(OPENER_RHO0, 2) + ', ' + msf(OPENER_RHOD, 2)], ['Cayley zoom κ', msf(OPENER_CZ, 2) + '×']);
   const rots = ['x', 'y', 'z', 'g', 'r'].filter(k => OPENER_ROT[k]).map(k => (k === 'g' ? 'grid ' : k === 'r' ? 'ring ' : k + ' ') + Math.round(OPENER_ROT[k]) + '°');
   P.push(['turns', rots.length ? rots.join(', ') : 'none']);
-  if (liftActive) P.push(['lift mode', OL.mode + ' \u00b7 n = ' + n]);
+  if (liftActive) P.push(['lift mode', OL.mode + ' \u00b7 \u00b1n path n = ' + n + ' \u00b7 C(n) n = ' + cn + (OL.lockN ? ' (locked)' : '')]);
   if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') P.push(['spiral p', OL.allP ? 'all p \u2264 G' : String(OL.p)]);
   if (liftActive) P.push(['showing', [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
   if (OL.stripOn) P.push(['strip a/b', OL.slopeA + '/' + OL.slopeB], ['offset s', String(OL.offset)], ['width w', String(Math.max(1, OL.width))]);
@@ -14137,7 +14302,7 @@ function msBuildOpener(noPlates) {
       L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${OL.allP ? 'p,\\ p\\le G' : OL.p === 1 ? '1' : 'p=' + OL.p}` + (OL.mirror ? msT`,\qquad \sigma(r)=M-r` : '') + (OL.dropout ? msT`,\qquad \text{dropout ring }M=p` : '') });
     }
     if (OL.mode === 'npath' || OL.mode === 'both' || OL.mode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
-    if (OL.chain) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)}` });
+    if (OL.chain) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)},\qquad n_C=${cn}` });
     if (OL.stripOn) {
       L.push({ t: 'p', text: 'Strip overlay: the band of cells whose v = b·r − a·M falls in [s, s+w), with slope a/b = ' + OL.slopeA + '/' + OL.slopeB + ', offset s = ' + OL.offset + ', width w = ' + Math.max(1, OL.width) + '.' });
       msStripLines(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width)).forEach(b => L.push(b));
@@ -14146,8 +14311,8 @@ function msBuildOpener(noPlates) {
         L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}` });
       } catch (e) {}
     }
-    msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: n, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
-    msBlockSection(n, L).forEach(b => doc.push(b));
+    msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: cn, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
+    msBlockSection(cn, L).forEach(b => doc.push(b));
     if (OL.gbOn) {
       doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG).forEach(b => doc.push(b));
       try {
@@ -14445,8 +14610,8 @@ function msDocToHtml(doc) {
       b.items.forEach(it => { h += '<span class="mp-key-item"><i style="background:' + it.rgb + '"></i>' + msEsc(it.lab) + '</span>'; });
       h += '</div>';
     } else if (b.t === 'plate') {
-      h += '<div class="mp-plates">' + b.items.map(it => '<figure class="mp-plate ' + it.cls + '"><img alt="' + msEsc(it.label) + ' view of the plate" src="' + it.cv.toDataURL('image/jpeg', 0.88) + '"><figcaption>' + msEsc(it.label) + '</figcaption></figure>').join('') +
-        '</div><div class="mp-cap">The plate this sheet accompanies, redrawn here from the same parameters.</div>';
+      h += '<div class="mp-plates">' + b.items.map(it => '<figure class="mp-plate ' + it.cls + '"><img alt="' + msEsc(it.label) + ' view of the plate" src="' + it.cv.toDataURL('image/jpeg', 0.94) + '"><figcaption>' + msEsc(it.label) + '</figcaption></figure>').join('') +
+        '</div><div class="mp-cap">The plate this sheet accompanies, redrawn here from the same parameters.' + (msLblNote(b.items) ? '<br>' + msEsc(msLblNote(b.items)) : '') + '</div>';
     } else if (b.t === 'gap') {
       h += '<div style="height:' + (b.h || 24) + 'px"></div>';
     }
@@ -14481,6 +14646,114 @@ function msPlateShot(w, h, paint) {
   try { paint(ctx); } finally { ctx.restore(); }
   return cv;
 }
+/* ── M LABELS ON THE MATH-SHEET PLATES ───────────────────────────────────────
+   Every point on a sheet plate is labelled with its M, in the same plate pixels the sheet is
+   cut from, so the preview, the PNG pages and the PDF all show the same labels. Rules:
+     1. Labels are set in screen space (the plate's own pixels), so they are always upright
+        whatever the Grid/Ring turn or the Cayley tilt is.
+     2. One font size for the whole plate: the largest in [floor, want] at which EVERY label
+        has its own box and no two boxes touch. Boxes use the measured advance plus the halo.
+     3. If even the floor size cannot hold every label, the rest are dropped, never overprinted:
+        coprime cells (gcd(r,M) = 1) are placed first, then smaller M, then smaller r. How many
+        were shown is recorded and printed under the plate, so a thinned plate says so.
+     4. A label whose box would cross the plate edge is dropped rather than clipped.
+   Past MS_LBL_MAXG there is no size at which this reads, so the plate is left unlabelled. */
+const MS_LBL_MAXG = 40;
+function msLblPlace(ctx, items, side) {
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  items = items.filter(it => it.x >= 0 && it.x <= W && it.y >= 0 && it.y <= H);
+  items.sort((a, b) => (a.co ? 0 : 1) - (b.co ? 0 : 1) || a.M - b.M || a.r - b.r);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  const probe = 100;
+  ctx.font = probe + 'px "JetBrains Mono",monospace';
+  const emW = Math.max(0.05, ctx.measureText('0').width / probe);
+  const want = side * 0.04, floor = side * 0.019, pad = 2, edge = 1;
+  const attempt = fs => {
+    const hh = fs * (LABEL_CAPH + LABEL_STROKE) + pad;
+    const cs = Math.max(hh, fs * emW * 3 + fs * LABEL_STROKE + pad);   // hash cell: any box spans at most 2 cells a side
+    const buckets = new Map(), out = [];
+    items.forEach(it => {
+      const ww = fs * emW * it.t.length + fs * LABEL_STROKE + pad;
+      const x0 = it.x - ww / 2, x1 = it.x + ww / 2, y0 = it.y - hh / 2, y1 = it.y + hh / 2;
+      if (x0 < edge || y0 < edge || x1 > W - edge || y1 > H - edge) return;
+      const gx0 = Math.floor(x0 / cs), gx1 = Math.floor(x1 / cs), gy0 = Math.floor(y0 / cs), gy1 = Math.floor(y1 / cs);
+      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
+        const b = buckets.get(gx + ',' + gy);
+        if (b) for (let k = 0; k < b.length; k++) if (x0 < b[k].x1 && x1 > b[k].x0 && y0 < b[k].y1 && y1 > b[k].y0) return;
+      }
+      const box = { x0: x0, x1: x1, y0: y0, y1: y1, it: it };
+      out.push(box);
+      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
+        const key = gx + ',' + gy; if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(box);
+      }
+    });
+    return out;
+  };
+  let placed = null, fs = floor;
+  for (let i = 0; i <= 16 && !placed; i++) {
+    const f = want + (floor - want) * i / 16, p = attempt(f);
+    if (p.length === items.length) { placed = p; fs = f; }
+  }
+  if (!placed) { fs = floor; placed = attempt(fs); }
+  ctx.font = fs + 'px "JetBrains Mono",monospace';
+  ctx.lineWidth = fs * LABEL_STROKE;
+  placed.forEach(b => {
+    ctx.strokeStyle = 'rgba(4,4,13,.94)'; ctx.strokeText(b.it.t, b.it.x, b.it.y);
+    ctx.fillStyle = b.it.co ? 'rgba(236,200,100,1)' : 'rgba(238,232,220,.96)'; ctx.fillText(b.it.t, b.it.x, b.it.y);
+  });
+  ctx.restore();
+  return { shown: placed.length, total: items.length, fs: fs };
+}
+/* The line under the plates: says what the numbers are, and says so if any were left off. */
+function msLblNote(items) {
+  const L = items.filter(it => it.total > 0);
+  if (!L.length) return '';
+  const cut = L.filter(it => it.shown < it.total);
+  return 'Each point is labelled with its M.' + (cut.length
+    ? ' Where points crowd, some labels are left off so none overlap (' + cut.map(it => it.label + ' ' + it.shown + ' of ' + it.total).join(', ') + ').'
+    : '');
+}
+function msLblXf(m, x, y) { return [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]; }
+function msLblOpener(ctx, xy, pts) {
+  MS_LBL.stats = null;
+  if (OPENER_G > MS_LBL_MAXG) return;
+  const m = ctx.getTransform(), items = [];
+  for (let i = 0; i < pts.length; i++) {
+    const r = pts[i][0], M = pts[i][1], q = xy(r, M); if (!q) continue;
+    const s = msLblXf(m, q[0], q[1]);
+    items.push({ x: s[0], y: s[1], t: '' + M, r: r, M: M, co: gcd(r, M) === 1 });
+  }
+  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height));
+}
+function msLblMain(ctx, S, kind) {
+  MS_LBL.stats = null;
+  const g = COP_G; if (g > MS_LBL_MAXG) return;
+  const m = ctx.getTransform(), items = [], cell = S / g;
+  for (let M = 1; M <= g; M++) {
+    for (let r = 1; r <= g; r++) {
+      if (kind !== 'grid' && thetaMode === 'clamp' && r > M) continue;   // clamp pins r > M onto the r = M point
+      if (sectorVis(r, M) <= 0) continue;
+      const q = kind === 'grid' ? [(r - 0.5) * cell, (M - 0.5) * cell]
+              : kind === 'ring' ? ringPt(ringRad(M, S), ringRot + thetaOf(r, M), S)
+              : cayleyXY(r, M, S);
+      if (!q) continue;
+      const s = msLblXf(m, q[0], q[1]);
+      items.push({ x: s[0], y: s[1], t: '' + M, r: r, M: M, co: gcd(r, M) === 1 });
+    }
+  }
+  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height));
+}
+/* Draws one plate with M labels on, and reports how many of its points got one. */
+function msLabelledShot(w, h, paint) {
+  MS_LBL.on = true; MS_LBL.stats = null;
+  let cv, st = null;
+  try { cv = msPlateShot(w, h, paint); st = MS_LBL.stats; } finally { MS_LBL.on = false; MS_LBL.stats = null; }
+  return { cv: cv, shown: st ? st.shown : 0, total: st ? st.total : 0 };
+}
 function msOpenerPlateImages() {
   if (!_openerSq || !_openerPts) return [];
   const view = OE.view, S = 900;
@@ -14490,8 +14763,8 @@ function msOpenerPlateImages() {
   return vs.map(v => {
     const wideCay = v === 'cayley';   // math-sheet plates always show Cayley at 2:1, alone or beside Grid and Ring
     const w = wideCay ? S * 2 : S, h = S;
-    const cv = msPlateShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
-    return { label: names[v], cv: cv, cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
+    const sh = msLabelledShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
+    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
   });
 }
 function msMainPlateImages(views) {
@@ -14503,8 +14776,8 @@ function msMainPlateImages(views) {
       viewMode = v;
       labelScale = LS[v] !== undefined ? LS[v] : lsWas;
       viewQuarter = VQ[v] !== undefined ? VQ[v] : vqWas;
-      const cv = msPlateShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side));
-      out.push({ label: names[v] || v, cv: cv, cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
+      const sh = msLabelledShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side));
+      out.push({ label: names[v] || v, cv: sh.cv, shown: sh.shown, total: sh.total, cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
     });
   } finally { viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
   return out;
