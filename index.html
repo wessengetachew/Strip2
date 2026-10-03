@@ -201,8 +201,8 @@ table.mp-table td.pct{text-align:right;color:#6b6558;white-space:nowrap;}
 .mp-plate{margin:0;}
 .mp-plate img{display:block;width:100%;height:auto;border-radius:5px;border:1px solid rgba(0,0,0,.28);background:#04040d;}
 .mp-plate figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#a3833a;margin-top:5px;text-align:center;}
-.mp-plate.solo{grid-column:1 / -1;max-width:520px;margin:0 auto;width:100%;}
-.mp-plate.wide{grid-column:1 / -1;max-width:720px;margin:0 auto;width:100%;}
+.mp-plate.solo{grid-column:1 / -1;max-width:640px;margin:0 auto;width:100%;}
+.mp-plate.wide{grid-column:1 / -1;max-width:none;margin:0 auto;width:100%;}
 .mp-plate.cay{grid-column:1 / -1;width:calc(50% - 6px);margin:0 auto;}
 .chip.ms-prev-btn{border-color:var(--gold);color:var(--gold);background:var(--gold2);font-weight:600;font-size:11px;padding:5px 12px;
   animation:mspGlow 2.8s ease-in-out infinite;}
@@ -13753,13 +13753,15 @@ async function msRender(doc, theme, opts) {
     return lines;
   };
   const items = []; let y = 250, eqNo = 0, secNo = 0, curT = '';
-  const add = (h, draw) => { items.push({ y: y, h: h, draw: draw, t: curT }); y += h; };
+  const add = (h, draw) => { items.push({ y: y, h: h, draw: draw, t: curT, sec: secNo }); y += h; };
+  let plateB = null, plateItem = null;   // the plate block is laid out after the rest of page 1 is measured
   doc.forEach(b => {
     curT = b.t;
     if (b.t === 'title') {
       const tf = '500 88px ' + DISP, tl = wrap(b.title, tf, TW), sf = 'italic 300 42px ' + SERIF, sl = wrap(b.sub || '', sf, TW - 200);
       const h = 60 + tl.length * 106 + 20 + sl.length * 62 + 44 + 60;
-      add(h, (c, y0) => {
+      add(h - 50, (c, y0) => {
+        c.translate(0, -50);   // drawn 50px higher; the item is 50px shorter to match
         c.textAlign = 'center'; c.textBaseline = 'alphabetic';
         c.fillStyle = th.acc; c.font = '26px ' + MONO; c.fillText(msSpaced(b.eyebrow), W / 2, y0 + 20);
         c.fillStyle = th.ink; c.font = tf; tl.forEach((l, i) => c.fillText(l, W / 2, y0 + 130 + i * 106));
@@ -13771,7 +13773,7 @@ async function msRender(doc, theme, opts) {
       });
     } else if (b.t === 'abs') {
       const f = 'italic 400 ' + (BODY - 2) + 'px ' + SERIF, ls = wrap(b.text, f, TW - 260), lh = (BODY - 2) * LH;
-      const h = 70 + ls.length * lh + 50;
+      const h = 70 + ls.length * lh + 36;
       add(h, (c, y0) => {
         c.textAlign = 'center'; c.textBaseline = 'alphabetic';
         c.fillStyle = th.acc; c.font = '22px ' + MONO; c.fillText(msSpaced('abstract'), W / 2, y0 + 34);
@@ -13781,7 +13783,7 @@ async function msRender(doc, theme, opts) {
     } else if (b.t === 'h') {
       const sn = ++secNo;
       const f = '500 50px ' + DISP;
-      add(150, (c, y0) => {
+      add(132, (c, y0) => {
         c.textAlign = 'left'; c.textBaseline = 'alphabetic';
         c.fillStyle = th.acc; c.font = '26px ' + MONO; c.fillText('§ ' + sn, MX, y0 + 78);
         c.fillStyle = th.ink; c.font = f; c.fillText(b.text, MX + 96, y0 + 82);
@@ -13867,32 +13869,55 @@ async function msRender(doc, theme, opts) {
         });
       });
     } else if (b.t === 'plate') {
-      // The canvases side by side in one row, each at its own aspect, all at the same height: three
-      // squares for Grid/Ring/Cayley, or two squares and a 2:1 Cayley. Capped so a lone tile stays modest.
-      const its = b.items.filter(it => it.cv), gp = 28, cap = 780;
-      if (its.length) {
-        const sumA = its.reduce((a, it) => a + it.cv.width / it.cv.height, 0);
-        const ph = Math.min(cap, (TW - gp * (its.length - 1)) / sumA);
-        const totW = sumA * ph + gp * (its.length - 1);
-        const lblNote = msLblNote(its);
-        add(ph + 150 + (lblNote ? 44 : 0), (c, y0) => {
-          let x = MX + (TW - totW) / 2;
-          its.forEach(it => {
-            const w = ph * it.cv.width / it.cv.height;
-            c.imageSmoothingQuality = 'high';
-            c.drawImage(it.cv, x, y0 + 12, w, ph);
-            c.strokeStyle = th.edge; c.lineWidth = 2; c.strokeRect(x, y0 + 12, w, ph);
-            c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.fillStyle = th.acc; c.font = '22px ' + MONO;
-            c.fillText(msSpaced(it.label), x + w / 2, y0 + 12 + ph + 42);
-            x += w + gp;
-          });
-          c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
-          c.fillText('The plate this sheet accompanies, redrawn from the same parameters.', MX + TW / 2, y0 + 12 + ph + 96);
-          if (lblNote) c.fillText(lblNote, MX + TW / 2, y0 + 12 + ph + 140);
-        });
-      }
+      plateB = b; plateItem = { y: y, h: 0, draw: () => {}, t: curT, sec: secNo }; items.push(plateItem);
     } else if (b.t === 'gap') { add(b.h || 24, () => {}); }
   });
+  if (plateItem) {
+    // Grid and Ring side by side on top, Cayley (2:1) below at the same overall width. The tiles are
+    // sized to what page 1 has left once the title, abstract, section 1 and section 2 are in, so the
+    // plate is as large as that page allows without pushing either section onto page 2.
+    const its = plateB.items.filter(it => it.cv);
+    if (its.length) {
+      const gp = 28, labH = 40, rgap = 18, lblNote = msLblNote(its);
+      const cay = its.filter(it => it.label === 'Cayley'), top = its.filter(it => it.label !== 'Cayley');
+      const rows = (top.length && cay.length) ? [top, cay] : [its];
+      const asp = r => r.reduce((a, it) => a + it.cv.width / it.cv.height, 0);
+      const rowW = (r, h) => h * asp(r) + gp * (r.length - 1);
+      const capH = r => (TW - gp * (r.length - 1)) / asp(r);
+      const used1 = items.reduce((a, it) => a + (it !== plateItem && it.sec <= 2 ? it.h : 0), 0);
+      const tail = 54 + (lblNote ? 44 : 0), overhead = 12 + rows.length * labH + (rows.length - 1) * rgap + tail + 8;
+      const avail = (MS.minH - 500) - used1 - 8 - overhead;
+      let hs;
+      if (rows.length === 1) hs = [Math.max(280, Math.min(capH(rows[0]), avail, 900))];
+      else {
+        const a1 = asp(rows[0]), a2 = asp(rows[1]), wide = rows[1].length === 1 && a2 >= 1.5;
+        let h1 = wide ? (avail - gp * (rows[0].length - 1) / a2) / (1 + a1 / a2) : avail / 2;
+        h1 = Math.max(260, Math.min(h1, capH(rows[0]), 900));
+        hs = [h1, wide ? Math.min(rowW(rows[0], h1) / a2, capH(rows[1])) : h1];
+      }
+      plateItem.h = Math.round(12 + hs.reduce((a, v) => a + v, 0) + rows.length * labH + (rows.length - 1) * rgap + tail + 8);
+      plateItem.draw = (c, y0) => {
+        let yy = y0 + 12;
+        rows.forEach((r, ri) => {
+          const h = hs[ri]; let x = MX + (TW - rowW(r, h)) / 2;
+          r.forEach(it => {
+            const w = h * it.cv.width / it.cv.height;
+            c.imageSmoothingQuality = 'high';
+            c.drawImage(it.cv, x, yy, w, h);
+            c.strokeStyle = th.edge; c.lineWidth = 2; c.strokeRect(x, yy, w, h);
+            c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.fillStyle = th.acc; c.font = '22px ' + MONO;
+            c.fillText(msSpaced(it.label), x + w / 2, yy + h + 30);
+            x += w + gp;
+          });
+          yy += h + labH + (ri < rows.length - 1 ? rgap : 0);
+        });
+        c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
+        c.fillText('The plate this sheet accompanies, redrawn from the same parameters.', MX + TW / 2, yy + 30);
+        if (lblNote) c.fillText(lblNote, MX + TW / 2, yy + 74);
+      };
+    }
+    { let yy = 250; items.forEach(it => { it.y = yy; yy += it.h; }); y = yy; }
+  }
   if (opts && opts.pages) {
     // Paged: the same items, cut onto A4-proportioned pages (2480 x 3508) at item boundaries, so an
     // equation, table or paragraph is never sliced. A heading is kept with the item that follows it.
@@ -13908,6 +13933,7 @@ async function msRender(doc, theme, opts) {
       const chunks = [];
       items.forEach(it => { if (it.t === 'h' || !chunks.length) chunks.push([]); chunks[chunks.length - 1].push(it); });
       chunks.forEach(ch => {
+        if (ch[0].sec === 3 && ch[0].t === 'h' && py > TOP) newPage();   // page 1 = title, plate, sections 1 and 2 only
         const tot = ch.reduce((a, it) => a + it.h, 0);
         if (py + tot <= BOT) { ch.forEach(place); return; }
         if (py > TOP && BOT - py < SLACK && tot <= FULL) newPage();
@@ -13927,7 +13953,7 @@ async function msRender(doc, theme, opts) {
       items.forEach((it, i) => {
         let need = it.h;
         if (it.t === 'h' && items[i + 1]) need += items[i + 1].h;
-        if (py + need > BOT && py > TOP) { groups.push([]); py = TOP; }
+        if ((py + need > BOT || (it.t === 'h' && it.sec === 3)) && py > TOP) { groups.push([]); py = TOP; }
         groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
       });
     }
@@ -14659,7 +14685,8 @@ function msPlateShot(w, h, paint) {
      4. A label whose box would cross the plate edge is dropped rather than clipped.
    Past MS_LBL_MAXG there is no size at which this reads, so the plate is left unlabelled. */
 const MS_LBL_MAXG = 40;
-function msLblPlace(ctx, items, side) {
+function msLblPlace(ctx, items, side, scale) {
+  scale = scale > 0 ? scale : 1;   // the opener's label-size slider; main-page plates pass nothing
   const W = ctx.canvas.width, H = ctx.canvas.height;
   items = items.filter(it => it.x >= 0 && it.x <= W && it.y >= 0 && it.y <= H);
   items.sort((a, b) => (a.co ? 0 : 1) - (b.co ? 0 : 1) || a.M - b.M || a.r - b.r);
@@ -14670,7 +14697,7 @@ function msLblPlace(ctx, items, side) {
   const probe = 100;
   ctx.font = probe + 'px "JetBrains Mono",monospace';
   const emW = Math.max(0.05, ctx.measureText('0').width / probe);
-  const want = side * 0.04, floor = side * 0.019, pad = 2, edge = 1;
+  const want = side * 0.04 * scale, floor = side * 0.019 * scale, pad = 2, edge = 1;
   const attempt = fs => {
     const hh = fs * (LABEL_CAPH + LABEL_STROKE) + pad;
     const cs = Math.max(hh, fs * emW * 3 + fs * LABEL_STROKE + pad);   // hash cell: any box spans at most 2 cells a side
@@ -14711,23 +14738,23 @@ function msLblPlace(ctx, items, side) {
 /* The line under the plates: says what the numbers are, and says so if any were left off. */
 function msLblNote(items) {
   const L = items.filter(it => it.total > 0);
-  if (!L.length) return '';
+  if (!L.length) return (items[0] && items[0].tooBig) ? 'Point labels are not drawn on a sheet plate past G = ' + MS_LBL_MAXG + '.' : '';
   const cut = L.filter(it => it.shown < it.total);
-  return 'Each point is labelled with its M.' + (cut.length
+  return 'Each point is labelled with ' + (L[0].what || 'its M') + '; gold marks a coprime cell.' + (cut.length
     ? ' Where points crowd, some labels are left off so none overlap (' + cut.map(it => it.label + ' ' + it.shown + ' of ' + it.total).join(', ') + ').'
     : '');
 }
 function msLblXf(m, x, y) { return [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]; }
 function msLblOpener(ctx, xy, pts) {
   MS_LBL.stats = null;
-  if (OPENER_G > MS_LBL_MAXG) return;
+  if (OPENER_LABEL_MODE === 'off' || OPENER_G > MS_LBL_MAXG) return;   // the opener's own label setting rules
   const m = ctx.getTransform(), items = [];
   for (let i = 0; i < pts.length; i++) {
     const r = pts[i][0], M = pts[i][1], q = xy(r, M); if (!q) continue;
     const s = msLblXf(m, q[0], q[1]);
-    items.push({ x: s[0], y: s[1], t: '' + M, r: r, M: M, co: gcd(r, M) === 1 });
+    items.push({ x: s[0], y: s[1], t: openerLabelText(OPENER_LABEL_MODE, r, M), r: r, M: M, co: gcd(r, M) === 1 });
   }
-  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height));
+  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height), OL.lblScale || 1);
 }
 function msLblMain(ctx, S, kind) {
   MS_LBL.stats = null;
@@ -14764,8 +14791,11 @@ function msOpenerPlateImages() {
     const wideCay = v === 'cayley';   // math-sheet plates always show Cayley at 2:1, alone or beside Grid and Ring
     const w = wideCay ? S * 2 : S, h = S;
     const sh = msLabelledShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
-    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
+    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, what: msOpenerLblWhat(), tooBig: OPENER_LABEL_MODE !== 'off' && OPENER_G > MS_LBL_MAXG, cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
   });
+}
+function msOpenerLblWhat() {
+  return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', gcd: 'its gcd(r, M)' }[OPENER_LABEL_MODE] || 'its M';
 }
 function msMainPlateImages(views) {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = 900, out = [];
