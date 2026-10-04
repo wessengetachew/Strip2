@@ -2003,13 +2003,16 @@ walk anyway.</p>
         <button class="chip tl" id="ol-cn-play" onclick="olCNPlay()" title="Step the C(n) depth from 0 up to G&minus;1, then loop back to 0. While locked it moves both n together.">&#9654;</button>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;margin-left:4px;" title="Lock the C(n) depth to the &plusmn;n path n, so one stepper moves both."><input type="checkbox" id="ol-lockn-chk" onchange="olToggleLockN(this.checked)"> &#128279; lock</label>
         <span class="lbl" style="margin-left:6px;" title="The spiral's prime">p</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepP(-1)" title="Previous prime">&#9664;</button><span class="val" id="ol-p-val">2</span><button class="sbtn" onclick="olStepP(1)" title="Next prime">&#9654;</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olStepP(-1)" title="Previous prime">&#9664;</button><span class="val" id="ol-p-val">1</span><button class="sbtn" onclick="olStepP(1)" title="Next prime">&#9654;</button></div>
         <button class="chip" id="ol-p1" onclick="olLockOne()" title="Lock to residue 1: r = 1 across every ring M. gcd(1, M) = 1 always, so this line never breaks. Stepping &#9664; from p = 2 lands here too.">1</button>
         <button class="chip tl" id="ol-p-play" onclick="olTogglePPlay()" title="Step p through every prime up to the preview G, on loop. The range follows the G slider live.">&#9654; Play</button>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the plate and every other overlay so the spiral of p reads clearly while p plays. Slide to 0 to turn it off."><input type="checkbox" id="ol-pdim-chk" onchange="olTogglePDim(this.checked)"> Dim</label>
+        <input type="range" id="ol-pdim-amt" min="0" max="100" step="1" value="0" oninput="olSetPDimAmt(this.value)" style="max-width:100px;" title="Prime dim amount, 0–100%. 0 is off.">
+        <span class="val" id="ol-pdim-amt-v">0%</span>
       </div>
       <div class="prow">
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.75);cursor:pointer;font-size:11.5px;" title="Overlay the spiral of every prime p &le; G at once. Denser, and slower, on big previews."><input type="checkbox" id="ol-allp-chk" onchange="olToggleAllP(this.checked)"> All p</label>
-        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(155,127,232,.9);cursor:pointer;font-size:11.5px;" title="Mirror conjugate &sigma;(r) = M &minus; r, drawn alongside the spiral."><input type="checkbox" id="ol-mirror-chk" onchange="olToggleMirror(this.checked)"> Mirror &sigma;(r)=M&minus;r</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(155,127,232,.9);cursor:pointer;font-size:11.5px;" title="Mirror conjugate &sigma;(r) = M &minus; r, drawn alongside the spiral."><input type="checkbox" id="ol-mirror-chk" checked onchange="olToggleMirror(this.checked)"> Mirror &sigma;(r)=M&minus;r</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.9);cursor:pointer;font-size:11.5px;" title="Highlight the dropout ring M=p, where the residue vanishes."><input type="checkbox" id="ol-dropout-chk" onchange="olToggleDropout(this.checked)"> Dropout M=p</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.7);cursor:pointer;font-size:11.5px;" title="Label the dropout ring with p=&hellip;"><input type="checkbox" id="ol-dropoutlbl-chk" onchange="olToggleDropoutLbl(this.checked)"> p lbl</label>
       </div>
@@ -2033,12 +2036,12 @@ walk anyway.</p>
         <span class="lbl">/ b</span>
         <div class="stepper"><button class="sbtn" onclick="olStepSlopeB(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sl-b" type="number" min="1" step="1" value="2" onchange="olSetSlopeB(this.value)" style="width:38px;"><button class="sbtn" onclick="olStepSlopeB(1)" title="+1">+</button></div>
         <span class="lbl">offset</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="-1" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olStepOffset(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-off" type="number" step="1" value="0" onchange="olSetOffset(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepOffset(1)" title="+1">+</button></div>
         <button class="chip" onclick="olResetOffset()" title="Back to s = 0.">reset s=0</button>
         <button class="chip" onclick="olPresetDiag()" title="Main diagonal: slope 1/1, offset 0, width 1 (r &minus; M = 0).">diagonal</button>
         <button class="chip" onclick="olPresetAnti()" title="Goldbach anti-diagonal: slope &minus;1/1, width 1, offset s = N = 2(G+1), so the band is r + M = N.">anti-diagonal</button>
         <span class="lbl">width</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="2" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="1" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
         <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
         <button class="chip" onclick="olFullWidth()" title="Widen the band to cover the whole lattice.">full width</button>
         <span class="hint" id="ol-strip-note">&mdash;</span>
@@ -2052,6 +2055,7 @@ walk anyway.</p>
         <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
         <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
         <button class="chip" id="ol-gb-dir" onclick="olToggleGbDir()" title="Direction Play Goldbach pairs walks: forward (small g to large) or backward.">dir: &#9654;</button>
+        <button class="chip" id="ol-gb-all-btn" onclick="olToggleGbAll()" title="Draw the four strips of EVERY Goldbach pair of N at once. The pair you are on stays brightest; the rest are drawn softer underneath.">all at once</button>
         <button class="chip" id="ol-gb-list-btn" onclick="olToggleGbList()" title="Show every Goldbach pair of N as a list. Click one to draw it on the plate.">all pairs &#9662;</button>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the base plate and every other overlay above, so the Goldbach pair reads clearly instead of getting lost under the spiral, chain, mirror etc. all lit up at once."><input type="checkbox" id="ol-gbdim-chk" onchange="olToggleGbDim(this.checked)"> Dim backdrop</label>
         <input type="range" id="ol-gbdim-amt" min="0" max="100" step="1" value="50" oninput="olSetGbDimAmt(this.value)" style="max-width:100px;" title="Dim amount, 0–100%. Starts at 50% when Dim backdrop is switched on.">
@@ -3745,10 +3749,10 @@ function setOpenerG(v) {
    lift survives and coral where it breaks. Preview only, like G and the
    Cayley tilt: it doesn't touch the Lift panel on the page. Connect and the
    chain are on by default. */
-const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 2, chain: true, surv: true, broken: true,
-             allP: false, mirror: false, dropout: false, dropoutLbl: false,
-             stripOn: true, slopeA: 1, slopeB: 2, offset: -1, width: 2,
-             gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
+const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
+             allP: false, mirror: true, dropout: false, dropoutLbl: false,
+             stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
+             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: false };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4120,7 +4124,21 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
   const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
   ctx.save();
   if (OL.gbSpot && viewKind && viewKind !== 'grid' && cw && ch) olGbSpotlight(ctx, xy, G, g, s, cw, ch);
-  for (const d of olGoldbachDescriptors(g, s, G)) {
+  const gapsAll = (OL.gbAll && !(MS_ISO.on && MS_ISO.noStrips)) ? olGoldbachPairs().filter(q => q !== g) : [];
+  if (gapsAll.length) {   // every other pair first, softer; the pair on show is then drawn over them at full strength
+    ctx.save(); ctx.globalAlpha = 0.5;
+    for (const q of gapsAll) for (const d of olGoldbachDescriptors(q, N - q, G)) {
+      ctx.fillStyle = d.rgb;
+      for (let r = d.rLo; r <= d.rHi; r++) {
+        const M = d.sign * r + d.c;
+        if (M < 1 || M > G || gcd(r, M) !== 1) continue;
+        const pt = xy(r, M); if (!pt) continue;
+        ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 0.8, 0, TAU); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+  for (const d of ((MS_ISO.on && MS_ISO.noStrips) ? [] : olGoldbachDescriptors(g, s, G))) {
     ctx.fillStyle = d.rgb;
     for (let r = d.rLo; r <= d.rHi; r++) {
       const M = d.sign * r + d.c;
@@ -4131,7 +4149,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
   }
   // Trail: every Goldbach pair's marker (g', N - g') joined in order of g', so the whole
   // dynamic is visible at once; the current pair is drawn brighter on top of it.
-  if (OL.gbTrail) {
+  if (OL.gbTrail && !(MS_ISO.on && MS_ISO.noMarker)) {
     const pairs = olGoldbachPairs(), pts = [];
     for (const q of pairs) { const m = olGbMarker(q, N - q), pt = xy(m[0], m[1]); pts.push(pt && isFinite(pt[0]) && isFinite(pt[1]) ? pt : null); }
     ctx.strokeStyle = 'rgba(242,200,96,.35)'; ctx.lineWidth = Math.max(0.8, dot * 0.55); ctx.lineJoin = 'round';
@@ -4144,7 +4162,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
   // Dark halo first so the gold marker still pops against a bright cell even
   // with the Dim option off and every other overlay lit up underneath it.
   const mk = olGbMarker(g, s), pt = xy(mk[0], mk[1]);
-  if (pt && isFinite(pt[0]) && isFinite(pt[1])) {
+  if (!(MS_ISO.on && MS_ISO.noMarker) && pt && isFinite(pt[0]) && isFinite(pt[1])) {
     ctx.fillStyle = 'rgba(4,4,13,.75)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 2.4, 0, TAU); ctx.fill();
     ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.4, 0, TAU); ctx.fill();
     ctx.strokeStyle = 'rgba(242,200,96,.9)'; ctx.lineWidth = Math.max(1, dot * 0.35);
@@ -4176,10 +4194,17 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
 function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
   if (m === 'none' && !OL.chain && !OL.stripOn && !OL.gbOn) return;
+  if (MS_ISO.on && MS_ISO.hideBase) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); }
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));   // line and dot sizes follow the cell, so G = 256 doesn't turn to felt
   const tk = Math.max(0.04, OL.survBrokenThick * 2);      // thickness slider: 0.5 default = unchanged size, 0..1 = 0x..2x
   ctx.save();
-  if (m === 'spiral' || m === 'both' || m === 'connect') olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.24, 0.6, 1.8) * tk);
+  const spOn = m === 'spiral' || m === 'both' || m === 'connect';
+  const pdA = (OL.pDim && spOn && !MS_ISO.on) ? Math.max(0, Math.min(1, (OL.pDimAmt != null ? OL.pDimAmt : 50) / 100)) : 0;
+  const spiralNow = () => olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.24, 0.6, 1.8) * tk);
+  if (pdA > 0) {   // prime dim: wash the plate, draw the other overlays faded, then the spiral on top at full strength
+    ctx.fillStyle = 'rgba(4,4,13,' + pdA + ')'; ctx.fillRect(0, 0, cw || S, ch || S);
+    ctx.globalAlpha = 1 - pdA * 0.85;
+  } else if (spOn) spiralNow();
   if (m === 'npath' || m === 'both' || m === 'connect') olNPath(ctx, xy, G, n, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.3, 0.7, 2.2) * tk);
   if (m === 'connect') olConnect(ctx, xy, G, n, cl(cell * 0.2, 0.5, 1.4));
   if (OL.chain) olChain(ctx, xy, G, openerChainN(), cl(cell * 0.25, 0.4, 1.5) * tk);
@@ -4191,6 +4216,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   // spiral-shaped region there instead of the straight one Grid draws, which
   // is the honest result of the same math under those views' own coordinates.
   if (OL.stripOn) { olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12)); if (OL.stripDots || OL.stripPick) olStripDots(ctx, xy, G, cl(cell * 0.4, 1.2, 2.6)); }
+  if (pdA > 0) { ctx.globalAlpha = 1; spiralNow(); }
   if (OL.gbOn) {
     // Dim the base plate AND every other overlay above -- drawn so far, on this
     // same canvas -- by the slider's amount, so the Goldbach pair reads clearly
@@ -4205,6 +4231,8 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   ctx.restore();
 }
 // The lift settings only move the overlays, so redraw the three tiles and leave the tally alone.
+var MS_ISO = { on: false, hideBase: false, noStrips: false, noMarker: false };   // isolated section plates (math-sheet advanced mode)
+var MS_ADV = { on: false, cn: null };                                            // preview-only advanced mode; cn overrides C(n) on the sheet only
 let _olRaf = 0;
 function openerOverlaySoon() {
   if (_olRaf) return;
@@ -4428,6 +4456,18 @@ function olStepGb(dir) {
   OL.gbG = next;
   olRedraw();
 }
+function olTogglePDim(v) {
+  OL.pDim = !!v;
+  if (OL.pDim && !(OL.pDimAmt > 0)) OL.pDimAmt = 50;   // switched on from 0: come back at the usual strength
+  olRedraw();
+}
+function olSetPDimAmt(v) {
+  const n = Number(v);
+  OL.pDimAmt = isFinite(n) ? Math.max(0, Math.min(100, n)) : 50;
+  OL.pDim = OL.pDimAmt > 0;   // 0 turns it off, anything above turns it on
+  olRedraw();
+}
+function olToggleGbAll() { OL.gbAll = !OL.gbAll; if (OL.gbAll) OL.gbOn = true; olRedraw(); }
 function olToggleGbDim(v) { OL.gbDim = !!v; olRedraw(); }
 function olSetGbDimAmt(v) {
   const n = Number(v);
@@ -4495,6 +4535,7 @@ function olPickGb(g) {
 }
 function olToggleGbList() {
   _olGbListOpen = !_olGbListOpen;
+  { const ab = $('ol-gb-all-btn'); if (ab) ab.classList.toggle('on', !!OL.gbAll); }
   const b = $('ol-gb-list-btn'); if (b) b.innerHTML = 'all pairs ' + (_olGbListOpen ? '&#9652;' : '&#9662;');
   olRedraw();
 }
@@ -4579,6 +4620,8 @@ function olSyncUI() {
   chk('ol-dropout-chk', OL.dropout); chk('ol-dropoutlbl-chk', OL.dropoutLbl);
   chk('ol-strip-chk', OL.stripOn);
   chk('ol-gbdim-chk', OL.gbDim);
+  chk('ol-pdim-chk', OL.pDim);
+  { const pa = $('ol-pdim-amt'); if (pa && document.activeElement !== pa) pa.value = OL.pDim ? OL.pDimAmt : 0; const pv = $('ol-pdim-amt-v'); if (pv) pv.textContent = (OL.pDim ? Math.round(OL.pDimAmt) : 0) + '%'; }
   const gbDimAmt = $('ol-gbdim-amt');
   if (gbDimAmt && document.activeElement !== gbDimAmt) gbDimAmt.value = OL.gbDimAmt != null ? OL.gbDimAmt : 50;
   document.querySelectorAll('.ol-theta-btn').forEach(b => b.classList.toggle('on', b.dataset.tm === OL.thetaMode));
@@ -4911,10 +4954,15 @@ function oeLegendSections() {
     if (OL.gbOn) {
       const N = olGoldbachN(), pairs = olGoldbachPairs();
       li.push({ c: null, t: 'Goldbach partitions \u00b7 E = 2(G+1) = ' + N });
-      li.push({ c: PAL.gold, t: 'c: r+M=g' });
-      li.push({ c: PAL.coral, t: 'd: r+M=s' });
-      li.push({ c: PAL.teal, t: 'a: M\u2212r=g' });
-      li.push({ c: PAL.violet, t: 'b: r\u2212M=g \u00b7 g,s both prime \u21d2 c,d fully lit \u00b7 converse once g > \u221aE' });
+      const gL = Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1)), sL = N - gL, eq = gbStripEqs(gL, sL);
+      if (OL.gbAll && pairs.length) {
+        li.push({ c: null, t: 'all ' + pairs.length + ' Goldbach pairs drawn at once \u00b7 for each pair g (s = ' + N + ' \u2212 g): c r+M=g \u00b7 d r+M=s \u00b7 a M\u2212r=g \u00b7 b r\u2212M=g \u00b7 g = ' + (pairs.length <= 16 ? pairs.join(', ') : pairs.slice(0, 16).join(', ') + ', \u2026') });
+        li.push({ c: null, t: 'the pair on show (brightest): g = ' + gL + ', s = ' + sL });
+      }
+      li.push({ c: PAL.gold, t: eq.c });
+      li.push({ c: PAL.coral, t: eq.d });
+      li.push({ c: PAL.teal, t: eq.a });
+      li.push({ c: PAL.violet, t: eq.b + ' \u00b7 g,s both prime \u21d2 c,d fully lit \u00b7 converse once g > \u221aE' });
       li.push({ c: null, t: 'pair dots ' + (OL.gbThick || 1).toFixed(1) + '\u00d7' + (OL.gbDim ? ' \u00b7 dim backdrop ' + Math.round(OL.gbDimAmt != null ? OL.gbDimAmt : 50) + '%' : ' \u00b7 dim backdrop off') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt != null ? OL.gbSpotAmt : 55) + '%' : ' \u00b7 spotlight off') + (OL.gbLabel ? ' \u00b7 marker label on' : '') + (OL.gbTrail ? ' \u00b7 trail on' : '') });
       { const gg = Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1)), mk = olGbMarker(gg, N - gg);
         li.push({ c: PAL.gold, t: 'gold marker (r, M) = (' + mk[0] + ', ' + mk[1] + ') \u00b7 ring M = s lies past the last ring, G = ' + OPENER_G + ' \u00b7 \u03b8 = 2\u03c0g/s = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0' + (OL.gbTrail ? ' \u00b7 trail joins all pairs' : '') + (OL.gbSpot ? ' \u00b7 spotlight ' + Math.round(OL.gbSpotAmt) + '%' : '') }); }
@@ -6730,7 +6778,24 @@ function plateScale(ctx) {
   const k = Math.hypot(t.a, t.b);
   return Math.max(1, Math.min(2, k || 1));
 }
+var MS_ISOM = null;   // main math-sheet isolated plates: { only: 'base' | 'strip' | 'lift' | 'part' }
 function paintViewInner(ctx, S, cap) {
+  const I = MS_ISOM, on = k => !I || I.only === k;
+  if (I) {
+    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); return; }
+    if (viewMode === 'ring') {
+      if (on('base')) drawRingBase(ctx, S, cap);
+      if (on('strip')) { if (walkMode === 'band') drawRingBand(ctx, S); if (showStrip) drawRingStrip(ctx, S); }
+      if (on('part')) drawPartitionsOverlay(ctx, S);
+      if (on('lift')) drawLiftOverlay(ctx, S);
+      return;
+    }
+    if (on('base')) { const base = buildBase(Math.min(COP_G, cap), $('cmode').value); ctx.imageSmoothingEnabled = COP_G > cap; ctx.drawImage(base, 0, 0, S, S); ctx.imageSmoothingEnabled = true; }
+    if (on('strip')) { if (walkMode === 'band') drawBandOverlay(ctx, S); if (showStrip) drawStripOverlay(ctx, S); }
+    if (on('part')) drawPartitionsOverlay(ctx, S);
+    if (on('lift')) drawLiftOverlay(ctx, S);
+    return;
+  }
   if (viewMode === 'cayley') { drawCayley(ctx, S); drawLiftOverlay(ctx, S); drawCayleyLabels(ctx, S); return; }
   if (viewMode === 'ring') {
     drawRingBase(ctx, S, cap);
@@ -10258,6 +10323,17 @@ function exportDetailSections(views) {
     pi.push({ rgb: CG, text: 'partition mode ' + partMode + ' \u00b7 E = ' + partE() + ' \u00b7 r(E) = ' + goldbachGaps().length + ' pairs' });
     pi.push({ rgb: null, text: 'drawn ' + shown.length + ' gap' + (shown.length === 1 ? '' : 's') + ': ' +
       shown.slice(0, 24).join(', ') + (shown.length > 24 ? ', \u2026' : '') });
+    { const E = partE(), col = k => 'rgba(' + BR[k].join(',') + ',.95)';
+      if (partMode === 'single') {
+        const sM = E - partG, eq = gbStripEqs(partG, sM);
+        pi.push({ rgb: col('c'), text: eq.c }); pi.push({ rgb: col('d'), text: eq.d });
+        pi.push({ rgb: col('a'), text: eq.a }); pi.push({ rgb: col('b'), text: eq.b + ' \u00b7 s = E \u2212 g = ' + sM });
+      } else {
+        pi.push({ rgb: null, text: 'each drawn gap g, with s = ' + E + ' \u2212 g:  c r+M=g \u00b7 d r+M=s \u00b7 a M\u2212r=g \u00b7 b r\u2212M=g' });
+        shown.slice(0, 12).forEach(g0 => { const e0 = gbStripEqs(g0, E - g0); pi.push({ rgb: null, text: 'g = ' + g0 + ', s = ' + (E - g0) + ' \u00b7 r+M=' + g0 + ' \u00b7 r+M=' + (E - g0) + ' \u00b7 M\u2212r=' + g0 + ' \u00b7 r\u2212M=' + g0 }); });
+        if (shown.length > 12) pi.push({ rgb: null, text: '\u2026 and ' + (shown.length - 12) + ' more gaps' });
+      }
+    }
     gbLegendLines(COP_G, partG, partMode === 'single').forEach(t => pi.push({ rgb: null, text: t }));
     pi.push({ rgb: null, text: 'families ' + [partShow.diff ? 'difference |M\u2212r|' : '', partShow.sum ? 'sum r+M' : ''].filter(Boolean).join(' + ') +
       (partSlopeLock ? ' \u00b7 main strip locked to pairs' : '') + ' \u00b7 backdrop \u00d7' + partBgBoost.toFixed(2) });
@@ -13946,6 +14022,25 @@ async function msRender(doc, theme, opts) {
       });
     } else if (b.t === 'plate') {
       plateB = b; plateItem = { y: y, h: 0, draw: () => {}, t: curT, sec: secNo }; items.push(plateItem);
+    } else if (b.t === 'iplate') {
+      const its = b.items.filter(it => it.cv);
+      if (its.length) {
+        const gp = 28, labH = 40, capL = wrap(b.cap || '', 'italic 300 28px ' + SERIF, TW - 100);
+        const asp = its.reduce((a, it) => a + it.cv.width / it.cv.height, 0);
+        const ph = Math.max(220, Math.min((TW - gp * (its.length - 1)) / asp, 640)), rw = ph * asp + gp * (its.length - 1);
+        add(Math.round(12 + ph + labH + capL.length * 38 + 34), (c, y0) => {
+          let x = MX + (TW - rw) / 2; const yy = y0 + 12;
+          its.forEach(it => {
+            const w = ph * it.cv.width / it.cv.height;
+            c.imageSmoothingQuality = 'high'; c.drawImage(it.cv, x, yy, w, ph);
+            c.strokeStyle = th.edge; c.lineWidth = 2; c.strokeRect(x, yy, w, ph);
+            c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.fillStyle = th.acc; c.font = '22px ' + MONO;
+            c.fillText(msSpaced(it.label), x + w / 2, yy + ph + 30); x += w + gp;
+          });
+          c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
+          capL.forEach((l, i) => c.fillText(l, MX + TW / 2, yy + ph + labH + 34 + i * 38));
+        });
+      }
     } else if (b.t === 'gap') { add(b.h || 24, () => {}); }
   });
   if (plateItem) {
@@ -14192,6 +14287,15 @@ function gbDetailFacts(G, gbG) {
            halfPrime: isPrime(E / 2), comet: ordered / (E / (lnE * lnE)) };
 }
 // One-line-per-fact strings for the on-screen-style legends (plain text, no TeX).
+/* The four Strip I equations with the gap's own numbers in them: c: r+M=g, d: r+M=s, a: M-r=g, b: r-M=g. */
+function gbStripEqs(g, s) {
+  return {
+    c: 'c: r+M=' + g,
+    d: s === g ? 'd: r+M=' + s + ' (same line as c, drawn once)' : 'd: r+M=' + s,
+    a: 'a: M\u2212r=' + g,
+    b: 'b: r\u2212M=' + g
+  };
+}
 function gbLegendLines(G, gbG, showCurrent) {
   const f = gbDetailFacts(G, gbG), out = [];
   out.push('E = 2(G+1) = ' + f.E + ' \u00b7 k(E) = ' + f.pairs.length + ' unordered pair' + (f.pairs.length === 1 ? '' : 's') + ' \u00b7 r(E) = ' + f.ordered + ' ordered');
@@ -14362,7 +14466,8 @@ function msStripLines(a, b, s, w) {
 function msDate() { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
 /* ══ OPENER ════════════════════════════════════════════════════════════════ */
-function msBuildOpener(noPlates) {
+function msBuildOpener(noPlates) { return msWithCN(() => msBuildOpenerRaw(noPlates)); }
+function msBuildOpenerRaw(noPlates) {
   const G = OPENER_G, view = OE.view, ratio = OE.cayRatio === '1:1' ? 1 : 2;
   const Wx = 4096, Sx = Wx / 1920, gap = 28 * Sx, tileW = (Wx - gap) / 2;
   const S = Math.round(view === 'all3' ? tileW : view === 'cayley' ? Wx / ratio : Wx);
@@ -14443,6 +14548,8 @@ function msBuildOpener(noPlates) {
   doc.push({ t: 'eq', tex: (wedge ? msT`\frac{\Phi(G)}{G(G+1)/2}` : msT`\frac{2\Phi(G)-1}{G^{2}}`) + msT`=\frac{${cop}}{${cells}}=${msf(pct, 4)}\%,\qquad \frac{6}{\pi^{2}}=\frac1{\zeta(2)}=${msf(target, 4)}\%,\qquad \Delta=${msf(pct - target, 4)}\%` });
   doc.push({ t: 'eq', tex: msT`\lim_{G\to\infty}\ \frac{\#\{(r,M)\in\mathcal L_G:\ \gcd(r,M)=1\}}{|\mathcal L_G|}=\frac{6}{\pi^{2}}` });
 
+  msIsoPush(doc, 'base');
+
   // 6 · lift
   let ssDone = false;
   const ssPush = () => {
@@ -14472,12 +14579,16 @@ function msBuildOpener(noPlates) {
     }
     msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: cn, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
     msBlockSection(cn, L).forEach(b => doc.push(b));
+    if (OL.mode !== 'none' || OL.chain) msIsoPush(doc, 'lift');
+    if (OL.stripOn) msIsoPush(doc, 'strip');
     if (OL.gbOn) {
       ssPush();
       doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG).forEach(b => doc.push(b));
+      msIsoPush(doc, 'gbstrips');
       try {
         const E = olGoldbachN(), gg = Math.max(1, Math.min(Math.floor(E / 2), OL.gbG || 1)), ss = E - gg, ps = olGoldbachPairs();
         doc.push({ t: 'h', text: 'The gold marker' });
+        msIsoPush(doc, 'gbmarker');
         doc.push({ t: 'p', text: 'The gold point that floats away from the lattice is the pair itself, read as a cell: (r, M) = (g, s). It is where the column r = g meets the anti-diagonal r + M = E, and since s = E \u2212 g \u2265 G + 1 its ring M = s lies beyond the outermost ring the plate draws. On Grid it falls off the square, on Ring it sits outside the outer ring, and on Cayley it lands in the empty disc the last image circle leaves open.' });
         doc.push({ t: 'eq', tex: msT`P_{g}=(g,\,s),\quad s=E-g=${ss},\qquad \theta(P_{g})=2\pi\,\frac{g}{s}=2\pi\,\frac{g}{E-g}=${msf(360 * gg / ss, 2)}^{\circ}` });
         doc.push({ t: 'eq', tex: msT`\gcd(g,s)=1\quad\text{for every Goldbach pair }g\ne s,\qquad s>G\ \Longrightarrow\ P_{g}\notin\mathcal L_{${G}}`, cap: 'Two distinct primes are always coprime, so the marker is a coprime cell of the extended lattice, one the plate only shows through this marker.' });
@@ -14492,7 +14603,8 @@ function msBuildOpener(noPlates) {
 }
 
 /* ══ MAIN PLATE ════════════════════════════════════════════════════════════ */
-function msBuildMain(views, noPlates) {
+function msBuildMain(views, noPlates) { return msWithCNMain(() => msBuildMainRaw(views, noPlates)); }
+function msBuildMainRaw(views, noPlates) {
   const G = COP_G, a = slopeA, b = slopeB, s = offS, w = widthW;
   const sel = $('cmode'), label = sel.options[sel.selectedIndex].textContent;
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
@@ -14563,8 +14675,11 @@ function msBuildMain(views, noPlates) {
     if (td.bandLine) doc.push({ t: 'note', text: td.bandLine + '.' });
   } catch (e) {}
 
+  msIsoPushMain(doc, 'base', vs);
+
   // 6 · strip / band
   doc.push({ t: 'h', text: walkMode === 'band' ? 'The block band' : 'The strip' });
+  if (showStrip || walkMode === 'band') msIsoPushMain(doc, 'strip', vs);
   if (walkMode === 'band') {
     const n = Math.max(0, w - 1);
     doc.push({ t: 'p', text: 'C(n) is a conjunction, not a strip average: r survives at M only if it is coprime to every column of the block M, …, M+n. The band below measures exactly that with n = w − 1, on the lattice capped as stated.' });
@@ -14608,6 +14723,7 @@ function msBuildMain(views, noPlates) {
     else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = 400, so no chain counts are given here.' });
     msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
     msBlockSection(cn, L).forEach(x => doc.push(x));   // block length, D(n), C(n) at the C(n) depth, as the opener does
+    msIsoPushMain(doc, 'lift', vs);
   }
   try {
     let stripEmpty = false;
@@ -14616,6 +14732,7 @@ function msBuildMain(views, noPlates) {
   } catch (e) {}
   if (pm !== 'off') {
     doc.push({ t: 'h', text: 'Goldbach partitions' });
+    msIsoPushMain(doc, 'part', vs);
     msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.').forEach(x => doc.push(x));
   }
   return doc;
@@ -14789,6 +14906,8 @@ function msDocToHtml(doc) {
     } else if (b.t === 'plate') {
       h += '<div class="mp-plates">' + b.items.map(it => '<figure class="mp-plate ' + it.cls + '"><img alt="' + msEsc(it.label) + ' view of the plate" src="' + it.cv.toDataURL('image/jpeg', 0.94) + '"><figcaption>' + msEsc(it.label) + '</figcaption></figure>').join('') +
         '</div><div class="mp-cap">The plate this sheet accompanies, redrawn here from the same parameters.' + (msLblNote(b.items) ? '<br>' + msEsc(msLblNote(b.items)) : '') + '</div>';
+    } else if (b.t === 'iplate') {
+      h += '<div class="mp-plates">' + b.items.map(it => '<figure class="mp-plate ' + it.cls + '"><img alt="' + msEsc(it.label) + ' isolated plate" src="' + it.cv.toDataURL('image/jpeg', 0.92) + '"><figcaption>' + msEsc(it.label) + '</figcaption></figure>').join('') + '</div><div class="mp-cap">' + msEsc(b.cap || '') + '</div>';
     } else if (b.t === 'gap') {
       h += '<div style="height:' + (b.h || 24) + 'px"></div>';
     }
@@ -14812,7 +14931,18 @@ function msOpenPreview(doc) {
    label mode and size, then rebuild the sheet in place, keeping the scroll position. */
 function msLblSync() {
   const t = $('msp-lbl-tools'); if (!t) return;
-  t.style.display = MS_PREV.kind === 'opener' ? 'inline-flex' : 'none';
+  t.style.display = (MS_PREV.kind === 'opener' || MS_PREV.kind === 'main') ? 'inline-flex' : 'none';
+  const core = $('msp-lbl-core'); if (core) core.style.display = MS_PREV.kind === 'opener' ? 'contents' : 'none';
+  const ab = $('msp-adv-btn'), at = $('msp-adv-tools');
+  if (ab) { ab.style.color = MS_ADV.on ? 'var(--gold)' : ''; ab.style.borderColor = MS_ADV.on ? 'var(--gold)' : ''; }
+  if (at) at.style.display = MS_ADV.on ? 'inline-flex' : 'none';
+  const cv = $('msp-cn-v');
+  if (cv) {
+    const nn = msCnNow(); let txt = 'n = ' + nn;
+    try { const D = Dn(nn), C = D * Math.PI * Math.PI / 6; if (isFinite(C)) txt += ' \u00b7 C(n) = ' + C.toFixed(6) + ' \u00b7 D(n) = ' + D.toFixed(6); } catch (e) {}
+    cv.textContent = txt;
+  }
+  const gs = $('msp-g-sl'); if (gs) { gs.max = MS_PREV.kind === 'main' ? 512 : 256; if (document.activeElement !== gs) gs.value = Math.min(msGNow(), +gs.max); $('msp-g-v').textContent = 'G = ' + msGNow(); }
   if (MS_PREV.kind !== 'opener') return;
   const sel = $('msp-lbl-sel');
   if (sel) {
@@ -14852,6 +14982,145 @@ function msLblRefresh() {
 function msLblAutoFilter() {
   if (MS_LB.mode !== 'off' && MS_LB.filter === 'all' && OPENER_G > MS_LBL_MAXG && OPENER_G <= MS_LBL_MAXG_FILTERED) MS_LB.filter = 'co';
 }
+/* ── ADVANCED MODE (preview only) ────────────────────────────────────────────
+   Adds a C(n) stepper that rebuilds the sheet at its own depth (the opener keeps its C(n)), and puts an
+   isolated picture of each section's own layer in the section it belongs to: just that overlay on an
+   empty plate, drawn by the same painters as the plate, so it can never disagree with it. */
+function msWithCNMain(fn) {
+  const cn0 = liftChainN, lk0 = liftLockN;
+  if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); }
+  try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; }
+}
+function msGNow() { return MS_PREV.kind === 'main' ? G : OPENER_G; }
+function msCnNow() { return MS_PREV.kind === 'main' ? msWithCNMain(liftChainNEff) : msWithCN(openerChainN); }
+function msIsoCapMain(kind, vs) {
+  return {
+    base: 'The colouring alone, no strip, lift or partition overlay.',
+    strip: walkMode === 'band' ? 'Only the block band, w = ' + widthW + ' (n = ' + (widthW - 1) + '), with the lattice removed.' : 'Only the strip band, a/b = ' + slopeA + '/' + slopeB + ', s = ' + offS + ', w = ' + widthW + ', with the lattice removed.',
+    lift: 'Only the lift overlays (' + (liftMode !== 'none' ? liftMode : 'no spiral or path') + (liftChainOn ? ', r-chain at C(n) = ' + liftChainNEff() : '') + ') on an empty plate.',
+    part: 'Only the four Goldbach strips a, b, c, d for g = ' + (typeof partG !== 'undefined' ? partG : 1) + '; the lattice and every other overlay are left off.'
+  }[kind];
+}
+function msIsoPushMain(doc, kind, vs) {
+  if (!MS_ADV.on) return;
+  try {
+    const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = 700, out = [];
+    const vmWas = viewMode, lsWas = labelScale, vqWas = viewQuarter, lbl = MS_LBL.on;
+    MS_LBL.on = false; MS_ISOM = { only: kind };
+    try {
+      vs.forEach(v => {
+        const wide = v === 'cayley' && exportCayWide, w = wide ? side * 2 : side;
+        viewMode = v; labelScale = LS[v] !== undefined ? LS[v] : lsWas; viewQuarter = VQ[v] !== undefined ? VQ[v] : vqWas;
+        out.push({ label: names[v] || v, cv: msPlateShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side)), cls: vs.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && vs.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
+      });
+    } finally { MS_ISOM = null; MS_LBL.on = lbl; viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
+    if (out.length) doc.push({ t: 'iplate', items: out, cap: msIsoCapMain(kind, vs) });
+  } catch (e) { MS_ISOM = null; }
+}
+function msWithCN(fn) {
+  const cn0 = OL.cn, lk0 = OL.lockN;
+  if (MS_ADV.on && MS_ADV.cn != null) { OL.cn = Math.max(0, Math.min(OPENER_G - 1, MS_ADV.cn)); OL.lockN = false; }
+  try { return fn(); } finally { OL.cn = cn0; OL.lockN = lk0; }
+}
+const MS_ISO_SPECS = {
+  base:     { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: {} },
+  lift:     { ol: { stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: { hideBase: true } },
+  strip:    { ol: { mode: 'none', chain: false, stripOn: true, stripDots: true, gbOn: false }, iso: { hideBase: true } },
+  gbstrips: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: false, gbSpot: false, gbLabel: false, gbDim: false }, iso: { hideBase: true, noMarker: true } },
+  gbmarker: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: true, gbSpot: false, gbLabel: true, gbDim: false }, iso: { hideBase: true, noStrips: true } }
+};
+function msIsoShot(spec, w, h, paint) {
+  const keep = {}; Object.keys(spec.ol).forEach(k => { keep[k] = OL[k]; OL[k] = spec.ol[k]; });
+  const lm = OPENER_LABEL_MODE, lon = MS_LBL.on;
+  OPENER_LABEL_MODE = 'off'; MS_LBL.on = false;
+  MS_ISO.on = true; MS_ISO.hideBase = !!spec.iso.hideBase; MS_ISO.noStrips = !!spec.iso.noStrips; MS_ISO.noMarker = !!spec.iso.noMarker;
+  try { return msPlateShot(w, h, paint); }
+  finally {
+    Object.keys(keep).forEach(k => { OL[k] = keep[k]; });
+    OPENER_LABEL_MODE = lm; MS_LBL.on = lon;
+    MS_ISO.on = false; MS_ISO.hideBase = false; MS_ISO.noStrips = false; MS_ISO.noMarker = false;
+  }
+}
+function msIsoCap(kind) {
+  const E = olGoldbachN(), g = Math.max(1, Math.min(Math.floor(E / 2), OL.gbG || 1)), sv = E - g;
+  return {
+    base: 'The colouring alone, no overlays: the cells this section counts.',
+    lift: 'Only the lift overlays (' + (OL.mode !== 'none' ? OL.mode : 'no spiral or path') + (OL.chain ? ', r-chain at C(n) = ' + openerChainN() : '') + ') on an empty plate.',
+    strip: 'Only the strip band, a/b = ' + OL.slopeA + '/' + OL.slopeB + ', s = ' + OL.offset + ', w = ' + Math.max(1, OL.width) + ', with the lattice removed.',
+    gbstrips: 'Only the four Goldbach strips for g = ' + g + ', s = ' + sv + ' (E = ' + E + '); the lattice, marker and trail are left off.',
+    gbmarker: 'Only the gold marker P_g = (' + g + ', ' + sv + ') and the trail of every Goldbach pair\u2019s marker. Grid has no image of it, since s > G puts it off the square.'
+  }[kind];
+}
+function msIsoPush(doc, kind) {
+  if (!MS_ADV.on) return;
+  try {
+    if (!_openerSq || !_openerPts) return;
+    const view = OE.view, S = 700, names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
+    const draw = { grid: openerDrawGrid, ring: openerDrawRing, cayley: openerDrawCayley };
+    let vs = view === 'all3' ? ['grid', 'ring', 'cayley'] : [view];
+    if (kind === 'gbmarker') vs = vs.filter(v => v !== 'grid');
+    if (!vs.length) return;
+    const items = vs.map(v => {
+      const wide = v === 'cayley', w = wide ? S * 2 : S, h = S;
+      return { label: names[v], cv: msIsoShot(MS_ISO_SPECS[kind], w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h })), cls: wide ? 'wide' : (view === 'all3' ? '' : 'solo') };
+    });
+    doc.push({ t: 'iplate', items: items, cap: msIsoCap(kind) });
+  } catch (e) {}
+}
+let _msAdvTimer = null;
+function msAdvRebuild(delay) {
+  clearTimeout(_msAdvTimer);
+  _msAdvTimer = setTimeout(() => {
+    const body = $('ms-preview-body'); if (!body || !MS_PREV.kind || !MS_PREV.doc) return;
+    if (MS_PREV.kind === 'opener' && MS_PREV.G && OPENER_G !== MS_PREV.G) setOpenerG(MS_PREV.G);
+    try {
+      const top = body.scrollTop;
+      MS_PREV.doc = MS_PREV.kind === 'main' ? msBuildMain(MS_PREV.views) : msBuildOpener();
+      body.innerHTML = msDocToHtml(MS_PREV.doc);
+      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(() => {});
+      body.scrollTop = top;
+    } catch (e) {}
+  }, delay == null ? 120 : delay);
+}
+let _msGWait = 0, _msGDeb = 0;
+function msMainSetG(v, delay) {
+  const g = Math.max(2, Math.min(10000, Math.round(+v) || G));
+  clearTimeout(_msGDeb); clearInterval(_msGWait);
+  const go = () => {
+    if (g !== G || COP_G !== g) onG(g);   // the main page rebuilds its coprimality bitset, then redraws
+    MS_PREV.G = g;
+    if (MS_ADV.cn != null) MS_ADV.cn = Math.min(MS_ADV.cn, g - 1);
+    msLblSync();
+    const t0 = Date.now();
+    _msGWait = setInterval(() => {
+      if ((COP && COP_G === g) || Date.now() - t0 > 30000) { clearInterval(_msGWait); msAdvRebuild(0); }
+    }, 120);
+  };
+  const gv = $('msp-g-v'); if (gv) gv.textContent = 'G = ' + g;
+  if (delay) _msGDeb = setTimeout(go, delay); else go();
+}
+function msSetG(v, delay) {
+  if (MS_PREV.kind === 'main') { msMainSetG(v, delay); return; }
+  const g = Math.max(2, Math.min(256, Math.round(+v) || OPENER_G));
+  if (g === OPENER_G && MS_PREV.G === g) { msLblSync(); return; }
+  OPENER_G = g;
+  const l = $('welcome-g-v'); if (l) l.textContent = g;
+  const sl = $('welcome-g'); if (sl && +sl.value !== g) sl.value = g;
+  try { _openerPts = openerPoints(); _openerSq = openerSquarePoints(); } catch (e) {}   // the sheet reads these directly
+  MS_PREV.G = g;
+  if (MS_ADV.cn != null) MS_ADV.cn = Math.min(MS_ADV.cn, g - 1);
+  msLblAutoFilter();
+  msLblSync(); msAdvRebuild(delay);
+  openerRedrawSoon();
+}
+function msGStep(d) { msSetG(msGNow() + d); }
+function msGPrime(d) { msSetG(d > 0 ? nextPrime(msGNow()) : prevPrime(msGNow())); }
+function msAdvToggle() { MS_ADV.on = !MS_ADV.on; if (!MS_ADV.on) MS_ADV.cn = null; msLblSync(); msAdvRebuild(); }
+function msAdvCN(d) {
+  const cur = MS_ADV.cn != null ? MS_ADV.cn : msCnNow();
+  MS_ADV.cn = Math.max(0, Math.min(msGNow() - 1, cur + d));
+  msLblSync(); msAdvRebuild();
+}
 function msLblStep(d) {
   const n = OPENER_LABEL_MODES.length;
   MS_LB.idx = ((MS_LB.idx + d) % n + n) % n; MS_LB.mode = OPENER_LABEL_MODES[MS_LB.idx].id; msLblAutoFilter();
@@ -14869,6 +15138,11 @@ function msLblFilterStep() {
 function msClosePreview() {
   MS_PREV.doc = null;
   MS_LB.active = false;   // the sheet goes back to the opener's own labels
+  MS_ADV.on = false; MS_ADV.cn = null;
+  clearInterval(_msGWait); clearTimeout(_msGDeb);
+  if (MS_PREV.kind === 'opener' && MS_PREV.G0 && OPENER_G !== MS_PREV.G0) { try { setOpenerG(MS_PREV.G0); } catch (e) {} }   // the opener goes back to the G it had
+  if (MS_PREV.kind === 'main' && MS_PREV.G0 && G !== MS_PREV.G0) { try { onG(MS_PREV.G0); } catch (e) {} }   // so does the main page
+  MS_PREV.G0 = null;
   const modal = $('ms-preview-modal'); if (!modal) return;
   modal.style.display = 'none';
   document.body.style.overflow = '';
@@ -15005,7 +15279,8 @@ function msLabelledShot(w, h, paint) {
   try { cv = msPlateShot(w, h, paint); st = MS_LBL.stats; } finally { MS_LBL.on = false; MS_LBL.stats = null; }
   return { cv: cv, shown: st ? st.shown : 0, total: st ? st.total : 0 };
 }
-function msOpenerPlateImages() {
+function msOpenerPlateImages() { return msWithCN(msOpenerPlateImagesRaw); }
+function msOpenerPlateImagesRaw() {
   if (!_openerSq || !_openerPts) return [];
   const view = OE.view, S = 900;
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
@@ -15021,7 +15296,8 @@ function msOpenerPlateImages() {
 function msOpenerLblWhat() {
   return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', gcd: 'its gcd(r, M)', depth: 'its block-survival depth (columns M, M+1, \u2026 coprime to r, capped at ' + DEPTH_CAP + ')' }[msLbMode()] || 'its M';
 }
-function msMainPlateImages(views) {
+function msMainPlateImages(views) { return msWithCNMain(() => msMainPlateImagesRaw(views)); }
+function msMainPlateImagesRaw(views) {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = 900, out = [];
   const vmWas = viewMode, lsWas = labelScale, vqWas = viewQuarter;
   try {
@@ -15055,7 +15331,7 @@ function msPreviewOpener() {
   try {
     msFreezeOpener();
     if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
-    MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G;
+    MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G; MS_PREV.G0 = OPENER_G; MS_ADV.on = false; MS_ADV.cn = null;
     MS_LB.active = true; MS_LB.mode = OPENER_LABEL_MODE; MS_LB.idx = Math.max(0, OPENER_LABEL_MODES.findIndex(x => x.id === OPENER_LABEL_MODE));
     MS_LB.scale = OL.lblScale || 1; MS_LB.filter = 'all';   // start from the opener's labels; changes stay in the preview
     MS_PREV.doc = msBuildOpener();
@@ -15064,9 +15340,11 @@ function msPreviewOpener() {
 }
 function msPreviewMain() {
   try {
-    MS_PREV.kind = 'main';
+    MS_PREV.kind = 'main'; MS_ADV.on = false; MS_ADV.cn = null; MS_PREV.G = G; MS_PREV.G0 = G;
     const vs = orderedExportViews();
-    msOpenPreview(msBuildMain(vs));
+    MS_PREV.views = vs;
+    MS_PREV.doc = msBuildMain(vs);
+    msOpenPreview(MS_PREV.doc);
   } catch (e) {}
 }
 /* Export button at the top of the pop-up: the same PNG pages the export panel writes (current
@@ -15105,7 +15383,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></div><div class="msp-status" id="msp-status"></div><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="256" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
