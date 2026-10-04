@@ -190,6 +190,12 @@ table.mp-table td.pct{text-align:right;color:#6b6558;white-space:nowrap;}
 .mp-key{display:flex;flex-wrap:wrap;gap:8px 18px;margin:8px 0 20px;font-family:var(--mono);font-size:12px;}
 .mp-key-item i{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid rgba(0,0,0,.18);margin-right:6px;vertical-align:-1px;}
 #ms-preview-modal .msp-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;}
+#ms-preview-modal .msp-lbl{display:none;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cream2);}
+#ms-preview-modal .msp-lbl .msp-lb{background:transparent;border:1px solid var(--edge2);color:var(--cream2);border-radius:5px;padding:3px 9px;font-family:var(--mono);font-size:11px;cursor:pointer;}
+#ms-preview-modal .msp-lbl .msp-lb:hover{color:var(--gold);border-color:var(--gold);}
+#ms-preview-modal .msp-lbl .msp-lv{min-width:58px;text-align:center;color:var(--gold);}
+#ms-preview-modal .msp-lbl input[type=range]{width:84px;}
+#ms-preview-modal .msp-lbl .msp-ln{color:var(--cream3);font-size:10px;}
 #ms-preview-modal .msp-status{font-family:var(--mono);font-size:10.5px;color:var(--cream3);max-width:240px;text-align:right;}
 #ms-preview-modal .msp-export{background:var(--gold2);border:1px solid var(--gold);color:var(--gold);border-radius:6px;padding:5px 14px;
   font-family:var(--mono);font-size:11px;letter-spacing:.04em;cursor:pointer;}
@@ -1650,30 +1656,32 @@ walk anyway.</p>
     </div>
 
     <div class="prow">
-      <span class="plabel">n &mdash; lift depth</span>
-      <label style="display:inline-flex;align-items:center;gap:4px;color:var(--cream2);cursor:pointer;">
-        <input type="checkbox" id="lift-lockn-chk" onchange="liftToggleLockN(this.checked)"> &#128279; Lock to r-chain depth n
-      </label>
+      <span class="lbl" title="Path depth n: drives the &plusmn;n path r = (M&plusmn;n)/2 and which primes the spiral skips as saturated.">&plusmn;n path</span>
+      <div class="stepper"><button class="sbtn" onclick="liftStepN(-1)" title="&minus;1">&minus;</button><span class="val" id="lift-n-val">0</span><button class="sbtn" onclick="liftStepN(1)" title="+1">+</button></div>
+      <button class="chip tl" id="lift-n-play-btn" onclick="liftNPlay()" title="Step the &plusmn;n path n from 0 up to G&minus;1, then loop back to 0.">&#9654;</button>
+      <span class="lbl" style="margin-left:6px;" title="C(n) block depth: the r-chain keeps only r coprime to M, M+1, &hellip;, M+n, and D(n)/C(n) are read at this n.">C(n)</span>
+      <div class="stepper"><button class="sbtn" onclick="liftStepChainN(-1)" title="&minus;1">&minus;</button><span class="val" id="lift-cn-val">0</span><button class="sbtn" onclick="liftStepChainN(1)" title="+1">+</button></div>
+      <button class="chip tl" id="lift-cn-play-btn" onclick="liftCNPlay()" title="Step the C(n) depth from 0 up to G&minus;1, then loop back to 0. While locked it moves both n together.">&#9654;</button>
+      <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;margin-left:4px;" title="Lock the C(n) depth to the &plusmn;n path n, so one stepper moves both."><input type="checkbox" id="lift-lockn-chk" onchange="liftToggleLockN(this.checked)"> &#128279; lock</label>
+      <span class="lbl" style="margin-left:6px;" title="The spiral's prime">p</span>
       <div class="stepper">
-        <button class="sbtn lift-n-stepbtn" onclick="liftStepN(-1)" title="&minus;1">&minus;</button>
-        <span class="val" id="lift-n-val">0</span>
-        <button class="sbtn lift-n-stepbtn" onclick="liftStepN(1)" title="+1">+</button>
+        <button class="sbtn" onclick="liftCycleSpiralP(-1)" title="Previous prime">&#9664;</button>
+        <input class="sval" id="lift-p-inp" type="number" min="1" step="1" value="5" onchange="liftSetSpiralP(this.value)" style="width:56px;">
+        <button class="sbtn" onclick="liftCycleSpiralP(1)" title="Next prime">&#9654;</button>
       </div>
-      <span class="hint" id="lift-n-locknote">shared with the <b>r-chain depth n</b> below &mdash; move either and both follow; the saturated primes the spiral skips come from this same n</span>
-      <div class="stepper" style="margin-left:6px;">
+      <button class="chip" id="lift-p1" onclick="liftLockOne()" title="Lock to residue 1: r = 1 across every ring M. gcd(1, M) = 1 always, so this line never breaks. Stepping &#9664; from p = 2 lands here too.">1</button>
+      <button class="chip tl" id="lift-p-play-btn" onclick="liftPPlay()" title="Step p through the primes, on loop. With Sync w/ C(n) on it skips primes already saturated at this n.">&#9654; Play</button>
+    </div>
+    <div class="prow">
+      <div class="stepper">
         <button class="chip lift-npdir-btn on" data-d="both" onclick="liftSetNPathDir('both')" title="Both branches, +n and &minus;n">&#8597;</button>
         <button class="chip lift-npdir-btn" data-d="plus" onclick="liftSetNPathDir('plus')" title="+n branch only">&#9650;</button>
         <button class="chip lift-npdir-btn" data-d="minus" onclick="liftSetNPathDir('minus')" title="&minus;n branch only">&#9660;</button>
       </div>
+      <span class="hint" id="lift-n-locknote">locked: &plusmn;n path n and C(n) are one number &mdash; move either and both follow; the saturated primes the spiral skips come from this same n</span>
     </div>
 
     <div class="prow">
-      <span class="plabel">Spiral prime p</span>
-      <div class="stepper">
-        <button class="sbtn" onclick="liftCycleSpiralP(-1)" title="Previous prime">&#9664;</button>
-        <input class="sval" id="lift-p-inp" type="number" min="2" step="1" value="5" onchange="liftSetSpiralP(this.value)" style="width:56px;">
-        <button class="sbtn" onclick="liftCycleSpiralP(1)" title="Next prime">&#9654;</button>
-      </div>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.75);cursor:pointer;" title="Overlay the spiral of every prime p &le; G (the whole grid range) at once. Dense on big grids, and slower there: one spiral per prime."><input type="checkbox" id="lift-allp-chk" onchange="liftToggleAllP(this.checked)"> All p</label>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(155,127,232,.9);cursor:pointer;" title="Mirror conjugate &sigma;(r)=M&minus;r"><input type="checkbox" id="lift-mirror-chk" onchange="liftToggleMirror(this.checked)"> Mirror &sigma;(r)=M&minus;r</label>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(230,56,72,.9);cursor:pointer;" title="Highlight the dropout ring M=p, where the residue vanishes."><input type="checkbox" id="lift-dropout-chk" onchange="liftToggleDropout(this.checked)"> Dropout M=p</label>
@@ -1732,8 +1740,6 @@ walk anyway.</p>
       <span class="lbl">speed</span>
       <input type="range" min="20" max="500" step="10" value="140" oninput="liftSetAnimSpeed(this.value)" style="max-width:110px;">
       <span class="val" id="lift-speed-val">140ms</span>
-      <button class="chip" id="lift-n-play-btn" onclick="liftNPlay()" title="Animate the lift depth n — while locked, the r-chain depth n moves with it.">&#9654; n</button>
-      <button class="chip" id="lift-p-play-btn" onclick="liftPPlay()" title="Animate the spiral prime p.">&#9654; p</button>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(200,168,74,.85);cursor:pointer;" title="While ▶ p plays, skip primes already saturated at the current lift depth (p ≤ n+1)."><input type="checkbox" id="lift-psync-chk" checked onchange="liftTogglePSync(this.checked)"> Sync w/ C(n)</label>
     </div>
 
@@ -3390,6 +3396,7 @@ function stepWelcome(d) {
 document.addEventListener('keydown', e => {
   const m = $('welcome-modal');
   if (!m || m.style.display === 'none') return;
+  const _pv = document.getElementById('ms-preview-modal'); if (_pv && _pv.style.display !== 'none') return;   // math-sheet preview open: leave the opener alone
   if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
   if (e.target && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== 'checkbox') return;
   e.preventDefault(); e.stopImmediatePropagation();
@@ -3618,12 +3625,13 @@ function openerSquarePoints() {
    plate's #lens-lbl select -- so there's nothing to remember, just read. */
 var MS_LBL = { on: false, stats: null };   // math-sheet plates only: M labels, collision-free (see msLblPlace)
 const OPENER_LABEL_MODES = [
-  { id: 'off', short: 'off',       t: 'No per-point labels.' },
-  { id: 'rM',  short: 'r/M',       t: 'Both coordinates, r over M.' },
-  { id: 'r',   short: 'r',         t: 'The row coordinate alone.' },
-  { id: 'M',   short: 'M',         t: 'The ring/column coordinate alone.' },
-  { id: 'res', short: 'r mod M',   t: 'The residue: r mod M.' },
-  { id: 'gcd', short: 'gcd(r,M)',  t: 'gcd(r,M) \u2014 1 marks a coprime cell.' }
+  { id: 'off',   short: 'off',       t: 'No per-point labels.' },
+  { id: 'r',     short: 'r',         t: 'The row coordinate alone.' },
+  { id: 'M',     short: 'M',         t: 'The ring/column coordinate alone.' },
+  { id: 'rM',    short: 'r/M',       t: 'Both coordinates, r over M.' },
+  { id: 'res',   short: 'r mod M',   t: 'The residue: the remainder of r divided by M. It equals r for r < M and reads 0 at r = M; it only differs from r where r > M (wrap / Grid), where it is the point\u2019s place around ring M.' },
+  { id: 'gcd',   short: 'gcd(r,M)',  t: 'gcd(r,M) \u2014 1 marks a coprime cell.' },
+  { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; 16+ = capped). The cell survives a block of width n+1 exactly when its depth is more than n.' }
 ];
 let _openerLblIdx = 0;
 let OPENER_LABEL_MODE = OPENER_LABEL_MODES[0].id;
@@ -3634,6 +3642,7 @@ function openerLabelText(mode, r, M) {
     : mode === 'M'   ? '' + M
     : mode === 'res' ? '' + (M > 0 ? r % M : 0)
     : mode === 'gcd' ? '' + gcd(r, M)
+    : mode === 'depth' ? (() => { const d = (typeof depthDir !== 'undefined' && depthDir === 'd') ? blockDepthDiag(r, M) : blockDepth(r, M); return d >= DEPTH_CAP ? DEPTH_CAP + '+' : '' + d; })()
     :                  r + '/' + M;   // 'rM', and the fallback
 }
 function stepOpenerLabelMode(d) {
@@ -4792,7 +4801,7 @@ function oeTallyData(Gopt, full) {
     cop: cop, copExpect: full ? 2 * ph.sum - 1 : ph.sum,
     rows: rows.map(e => ({ sw: swatch(e), label: e.l, n: e.n, pct: pct(e.n) })),
     more: more ? { label: '+ ' + more.classes + ' more classes', n: more.n, pct: pct(more.n) } : null,
-    sumOk: sum === total, sum: sum, total: total,
+    sumOk: sum === total, sum: sum, total: total, byLabel: map,
     gcdLine: full ? 'gcd = 1 cells: ' + cop + ' = 2\u00b7(\u03c6(1)+\u2026+\u03c6(' + G + ')) \u2212 1 = ' + (2 * ph.sum - 1) : 'gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' + (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum,
     gcdOk: cop === (full ? 2 * ph.sum - 1 : ph.sum),
     bandLine: (mode === 'ethiopia' || mode === 'ethiodepth' || mode === 'ethioinv') ? 'each band tends to G\u00b2/6 = ' + (G * G / 6).toFixed(1) + ' cells as G grows' : null
@@ -5757,7 +5766,7 @@ function sendOpenerToMainPage() {
   const lp = $('lift-panel'); if (lp) lp.classList.remove('collapsed');
   if (!liftOn) liftToggleOn();
   liftSetMode(OL.mode);
-  liftSetSpiralP(OL.p);
+  liftSetSpiralP(OL.p);   // 1 carries over too (residue-1 line)
   liftToggleAllP(OL.allP); { const c = $('lift-allp-chk'); if (c) c.checked = OL.allP; }
   liftToggleMirror(OL.mirror); { const c = $('lift-mirror-chk'); if (c) c.checked = OL.mirror; }
   liftToggleDropout(OL.dropout); { const c = $('lift-dropout-chk'); if (c) c.checked = OL.dropout; }
@@ -5769,6 +5778,7 @@ function sendOpenerToMainPage() {
   liftLockN = !!OL.lockN;
   liftNManual = openerLiftN();
   liftSetChainN(openerChainN());
+  liftRenderNReadout(); liftRenderTable();   // both steppers show the opener's n and C(n) at once
 
   redraw(true);
 }
@@ -7073,6 +7083,7 @@ function liftSetMode(m) {
 }
 function liftToggleLockN(v) {
   liftLockN = !!v;
+  if (liftCNPlayIv) { clearInterval(liftCNPlayIv); liftCNPlayIv = null; const cb = $('lift-cn-play-btn'); if (cb) { cb.textContent = '\u25B6'; cb.classList.remove('on'); } }
   if (liftLockN) liftNManual = Math.max(0, Math.min(liftMaxN(), liftChainN));   // adopt the r-chain's depth on lock
   liftRenderNReadout();
   redraw(false);
@@ -7084,6 +7095,7 @@ function liftStepN(d) {
 }
 function liftRenderNReadout() {
   const el = $('lift-n-val'); if (el) el.textContent = liftN();
+  const cel = $('lift-cn-val'); if (cel) cel.textContent = liftChainNEff();
   const note = $('lift-n-locknote'); if (note) note.style.display = liftLockN ? '' : 'none';
   liftRenderChainNReadout();
   const lockChk = $('lift-lockn-chk'); if (lockChk) lockChk.checked = liftLockN;
@@ -7094,16 +7106,18 @@ function liftSetNPathDir(d) {
   redraw(false);
 }
 function liftCycleSpiralP(dir) {
-  liftSpiralP = Math.max(2, dir > 0 ? nextPrime(liftSpiralP) : prevPrime(liftSpiralP));
+  // p runs 1, 2, 3, 5, 7 ...: 1 is not prime but it is the residue every ring has, so it sits before 2 (as in the opener).
+  liftSpiralP = dir > 0 ? nextPrime(liftSpiralP) : (liftSpiralP <= 2 ? 1 : prevPrime(liftSpiralP));
   const inp = $('lift-p-inp'); if (inp) inp.value = liftSpiralP;
   redraw(false);
 }
 function liftSetSpiralP(v) {
   v = Math.round(+v) || 2;
-  liftSpiralP = isPrime(v) ? v : nextPrime(v - 1);
+  liftSpiralP = v === 1 ? 1 : (isPrime(v) ? v : nextPrime(Math.max(1, v - 1)));
   const inp = $('lift-p-inp'); if (inp) inp.value = liftSpiralP;
   redraw(false);
 }
+function liftLockOne() { if (liftPPlayIv) liftPPlay(); liftSetSpiralP(1); }
 function liftToggleMirror(v) { liftMirrorOn = !!v; redraw(false); }
 function liftToggleDropout(v) { liftDropoutOn = !!v; redraw(false); }
 function liftToggleDropoutLbl(v) { liftDropoutLblOn = !!v; redraw(false); }
@@ -7146,6 +7160,7 @@ function liftRenderChainNReadout() {
   const mx = liftMaxN();
   liftNManual = Math.min(liftNManual, mx); liftChainN = Math.min(liftChainN, mx);   // G shrank under the depth
   const el = $('lift-chain-n-val'); if (el) el.textContent = liftChainNEff();
+  const cel = $('lift-cn-val'); if (cel) cel.textContent = liftChainNEff();
   liftChainN = liftLockN ? liftN() : liftChainN;
   const sl = $('lift-chain-n-sl');
   if (sl) { sl.max = mx; sl.value = liftChainNEff(); }
@@ -7172,13 +7187,32 @@ function liftNPlay() {
   const btn = $('lift-n-play-btn');
   if (liftNPlayIv) {
     clearInterval(liftNPlayIv); liftNPlayIv = null;
-    if (btn) { btn.textContent = '\u25B6 n'; btn.classList.remove('on'); }
+    if (btn) { btn.textContent = '\u25B6'; btn.classList.remove('on'); }
+    const cb = $('lift-cn-play-btn'); if (cb && !liftCNPlayIv) { cb.textContent = '\u25B6'; cb.classList.remove('on'); }
     return;
   }
-  if (btn) { btn.textContent = '\u23F8 n'; btn.classList.add('on'); }
+  if (btn) { btn.textContent = '\u25A0'; btn.classList.add('on'); }
+  if (liftLockN) { const cb = $('lift-cn-play-btn'); if (cb) { cb.textContent = '\u25A0'; cb.classList.add('on'); } }
   liftNPlayIv = setInterval(function () {
     // Steps the lift depth n; while locked the r-chain depth moves with it.
     liftNManual = (liftNManual + 1 > liftMaxN()) ? 0 : liftNManual + 1;
+    liftRenderNReadout(); liftRenderTable(); redraw(false);
+  }, liftAnimSpeed);
+}
+/* C(n) play: steps the r-chain depth 0 .. G-1 and wraps. Locked, one clock moves both n, so it just runs the shared one. */
+let liftCNPlayIv = null;
+function liftCNPlay() {
+  const btn = $('lift-cn-play-btn');
+  if (liftCNPlayIv) {
+    clearInterval(liftCNPlayIv); liftCNPlayIv = null;
+    if (btn) { btn.textContent = '\u25B6'; btn.classList.remove('on'); }
+    return;
+  }
+  if (liftLockN) { liftNPlay(); return; }
+  if (btn) { btn.textContent = '\u25A0'; btn.classList.add('on'); }
+  liftCNPlayIv = setInterval(function () {
+    if (liftLockN) { clearInterval(liftCNPlayIv); liftCNPlayIv = null; if (btn) { btn.textContent = '\u25B6'; btn.classList.remove('on'); } return; }
+    liftChainN = (liftChainN + 1 > liftMaxN()) ? 0 : liftChainN + 1;
     liftRenderNReadout(); liftRenderTable(); redraw(false);
   }, liftAnimSpeed);
 }
@@ -7186,10 +7220,10 @@ function liftPPlay() {
   const btn = $('lift-p-play-btn');
   if (liftPPlayIv) {
     clearInterval(liftPPlayIv); liftPPlayIv = null;
-    if (btn) { btn.textContent = '\u25B6 p'; btn.classList.remove('on'); }
+    if (btn) { btn.textContent = '\u25B6 Play'; btn.classList.remove('on'); }
     return;
   }
-  if (btn) { btn.textContent = '\u23F8 p'; btn.classList.add('on'); }
+  if (btn) { btn.textContent = '\u25A0 Stop'; btn.classList.add('on'); }
   liftPPlayIv = setInterval(function () {
     let p = nextPrime(liftSpiralP);
     if (liftPSyncOn) { const cap = liftN() + 1; while (p <= cap) p = nextPrime(p); }
@@ -7209,12 +7243,11 @@ function liftXY(r, M, S) {
 
 function liftComputeCD(n) {
   const ZETA2 = Math.PI * Math.PI / 6;
-  let D = 1, sat = 0;
-  for (let i = 0; i < PRIMES.length; i++) {
-    const p = PRIMES[i], num = Math.min(n + 1, p);
-    D *= (1 - num / (p * p));
-    if (p <= n + 1) sat++;
-  }
+  // D(n) comes from Dn(), the cached product over every prime below 200,000. This loop used to multiply over
+  // PRIMES (primes below 10,000 only), which left D(0) = 0.607933 and C(0) = 1.000010 instead of 6/pi^2 and 1.
+  let sat = 0;
+  for (let i = 0; i < PRIMES.length; i++) if (PRIMES[i] <= n + 1) sat++;
+  const D = Dn(n);
   return { C: D * ZETA2, D: D, sat: sat, zeta2: ZETA2 };
 }
 
@@ -9933,7 +9966,7 @@ function paintPlate(ctx, x, y, w, h, cap, keepFlags) {
    (density, residue, modular distance) get a ramp instead, since naming
    eight stops of a gradient would be inventing structure that is not there. */
 function colourKeyEntries(mode) {
-  const probe = (r, M, lab) => ({ lab, rgb: cellRGBAstr(mode, 1, r, M, 1) });
+  const probe = (r, M, lab) => ({ lab, rgb: cellRGBAstr(mode, 1, r, M, 1), r: r, M: M });
   switch (mode) {
     case 'binary':
       return [probe(1, 2, 'gcd = 1  coprime'), probe(2, 4, 'gcd > 1')];
@@ -9988,6 +10021,38 @@ function colourKeyEntries(mode) {
     default:
       return null;                     // continuous, or outside the argument
   }
+}
+/* The colour key with a cell count on every class, so an exported plate says how much of the lattice each
+   colour is, not only what it means. Counts come from the same tally the opener's table uses (oeTallyData),
+   read over the full G x G square the plate holds, and each key row is matched to its class through the same
+   classifier (openerClass), so a row can never be counted against the wrong colour. The tally is cached per
+   mode / G / block depth, since the legend, the side key and the math sheet all ask for it. */
+const KEY_COUNT_MAX_G = 2048;   // 4.2M cells; above this the tally is too slow to run at export time
+let _keyTallyCache = { k: '', td: null };
+function keyTally(G) {
+  const mode = $('cmode').value, k = mode + '|' + G + '|' + blockN() + '|' + (typeof depthDir !== 'undefined' ? depthDir : '');
+  if (_keyTallyCache.k !== k) _keyTallyCache = { k: k, td: oeTallyData(G, true) };
+  return _keyTallyCache.td;
+}
+function colourKeyWithCounts(mode, G) {
+  const entries = colourKeyEntries(mode);
+  if (!entries || !G || G > KEY_COUNT_MAX_G) return entries;
+  let td; try { td = keyTally(G); } catch (e) { return entries; }
+  const total = td.total, seen = new Set(), lim = blockN() + 1;
+  const pct = n => (100 * n / total).toFixed(n * 1000 < total ? 2 : 1) + '%';
+  return entries.map(e => {
+    let cls = null, m;
+    if (mode === 'sat' && (m = /^p = (\d+)/.exec(e.lab))) cls = 'prime ' + m[1] + ' | r  \u00b7 killed';
+    else if (mode === 'failp' && (m = /^p = (\d+)/.exec(e.lab))) cls = 'first fail: prime ' + m[1];
+    else if (e.r !== undefined && e.lab.indexOf('grouped into the classes') < 0) { try { cls = openerClass(mode, e.r, e.M).l; } catch (x) {} }
+    if (cls === null) return e;
+    const c = td.byLabel.get(cls), n = c ? c.n : 0;
+    let note;
+    if (seen.has(cls)) note = 'counted with the class above';
+    else { seen.add(cls); note = n.toLocaleString() + ' cells \u00b7 ' + pct(n); }
+    if (n === 0 && (mode === 'sat') && /^p = (\d+)/.test(e.lab) && +RegExp.$1 > lim) note = '0 \u00b7 p > n+1 = ' + lim + ', not saturated yet';
+    return { lab: e.lab, rgb: e.rgb, r: e.r, M: e.M, n: n, note: note };
+  });
 }
 function bigOmega(n) {
   let m = n, c = 0;
@@ -10162,7 +10227,8 @@ function exportDetailSections(views) {
       ' \u00b7 dot ' + liftDotScale.toFixed(2) + '\u00d7 \u00b7 thickness ' + liftThick.toFixed(2) + '\u00d7' +
       (liftDimOn ? ' \u00b7 base plate dimmed to ' + liftDimPct + '%' : '') });
     li.push({ rgb: null, text: 'saturated p \u2264 n+1: ' + (sat.length ? sat.join(', ') : 'none') + ' (' + cd.sat + ')' });
-    li.push({ rgb: null, text: 'D(n) = ' + fmt(cd.D, 6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + fmt(cd.C, 6) });
+    li.push({ rgb: null, text: 'D(n) = ' + fmt(cd.D, 6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + fmt(cd.C, 6) + (liftChainNEff() !== n ? ' \u00b7 at \u00b1n path n = ' + n : '') });
+    if (liftChainNEff() !== n) { const nc = liftChainNEff(), cc = liftComputeCD(nc); li.push({ rgb: null, text: 'at C(n) depth n = ' + nc + ': D(n) = ' + fmt(cc.D, 6) + ' \u00b7 C(n) = ' + fmt(cc.C, 6) + ' \u00b7 saturated p \u2264 n+1: ' + (PRIMES.filter(q => q <= nc + 1).join(', ') || 'none') }); }
     {
       const globalCop = 6 / (Math.PI * Math.PI), ratioD = cd.D / globalCop, deltaD = 100 * (ratioD - 1);
       li.push({ rgb: null, text: 'D(n) / (6/\u03c0\u00b2) = ' + ratioD.toFixed(4) + '\u00d7 global pair density \u00b7 \u0394 ' + (deltaD >= 0 ? '+' : '') + deltaD.toFixed(2) + '%' });
@@ -10171,9 +10237,9 @@ function exportDetailSections(views) {
   }
 
   // ── WHAT THE PICTURE COUNTS ── the colour classes with their cell counts, as in the opener's table
-  if (COP_G && COP_G <= 800) {
+  if (COP_G && COP_G <= KEY_COUNT_MAX_G) {
     try {
-      const td = oeTallyData(COP_G, true), ci = [];
+      const td = keyTally(COP_G), ci = [];
       td.rows.concat(td.more ? [td.more] : []).forEach(r => ci.push({ rgb: r.sw || null, text: r.label + ' \u00b7 ' + r.n.toLocaleString() + ' \u00b7 ' + r.pct }));
       ci.push({ rgb: null, text: td.header });
       ci.push({ rgb: null, text: 'classes sum to ' + td.sum.toLocaleString() + (td.sumOk ? ' \u2713' : ' \u2260 ' + td.total.toLocaleString()) });
@@ -10182,7 +10248,7 @@ function exportDetailSections(views) {
       out.push({ title: 'WHAT THE PICTURE COUNTS', items: ci });
     } catch (e) {}
   } else if (COP_G) {
-    out.push({ title: 'WHAT THE PICTURE COUNTS', items: [{ rgb: null, text: 'class counts skipped above G = 800 (' + (COP_G * COP_G).toLocaleString() + ' cells)' }] });
+    out.push({ title: 'WHAT THE PICTURE COUNTS', items: [{ rgb: null, text: 'class counts are not run above G = ' + KEY_COUNT_MAX_G + ' (' + (COP_G * COP_G).toLocaleString() + ' cells)' }] });
   }
 
   // ── PARTITION / SECTORS ──
@@ -10528,13 +10594,14 @@ async function exportPNG(pxReq, views) {
        colours mean. Sampled from the painter, so it is a key and not a claim
        about the palette. */
     const mode = $('cmode').value;
-    const entries = colourKeyEntries(mode);
+    const entries = colourKeyWithCounts(mode, COP_G);
     let ky = headerH + lp.y + 30 * S + (wrap(DESC[v] || '', lp.w).length + 2) * 20 * S;
     ctx.fillStyle = PAL.gold; ctx.font = (13 * S) + 'px ' + MONO;
     ctx.fillText('COLOUR KEY \u00b7 ' + mode, lp.x, ky);
     ky += 26 * S;
     if (entries) {
       ctx.font = (12.5 * S) + 'px ' + MONO;
+      const keyLabW = Math.max.apply(null, entries.map(e => ctx.measureText(e.lab).width)) + ctx.measureText('   ').width;
       entries.forEach((e, i) => {
         const ey = ky + i * 22 * S;
         ctx.fillStyle = e.rgb;
@@ -10543,6 +10610,10 @@ async function exportPNG(pxReq, views) {
         ctx.strokeRect(lp.x + .5, ey - 8 * S + .5, 15 * S - 1, 15 * S - 1);
         ctx.fillStyle = PAL.cream3;
         ctx.fillText(e.lab, lp.x + 26 * S, ey);
+        if (e.note) {
+          ctx.fillStyle = PAL.cream2; ctx.fillText('\u00b7 ' + e.note, lp.x + 26 * S + keyLabW, ey);
+          ctx.fillStyle = PAL.cream3;
+        }
       });
       ky += entries.length * 22 * S + 10 * S;
     } else {
@@ -13844,10 +13915,15 @@ async function msRender(doc, theme, opts) {
       const px = 27, lh = 40, swW = 34, numW = 130, pctW = 170, labW = TW - swW - numW - pctW - 20;
       const laid = b.rows.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
       const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
-      add(rowsH + 70, (c, y0) => {
+      const HH = b.head ? 46 : 0;
+      add(rowsH + 70 + HH, (c, y0) => {
         c.textBaseline = 'alphabetic';
-        c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8); c.lineTo(W - MX, y0 + 8); c.stroke();
-        let yy = y0 + 50;
+        if (b.head) {
+          c.fillStyle = th.acc; c.font = '22px ' + MONO; c.textAlign = 'left'; c.fillText(msSpaced(b.head[0]), MX + swW, y0 + 36);
+          c.textAlign = 'right'; c.fillText(msSpaced(b.head[1]), W - MX - pctW, y0 + 36); c.fillText(msSpaced(b.head[2]), W - MX, y0 + 36);
+        }
+        c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8 + HH); c.lineTo(W - MX, y0 + 8 + HH); c.stroke();
+        let yy = y0 + 50 + HH;
         laid.forEach(l => {
           if (l.r.sw) { c.fillStyle = l.r.sw; c.fillRect(MX, yy - 24, swW - 8, swW - 8); c.strokeStyle = th.edge; c.lineWidth = 1.5; c.strokeRect(MX + .75, yy - 24 + .75, swW - 9.5, swW - 9.5); }
           c.textAlign = 'left'; c.fillStyle = th.ink; c.font = px + 'px ' + MONO;
@@ -13940,6 +14016,7 @@ async function msRender(doc, theme, opts) {
         if (py === TOP && tot <= FULL) { ch.forEach(place); return; }
         ch.forEach((it, i) => {
           let need = it.h; if (it.t === 'h' && ch[i + 1]) need += ch[i + 1].h;
+          if (it.t === 'p' && ch[i + 1] && (ch[i + 1].t === 'table' || ch[i + 1].t === 'key')) need += ch[i + 1].h;   // intro stays with its table
           // A bare formula right after another bare formula (no paragraph between them) is one
           // train of thought — e.g. the short one-line facts in §6 — so a page break never lands
           // between two of those; it waits for the next item that actually starts a new thought
@@ -13953,6 +14030,7 @@ async function msRender(doc, theme, opts) {
       items.forEach((it, i) => {
         let need = it.h;
         if (it.t === 'h' && items[i + 1]) need += items[i + 1].h;
+        if (it.t === 'p' && items[i + 1] && (items[i + 1].t === 'table' || items[i + 1].t === 'key')) need += items[i + 1].h;
         if ((py + need > BOT || (it.t === 'h' && it.sec === 3)) && py > TOP) { groups.push([]); py = TOP; }
         groups[groups.length - 1].push({ it: it, y: py }); py += it.h;
       });
@@ -14202,7 +14280,7 @@ function msLiftDetail(G, o) {
         rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%' });
       }
       out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
-      out.push({ t: 'table', rows: rows });
+      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share'], rows: rows });
     }
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
@@ -14229,6 +14307,50 @@ function msGoldbach(G, gbG, title) {
     const S = sigma(E, spf), li = li2(E);
     out.push({ t: 'eq', tex: msT`\mathfrak{S}(E)=2C_{2}\prod_{p\mid E,\ p>2}\frac{p-1}{p-2}=${msf(S, 6)},\qquad C_{2}=0.660162\ldots`, cap: 'Hardy–Littlewood: r(E) ~ 𝔖(E)·li₂(E), here ' + msf(S * li, 2) + ' against the actual ' + ordered + '. The asymptotic is a statement about large E; at this size it is a rough guide.' });
   } catch (e) {}
+  return out;
+}
+/* The singular series, written once for the three things this plate measures. v_p = nu_p = the number of
+   residue classes an excluded set loses at the prime p; every density here is a product of local factors in it.
+   Numbers are computed from the plate's own G, n and strip, and the closed form is checked against the
+   product multiplied out prime by prime. */
+let _ssPrimes = null;
+function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn) {
+  const out = [{ t: 'h', text: 'The singular series' }];
+  out.push({ t: 'p', text: 'Every density on this page is one count. For a set of excluded residue classes, \u03bd_p is the number of the p classes it removes at the prime p. A line loses the share \u03bd_p/p at p; a block of cells loses \u03bd_p/p\u00b2, because the cell also needs p | r. The singular series is the product of the local factors, set against what independent primes would give.' });
+  out.push({ t: 'eq', tex: msT`\mathfrak S(\mathscr X)=\prod_{p}\frac{1-\nu_p/p}{(1-1/p)^{|\mathscr X|}},\qquad \nu_p=\#\{\,h\bmod p:\ h\in\mathscr X\,\}`, cap: 'The product converges because \u03bd_p = |X| once p is large, and then the factor is 1 \u2212 O(1/p\u00b2).' });
+  // block
+  const nu = [2, 3, 5, 7].map(q => ({ q: q, v: Math.min(cn + 1, q) }));
+  let Dv = NaN; try { Dv = Dn(cn); } catch (e) {}
+  const fr = nu.map(o => msT`\Big(1-\frac{${o.v}}{${o.q * o.q}}\Big)`).join('');
+  out.push({ t: 'eq', tex: msT`\text{block, }\mathscr X=\{0,\dots,n\}:\quad D(${cn})=${fr}\cdots=${msf(Dv, 6)}`, cap: 'Here \u03bd_p = min(n+1, p), at the plate\u2019s C(n) depth n = ' + cn + '. The first four primes are written out; the product runs over every prime. The measured share on the plate is in the section above.' });
+  // strip
+  if (!stripEmpty && a === 1 && b === 1 && w === 1 && Math.abs(s) >= 1) {
+    const g0 = Math.abs(s), ps = pfac(g0, SPF);
+    out.push({ t: 'eq', tex: msT`\text{strip, }\mathscr X=\{0\}\ \text{on}\ r-M=${s}:\quad \gcd(r,M)=\gcd(${g0},M)\ \Longrightarrow\ \delta\to\prod_{p\mid ${g0}}\Big(1-\frac1p\Big)=\frac{\varphi(${g0})}{${g0}}=${msf(phi(g0, SPF) / g0, 6)}`, cap: 'One class is lost at each prime dividing ' + g0 + ' (\u03bd_p = 1 there, 0 elsewhere)' + (ps.length ? ': p = ' + ps.join(', ') + '.' : '; |s| = 1 loses none, so \u03b4 \u2192 1.') });
+  } else if (!stripEmpty) {
+    out.push({ t: 'p', text: 'The strip prediction \u03b4_pred of the section above is this same product, evaluated on each diagonal v = c in the window and averaged by the diagonal\u2019s length.' });
+  }
+  // Goldbach
+  const E = 2 * (G + 1);
+  try { ensureSPFTo(E); } catch (e) {}
+  const odd = pfac(E, SPF).filter(q => q > 2);
+  const S = sigma(E, SPF);
+  const facTex = odd.length ? odd.map(q => msT`\frac{${q - 1}}{${q - 2}}`).join('\\cdot ') : '1';
+  out.push({ t: 'eq', tex: msT`\text{Goldbach, }\mathscr X=\{0,E\}:\quad \nu_p=\begin{cases}1&p\mid E\\2&p\nmid E\end{cases}\ \Longrightarrow\ \mathfrak S(E)=2\!\prod_{p>2}\Big(1-\frac1{(p-1)^{2}}\Big)\prod_{p\mid E,\ p>2}\frac{p-1}{p-2}` });
+  out.push({ t: 'eq', tex: msT`E=2(G+1)=${E},\qquad \mathfrak S(${E})=2C_{2}\cdot ${facTex}=${msf(S, 6)},\qquad C_{2}=0.660162\ldots` });
+  try {
+    if (!_ssPrimes) _ssPrimes = primesUpTo(200000);
+    let direct = 1; for (const q of _ssPrimes) { const v = (E % q === 0) ? 1 : 2; direct *= (1 - v / q) / ((1 - 1 / q) * (1 - 1 / q)); }
+    out.push({ t: 'note', text: 'Check: multiplying the local factors \u03bd_p = 1 or 2 out prime by prime over all primes below 200,000 gives ' + msf(direct, 6) + ', against the closed form ' + msf(S, 6) + '. The tail beyond 200,000 moves the product by less than 2\u00b710\u207b\u2076.' });
+  } catch (e) {}
+  if (partOn) {
+    out.push({ t: 'p', text: 'The count this predicts, for the gap on show, follows in the Goldbach section.' });
+  } else if (E <= 20000) {
+    const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
+    const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
+    let hl = NaN; try { hl = S * li2(E); } catch (e) {}
+    out.push({ t: 'eq', tex: msT`r(E)\sim\mathfrak S(E)\,\mathrm{li}_{2}(E):\qquad r(${E})=${ordered},\qquad \mathfrak S(${E})\,\mathrm{li}_{2}(${E})=${msf(hl, 1)},\qquad \text{ratio}=${msf(hl ? ordered / hl : NaN, 3)}`, cap: 'r(E) counts the ordered ways E = q + q\u2032 with both prime. The asymptotic is a statement about large E; at this size it is a rough guide.' });
+  }
   return out;
 }
 function msStripLines(a, b, s, w) {
@@ -14322,6 +14444,15 @@ function msBuildOpener(noPlates) {
   doc.push({ t: 'eq', tex: msT`\lim_{G\to\infty}\ \frac{\#\{(r,M)\in\mathcal L_G:\ \gcd(r,M)=1\}}{|\mathcal L_G|}=\frac{6}{\pi^{2}}` });
 
   // 6 · lift
+  let ssDone = false;
+  const ssPush = () => {
+    if (ssDone) return; ssDone = true;
+    try {
+      let se = !OL.stripOn;
+      if (OL.stripOn) { try { se = !olStripPoints(G).total; } catch (e) {} }
+      msSingularSeries(G, cn, OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width), se, !!OL.gbOn).forEach(x => doc.push(x));
+    } catch (e) {}
+  };
   if (liftActive) {
     const L = [];
     if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') {
@@ -14334,12 +14465,15 @@ function msBuildOpener(noPlates) {
       msStripLines(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width)).forEach(b => L.push(b));
       try {
         const sp = olStripPoints(G);
+        if (!sp.total) L.push({ t: 'p', text: 'This band holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (OL.slopeA === -1 && OL.slopeB === 1 ? ' For slope \u22121/1 the band is the anti-diagonal r + M = ' + OL.offset + (Math.max(1, OL.width) > 1 ? ' \u2026 ' + (OL.offset + Math.max(1, OL.width) - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
+        else
         L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}` });
       } catch (e) {}
     }
     msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: cn, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
     msBlockSection(cn, L).forEach(b => doc.push(b));
     if (OL.gbOn) {
+      ssPush();
       doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG).forEach(b => doc.push(b));
       try {
         const E = olGoldbachN(), gg = Math.max(1, Math.min(Math.floor(E / 2), OL.gbG || 1)), ss = E - gg, ps = olGoldbachPairs();
@@ -14353,6 +14487,7 @@ function msBuildOpener(noPlates) {
       } catch (e) {}
     }
   }
+  ssPush();
   return doc;
 }
 
@@ -14363,7 +14498,8 @@ function msBuildMain(views, noPlates) {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
   const vs = names[views[0]] ? views : [viewMode];
   const vname = vs.map(v => names[v]).join(' · ');
-  const liveLift = (typeof liftOn !== 'undefined' && liftOn && liftMode !== 'none');
+  // same test the opener uses: the r-chain draws C(n) lines even when the mode is None, so it counts as lift
+  const liveLift = (typeof liftOn !== 'undefined' && liftOn && (liftMode !== 'none' || liftChainOn));
   const pm = (typeof partMode !== 'undefined') ? partMode : 'off';
   const doc = [];
   doc.push({ t: 'title', eyebrow: 'Strip Arithmetic II · The Plate', title: 'The Mathematics of This Export', sub: vname + ' · G = ' + G + (walkMode === 'band' ? ' · block band w = ' + w : ' · strip ' + a + '/' + b + ', s = ' + s + ', w = ' + w), by: 'Wessen Getachew  ·  wessengetachew.github.io  ·  ' + msDate() });
@@ -14374,7 +14510,12 @@ function msBuildMain(views, noPlates) {
   const P = [['G', String(G)], ['views', vname], ['walk', walkMode], ['strip a/b', a + '/' + b], ['offset s', String(s)], ['width w', String(w)], ['colouring', label]];
   if (vs.includes('ring')) P.push(['θ mode', thetaMode], ['ring turn θ₀', msDeg(ringRot) + '°'], ['ring hole h', msf(ringHole, 2)], ['ring winding', RING_H > 0 ? 'clockwise' : 'counter-clockwise']);
   if (vs.includes('cayley')) P.push(['Cayley map', cmap + (cmap === 'A' ? '  ρ₀ ' + msf(rho0, 2) + '  ρ_d ' + msf(rhoD, 2) : '  a ' + msf(ba, 2) + '∠' + baAng + '°')], ['Cayley tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']);
-  P.push(['plate turns', vs.map(v => names[v] + ' ' + ((VQ[v] !== undefined ? VQ[v] : viewQuarter) * 90) + '°').join(', ')]);
+  P.push(['plate turns', vs.map(v => names[v] + ' ' + ((VQ[v] !== undefined ? VQ[v] : viewQuarter) * 90) + '\u00b0').join(', ')]);
+  if (liveLift) {
+    P.push(['lift mode', liftMode + ' \u00b7 \u00b1n path n = ' + liftN() + ' \u00b7 C(n) n = ' + liftChainNEff() + (liftLockN ? ' (locked)' : '')]);
+    if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') P.push(['spiral p', liftAllPOn ? 'all p \u2264 G' : String(liftSpiralP)]);
+    P.push(['showing', [liftSurvOn ? 'surviving' : '', liftBrokenOn ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
+  }
   doc.push({ t: 'h', text: 'Parameters' });
   doc.push({ t: 'params', items: P });
 
@@ -14407,13 +14548,13 @@ function msBuildMain(views, noPlates) {
   // 4 · colouring
   msColouring().forEach(x => doc.push(x));
   try {
-    const entries = colourKeyEntries($('cmode').value);
-    if (entries && entries.length) { doc.push({ t: 'p', text: 'Colour key, sampled from the painter itself:' }); doc.push({ t: 'key', items: entries.map(e => ({ rgb: e.rgb, lab: e.lab })) }); }
+    const entries = colourKeyWithCounts($('cmode').value, G);
+    if (entries && entries.length) { doc.push({ t: 'p', text: 'Colour key, sampled from the painter itself' + (entries.some(e => e.note) ? ', with the number of lattice cells in each class:' : ':') }); doc.push({ t: 'key', items: entries.map(e => ({ rgb: e.rgb, lab: e.lab + (e.note ? '  \u00b7  ' + e.note : '') })) }); }
   } catch (e) {}
 
   // 5 · counts: the same class table the opener shows, over the full G x G square this plate holds
-  if (G <= 800) try {
-    const td = oeTallyData(G, true);
+  if (G <= KEY_COUNT_MAX_G) try {
+    const td = keyTally(G);
     doc.push({ t: 'h', text: 'What the picture counts' });
     doc.push({ t: 'p', text: 'Classes of the active colouring over the lattice (' + td.header + '):' });
     doc.push({ t: 'table', rows: td.rows.concat(td.more ? [td.more] : []) });
@@ -14438,6 +14579,10 @@ function msBuildMain(views, noPlates) {
     msStripLines(a, b, s, w).forEach(x => doc.push(x));
     try {
       const st = walkStrip(0);
+      if (!st.total) {
+        const anti = (a === -1 && b === 1);
+        doc.push({ t: 'p', text: 'This window holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (anti ? ' For slope \u22121/1 the window is the anti-diagonal r + M = ' + s + (w > 1 ? ' \u2026 ' + (s + w - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
+      } else
       doc.push({ t: 'eq', tex: msT`\#\text{cells}=${st.total.toLocaleString()},\qquad \#\{\gcd=1\}=${st.cop.toLocaleString()},\qquad \delta=\frac{${st.cop.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.cop / st.total : 0, 9)}` });
       if (a === 1 && b === 1 && w === 1 && s === 0) {
         doc.push({ t: 'eq', tex: msT`r=M\ \Longrightarrow\ \gcd(r,M)=M,\ \text{coprime only at }M=1\ \Longrightarrow\ \delta=\frac1G=\frac1{${G}}=${msf(1 / G, 9)}` });
@@ -14455,14 +14600,20 @@ function msBuildMain(views, noPlates) {
 
   // 6 · lift + partitions
   if (liveLift) {
-    const n = liftN();
+    const n = liftN(), cn = liftChainNEff(), chainDrawn = liftChainOn && G <= 400;   // the plate draws the r-chain only up to G = 400
     const L = [];
     if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${liftAllPOn ? 'p,\\ p\\le G' : 'p=' + liftSpiralP}` });
     if (liftMode === 'npath' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
-    if (liftChainOn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1),\qquad\text{survives where }\gcd(r,M+1)=1,\qquad\text{depth}=${liftChainNEff()}` });
-    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: liftChainOn, chainN: liftChainNEff(), surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
-    msBlockSection(n, L).forEach(x => doc.push(x));
+    if (chainDrawn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)},\qquad n_C=${cn}` });
+    else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = 400, so no chain counts are given here.' });
+    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
+    msBlockSection(cn, L).forEach(x => doc.push(x));   // block length, D(n), C(n) at the C(n) depth, as the opener does
   }
+  try {
+    let stripEmpty = false;
+    if (walkMode !== 'band') { try { stripEmpty = !walkStrip(0).total; } catch (e) {} }
+    msSingularSeries(G, liveLift ? liftChainNEff() : 1, a, b, s, w, walkMode === 'band' ? true : stripEmpty, pm !== 'off').forEach(x => doc.push(x));
+  } catch (e) {}
   if (pm !== 'off') {
     doc.push({ t: 'h', text: 'Goldbach partitions' });
     msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.').forEach(x => doc.push(x));
@@ -14623,7 +14774,7 @@ function msDocToHtml(doc) {
       b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
       h += '</table></div>';
     } else if (b.t === 'table') {
-      h += '<table class="mp-table"><tbody>';
+      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th><th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th></tr></thead>' : '') + '<tbody>';
       b.rows.forEach(r => {
         h += '<tr><td class="sw">' + (r.sw ? '<i style="background:' + r.sw + '"></i>' : '') + '</td>' +
           '<td class="lab">' + msEsc(r.label) + '</td>' +
@@ -14655,8 +14806,69 @@ function msOpenPreview(doc) {
   document.body.style.overflow = 'hidden';
   body.scrollTop = 0;
   if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(() => {});
+  msLblSync();
+}
+/* Label controls in the preview (opener only; the main sheet always labels M). They drive the opener's own
+   label mode and size, then rebuild the sheet in place, keeping the scroll position. */
+function msLblSync() {
+  const t = $('msp-lbl-tools'); if (!t) return;
+  t.style.display = MS_PREV.kind === 'opener' ? 'inline-flex' : 'none';
+  if (MS_PREV.kind !== 'opener') return;
+  const sel = $('msp-lbl-sel');
+  if (sel) {
+    if (!sel.options.length) OPENER_LABEL_MODES.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.short; o.title = m.t; sel.appendChild(o); });
+    sel.value = msLbMode();
+  }
+  $('msp-lbl-f').textContent = { all: 'all', co: 'gcd = 1', nco: 'gcd > 1' }[msLbFilter()];
+  const sl = $('msp-lbl-sz'); if (sl && document.activeElement !== sl) sl.value = msLbScale();
+  $('msp-lbl-sz-v').innerHTML = msLbScale().toFixed(1) + '&times;';
+  $('msp-lbl-note').textContent = OPENER_G > MS_LBL_MAXG_FILTERED ? 'no labels past G = ' + MS_LBL_MAXG_FILTERED
+    : OPENER_G > msLbMax() ? 'G > ' + MS_LBL_MAXG + ': pick gcd = 1 or gcd > 1' : '';
+}
+let _msLblTimer = null;
+function msLblRefresh() {
+  clearTimeout(_msLblTimer);
+  _msLblTimer = setTimeout(() => {
+    const body = $('ms-preview-body'), doc = MS_PREV.doc;
+    if (!body || !doc || MS_PREV.kind !== 'opener') return;
+    if (MS_PREV.G && OPENER_G !== MS_PREV.G) setOpenerG(MS_PREV.G);   // the sheet text is frozen at that G; never redraw plates at another
+    const i = doc.findIndex(x => x.t === 'plate'); if (i < 0) return;
+    try {
+      // Only the plate pictures and the line under them are redrawn. Every number and equation on the sheet is
+      // left exactly as it was when the preview opened, so a label change can never touch the parameters.
+      doc[i] = { t: 'plate', items: msOpenerPlateImages() };
+      const old = body.querySelector('.mp-plates'), oldCap = old && old.nextElementSibling;
+      const tmp = document.createElement('div'); tmp.innerHTML = msDocToHtml([doc[i]]);
+      if (old && tmp.children.length >= 2) {
+        const top = body.scrollTop;
+        old.replaceWith(tmp.children[0]);
+        if (oldCap && oldCap.classList.contains('mp-cap')) oldCap.replaceWith(tmp.children[0]);
+        body.scrollTop = top;
+      }
+    } catch (e) {}
+  }, 80);
+}
+/* Preview-only label controls: they change MS_LB, never the opener. */
+function msLblAutoFilter() {
+  if (MS_LB.mode !== 'off' && MS_LB.filter === 'all' && OPENER_G > MS_LBL_MAXG && OPENER_G <= MS_LBL_MAXG_FILTERED) MS_LB.filter = 'co';
+}
+function msLblStep(d) {
+  const n = OPENER_LABEL_MODES.length;
+  MS_LB.idx = ((MS_LB.idx + d) % n + n) % n; MS_LB.mode = OPENER_LABEL_MODES[MS_LB.idx].id; msLblAutoFilter();
+  msLblSync(); msLblRefresh();
+}
+function msLblPick(id) {
+  const i = OPENER_LABEL_MODES.findIndex(m => m.id === id); if (i < 0) return;
+  MS_LB.idx = i; MS_LB.mode = id; msLblAutoFilter(); msLblSync(); msLblRefresh();
+}
+function msLblSize(v) { const n = Number(v); MS_LB.scale = isFinite(n) ? Math.max(0.5, Math.min(3, n)) : 1; msLblSync(); msLblRefresh(); }
+function msLblFilterStep() {
+  MS_LB.filter = { all: 'co', co: 'nco', nco: 'all' }[MS_LB.filter] || 'all';
+  msLblSync(); msLblRefresh();
 }
 function msClosePreview() {
+  MS_PREV.doc = null;
+  MS_LB.active = false;   // the sheet goes back to the opener's own labels
   const modal = $('ms-preview-modal'); if (!modal) return;
   modal.style.display = 'none';
   document.body.style.overflow = '';
@@ -14685,6 +14897,15 @@ function msPlateShot(w, h, paint) {
      4. A label whose box would cross the plate edge is dropped rather than clipped.
    Past MS_LBL_MAXG there is no size at which this reads, so the plate is left unlabelled. */
 const MS_LBL_MAXG = 40;
+const MS_LBL_MAXG_FILTERED = 128;   // with a gcd filter only about half the points carry a label, so more rings can be read
+/* The preview's own label settings. They apply to the sheet plates only (preview, PNG pages, PDF) and never
+   change the opener's labels; while the preview is open they override the opener's, and they are dropped when it closes. */
+const MS_LB = { active: false, mode: 'off', idx: 0, scale: 1, filter: 'all' };
+function msLbMode() { return MS_LB.active ? MS_LB.mode : OPENER_LABEL_MODE; }
+function msLbScale() { return MS_LB.active ? MS_LB.scale : (OL.lblScale || 1); }
+function msLbFilter() { return MS_LB.active ? MS_LB.filter : 'all'; }
+function msLbMax() { return msLbFilter() === 'all' ? MS_LBL_MAXG : MS_LBL_MAXG_FILTERED; }
+function msLbFilterText() { return { co: 'coprime cells (gcd(r, M) = 1)', nco: 'non-coprime cells (gcd(r, M) > 1)' }[msLbFilter()] || ''; }
 function msLblPlace(ctx, items, side, scale) {
   scale = scale > 0 ? scale : 1;   // the opener's label-size slider; main-page plates pass nothing
   const W = ctx.canvas.width, H = ctx.canvas.height;
@@ -14738,23 +14959,26 @@ function msLblPlace(ctx, items, side, scale) {
 /* The line under the plates: says what the numbers are, and says so if any were left off. */
 function msLblNote(items) {
   const L = items.filter(it => it.total > 0);
-  if (!L.length) return (items[0] && items[0].tooBig) ? 'Point labels are not drawn on a sheet plate past G = ' + MS_LBL_MAXG + '.' : '';
+  if (!L.length) return (items[0] && items[0].tooBig) ? 'Point labels are not drawn on a sheet plate past G = ' + (items[0].max || MS_LBL_MAXG) + '.' : '';
   const cut = L.filter(it => it.shown < it.total);
-  return 'Each point is labelled with ' + (L[0].what || 'its M') + '; gold marks a coprime cell.' + (cut.length
+  return 'Each point is labelled with ' + (L[0].what || 'its M') + '; gold marks a coprime cell.' + (L[0].only ? ' Only ' + L[0].only + ' are labelled.' : '') + (cut.length
     ? ' Where points crowd, some labels are left off so none overlap (' + cut.map(it => it.label + ' ' + it.shown + ' of ' + it.total).join(', ') + ').'
     : '');
 }
 function msLblXf(m, x, y) { return [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]; }
 function msLblOpener(ctx, xy, pts) {
   MS_LBL.stats = null;
-  if (OPENER_LABEL_MODE === 'off' || OPENER_G > MS_LBL_MAXG) return;   // the opener's own label setting rules
+  const mode = msLbMode(), flt = msLbFilter();
+  if (mode === 'off' || OPENER_G > msLbMax()) return;   // the sheet's own label setting rules (the opener's, unless the preview set one)
   const m = ctx.getTransform(), items = [];
   for (let i = 0; i < pts.length; i++) {
-    const r = pts[i][0], M = pts[i][1], q = xy(r, M); if (!q) continue;
+    const r = pts[i][0], M = pts[i][1], co = gcd(r, M) === 1;
+    if ((flt === 'co' && !co) || (flt === 'nco' && co)) continue;
+    const q = xy(r, M); if (!q) continue;
     const s = msLblXf(m, q[0], q[1]);
-    items.push({ x: s[0], y: s[1], t: openerLabelText(OPENER_LABEL_MODE, r, M), r: r, M: M, co: gcd(r, M) === 1 });
+    items.push({ x: s[0], y: s[1], t: openerLabelText(mode, r, M), r: r, M: M, co: co });
   }
-  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height), OL.lblScale || 1);
+  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height), msLbScale());
 }
 function msLblMain(ctx, S, kind) {
   MS_LBL.stats = null;
@@ -14791,11 +15015,11 @@ function msOpenerPlateImages() {
     const wideCay = v === 'cayley';   // math-sheet plates always show Cayley at 2:1, alone or beside Grid and Ring
     const w = wideCay ? S * 2 : S, h = S;
     const sh = msLabelledShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
-    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, what: msOpenerLblWhat(), tooBig: OPENER_LABEL_MODE !== 'off' && OPENER_G > MS_LBL_MAXG, cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
+    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && OPENER_G > msLbMax(), cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
   });
 }
 function msOpenerLblWhat() {
-  return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', gcd: 'its gcd(r, M)' }[OPENER_LABEL_MODE] || 'its M';
+  return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', gcd: 'its gcd(r, M)', depth: 'its block-survival depth (columns M, M+1, \u2026 coprime to r, capped at ' + DEPTH_CAP + ')' }[msLbMode()] || 'its M';
 }
 function msMainPlateImages(views) {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = 900, out = [];
@@ -14820,11 +15044,22 @@ function msAddPlates(doc, items) {
   doc.splice(i >= 0 ? i + 1 : 1, 0, { t: 'plate', items: items });
   return doc;
 }
+/* The sheet is a snapshot of the opener. Anything still playing behind it (the n / C(n) / p / Goldbach loops, the
+   rotation) would move the parameters under it, so the preview stops them when it opens. */
+function msFreezeOpener() {
+  ['stopOpenerPlay', 'olStopNPlay', 'olStopCNPlay', 'olStopPPlay', 'olStopGbPlay', 'olStopGapPlay', 'stopOpenerRotPlay'].forEach(fn => {
+    try { if (typeof window[fn] === 'function') window[fn](); } catch (e) {}
+  });
+}
 function msPreviewOpener() {
   try {
+    msFreezeOpener();
     if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
-    MS_PREV.kind = 'opener';
-    msOpenPreview(msBuildOpener());
+    MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G;
+    MS_LB.active = true; MS_LB.mode = OPENER_LABEL_MODE; MS_LB.idx = Math.max(0, OPENER_LABEL_MODES.findIndex(x => x.id === OPENER_LABEL_MODE));
+    MS_LB.scale = OL.lblScale || 1; MS_LB.filter = 'all';   // start from the opener's labels; changes stay in the preview
+    MS_PREV.doc = msBuildOpener();
+    msOpenPreview(MS_PREV.doc);
   } catch (e) {}
 }
 function msPreviewMain() {
@@ -14870,7 +15105,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-status" id="msp-status"></div><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></div><div class="msp-status" id="msp-status"></div><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
