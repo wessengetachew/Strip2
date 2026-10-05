@@ -1172,6 +1172,8 @@ walk anyway.</p>
     <span class="plabel">Walk</span>
     <button class="chip tl on" id="wk-strip" onclick="setWalk('strip')" title="Counts one cell at a time: the fraction of cells in the band with gcd(r,M)=1. Exact closed form — the weighted mean of φ(c)/c over the band's lines — but NOT C(n): at n=5 it reads 0.578 against D(5) = 0.194142.">Strip &mdash; per <b>cell</b></button>
     <button class="chip cr" id="wk-band" onclick="setWalk('band')" title="Counts one whole block at a time: gcd(r, M+j)=1 for EVERY j, an AND across all n+1 columns. This is the walk that converges to D(n).">Block &mdash; per <b>block</b>, AND over n+1</button>
+    <button class="chip bs-btn on" data-s="chain" onclick="setBandStyle('chain')" title="Block walk drawn like the opener's C(n): every coprime cell stays, the r-chain from each cell the block keeps is a line, teal where it lifts to the next ring and coral where it breaks. Width up or down is the depth n = w - 1, so raising it drops the chains the block can no longer keep.">look: chain</button>
+    <button class="chip bs-btn" data-s="solid" onclick="setBandStyle('solid')" title="The earlier look: every cell the block keeps filled solid coral.">look: solid</button>
     <span class="hint" id="wk-note"></span>
     <span class="hint">overlay: <b style="color:var(--teal)">teal = strip</b> &middot; <b style="color:var(--coral)">coral = block</b></span>
   </div>
@@ -6701,7 +6703,7 @@ function setWalk(m) {
   $('wk-strip').classList.toggle('on', m === 'strip');
   $('wk-band').classList.toggle('on', m === 'band');
   $('wk-note').textContent = m === 'band'
-    ? 'width w = n+1; the band\u2019s own AND ignores offset s (anchored at M) \u2014 the strip reading below still tracks s live'
+    ? 'width w = n+1, and it sets the C(n) depth the r-chain and the sieve sheet use; the band\u2019s own AND ignores offset s (anchored at M) \u2014 the strip reading below still tracks s live'
     : '';
   redraw(true);
 }
@@ -6931,17 +6933,17 @@ var MS_ISOM = null;   // main math-sheet isolated plates: { only: 'base' | 'stri
 function paintViewInner(ctx, S, cap) {
   const I = MS_ISOM, on = k => !I || I.only === k;
   if (I) {
-    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (MS_LBL.on) drawCayleyLabels(ctx, S); return; }
+    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('strip') && bandChainNow()) liftDrawChain(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (MS_LBL.on) drawCayleyLabels(ctx, S); return; }
     if (viewMode === 'ring') {
       if (on('base')) drawRingBase(ctx, S, cap);
-      if (on('strip')) { if (walkMode === 'band') drawRingBand(ctx, S); if (showStrip) drawRingStrip(ctx, S); }
+      if (on('strip')) { if (walkMode === 'band') { drawRingBand(ctx, S); if (bandChainNow()) liftDrawChain(ctx, S); } if (showStrip) drawRingStrip(ctx, S); }
       if (on('part')) drawPartitionsOverlay(ctx, S);
       if (on('lift')) drawLiftOverlay(ctx, S);
       if (MS_LBL.on) drawRingLabels(ctx, S);
       return;
     }
     if (on('base')) { const base = buildBase(Math.min(COP_G, cap), $('cmode').value); ctx.imageSmoothingEnabled = COP_G > cap; ctx.drawImage(base, 0, 0, S, S); ctx.imageSmoothingEnabled = true; }
-    if (on('strip')) { if (walkMode === 'band') drawBandOverlay(ctx, S); if (showStrip) drawStripOverlay(ctx, S); }
+    if (on('strip')) { if (walkMode === 'band') { drawBandOverlay(ctx, S); if (bandChainNow()) liftDrawChain(ctx, S); } if (showStrip) drawStripOverlay(ctx, S); }
     if (on('part')) drawPartitionsOverlay(ctx, S);
     if (on('lift')) drawLiftOverlay(ctx, S);
     if (MS_LBL.on) drawGridLabels(ctx, S);
@@ -7283,7 +7285,24 @@ let liftChainN = 0;                // the r-chain's own depth gate; follows the 
    the G rings that exist, so the lift / r-chain depth runs 0 … G−1. */
 function liftMaxN() { return Math.max(0, (COP_G || 1) - 1); }
 function liftN() { return Math.max(0, Math.min(liftMaxN(), liftNManual)); }
-function liftChainNEff() { return liftLockN ? liftN() : Math.max(0, Math.min(liftMaxN(), liftChainN)); }
+/* Block walk drives the depth. In Walk: Block the width w is n + 1, so the r-chain's depth is w - 1 -- the same
+   dynamic the opener's C(n) has: raise the width and the chains of cells the block can no longer keep drop out, the
+   rest stay as teal (lifts to the next ring) or coral (breaks). The math sheet can still override it for itself. */
+const LIFT_CHAIN_MAX = 1024;          // the r-chain is drawn up to this G (it was 400); the opener's own ceiling
+let bandStyle = 'chain';              // block walk look: 'chain' (opener-style) or 'solid' (the old coral blocks)
+var MS_CN_MAIN = null;                // math sheet override for the depth, null = follow the page
+function bandDrivesN() { return walkMode === 'band'; }
+function bandChainNow() { return walkMode === 'band' && bandStyle === 'chain' && COP_G <= LIFT_CHAIN_MAX; }
+function liftChainNEff() {
+  if (MS_CN_MAIN != null) return Math.max(0, Math.min(liftMaxN(), MS_CN_MAIN));
+  if (bandDrivesN()) return Math.max(0, Math.min(liftMaxN(), widthW - 1));
+  return liftLockN ? liftN() : Math.max(0, Math.min(liftMaxN(), liftChainN));
+}
+function setBandStyle(v) {
+  bandStyle = v === 'solid' ? 'solid' : 'chain';
+  document.querySelectorAll('.bs-btn').forEach(b => b.classList.toggle('on', b.dataset.s === bandStyle));
+  ringKey = ''; cayKey = ''; redraw(false);
+}
 
 function liftToggleOn() {
   liftOn = !liftOn;
@@ -7639,7 +7658,7 @@ function liftDrawConnect(ctx, S) {
    as the spiral/npath O(G) markers already carry. */
 function liftDrawChain(ctx, S) {
   const G = COP_G;
-  if (G > 400) return;
+  if (G > LIFT_CHAIN_MAX) return;
   const ptk = S / 700;
   const lw = Math.max(0.5, 0.9 * ptk) * liftThick;
   const n = liftChainNEff();
@@ -7679,13 +7698,14 @@ function liftDrawChain(ctx, S) {
 }
 
 function drawLiftOverlay(ctx, S) {
-  if (!liftOn || !COP_G) return;
+  if (!COP_G) return;
+  if (!liftOn) { if (bandChainNow()) { ctx.save(); liftDrawChain(ctx, S); ctx.restore(); } return; }
   ctx.save();
   if (liftDimOn) { ctx.fillStyle = 'rgba(4,4,13,' + (1 - liftDimPct / 100).toFixed(3) + ')'; ctx.fillRect(0, 0, S, S); }
   if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') liftDrawSpiral(ctx, S);
   if (liftMode === 'npath' || liftMode === 'both' || liftMode === 'connect') liftDrawNPath(ctx, S);
   if (liftMode === 'connect') liftDrawConnect(ctx, S);
-  if (liftChainOn) liftDrawChain(ctx, S);
+  if (liftChainOn || bandChainNow()) liftDrawChain(ctx, S);
   ctx.restore();
 }
 
@@ -8385,7 +8405,7 @@ function drawBandOverlay(ctx, S) {
       for (let M = 1; M + w - 1 <= g; M += step)
         if (!inBand(r, M, w, g)) { ctx.fillRect((r - 1) * k, (M - 1) * k, sz, sz); drawn++; }
   }
-  if (survOn) {
+  if (survOn && !bandChainNow()) {
     ctx.fillStyle = 'rgba(224,80,96,.85)';
     let drawn = 0;
     for (let r = 1; r <= g && drawn < 400000; r += step)
@@ -8802,7 +8822,7 @@ function drawRingBand(ctx, S) {
     ctx.fillStyle = 'rgba(4,4,13,.62)';
     ctx.beginPath(); ctx.arc(S / 2, S / 2, ringOuter(S) + 1, 0, TAU); ctx.fill();
   }
-  if (survOn) {
+  if (survOn && !bandChainNow()) {
     ctx.fillStyle = 'rgba(224,80,96,.85)';
     let drawn = 0;
     for (let r = 1; r <= g && drawn < 200000; r += step)
@@ -9257,7 +9277,7 @@ function drawCayleyBand(ctx, S) {
     ctx.fillStyle = 'rgba(4,4,13,.62)';
     ctx.fillRect(0, 0, S, S);
   }
-  if (survOn) {
+  if (survOn && !bandChainNow()) {
     ctx.fillStyle = 'rgba(224,80,96,.85)';
     let drawn = 0;
     for (let r = 1; r <= g && drawn < 200000; r += step)
@@ -10438,9 +10458,9 @@ function exportDetailSections(views) {
         (liftNPathDir === 'both' ? '+n and \u2212n' : liftNPathDir === 'plus' ? '+n only' : '\u2212n only') });
     }
     if (liftMode === 'connect') li.push({ rgb: CW, text: 'connectors joining spiral and \u00b1n path at shared rings' });
-    if (liftChainOn && COP_G <= 400) li.push({ rgb: CT, text: 'r-chain r \u2192 r mod(M+1) \u00b7 depth n = ' + liftChainNEff() +
+    if ((liftChainOn || bandChainNow()) && COP_G <= LIFT_CHAIN_MAX) li.push({ rgb: CT, text: 'r-chain r \u2192 r mod(M+1) \u00b7 depth n = ' + liftChainNEff() +
       (liftChainNEff() > 0 ? ' (only r block-coprime that far ahead)' : ' (every r)') + ' \u00b7 teal survives, coral dies' });
-    else if (liftChainOn) li.push({ rgb: null, text: 'r-chain not drawn (G > 400)' });
+    else if (liftChainOn || (walkMode === 'band' && bandStyle === 'chain')) li.push({ rgb: null, text: 'r-chain not drawn (G > ' + LIFT_CHAIN_MAX + '); the block band is filled solid instead' });
     li.push({ rgb: null, text: 'showing ' + [liftSurvOn ? 'surviving' : '', liftBrokenOn ? 'broken' : ''].filter(Boolean).join(' + ') +
       ' \u00b7 dot ' + liftDotScale.toFixed(2) + '\u00d7 \u00b7 thickness ' + liftThick.toFixed(2) + '\u00d7' +
       (liftDimOn ? ' \u00b7 base plate dimmed to ' + liftDimPct + '%' : '') });
@@ -12266,7 +12286,7 @@ function labelText(mode, r, m) {
    the view note says so, rather than the mode appearing broken. */
 let GRID_LABELS_HIDDEN = '';
 function liftLabelGone(r, M) {
-  if (typeof liftOn === 'undefined' || !liftOn || !liftChainOn || COP_G > 400) return false;
+  if (typeof liftOn === 'undefined' || !((liftOn && liftChainOn) || bandChainNow()) || COP_G > LIFT_CHAIN_MAX) return false;
   if (typeof MS_ISOM !== 'undefined' && MS_ISOM && MS_ISOM.only !== 'lift') return false;   // an isolated plate that does not draw the chain keeps its labels
   const n = liftChainNEff();
   if (n <= 0 || M < 2 || M >= COP_G || r >= M || gcd(r, M) !== 1) return false;
@@ -15091,12 +15111,12 @@ function msBuildMainRaw(views, noPlates) {
 
   // 6 · lift + partitions
   if (liveLift) {
-    const n = liftN(), cn = liftChainNEff(), chainDrawn = liftChainOn && G <= 400;   // the plate draws the r-chain only up to G = 400
+    const n = liftN(), cn = liftChainNEff(), chainDrawn = (liftChainOn || bandChainNow()) && G <= LIFT_CHAIN_MAX;   // the plate draws the r-chain only up to G = LIFT_CHAIN_MAX
     const L = [];
     if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\text{spiral: }\ r=${liftAllPOn ? 'p,\\ p\\le G' : 'p=' + liftSpiralP}` });
     if (liftMode === 'npath' || liftMode === 'both' || liftMode === 'connect') L.push({ t: 'eq', tex: msT`\pm n\ \text{path: }\ r=\frac{M\pm n}{2},\qquad n=${n}` });
     if (chainDrawn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)},\qquad n_C=${cn}` });
-    else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = 400, so no chain counts are given here.' });
+    else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = ' + LIFT_CHAIN_MAX + ', so no chain counts are given here.' });
     if (liftMode !== 'none' || chainDrawn) msIsoPushMain(L, 'lift', vs);   // under the spiral / path / chain equations it shows
     msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
     msBlockSection(cn, L).forEach(x => doc.push(x));   // block length, D(n), C(n) at the C(n) depth, as the opener does
@@ -15364,16 +15384,16 @@ function msLblAutoFilter() {
    isolated picture of each section's own layer in the section it belongs to: just that overlay on an
    empty plate, drawn by the same painters as the plate, so it can never disagree with it. */
 function msWithCNMain(fn) {
-  const cn0 = liftChainN, lk0 = liftLockN;
-  if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); }
-  try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; }
+  const cn0 = liftChainN, lk0 = liftLockN, ov0 = MS_CN_MAIN;
+  if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
+  try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
 }
 function msGNow() { return MS_PREV.kind === 'main' ? G : OPENER_G; }
 function msCnNow() { return MS_PREV.kind === 'main' ? msWithCNMain(liftChainNEff) : msWithCN(openerChainN); }
 function msIsoCapMain(kind, vs) {
   return {
     base: 'The colouring alone, no strip, lift or partition overlay.',
-    sieve: 'Only the r-chain at depth n = ' + liftChainNEff() + ' on an empty plate: one line per cell the block keeps, teal where its lift to ring M+1 stays coprime, coral where it breaks.',
+    sieve: (COP_G > LIFT_CHAIN_MAX ? 'The r-chain is not drawn above G = ' + LIFT_CHAIN_MAX + ', so this plate is empty at G = ' + COP_G + '. ' : '') + 'Only the r-chain at depth n = ' + liftChainNEff() + (walkMode === 'band' ? ' (the block walk\u2019s w \u2212 1)' : '') + ' on an empty plate: one line per cell the block keeps, teal where its lift to ring M+1 stays coprime, coral where it breaks.',
     strip: walkMode === 'band' ? 'Only the block band, w = ' + widthW + ' (n = ' + (widthW - 1) + '), with the lattice removed.' : 'Only the strip band, a/b = ' + slopeA + '/' + slopeB + ', s = ' + offS + ', w = ' + widthW + ', with the lattice removed.',
     lift: 'Only the lift overlays (' + (liftMode !== 'none' ? liftMode : 'no spiral or path') + (liftChainOn ? ', r-chain at C(n) = ' + liftChainNEff() : '') + ') on an empty plate.',
     part: (partMode === 'single' || partMode === 'off' ? 'Only the four Goldbach strips a, b, c, d for g = ' + (typeof partG !== 'undefined' ? partG : 1) + msGbStripNote(G, typeof partG !== 'undefined' ? partG : 1) : 'Only the Goldbach strips of the gaps drawn on the plate (' + partMode + ' mode)') + '; the lattice and every other overlay are left off.'
@@ -15515,7 +15535,11 @@ function msSetG(v, delay) {
 }
 function msGStep(d) { msSetG(msGNow() + d); }
 function msGPrime(d) { msSetG(d > 0 ? nextPrime(msGNow()) : prevPrime(msGNow())); }
-function msSieveToggle() { MS_ADV.sieve = !MS_ADV.sieve; msLblSync(); msAdvRebuild(0); }
+function msSieveToggle() {
+  MS_ADV.sieve = !MS_ADV.sieve; msLblSync();
+  if (MS_ADV.sieve && MS_PREV.kind === 'main' && G > LIFT_CHAIN_MAX) { msMainSetG(LIFT_CHAIN_MAX, 0); return; }
+  msAdvRebuild(0);
+}
 function msAdvToggle() { MS_ADV.on = !MS_ADV.on; if (!MS_ADV.on) { MS_ADV.cn = null; MS_ADV.sieve = false; } msLblSync(); msAdvRebuild(); }
 function msAdvCN(d) {
   const cur = MS_ADV.cn != null ? MS_ADV.cn : msCnNow();
@@ -15763,6 +15787,12 @@ function msPreviewMain(sieve) {
     MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
     const vs = orderedExportViews();
     MS_PREV.views = vs;
+    if (sieve && G > LIFT_CHAIN_MAX) {   // the r-chain plates are drawn up to G = LIFT_CHAIN_MAX, so the sieve sheet opens there
+      MS_PREV.doc = [{ t: 'p', text: 'The r-chain is drawn up to G = ' + LIFT_CHAIN_MAX + ', so the sieve sheet is rebuilding the lattice at that size. The page returns to G = ' + G + ' when you close it.' }];
+      msOpenPreview(MS_PREV.doc);
+      msMainSetG(LIFT_CHAIN_MAX, 0);
+      return;
+    }
     MS_PREV.doc = msBuildMain(vs);
     msOpenPreview(MS_PREV.doc);
   } catch (e) {}
