@@ -1609,6 +1609,13 @@ walk anyway.</p>
       <input type="range" id="part-bgboost" min="100" max="400" value="180" oninput="setPartBgBoost(+this.value)" style="width:100px">
       <span class="lbl" id="part-bgboost-v">1.8&times;</span>
       <div class="sep"></div>
+      <label class="lbl" style="cursor:pointer" title="Ring and Cayley: the gold point P_g = (g, s), where the column r = g meets r + M = E. s is past the last ring, so it floats outside the lattice (Grid has no image of it). One marker per Goldbach pair, so the markers number exactly k(E)."><input type="checkbox" checked onchange="setGbMark('on',this.checked)"> gold markers</label>
+      <label class="lbl" style="cursor:pointer" title="Join the markers in order of g."><input type="checkbox" checked onchange="setGbMark('trail',this.checked)"> trail</label>
+      <label class="lbl" style="cursor:pointer" title="Label each marker g + s (just g when there are many) and print the count k(E)."><input type="checkbox" checked onchange="setGbMark('labels',this.checked)"> labels</label>
+      <button class="chip" onclick="gbFitMarkers()" title="Zoom the plate out just far enough to bring every gold marker into view.">&#10530; fit markers</button>
+      <input type="range" min="0.3" max="3" step="0.1" value="1" oninput="setGbMark('scale',this.value)" style="width:80px" title="Marker label and dot size.">
+      <span class="lbl" id="gbmk-sz-v">1.0&times;</span>
+      <div class="sep"></div>
       <span class="lbl" title="All views: a flat dark wash over everything except the strip points themselves, so partitions stick out against the backdrop. Same knob Strip I had. Defaults high, near the 90% ceiling, so only the strip's own points read clearly once Goldbach is on.">dim</span>
       <input type="range" id="part-dim" min="0" max="90" value="90" oninput="setPartDim(+this.value)" style="width:100px">
       <span class="lbl" id="part-dim-v">90%</span>
@@ -2076,6 +2083,8 @@ walk anyway.</p>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Join every Goldbach pair's gold marker (g, N&minus;g) in order of g. The marker sits on ring M = N&minus;g, past the last ring the plate draws, so the trail shows how it spirals in as g grows."><input type="checkbox" id="ol-gbtrail-chk" checked onchange="olToggleGbTrail(this.checked)"> marker trail</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Label the gold marker with its lattice point (g, s) and its angle."><input type="checkbox" id="ol-gblabel-chk" checked onchange="olToggleGbLabel(this.checked)"> marker label</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Label every gold marker in the trail with its pair (g + s), and print the count. The number of markers is k(E), the exact number of Goldbach pairs of E. Appears in exports and sheets too."><input type="checkbox" id="ol-gbmkall-chk" checked onchange="olToggleGbMkAll(this.checked)"> label all markers</label>
+        <input type="range" id="ol-gblblsz" min="0.3" max="3" step="0.1" value="1" oninput="olSetGbLblScale(this.value)" style="width:80px" title="Size of the gold-marker labels (the focused marker's and every trail marker's). Applies to the plates, exports and sheets.">
+        <span id="ol-gblblsz-v" style="color:rgba(232,227,219,.75);font-size:11.5px">1.0&times;</span>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim everything except the marker's patch &mdash; outside the outermost ring on Ring, inside the pole-side disc on Cayley &mdash; and light that patch with a gold glow centred on the marker."><input type="checkbox" id="ol-gbspot-chk" checked onchange="olToggleGbSpot(this.checked)"> spotlight</label>
         <input type="range" id="ol-gbspot-amt" min="0" max="100" step="1" value="55" oninput="olSetGbSpotAmt(this.value)" style="max-width:90px;" title="How far the rest of the plate is dimmed.">
         <span class="val" id="ol-gbspot-v">55%</span>
@@ -3809,7 +3818,7 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
-             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbMkAll: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
+             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: false };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4220,7 +4229,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
        a label that would overlap one already placed is skipped, and the caption says how many were. */
     if (OL.gbMkAll && cw && ch) {
       const tm = ctx.getTransform(), cvw = ctx.canvas.width, cvh = ctx.canvas.height, sc = cvw / cw;
-      const fs = Math.max(8 * sc, Math.min(cvw, cvh) / 80), full = pairs.length <= 14, boxes = [];
+      const fs = Math.max(5 * sc, Math.min(cvw, cvh) / 80) * (OL.gbLblScale || 1), full = pairs.length <= 14, boxes = [];
       let shown = 0, off = 0, hid = 0;
       ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.font = fs + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       pairs.forEach((q, i) => {
@@ -4260,7 +4269,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
       // shifted the text away from its box.)
       const tm = ctx.getTransform(), dp = tm.transformPoint(new DOMPoint(pt[0], pt[1]));
       const kx = Math.hypot(tm.a, tm.b) || 1, cvw = ctx.canvas.width, cvh = ctx.canvas.height, sc = cvw / cw;
-      const fs = Math.max(10 * sc, Math.min(cvw, cvh) / 64), txt = '(' + mk[0] + ', ' + mk[1] + ')  \u03b8 = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0';
+      const fs = Math.max(6 * sc, Math.min(cvw, cvh) / 64) * (OL.gbLblScale || 1), txt = '(' + mk[0] + ', ' + mk[1] + ')  \u03b8 = ' + (360 * mk[0] / mk[1]).toFixed(1) + '\u00b0';
       ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.font = fs + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       const tw = ctx.measureText(txt).width, gap = dot * 3.6 * kx, pad = fs * 0.35;
@@ -5607,6 +5616,7 @@ function olSetThetaMode(m) {
 function olToggleGbTrail(v) { OL.gbTrail = !!v; olRedraw(); }
 function olToggleGbLabel(v) { OL.gbLabel = !!v; olRedraw(); }
 function olToggleGbMkAll(v) { OL.gbMkAll = !!v; olRedraw(); }
+function olSetGbLblScale(v) { OL.gbLblScale = Math.max(0.3, Math.min(3, +v || 1)); const l = $('ol-gblblsz-v'); if (l) l.textContent = OL.gbLblScale.toFixed(1) + '\u00d7'; olRedraw(); }
 function olSetGbThick(v) {
   const n = Number(v); OL.gbThick = isFinite(n) ? Math.max(0.5, Math.min(6, n)) : 1;
   const lbl = $('ol-gbthick-v'); if (lbl) lbl.textContent = OL.gbThick.toFixed(1) + '\u00d7';
@@ -5874,8 +5884,49 @@ function openerMusicSrc() {
   return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(OPENER_TRACK_URL) +
     '&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false&single_active=true';
 }
+/* Fade and loop. The SoundCloud widget is driven by postMessage (setVolume / seekTo / play and its 'finish' and
+   'playProgress' events), so no extra script is loaded: the track fades in from silence, fades out over its last
+   few seconds, and on 'finish' seeks to 0 and fades back in. Stopping fades out first, then removes the frame. */
+const MUS = { frame: null, vol: 100, dur: 0, fadeT: 0, ready: false, outing: false, IN: 3000, OUT: 4500 };
+function musPost(o) { try { if (MUS.frame && MUS.frame.contentWindow) MUS.frame.contentWindow.postMessage(JSON.stringify(o), 'https://w.soundcloud.com'); } catch (e) {} }
+function musVol(v) { MUS.vol = Math.max(0, Math.min(100, v)); musPost({ method: 'setVolume', value: Math.round(MUS.vol) }); }
+function musRamp(to, ms, done) {
+  clearInterval(MUS.fadeT);
+  const from = MUS.vol, t0 = performance.now();
+  MUS.fadeT = setInterval(() => {
+    const k = Math.min(1, (performance.now() - t0) / Math.max(1, ms));
+    musVol(from + (to - from) * k);
+    if (k >= 1) { clearInterval(MUS.fadeT); if (done) done(); }
+  }, 90);
+}
+function musOnMessage(e) {
+  if (!MUS.frame || e.origin !== 'https://w.soundcloud.com' || e.source !== MUS.frame.contentWindow) return;
+  let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
+  if (!d) return;
+  if (d.method === 'ready') {
+    MUS.ready = true; musVol(0);
+    ['play', 'finish', 'playProgress'].forEach(ev => musPost({ method: 'addEventListener', value: ev }));
+    musPost({ method: 'play' });
+  } else if (d.method === 'play') {
+    if (!MUS.outing && MUS.vol < 100 && !MUS.fadeT) musRamp(100, MUS.IN);
+    else if (!MUS.outing && MUS.vol < 100) musRamp(100, MUS.IN);
+  } else if (d.method === 'playProgress' && d.value) {
+    const cur = +d.value.currentPosition, rel = +d.value.relativePosition;
+    if (rel > 0.02 && cur > 0) MUS.dur = cur / rel;
+    if (MUS.dur && !MUS.outing) {
+      const left = MUS.dur - cur;
+      if (left < MUS.OUT) { clearInterval(MUS.fadeT); musVol(100 * Math.max(0, left) / MUS.OUT); }
+    }
+  } else if (d.method === 'finish') {
+    clearInterval(MUS.fadeT); musVol(0);
+    musPost({ method: 'seekTo', value: 0 }); musPost({ method: 'play' });
+    setTimeout(() => { if (!MUS.outing) musRamp(100, MUS.IN); }, 250);
+  }
+}
+window.addEventListener('message', musOnMessage);
 function startOpenerMusic() {
   if (!_openerMusicOn) return;
+  if (MUS.outing) { MUS.outing = false; clearInterval(MUS.fadeT); musRamp(100, 800); }
   const slot = $('welcome-music-slot'); if (!slot) return;
   if (!slot.querySelector('iframe')) {
     const f = document.createElement('iframe');
@@ -5887,14 +5938,16 @@ function startOpenerMusic() {
     f.sandbox = 'allow-scripts allow-same-origin';
     f.title = OPENER_TRACK.title + ' \u2014 ' + OPENER_TRACK.artist;
     f.src = openerMusicSrc();
+    MUS.frame = f; MUS.vol = 0; MUS.dur = 0; MUS.ready = false; MUS.outing = false;
     slot.appendChild(f);
   }
   setOpenerMediaSession(true);
 }
 function stopOpenerMusic() {
   const slot = $('welcome-music-slot'); if (!slot) return;
-  slot.innerHTML = '';   // dropping the iframe is the reliable way to actually stop SoundCloud audio
+  const kill = () => { if (!MUS.outing && MUS.frame) return; slot.innerHTML = ''; MUS.frame = null; MUS.outing = false; MUS.ready = false; };   // dropping the iframe is the reliable way to actually stop SoundCloud audio
   setOpenerMediaSession(false);
+  if (MUS.frame && MUS.ready && MUS.vol > 3) { MUS.outing = true; musRamp(0, 900, kill); } else { MUS.outing = true; kill(); }
 }
 function toggleOpenerMusic() {
   _openerMusicOn = !_openerMusicOn;
@@ -6933,13 +6986,14 @@ var MS_ISOM = null;   // main math-sheet isolated plates: { only: 'base' | 'stri
 function paintViewInner(ctx, S, cap) {
   const I = MS_ISOM, on = k => !I || I.only === k;
   if (I) {
-    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('strip') && bandChainNow()) liftDrawChain(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (MS_LBL.on) drawCayleyLabels(ctx, S); return; }
+    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('strip') && bandChainNow()) liftDrawChain(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (on('marker')) drawGoldMarkers(ctx, S); if (MS_LBL.on && !on('marker')) drawCayleyLabels(ctx, S); return; }
     if (viewMode === 'ring') {
       if (on('base')) drawRingBase(ctx, S, cap);
       if (on('strip')) { if (walkMode === 'band') { drawRingBand(ctx, S); if (bandChainNow()) liftDrawChain(ctx, S); } if (showStrip) drawRingStrip(ctx, S); }
       if (on('part')) drawPartitionsOverlay(ctx, S);
       if (on('lift')) drawLiftOverlay(ctx, S);
-      if (MS_LBL.on) drawRingLabels(ctx, S);
+      if (on('marker')) drawGoldMarkers(ctx, S);
+      if (MS_LBL.on && !on('marker')) drawRingLabels(ctx, S);
       return;
     }
     if (on('base')) { const base = buildBase(Math.min(COP_G, cap), $('cmode').value); ctx.imageSmoothingEnabled = COP_G > cap; ctx.drawImage(base, 0, 0, S, S); ctx.imageSmoothingEnabled = true; }
@@ -6949,7 +7003,7 @@ function paintViewInner(ctx, S, cap) {
     if (MS_LBL.on) drawGridLabels(ctx, S);
     return;
   }
-  if (viewMode === 'cayley') { drawCayley(ctx, S); drawLiftOverlay(ctx, S); drawCayleyLabels(ctx, S); return; }
+  if (viewMode === 'cayley') { drawCayley(ctx, S); drawLiftOverlay(ctx, S); drawGoldMarkers(ctx, S); drawCayleyLabels(ctx, S); return; }
   if (viewMode === 'ring') {
     drawRingBase(ctx, S, cap);
     drawSectorBands(ctx, S);
@@ -6961,6 +7015,7 @@ function paintViewInner(ctx, S, cap) {
     drawUnitVoid(ctx, S);
     drawPartitionsOverlay(ctx, S);
     drawLiftOverlay(ctx, S);
+    drawGoldMarkers(ctx, S);
     drawRingLabels(ctx, S);
     return;
   }
@@ -7241,6 +7296,84 @@ function drawPartitionsOverlay(ctx, S) {
         }
       }
     }
+  }
+  ctx.restore();
+}
+
+/* ── GOLD MARKERS on the main page ───────────────────────────────────────────
+   A Goldbach pair g + s = E is also the lattice point (r, M) = (g, s): the column r = g where it meets the
+   anti-diagonal r + M = E, with E = 2(G+1). Since g <= E/2 gives s >= G+1, that cell lies one ring or more
+   past the last ring the plate draws, so Grid has no image of it (it is off the square); Ring and Cayley
+   place it through the same maps as every other cell. One marker per prime pair, so the number of markers is
+   exactly k(E). Same idea as the opener's gold marker. Labels are drawn upright in device space. */
+let gbMarkOn = true, gbMarkTrail = true, gbMarkLabels = true, gbMarkScale = 1;
+function gbMarkPairs() {
+  const E = partE(), out = [];
+  for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) out.push(q);
+  return out;
+}
+function setGbMark(k, v) {
+  if (k === 'on') gbMarkOn = !!v; else if (k === 'trail') gbMarkTrail = !!v; else if (k === 'labels') gbMarkLabels = !!v;
+  else if (k === 'scale') { gbMarkScale = Math.max(0.3, Math.min(3, +v || 1)); const l = $('gbmk-sz-v'); if (l) l.textContent = gbMarkScale.toFixed(1) + '×'; }
+  redraw(false);
+}
+function gbFitMarkers() {
+  if (partMode === 'off') { setPartMode('single'); }
+  const S = plateS(), E = partE(), c = S / 2; let d = 0;
+  for (const q of gbMarkPairs()) { const m = liftXY(q, E - q, S); if (m && isFinite(m[0]) && isFinite(m[1])) d = Math.max(d, Math.hypot(m[0] - c, m[1] - c)); }
+  if (!d) return;
+  plateZoomAt(Math.min(1, 0.46 * S / d), c, c, S); syncPlateUI(); lensParkForZoom(); redraw(false);
+}
+function drawGoldMarkers(ctx, S) {
+  if (!gbMarkOn || partMode === 'off' || !COP || !COP_G || viewMode === 'grid') return;
+  const E = partE(), g = Math.max(1, Math.min(Math.floor(E / 2), partG || 1)), s = E - g;
+  const pairs = gbMarkPairs(), pts = [];
+  let zfit = 1;
+  if (MS_ISOM && MS_ISOM.only === 'marker') {   /* the sheet's own plate: zoom out about its centre until every marker is in view */
+    const tm0 = ctx.getTransform(), cvw0 = ctx.canvas.width, cvh0 = ctx.canvas.height, cx = cvw0 / 2, cy = cvh0 / 2; let d = 0;
+    for (const q of pairs) { const m = liftXY(q, E - q, S); if (!m || !isFinite(m[0]) || !isFinite(m[1])) continue; const dp = tm0.transformPoint(new DOMPoint(m[0], m[1])); d = Math.max(d, Math.abs(dp.x - cx) / (cvw0 * 0.46), Math.abs(dp.y - cy) / (cvh0 * 0.46)); }
+    if (d > 1) { zfit = 1 / d; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(cx, cy); ctx.scale(zfit, zfit); ctx.translate(-cx, -cy); ctx.transform(tm0.a, tm0.b, tm0.c, tm0.d, tm0.e, tm0.f); }
+  }
+  const ptk = S / 700, dot = Math.max(2.2 * ptk, 2) * (gbMarkScale > 1 ? 1 : gbMarkScale) / zfit;
+  for (const q of pairs) { const m = liftXY(q, E - q, S); pts.push(m && isFinite(m[0]) && isFinite(m[1]) ? m : null); }
+  ctx.save();
+  if (gbMarkTrail) {
+    ctx.strokeStyle = 'rgba(242,200,96,.35)'; ctx.lineWidth = Math.max(0.8, dot * 0.5); ctx.lineJoin = 'round';
+    ctx.beginPath(); let pen = false;
+    pts.forEach(pt => { if (!pt) { pen = false; return; } if (pen) ctx.lineTo(pt[0], pt[1]); else { ctx.moveTo(pt[0], pt[1]); pen = true; } });
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(242,200,96,.8)';
+    pts.forEach(pt => { if (!pt) return; ctx.beginPath(); ctx.arc(pt[0], pt[1], Math.max(1, dot * 0.75), 0, TAU); ctx.fill(); });
+  }
+  const mk = liftXY(g, s, S);
+  if (mk && isFinite(mk[0]) && isFinite(mk[1])) {
+    ctx.fillStyle = 'rgba(4,4,13,.75)'; ctx.beginPath(); ctx.arc(mk[0], mk[1], dot * 2.2, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.beginPath(); ctx.arc(mk[0], mk[1], dot * 1.3, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(242,200,96,.9)'; ctx.lineWidth = Math.max(1, dot * 0.3); ctx.beginPath(); ctx.arc(mk[0], mk[1], dot * 2.7, 0, TAU); ctx.stroke();
+  }
+  if (gbMarkLabels) {
+    const tm = ctx.getTransform(), kx = (Math.hypot(tm.a, tm.b) || 1) / zfit, cvw = ctx.canvas.width, cvh = ctx.canvas.height;
+    const fs = Math.max(6, S / 78 * kx * gbMarkScale), full = pairs.length <= 14, boxes = [];
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.font = fs + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    let off = 0, hid = 0;
+    const put = (pt, txt, hi) => {
+      const dp = tm.transformPoint(new DOMPoint(pt[0], pt[1]));
+      if (dp.x < 0 || dp.y < 0 || dp.x > cvw || dp.y > cvh) { off++; return; }
+      const tw = ctx.measureText(txt).width, pad = fs * 0.25;
+      const tx = Math.min(cvw - tw - pad - 2, dp.x + fs * 0.7), ty = Math.max(fs, Math.min(cvh - fs * 3, dp.y - fs * 0.8));
+      const bx = { x0: tx - pad, y0: ty - fs * 0.7, x1: tx + tw + pad, y1: ty + fs * 0.7 };
+      if (!hi && boxes.some(o => bx.x0 < o.x1 && bx.x1 > o.x0 && bx.y0 < o.y1 && bx.y1 > o.y0)) { hid++; return; }
+      boxes.push(bx);
+      ctx.fillStyle = 'rgba(4,4,13,.72)'; ctx.fillRect(bx.x0, bx.y0, bx.x1 - bx.x0, bx.y1 - bx.y0);
+      ctx.fillStyle = 'rgba(242,200,96,.97)'; ctx.fillText(txt, tx, ty);
+    };
+    if (mk && isFinite(mk[0]) && isFinite(mk[1])) put(mk, '(' + g + ', ' + s + ')  θ = ' + (360 * Math.min(1, g / s) * (thetaMode === 'unit' ? s / COP_G : 1)).toFixed(1) + '°', true);
+    pairs.forEach((q, i) => { if (q === g || !pts[i]) { if (!pts[i]) off++; return; } put(pts[i], full ? q + '+' + (E - q) : String(q), false); });
+    const cap = 'E = ' + E + ' · ' + pairs.length + ' gold markers = k(E)' + (off ? ' · ' + off + ' off plate' : '') + (hid ? ' · ' + hid + ' labels skipped' : '');
+    ctx.font = fs + 'px ' + MONO; const w2 = ctx.measureText(cap).width;
+    ctx.fillStyle = 'rgba(4,4,13,.82)'; ctx.fillRect(4, cvh - fs * 1.9, w2 + fs, fs * 1.5);
+    ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.fillText(cap, 4 + fs * 0.5, cvh - fs * 1.15);
+    ctx.restore();
   }
   ctx.restore();
 }
@@ -15129,8 +15262,30 @@ function msBuildMainRaw(views, noPlates) {
   if (pm !== 'off') {
     doc.push({ t: 'h', text: 'Goldbach partitions' });
     msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.', o => msIsoPushMain(o, 'part', vs), (() => { try { if (pm === 'single' || pm === 'off') return ''; const n = currentPartBatch().filter(it => !partHidden.has(it.g)).length; return 'The overlay is in ' + pm + ' mode: ' + n + ' partition' + (n === 1 ? ' is' : 's are') + ' drawn at once (the plate\u2019s own list), each as its own set of strips.'; } catch (e) { return ''; } })()).forEach(x => doc.push(x));
+    try { msGoldMarkerMain(doc, vs); } catch (e) {}
   }
   return doc;
+}
+
+
+/* The main page's gold-marker section: the same facts as the opener's, for E = 2(G+1) and the page's own maps. */
+function msGoldMarkerMain(doc, vs) {
+  if (!gbMarkOn) return;
+  const E = partE(), g = Math.max(1, Math.min(Math.floor(E / 2), partG || 1)), s = E - g, ps = gbMarkPairs();
+  doc.push({ t: 'h', text: 'The gold marker' });
+  doc.push({ t: 'p', text: 'A Goldbach pair g + s = ' + E + ' is also a lattice cell: (r, M) = (g, s), where the column r = g meets the anti-diagonal r + M = E. Since g ≤ E/2 forces s ≥ G + 1, the cell lies past the last ring the plate draws, so Grid has no image of it and Ring and Cayley put it through the same maps as every other cell. These are the gold points outside the lattice.' });
+  doc.push({ t: 'eq', tex: msT`P_{g}=(g,\,s),\quad s=E-g=${s},\qquad \theta(P_{g})=2\pi\,\frac{g}{s}=${msf(360 * g / s, 2)}^{\circ}`, cap: 'For the page’s wrap and clamp angle modes (r < M here, so they agree). In unit mode the angle is 2πg/G instead.' });
+  const sv = vs.filter(v => v !== 'grid'); if (MS_ADV.on && sv.length) msIsoPushMain(doc, 'marker', sv);
+  doc.push({ t: 'eq', tex: msT`\gcd(g,s)=1\ \text{for every Goldbach pair}\ g\ne s,\qquad s>G\ \Longrightarrow\ P_{g}\notin\mathcal L_{${G}}`, cap: 'Two distinct primes are always coprime, so each marker is a coprime cell of the extended lattice that the plate shows only through the marker.' });
+  const half = (ps.indexOf(E / 2) >= 0) ? 1 : 0, rE = 2 * ps.length - half, cap = 48, rows = [];
+  doc.push({ t: 'eq', tex: msT`\#\{\text{gold markers}\}=k(E)=${ps.length},\qquad r(E)=2k(E)-\mathbf 1[E/2\ \text{prime}]=${rE}`, cap: 'One marker per unordered pair g + s = ' + E + ', so the gold points outside the lattice number exactly k(E); r(E) counts ordered pairs. An exact sieve count, not an estimate.' });
+  ps.slice(0, cap).forEach(q => {
+    const sq = E - q, f = gbDetailFacts(G, q).L, tc = f.a.cop + f.b.cop + f.c.cop + f.d.cop, tt = f.a.tot + f.b.tot + f.c.tot + f.d.tot;
+    rows.push({ label: q + ' + ' + sq + ' · θ ' + msf(360 * q / sq, 1) + '° · c ' + f.c.cop + '/' + f.c.tot + ' d ' + f.d.cop + '/' + f.d.tot + ' a ' + f.a.cop + '/' + f.a.tot + ' b ' + f.b.cop + '/' + f.b.tot, n: tc + '/' + tt, pct: tt ? (100 * tc / tt).toFixed(1) + '%' : '–' });
+  });
+  if (ps.length > cap) rows.push({ label: '… ' + (ps.length - cap) + ' more pairs, same pattern', n: '', pct: '' });
+  if (rows.length) doc.push({ t: 'table', head: ['pair g + s · angle · the four strips c, d, a, b (coprime / cells)', 'coprime / cells', 'share'], rows: rows });
+  doc.push({ t: 'note', text: 'Line c is fully coprime when g is prime and line d when s is prime (see the Goldbach section above). Labels on the plates read g + s with 14 or fewer markers, otherwise g alone, and a label that would sit on another is skipped, so this table is the complete list.' });
 }
 
 /* ══ glue ══════════════════════════════════════════════════════════════════ */
@@ -15396,6 +15551,7 @@ function msIsoCapMain(kind, vs) {
     sieve: (COP_G > LIFT_CHAIN_MAX ? 'The r-chain is not drawn above G = ' + LIFT_CHAIN_MAX + ', so this plate is empty at G = ' + COP_G + '. ' : '') + 'Only the r-chain at depth n = ' + liftChainNEff() + (walkMode === 'band' ? ' (the block walk\u2019s w \u2212 1)' : '') + ' on an empty plate: one line per cell the block keeps, teal where its lift to ring M+1 stays coprime, coral where it breaks.',
     strip: walkMode === 'band' ? 'Only the block band, w = ' + widthW + ' (n = ' + (widthW - 1) + '), with the lattice removed.' : 'Only the strip band, a/b = ' + slopeA + '/' + slopeB + ', s = ' + offS + ', w = ' + widthW + ', with the lattice removed.',
     lift: 'Only the lift overlays (' + (liftMode !== 'none' ? liftMode : 'no spiral or path') + (liftChainOn ? ', r-chain at C(n) = ' + liftChainNEff() : '') + ') on an empty plate.',
+    marker: 'Only the gold markers P_g = (g, s), one per Goldbach pair, with their labels and the trail joining them (Grid has no image of them).',
     part: (partMode === 'single' || partMode === 'off' ? 'Only the four Goldbach strips a, b, c, d for g = ' + (typeof partG !== 'undefined' ? partG : 1) + msGbStripNote(G, typeof partG !== 'undefined' ? partG : 1) : 'Only the Goldbach strips of the gaps drawn on the plate (' + partMode + ' mode)') + '; the lattice and every other overlay are left off.'
   }[kind];
 }
