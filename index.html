@@ -2071,6 +2071,7 @@ walk anyway.</p>
         <span class="val" id="ol-gbthick-v">1.0&times;</span>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Join every Goldbach pair's gold marker (g, N&minus;g) in order of g. The marker sits on ring M = N&minus;g, past the last ring the plate draws, so the trail shows how it spirals in as g grows."><input type="checkbox" id="ol-gbtrail-chk" checked onchange="olToggleGbTrail(this.checked)"> marker trail</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Label the gold marker with its lattice point (g, s) and its angle."><input type="checkbox" id="ol-gblabel-chk" checked onchange="olToggleGbLabel(this.checked)"> marker label</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Label every gold marker in the trail with its pair (g + s), and print the count. The number of markers is k(E), the exact number of Goldbach pairs of E. Appears in exports and sheets too."><input type="checkbox" id="ol-gbmkall-chk" checked onchange="olToggleGbMkAll(this.checked)"> label all markers</label>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim everything except the marker's patch &mdash; outside the outermost ring on Ring, inside the pole-side disc on Cayley &mdash; and light that patch with a gold glow centred on the marker."><input type="checkbox" id="ol-gbspot-chk" checked onchange="olToggleGbSpot(this.checked)"> spotlight</label>
         <input type="range" id="ol-gbspot-amt" min="0" max="100" step="1" value="55" oninput="olSetGbSpotAmt(this.value)" style="max-width:90px;" title="How far the rest of the plate is dimmed.">
         <span class="val" id="ol-gbspot-v">55%</span>
@@ -2622,6 +2623,41 @@ Full attribution is in the credits panel below.
   <tr><td><b>N. J. A. Sloane</b> and OEIS contributors</td>
   <td>$C_2$ as <a href="https://oeis.org/A005597" target="_blank" rel="noopener">A005597</a>,
   and the cross-checking of every constant quoted on this page against a published value.<div class="cgo"><button class="chip" onclick="cgo({panel:'Self test',run:'selftest'})">self-test the constants</button></div></td></tr>
+  </table></div>
+
+  <h3>Added on the opener and the sheets &mdash; who the ideas belong to</h3>
+  <div class="scroll"><table>
+  <tr><th>Whose</th><th>What it is doing here</th></tr>
+
+  <tr><td><b>Alphonse de Polignac</b> (1849);<br><b>Yitang Zhang</b> (2013); <b>James Maynard</b>, <b>Terence Tao</b> and the Polymath8 project</td>
+  <td>The prime-gap presets. A gap $g$ is the diagonal $|M-r|=g$, and its coprime cells are the pairs $(r,\,r+g)$:
+  gap 2 is the twin-prime line, 4 the cousin line, 6 the sexy line. De Polignac conjectured every even gap occurs
+  infinitely often; Zhang proved some gap below $7\times10^{7}$ does, and Maynard and Polymath8 brought that bound
+  down to 246. The page draws the lines and counts cells on them. It proves nothing about them, and the twin-prime
+  and de Polignac conjectures remain open.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'twin',scroll:'cv'})">twin line, gap 2</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'cousin',scroll:'cv'})">cousin, gap 4</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'diag',scroll:'cv'})">sexy, gap 6</button></div></td></tr>
+
+  <tr><td><b>G. H. Hardy</b>, <b>J. E. Littlewood</b>, <b>S. Ramanujan</b>; <b>I. M. Vinogradov</b>; <b>Harald Helfgott</b>;<br><b>P. G. L. Dirichlet</b> (the kernel)</td>
+  <td>The circle method, which the ring's hole fill illustrates. The fill draws the Dirichlet-kernel profile
+  $|\sin(N\vartheta/2)/\sin(\vartheta/2)|$ whose peaks the method studies, and the page's $\mathfrak S(E)$ and
+  integral forms are the Hardy&ndash;Littlewood heuristic. Vinogradov proved the ternary problem for large odd numbers
+  and Helfgott for all odd $N>5$; the binary (even) problem this page works on is open. The picture is a rendering of the
+  kernel, not an implementation of the method.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'ring',cm:1,scroll:'cv'})">ring + circle method</button></div></td></tr>
+
+  <tr><td><b>Bernhard Riemann</b></td>
+  <td>The Riemann sphere, to which the Cayley view lifts the disk and about which its tilt rotates; the stereographic
+  picture is his. Presentation only, as with the Cayley map above.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',view:'cayley',scroll:'cv'})">Cayley view</button></div></td></tr>
+
+  <tr><td><b>Franz Mertens</b>; <b>Hadamard</b> &amp; <b>de la Vall&eacute;e Poussin</b></td>
+  <td>Mertens' third theorem, used in the sheets' note on how the saturated primes' product settles toward
+  $e^{-\gamma}/\ln(n+1)$, and the prime number theorem behind the density $1/\ln t$ in the finer Goldbach integral
+  $\int_2^{E-2}dt/(\ln t\,\ln(E-t))$ the sheets compare with the exact count.<div class="cgo"><button class="chip" onclick="cgo({panel:'Prime counter'})">the counter</button><button class="chip" onclick="cgo({sub:'one caveat'})">what li₂ is</button></div></td></tr>
+
+  <tr><td>Presentation, not attribution &mdash;<br>the r-chain, Goldbach strips and gold markers</td>
+  <td>The r-chain ($r\to r \bmod (M+1)$ kept while $\gcd(r,M+j)=1$), the four strips $r+M=g$, $r+M=s$, $M-r=g$,
+  $r-M=g$, and the gold marker $P_g=(g,s)$ are ways of drawing the elementary Goldbach identity $g+s=E$ with
+  $g,s$ prime in the lattice's own coordinates. The number of gold markers for $E$ is the exact Goldbach pair count
+  $k(E)$, found by sieving, not estimated; each is labelled $g+s$ on the opener plates and exports, and the math sheets list them
+  all. Nothing here is a new theorem.<div class="cnone">opener and sheet controls &mdash; not reachable from this page&rsquo;s chips</div></td></tr>
   </table></div>
 
   <h3>Music</h3>
@@ -3768,7 +3804,7 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
-             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
+             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbMkAll: true, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: false };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4174,6 +4210,34 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
     ctx.stroke();
     ctx.fillStyle = 'rgba(242,200,96,.75)';
     pts.forEach(pt => { if (!pt) return; ctx.beginPath(); ctx.arc(pt[0], pt[1], Math.max(0.9, dot * 0.7), 0, TAU); ctx.fill(); });
+    /* Label every marker (device space, upright). Each trail point is one Goldbach pair, so the count of
+       labelled points is k(E) up to the pairs that fall off the plate. Few pairs get "g+s"; many get just g;
+       a label that would overlap one already placed is skipped, and the caption says how many were. */
+    if (OL.gbMkAll && cw && ch) {
+      const tm = ctx.getTransform(), cvw = ctx.canvas.width, cvh = ctx.canvas.height, sc = cvw / cw;
+      const fs = Math.max(8 * sc, Math.min(cvw, cvh) / 80), full = pairs.length <= 14, boxes = [];
+      let shown = 0, off = 0, hid = 0;
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.font = fs + 'px ' + MONO; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      pairs.forEach((q, i) => {
+        const pt = pts[i]; if (!pt) { off++; return; }
+        const dp = tm.transformPoint(new DOMPoint(pt[0], pt[1]));
+        if (dp.x < 0 || dp.y < 0 || dp.x > cvw || dp.y > cvh) { off++; return; }
+        shown++;
+        if (q === g) return;   // the pair in focus has its own label
+        const txt = full ? q + '+' + (N - q) : String(q), tw = ctx.measureText(txt).width, pad = fs * 0.25;
+        const tx = Math.min(cvw - tw - pad - 2, dp.x + fs * 0.7), ty = Math.max(fs, Math.min(cvh - fs, dp.y - fs * 0.8));
+        const bx = { x0: tx - pad, y0: ty - fs * 0.7, x1: tx + tw + pad, y1: ty + fs * 0.7 };
+        if (boxes.some(o => bx.x0 < o.x1 && bx.x1 > o.x0 && bx.y0 < o.y1 && bx.y1 > o.y0)) { hid++; return; }
+        boxes.push(bx);
+        ctx.fillStyle = 'rgba(4,4,13,.7)'; ctx.fillRect(bx.x0, bx.y0, bx.x1 - bx.x0, bx.y1 - bx.y0);
+        ctx.fillStyle = 'rgba(242,200,96,.95)'; ctx.fillText(txt, tx, ty);
+      });
+      const cap = 'E = ' + N + ' \u00b7 ' + pairs.length + ' gold markers = k(E)' + (off ? ' \u00b7 ' + off + ' off plate' : '') + (hid ? ' \u00b7 ' + hid + ' labels skipped (crowded)' : '');
+      ctx.font = fs + 'px ' + MONO; const cw2 = ctx.measureText(cap).width;
+      ctx.fillStyle = 'rgba(4,4,13,.82)'; ctx.fillRect(4, cvh - fs * 1.9, cw2 + fs, fs * 1.5);
+      ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.fillText(cap, 4 + fs * 0.5, cvh - fs * 1.15);
+      ctx.restore();
+    }
   }
   // Dark halo first so the gold marker still pops against a bright cell even
   // with the Dim option off and every other overlay lit up underneath it.
@@ -4197,7 +4261,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
       const tw = ctx.measureText(txt).width, gap = dot * 3.6 * kx, pad = fs * 0.35;
       let tx = dp.x + gap; if (tx + tw + pad > cvw - 4) tx = dp.x - gap - tw;
       tx = Math.max(pad + 2, Math.min(cvw - tw - pad - 2, tx));
-      const ty = Math.max(fs, Math.min(cvh - fs, dp.y - dot * 3.2 * kx));
+      const ty = Math.max(fs, Math.min(cvh - fs - (OL.gbMkAll ? fs * 2.2 : 0), dp.y - dot * 3.2 * kx));
       ctx.fillStyle = 'rgba(4,4,13,.82)'; ctx.fillRect(tx - pad, ty - fs * 0.75, tw + 2 * pad, fs * 1.5);
       ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.fillText(txt, tx, ty);
       ctx.restore();
@@ -4643,6 +4707,7 @@ function olSyncUI() {
   document.querySelectorAll('.ol-theta-btn').forEach(b => b.classList.toggle('on', b.dataset.tm === OL.thetaMode));
   const chkT = $('ol-gbtrail-chk'); if (chkT) chkT.checked = !!OL.gbTrail;
   const chkL = $('ol-gblabel-chk'); if (chkL) chkL.checked = !!OL.gbLabel;
+  const chkA = $('ol-gbmkall-chk'); if (chkA) chkA.checked = !!OL.gbMkAll;
   const chkS = $('ol-gbspot-chk'); if (chkS) chkS.checked = !!OL.gbSpot;
   const spA = $('ol-gbspot-amt'); if (spA && document.activeElement !== spA) spA.value = OL.gbSpotAmt;
   const spL = $('ol-gbspot-v'); if (spL) spL.textContent = Math.round(OL.gbSpotAmt) + '%';
@@ -5533,6 +5598,7 @@ function olSetThetaMode(m) {
 }
 function olToggleGbTrail(v) { OL.gbTrail = !!v; olRedraw(); }
 function olToggleGbLabel(v) { OL.gbLabel = !!v; olRedraw(); }
+function olToggleGbMkAll(v) { OL.gbMkAll = !!v; olRedraw(); }
 function olSetGbThick(v) {
   const n = Number(v); OL.gbThick = isFinite(n) ? Math.max(0.5, Math.min(6, n)) : 1;
   const lbl = $('ol-gbthick-v'); if (lbl) lbl.textContent = OL.gbThick.toFixed(1) + '\u00d7';
@@ -9900,6 +9966,8 @@ const PRESETS = {
   blk5:  { a: 1,  b: 1, s: 0,   w: 6,  walk: 'band' },   // the C(5) case
   blk29: { a: 1,  b: 1, s: 0,   w: 30, walk: 'band' },   // the C(29) case
   grg:   { a: -1, b: 1, s: 206, w: 1, minG: 256, walk: 'strip' },  // 206 = 2·103, rough
+  twin:  { a: 1,  b: 1, s: 2,   w: 1, walk: 'strip' },   // gap 2 diagonal: pairs (r, r+2)
+  cousin:{ a: 1,  b: 1, s: 4,   w: 1, walk: 'strip' },   // gap 4
   f12:   { a: 1,  b: 2, s: 1,   w: 1, walk: 'strip' },
   f23:   { a: 2,  b: 3, s: 1,   w: 1, walk: 'strip' }
 };
@@ -13599,6 +13667,7 @@ function cgo(o) {
   const wantView = o.view || (touchesLattice && creditView !== 'keep' ? creditView : null);
   if (wantView)        _cTry(() => setView(wantView));
   if (o.cmap)          _cTry(() => setCmap(o.cmap));
+  if (o.cm)            _cTry(() => setCircleMethod(true));
   if (o.walk)          _cTry(() => setWalk(o.walk));
   if (o.preset)        _cTry(() => preset(o.preset));
   if (o.gn)            _cTry(() => setGN(o.gn));
@@ -14444,7 +14513,7 @@ function msLiftDetail(G, o) {
       out.push({ t: 'p', text: 'The spiral is locked to the residue r = 1. gcd(1, M) = 1 for every M, so this line never breaks.' });
     } else if (o.p <= G) {
       let ok = 0, bad = 0, wrap = 0;
-      for (let M = o.p + 1; M <= G; M++) { if (gcd(o.p, M) === 1) { ok++; if (gcd(o.p, M + 1) !== 1) wrap++; } else bad++; }
+      for (let M = o.p + 1; M <= G; M++) { if (gcd(o.p, M) === 1) { ok++; if (M < G && gcd(o.p, M + 1) !== 1) wrap++; } else bad++; /* M + 1 must itself be on the lattice to be ringed */ }
       const pp = o.p;
       out.push({ t: 'eq', tex: msT`\text{spiral } r=${pp}:\quad \#\{M\in(${pp},${G}]:\ ${pp}\nmid M\}=${ok},\qquad \#\{${pp}\mid M\}=${bad},\qquad \text{surviving share}=${msf(ok + bad ? ok / (ok + bad) : 0, 4)}\ \to\ 1-\tfrac1{${pp}}=${msf(1 - 1 / pp, 4)}`, cap: 'The dropout ring is M = ' + pp + ' itself, where the residue vanishes. ' + wrap + ' of the ' + ok + ' surviving points fail one step later, at M+1, and are ringed on the plate.' });
     } else {
@@ -14455,7 +14524,8 @@ function msLiftDetail(G, o) {
   if (o.mode === 'npath' || o.mode === 'both' || o.mode === 'connect') {
     if (!big) {
       let tot = 0, cop = 0;
-      for (let M = 1; M <= G; M++) for (const sg of (o.dir === 'plus' ? [1] : o.dir === 'minus' ? [-1] : [1, -1])) {
+      for (let M = 1; M <= G; M++) for (const sg of (o.dir === 'plus' ? [1] : o.dir === 'minus' ? [-1] : (M0 === 0 ? [1] : [1, -1]))) {   // at n = 0 the + and − paths are the same cells, so each is counted once
+
         const t2 = M + sg * M0; if (t2 % 2 || t2 < 2) continue; const r = t2 / 2; if (r < 1 || r > M) continue;
         tot++; if (gcd(r, M) === 1) cop++;
       }
@@ -14508,7 +14578,7 @@ function msLiftDetail(G, o) {
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
   return out;
 }
-function msGoldbach(G, gbG, title, hook) {
+function msGoldbach(G, gbG, title, hook, batchNote) {
   const E = 2 * (G + 1), maxG = Math.floor(E / 2), g = Math.max(1, Math.min(maxG, gbG || 1)), s = E - g;
   const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
   const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
@@ -14519,7 +14589,7 @@ function msGoldbach(G, gbG, title, hook) {
   out.push({ t: 'eq', tex: msT`k(E)=\#\{\,q\le E/2:\ q,\ E-q\ \mathrm{prime}\,\}=${pairs.length},\qquad r(E)=2k-\mathbf 1[E/2\ \mathrm{prime}]=${ordered}` });
   const fd = gbDetailFacts(G, gbG);
   out.push({ t: 'p', text: 'Of the ' + Math.max(0, fd.half - 1) + ' partitions g + s = ' + E + ' with 2 \u2264 g \u2264 E/2, ' + pairs.length + ' are Goldbach pairs (' + (100 * fd.share).toFixed(1) + '%); in every other one g or s is composite, and that shows up on the plate as a punctured line. ' + (pairs.length ? 'The smallest pair has g = ' + fd.smallest + ' and the one nearest the middle has g = ' + fd.nearest + (fd.halfPrime ? '; E/2 = ' + (E / 2) + ' is itself prime, so that pair has g = s' : '') + '.' : 'There is no pair at this E.') });
-  out.push({ t: 'p', text: 'The gap on show is g = ' + g + ', s = ' + s + ': ' + fd.verdict + '.' });
+  out.push({ t: 'p', text: (batchNote ? batchNote + ' The gap in focus is' : 'The gap on show is') + ' g = ' + g + ', s = ' + s + ': ' + fd.verdict + '.' });
   out.push({ t: 'eq', tex: msT`\#\{\gcd=1\}\big/\#\text{cells}:\quad c:\ ${fd.L.c.cop}/${fd.L.c.tot},\quad d:\ ${fd.L.d.cop}/${fd.L.d.tot},\quad a:\ ${fd.L.a.cop}/${fd.L.a.tot},\quad b:\ ${fd.L.b.cop}/${fd.L.b.tot}`, cap: 'Counted on the full G \u00d7 G square (Ring and Cayley show only its r \u2264 M half). Line c is entirely coprime exactly when g is prime, since gcd(r, g \u2212 r) = gcd(r, g). Line d is entirely coprime exactly when s is prime once g > \u221aE, because its g \u2212 1 cells then always reach a multiple of any small factor of s. A pair is a gap where both are.' });
   if (hook) { try { hook(out); } catch (e) {} }   // the isolated strips plate sits right under the four-line counts
   out.push({ t: 'eq', tex: msT`\frac{r(E)}{E/\ln^{2}E}=\frac{${ordered}}{${msf(E / (Math.log(E) ** 2), 2)}}=${msf(fd.comet, 3)}`, cap: 'The Goldbach comet: r(E) scaled by its typical size E/ln\u00b2E. Even E with many small prime factors sit high in the comet, those with few sit low.' });
@@ -14528,7 +14598,7 @@ function msGoldbach(G, gbG, title, hook) {
   try {
     const spf = (typeof SPF !== 'undefined' && SPF && SPF.length > E) ? SPF : buildSPF(E + 1);
     const S = sigma(E, spf), li = li2(E);
-    out.push({ t: 'eq', tex: msT`\mathfrak{S}(E)=2C_{2}\prod_{p\mid E,\ p>2}\frac{p-1}{p-2}=${msf(S, 6)},\qquad C_{2}=0.660162\ldots`, cap: 'Hardy–Littlewood: r(E) ~ 𝔖(E)·li₂(E), here ' + msf(S * li, 2) + ' against the actual ' + ordered + '. The asymptotic is a statement about large E; at this size it is a rough guide.' });
+    out.push({ t: 'eq', tex: msT`\mathfrak{S}(E)=2C_{2}\prod_{p\mid E,\ p>2}\frac{p-1}{p-2}=${msf(S, 6)},\qquad C_{2}=0.660162\ldots`, cap: 'Hardy–Littlewood: r(E) ~ 𝔖(E)·li₂(E), with li₂(E) = ∫₂ᴱ dt/ln²t, here ' + msf(S * li, 2) + ' against the actual ' + ordered + '. The finer form 𝔖(E)·∫₂^{E−2} dt/(ln t · ln(E−t)) gives ' + msf(S * msHLJ(E), 2) + '. The asymptotic is a statement about large E; at this size neither is more than a rough guide.' });
   } catch (e) {}
   return out;
 }
@@ -14537,7 +14607,7 @@ function msGoldbach(G, gbG, title, hook) {
    Numbers are computed from the plate's own G, n and strip, and the closed form is checked against the
    product multiplied out prime by prime. */
 let _ssPrimes = null;
-function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn) {
+function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn, predShown) {
   const out = [{ t: 'h', text: 'The singular series' }];
   out.push({ t: 'p', text: 'Every density on this page is one count. For a set of excluded residue classes, \u03bd_p is the number of the p classes it removes at the prime p. A line loses the share \u03bd_p/p at p; a block of cells loses \u03bd_p/p\u00b2, because the cell also needs p | r. The singular series is the product of the local factors, set against what independent primes would give.' });
   out.push({ t: 'eq', tex: msT`\mathfrak S(\mathscr X)=\prod_{p}\frac{1-\nu_p/p}{(1-1/p)^{|\mathscr X|}},\qquad \nu_p=\#\{\,h\bmod p:\ h\in\mathscr X\,\}`, cap: 'The product converges because \u03bd_p = |X| once p is large, and then the factor is 1 \u2212 O(1/p\u00b2).' });
@@ -14550,7 +14620,7 @@ function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn) {
   if (!stripEmpty && a === 1 && b === 1 && w === 1 && Math.abs(s) >= 1) {
     const g0 = Math.abs(s), ps = pfac(g0, SPF);
     out.push({ t: 'eq', tex: msT`\text{strip, }\mathscr X=\{0\}\ \text{on}\ r-M=${s}:\quad \gcd(r,M)=\gcd(${g0},M)\ \Longrightarrow\ \delta\to\prod_{p\mid ${g0}}\Big(1-\frac1p\Big)=\frac{\varphi(${g0})}{${g0}}=${msf(phi(g0, SPF) / g0, 6)}`, cap: 'One class is lost at each prime dividing ' + g0 + ' (\u03bd_p = 1 there, 0 elsewhere)' + (ps.length ? ': p = ' + ps.join(', ') + '.' : '; |s| = 1 loses none, so \u03b4 \u2192 1.') });
-  } else if (!stripEmpty) {
+  } else if (!stripEmpty && predShown) {
     out.push({ t: 'p', text: 'The strip prediction \u03b4_pred of the section above is this same product, evaluated on each diagonal v = c in the window and averaged by the diagonal\u2019s length.' });
   }
   // Goldbach
@@ -14572,7 +14642,7 @@ function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn) {
     const pairs = []; for (let q = 2; q <= E / 2; q++) if (isPrime(q) && isPrime(E - q)) pairs.push(q);
     const ordered = 2 * pairs.length - (isPrime(E / 2) ? 1 : 0);
     let hl = NaN; try { hl = S * li2(E); } catch (e) {}
-    out.push({ t: 'eq', tex: msT`r(E)\sim\mathfrak S(E)\,\mathrm{li}_{2}(E):\qquad r(${E})=${ordered},\qquad \mathfrak S(${E})\,\mathrm{li}_{2}(${E})=${msf(hl, 1)},\qquad \text{ratio}=${msf(hl ? ordered / hl : NaN, 3)}`, cap: 'r(E) counts the ordered ways E = q + q\u2032 with both prime. The asymptotic is a statement about large E; at this size it is a rough guide.' });
+    out.push({ t: 'eq', tex: msT`r(E)\sim\mathfrak S(E)\,\mathrm{li}_{2}(E):\qquad r(${E})=${ordered},\qquad \mathfrak S(${E})\,\mathrm{li}_{2}(${E})=${msf(hl, 1)},\qquad \text{ratio}=${msf(hl ? ordered / hl : NaN, 3)}`, cap: 'r(E) counts the ordered ways E = q + q\u2032 with both prime; li\u2082(E) = \u222b\u2082\u1d31 dt/ln\u00b2t. The finer form \ud835\udd16(E)\u00b7\u222b\u2082^{E\u22122} dt/(ln t \u00b7 ln(E\u2212t)) gives ' + msf(S * msHLJ(E), 1) + '. The asymptotic is a statement about large E; at this size it is a rough guide.' });
   }
   return out;
 }
@@ -14693,7 +14763,7 @@ function msBuildSieve(kind, views, noPlates) {
     });
     doc.push({ t: 'h', text: 'Where the shrinkage sits' });
     doc.push({ t: 'p', text: 'Taking logs turns the product into a sum, so the drop in D(n) splits cleanly into what the frozen primes have already taken and what the still-moving primes take. The saturated part grows without bound as more primes freeze; the active part stays bounded and shrinks in relative terms.' });
-    doc.push({ t: 'eq', tex: msT`-\ln D(n)=\underbrace{-\sum_{p\le n+1}\ln\!\Big(1-\frac1p\Big)}_{\text{saturated}}\ \ \underbrace{-\sum_{p>n+1}\ln\!\Big(1-\frac{n+1}{p^{2}}\Big)}_{\text{active}}` });
+    doc.push({ t: 'eq', tex: msT`-\ln D(n)=\underbrace{-\sum_{p\le n+1}\ln\!\Big(1-\frac1p\Big)}_{\text{saturated}}\ +\ \underbrace{-\sum_{p>n+1}\ln\!\Big(1-\frac{n+1}{p^{2}}\Big)}_{\text{active}}` });
     doc.push({ t: 'table', head: ['depth n · total and saturated share', '−ln S (saturated)', '−ln A'], rows: srows });
     // C(n) against n
     if (!noPlates) {
@@ -14791,7 +14861,7 @@ function msBuildOpenerRaw(noPlates) {
 
   // 2 · lattice
   doc.push({ t: 'h', text: 'The lattice' });
-  doc.push({ t: 'p', text: (wedge ? 'Ring and Cayley fold r > M onto the wedge r ≤ M, so the set they hold is the triangle below; Grid draws the whole G × G square.' : (view !== 'grid' ? 'In ' + OL.thetaMode + ' mode Ring and Cayley plot the whole G × G square too, since r > M ' + (OL.thetaMode === 'wrap' ? 'laps the ring instead of folding onto the r = M spoke' : 'lands on its own spoke r/G') + '. The counts below still read the triangle r ≤ M.' : 'Grid draws the whole G × G square of cells.')) });
+  doc.push({ t: 'p', text: (wedge ? 'Ring and Cayley plot only the wedge r ≤ M (in clamp mode a cell with r > M would sit on the r = M spoke, so it is left out), so the set they hold is the triangle below; Grid draws the whole G × G square.' : (view !== 'grid' ? 'In ' + OL.thetaMode + ' mode Ring and Cayley plot the whole G × G square too, since r > M ' + (OL.thetaMode === 'wrap' ? 'laps the ring instead of folding onto the r = M spoke' : 'lands on its own spoke r/G') + '. The lattice counts below read the triangle r ≤ M; the strip and Goldbach counts read the whole square.' : 'Grid draws the whole G × G square of cells.')) });
   doc.push({ t: 'eq', tex: msT`\mathcal L_{${G}}=\{(r,M)\in\mathbb Z^{2}:\ 1\le r\le M\le ${G}\}` });
   doc.push({ t: 'eq', tex: msT`|\mathcal L_{${G}}|=\sum_{M=1}^{${G}}M=\frac{${G}\cdot ${G + 1}}{2}=${G * (G + 1) / 2}` + (!wedge ? msT`,\qquad |[1,${G}]^{2}|=${G * G}` : '') });
 
@@ -14847,7 +14917,7 @@ function msBuildOpenerRaw(noPlates) {
     try {
       let se = !OL.stripOn;
       if (OL.stripOn) { try { se = !olStripPoints(G).total; } catch (e) {} }
-      msSingularSeries(G, cn, OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width), se, !!OL.gbOn).forEach(x => doc.push(x));
+      msSingularSeries(G, cn, OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width), se, !!OL.gbOn, doc.some(b => b.t === 'eq' && /delta_\{\\mathrm\{pred\}\}/.test(b.tex || ''))).forEach(x => doc.push(x));
     } catch (e) {}
   };
   if (liftActive) {
@@ -14865,7 +14935,7 @@ function msBuildOpenerRaw(noPlates) {
         const sp = olStripPoints(G);
         if (!sp.total) L.push({ t: 'p', text: 'This band holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (OL.slopeA === -1 && OL.slopeB === 1 ? ' For slope \u22121/1 the band is the anti-diagonal r + M = ' + OL.offset + (Math.max(1, OL.width) > 1 ? ' \u2026 ' + (OL.offset + Math.max(1, OL.width) - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
         else
-        L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}` });
+        L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}`, cap: 'Counted over the whole G \u00d7 G square (1 \u2264 r, M \u2264 G), the cells Grid draws; Ring and Cayley plot only the r \u2264 M half of it in clamp mode.' });
       } catch (e) {}
       msIsoPush(L, 'strip');   // under the band's own counts
     }
@@ -14873,7 +14943,7 @@ function msBuildOpenerRaw(noPlates) {
     msBlockSection(cn, L).forEach(b => doc.push(b));
     if (OL.gbOn) {
       ssPush();
-      doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG, undefined, o => msIsoPush(o, 'gbstrips')).forEach(b => doc.push(b));
+      doc.push({ t: 'h', text: 'Goldbach partitions' }); msGoldbach(G, OL.gbG, undefined, o => msIsoPush(o, 'gbstrips'), OL.gbAll ? 'All ' + olGoldbachPairs().length + ' Goldbach pairs of E are drawn at once, the one in focus brightest.' : '').forEach(b => doc.push(b));
       try {
         const E = olGoldbachN(), gg = Math.max(1, Math.min(Math.floor(E / 2), OL.gbG || 1)), ss = E - gg, ps = olGoldbachPairs();
         doc.push({ t: 'h', text: 'The gold marker' });
@@ -14883,7 +14953,19 @@ function msBuildOpenerRaw(noPlates) {
         doc.push({ t: 'eq', tex: msT`\gcd(g,s)=1\quad\text{for every Goldbach pair }g\ne s,\qquad s>G\ \Longrightarrow\ P_{g}\notin\mathcal L_{${G}}`, cap: 'Two distinct primes are always coprime, so the marker is a coprime cell of the extended lattice, one the plate only shows through this marker.' });
         doc.push({ t: 'eq', tex: msT`\rho(P_{g})=\rho_{0}+\rho_{d}\,\frac{s}{G}=${msf(OPENER_RHO0 + OPENER_RHOD * ss / G, 3)}\ >\ \rho_{0}+\rho_{d}=${msf(OPENER_RHO0 + OPENER_RHOD, 3)}`, cap: 'Cayley: the marker\u2019s radius passes the largest ring\u2019s, which is why it is inside the pole-side disc.' });
         if (showRing) doc.push({ t: 'eq', tex: msT`\rho_{\mathrm{Ring}}(P_{g})=R\Big(h+(1-h)\,\frac{s-\frac12}{G}\Big)=${msf(OPENER_RING_HOLE + (1 - OPENER_RING_HOLE) * (ss - 0.5) / G, 3)}\,R,\qquad h=${msf(OPENER_RING_HOLE, 2)}`, cap: 'At h = 1 every ring collapses onto the unit circle and the marker simply slides round it with \u03b8 = 2\u03c0g/s. As h falls to 0 the marker moves out to about (s/G)R, which is why the Ring may need zooming out to keep it in view.' });
-        doc.push({ t: 'p', text: 'The dynamic: g/s = g/(E \u2212 g) is increasing in g, so as g walks the ' + ps.length + ' Goldbach pairs of ' + E + ' the marker turns once through a full circle (\u03b8 from near 0 to 360\u00b0) while its ring index s falls from ' + (ps.length ? (E - ps[0]) : '\u2013') + ' toward E/2 = ' + (E / 2) + ': an inward spiral. It closes on the \u03b8 = 360\u00b0 seam exactly when E/2 is itself prime (g = s). The trail draws all ' + ps.length + ' markers in that order.' });
+        doc.push({ t: 'p', text: 'The dynamic: g/s = g/(E \u2212 g) is increasing in g, so as g walks the ' + ps.length + ' Goldbach pairs of ' + E + ' the marker\u2019s angle \u03b8 = 2\u03c0g/s rises from ' + (ps.length ? msf(360 * ps[0] / (E - ps[0]), 1) : '\u2013') + '\u00b0 (g = ' + (ps.length ? ps[0] : '\u2013') + ') to ' + (ps.length ? msf(360 * ps[ps.length - 1] / (E - ps[ps.length - 1]), 1) : '\u2013') + '\u00b0 (g = ' + (ps.length ? ps[ps.length - 1] : '\u2013') + '), reaching 360\u00b0 only if E/2 is prime, while its ring index s falls from ' + (ps.length ? (E - ps[0]) : '\u2013') + ' toward E/2 = ' + (E / 2) + ': an inward spiral. It lands on the \u03b8 = 360\u00b0 seam exactly when E/2 is itself prime (g = s). The trail draws all ' + ps.length + ' markers in that order.' });
+        {
+          const half = (E % 2 === 0 && ps.indexOf(E / 2) >= 0) ? 1 : 0, rE = 2 * ps.length - half, cap = 48, rows = [];
+          doc.push({ t: 'eq', tex: msT`\#\{\text{gold markers}\}=k(E)=${ps.length},\qquad r(E)=2k(E)-\mathbf 1[E/2\ \text{prime}]=${rE}`, cap: 'Each marker is one unordered Goldbach pair g + s = ' + E + ', so the number of gold points outside the lattice is exactly the pair count k(E); r(E) counts ordered pairs. The count is an exact integer from a sieve of primes, not an estimate.' });
+          ps.slice(0, cap).forEach((q, i) => {
+            const sq = E - q, row = [String(i + 1), q + ' + ' + sq, '(' + q + ', ' + sq + ')', msf(360 * q / sq, 2) + '\u00b0', msf(OPENER_RHO0 + OPENER_RHOD * sq / G, 3)];
+            if (showRing) row.push(msf(OPENER_RING_HOLE + (1 - OPENER_RING_HOLE) * (sq - 0.5) / G, 3) + ' R');
+            rows.push(row);
+          });
+          if (ps.length > cap) rows.push(['\u2026', (ps.length - cap) + ' more pairs, same pattern', '', '', ''].concat(showRing ? [''] : []));
+          doc.push({ t: 'table', head: ['#', 'pair g + s', 'marker (g, s)', '\u03b8 = 2\u03c0g/s', '\u03c1 Cayley'].concat(showRing ? ['\u03c1 Ring'] : []), rows: rows });
+          doc.push({ t: 'note', text: 'Labels on the plates: with 14 or fewer markers each is written g + s; with more, just g, and a label that would sit on top of another is skipped, so the table is the complete list. Markers beyond the plate edge are counted in the caption as off plate.' });
+        }
       } catch (e) {}
     }
   }
@@ -14942,7 +15024,7 @@ function msBuildMainRaw(views, noPlates) {
     const zin = Math.max(0.25, cayleyZoomIn), zout = cmap === 'A' ? Math.max(1, cayleyZoomOut) : 1;
     if (cmap === 'A') doc.push({ t: 'eq', tex: msT`z=\rho e^{i\theta},\quad \rho(M)=\rho_{0}+\rho_{d}\frac MG=${msf(rho0, 2)}+${msf(rhoD, 2)}\frac MG,\qquad w=\frac{z-1}{z+1}=u+iv` });
     else doc.push({ t: 'eq', tex: msT`z=\rho e^{i\theta},\quad \rho(M)=\frac MG,\qquad w=\frac{z-a}{1-\bar a z},\qquad a=${msf(ba, 2)}\,e^{i\,${baAng}^{\circ}}` });
-    doc.push({ t: 'eq', tex: msT`\mathrm{Cay}(r,M)=\big(c+R_c\,u,\ \ c-R_c\,v\big),\qquad R_c=0.46\,S\,\frac{\kappa_{\mathrm{in}}}{\kappa_{\mathrm{out}}}=0.46\,S\cdot\frac{${msf(zin, 2)}}{${msf(zout, 2)}}`, cap: 'θ is the same map Ring uses. ' + (cmap === 'A' ? 'Map A is unbounded: a pole crosses the plate where ρ passes 1.' : 'Map B is a disc automorphism, bounded: |w| ≤ 1 everywhere.') });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Cay}(r,M)=\big(c+R_c\,u,\ \ c-R_c\,v\big),\qquad R_c=0.46\,S\,\frac{\kappa_{\mathrm{in}}}{\kappa_{\mathrm{out}}}=0.46\,S\cdot\frac{${msf(zin, 2)}}{${msf(zout, 2)}}`, cap: 'θ(r, M) is the same map Ring uses, before Ring\u2019s own turn θ\u2080 and winding. ' + (cmap === 'A' ? 'Map A is unbounded: a pole crosses the plate where ρ passes 1.' : 'Map B is a disc automorphism, bounded: |w| ≤ 1 everywhere.') });
     if (cayleyRotX || cayleyRotY) doc.push({ t: 'eq', tex: msT`\Sigma(w)=\Big(\tfrac{2u}{1+|w|^{2}},\ \tfrac{2v}{1+|w|^{2}},\ \tfrac{|w|^{2}-1}{1+|w|^{2}}\Big),\qquad w'=\frac{X+iY}{1-Z}\ \ \text{after}\ R_y(${cayleyRotY}^{\circ})R_x(${cayleyRotX}^{\circ})` });
   }
 
@@ -14985,7 +15067,7 @@ function msBuildMainRaw(views, noPlates) {
         const anti = (a === -1 && b === 1);
         doc.push({ t: 'p', text: 'This window holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (anti ? ' For slope \u22121/1 the window is the anti-diagonal r + M = ' + s + (w > 1 ? ' \u2026 ' + (s + w - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
       } else
-      doc.push({ t: 'eq', tex: msT`\#\text{cells}=${st.total.toLocaleString()},\qquad \#\{\gcd=1\}=${st.cop.toLocaleString()},\qquad \delta=\frac{${st.cop.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.cop / st.total : 0, 9)}` });
+      doc.push({ t: 'eq', tex: msT`\#\text{cells}=${st.total.toLocaleString()},\qquad \#\{\gcd=1\}=${st.cop.toLocaleString()},\qquad \delta=\frac{${st.cop.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.cop / st.total : 0, 9)}`, cap: 'Counted over the whole G \u00d7 G square (1 \u2264 r, M \u2264 G).' });
       if (a === 1 && b === 1 && w === 1 && s === 0) {
         doc.push({ t: 'eq', tex: msT`r=M\ \Longrightarrow\ \gcd(r,M)=M,\ \text{coprime only at }M=1\ \Longrightarrow\ \delta=\frac1G=\frac1{${G}}=${msf(1 / G, 9)}` });
       } else if (a === 1 && b === 1 && w === 1 && Math.abs(s) >= 1) {
@@ -15016,11 +15098,11 @@ function msBuildMainRaw(views, noPlates) {
   try {
     let stripEmpty = false;
     if (walkMode !== 'band') { try { stripEmpty = !walkStrip(0).total; } catch (e) {} }
-    msSingularSeries(G, liveLift ? liftChainNEff() : 1, a, b, s, w, walkMode === 'band' ? true : stripEmpty, pm !== 'off').forEach(x => doc.push(x));
+    msSingularSeries(G, liveLift ? liftChainNEff() : 1, a, b, s, w, walkMode === 'band' ? true : stripEmpty, pm !== 'off', doc.some(b => b.t === 'eq' && /delta_\{\\mathrm\{pred\}\}/.test(b.tex || ''))).forEach(x => doc.push(x));
   } catch (e) {}
   if (pm !== 'off') {
     doc.push({ t: 'h', text: 'Goldbach partitions' });
-    msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.', o => msIsoPushMain(o, 'part', vs)).forEach(x => doc.push(x));
+    msGoldbach(G, (typeof partG !== 'undefined' ? partG : 1), 'The partitions overlay reads the lattice at E = 2(G+1); each prime pair g + (E − g) appears as a fully coprime line of the same lattice.', o => msIsoPushMain(o, 'part', vs), (() => { try { if (pm === 'single' || pm === 'off') return ''; const n = currentPartBatch().filter(it => !partHidden.has(it.g)).length; return 'The overlay is in ' + pm + ' mode: ' + n + ' partition' + (n === 1 ? ' is' : 's are') + ' drawn at once (the plate\u2019s own list), each as its own set of strips.'; } catch (e) { return ''; } })()).forEach(x => doc.push(x));
   }
   return doc;
 }
@@ -15320,7 +15402,7 @@ const MS_ISO_SPECS = {
   strip:    { ol: { mode: 'none', chain: false, stripOn: true, stripDots: true, gbOn: false }, iso: { hideBase: true } },
   gbstrips: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: false, gbSpot: false, gbLabel: false, gbDim: false }, iso: { hideBase: true, noMarker: true } },
   sieve:    { ol: { mode: 'none', chain: true, stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: { hideBase: true } },
-  gbmarker: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: true, gbSpot: false, gbLabel: true, gbDim: false }, iso: { hideBase: true, noStrips: true } }
+  gbmarker: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: true, gbSpot: false, gbLabel: true, gbMkAll: true, gbDim: false }, iso: { hideBase: true, noStrips: true } }
 };
 function msIsoShot(spec, w, h, paint) {
   const keep = {}; Object.keys(spec.ol).forEach(k => { keep[k] = OL[k]; OL[k] = spec.ol[k]; });
@@ -15333,6 +15415,15 @@ function msIsoShot(spec, w, h, paint) {
     MS_LBL.on = lon; MS_LBL.mask = lmask; MS_LBL.stats = null;
     MS_ISO.on = false; MS_ISO.hideBase = false; MS_ISO.noStrips = false; MS_ISO.noMarker = false;
   }
+}
+/* The finite-size form of the Hardy-Littlewood count: J(E) = integral of dt / (ln t * ln(E - t)) from 2 to E - 2. li2(E) is its
+   large-E simplification, and at the sizes on a sheet it overshoots, so both are stated. */
+function msHLJ(E) {
+  if (!(E > 4)) return NaN;
+  const a = 2, b = E - 2, n = 2000, h = (b - a) / n, f = t => 1 / (Math.log(t) * Math.log(E - t));
+  let sum = f(a) + f(b);
+  for (let i = 1; i < n; i++) sum += f(a + i * h) * (i % 2 ? 4 : 2);
+  return sum * h / 3;
 }
 function msGbStripNote(G, g) {
   try {
