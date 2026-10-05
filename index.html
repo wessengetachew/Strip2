@@ -1382,8 +1382,8 @@ walk anyway.</p>
       <span class="pt" id="void-m-pt"></span>
     </div>
     <span class="lbl" title="Which way increasing r winds around each ring on screen.">winding</span>
-    <button class="chip windchip on" data-h="1" onclick="setRingWinding(1)" title="Clockwise on screen: screen angle = &minus;2&pi;r/M (default).">&#8635; clockwise</button>
-    <button class="chip windchip" data-h="-1" onclick="setRingWinding(-1)" title="Counter-clockwise on screen: angle = +2&pi;r/M, the way e^{2&pi;ir/M} and the Cayley view wind.">&#8634; counter</button>
+    <button class="chip windchip" data-h="1" onclick="setRingWinding(1)" title="Clockwise on screen: screen angle = &minus;2&pi;r/M (default).">&#8635; clockwise</button>
+    <button class="chip windchip on" data-h="-1" onclick="setRingWinding(-1)" title="Counter-clockwise on screen: angle = +2&pi;r/M, the way e^{2&pi;ir/M} and the Cayley view wind.">&#8634; counter</button>
     <button class="chip" onclick="setRingRot(0);setRingHole(0)" title="Back to no rotation and no inner hole.">Reset ring</button>
   </div>
 
@@ -1937,7 +1937,7 @@ walk anyway.</p>
       <button class="chip" onclick="stepOpenerLabelMode(1)" title="Next label mode">&#9660;</button>
       <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="No per-point labels.">off</span>
       <span class="lbl">size</span>
-      <input type="range" id="ol-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="olSetLblScale(this.value)" style="max-width:90px;" title="Label text size, Grid/Ring/Cayley alike.">
+      <input type="range" id="ol-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="olSetLblScale(this.value)" style="max-width:90px;" title="Label text size, Grid/Ring/Cayley alike.">
       <span class="val" id="ol-lbl-sz-v">1.0&times;</span>
       <span class="hint">one view at a time redraws faster</span>
     </div>
@@ -1953,8 +1953,8 @@ walk anyway.</p>
       <input type="range" id="ol-pt-sz" min="0.3" max="3" step="0.1" value="1" oninput="olSetPtScale(this.value)" style="max-width:110px;">
       <span class="val" id="ol-pt-sz-v">1.0&times;</span>
       <span class="lbl" style="margin-left:8px;" title="Which way &theta; sweeps on the Ring and Cayley previews, since Cayley is built from the same &theta; as Ring. Doesn't touch the live plate.">turn</span>
-      <button class="chip ol-ringdir-btn" data-dir="ccw" onclick="olSetRingDir(true)" title="&theta; = 0 at the right, increasing counter-clockwise.">&#8634; CCW</button>
-      <button class="chip ol-ringdir-btn on" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise &mdash; the default.">&#8635; CW</button>
+      <button class="chip ol-ringdir-btn on" data-dir="ccw" onclick="olSetRingDir(true)" title="&theta; = 0 at the right, increasing counter-clockwise.">&#8634; CCW</button>
+      <button class="chip ol-ringdir-btn" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise &mdash; the default.">&#8635; CW</button>
       <span class="hint">Ring &amp; Cayley only</span>
     </div>
     <div id="welcome-preview">
@@ -3691,6 +3691,10 @@ const OPENER_LABEL_MODES = [
   { id: 'rM',    short: 'r/M',       t: 'Both coordinates, r over M.' },
   { id: 'res',   short: 'r mod M',   t: 'The residue: the remainder of r divided by M. It equals r for r < M and reads 0 at r = M; it only differs from r where r > M (wrap / Grid), where it is the point\u2019s place around ring M.' },
   { id: 'gcd',   short: 'gcd(r,M)',  t: 'gcd(r,M) \u2014 1 marks a coprime cell.' },
+  { id: 'dec',   short: 'r/M decimal', t: 'r divided by M as a decimal, to four places. This is the fraction that sets the angle on Ring and Cayley in wrap and clamp modes (unit mode uses r/G instead).' },
+  { id: 'deg',   short: 'angle \u00b0',   t: 'The Ring angle 360\u00b7r/M in degrees (wrap and clamp modes; unit mode uses 360\u00b7r/G).' },
+  { id: 'pi',    short: 'angle \u00b7\u03c0',   t: 'The Ring angle 2\u03c0\u00b7r/M written as a multiple of \u03c0, reduced: 5/13 reads 10\u03c0/13, a half turn reads \u03c0.' },
+  { id: 'rad',   short: 'angle rad', t: 'The Ring angle 2\u03c0\u00b7r/M in radians, to three places.' },
   { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; 16+ = capped). The cell survives a block of width n+1 exactly when its depth is more than n.' }
 ];
 let _openerLblIdx = 0;
@@ -3702,6 +3706,10 @@ function openerLabelText(mode, r, M) {
     : mode === 'M'   ? '' + M
     : mode === 'res' ? '' + (M > 0 ? r % M : 0)
     : mode === 'gcd' ? '' + gcd(r, M)
+    : mode === 'dec' ? (M > 0 ? '' + (+(r / M).toFixed(4)) : '0')
+    : mode === 'deg' ? (M > 0 ? '' + (+(360 * r / M).toFixed(1)) + '\u00b0' : '0\u00b0')
+    : mode === 'rad' ? (M > 0 ? '' + (+(2 * Math.PI * r / M).toFixed(3)) : '0')
+    : mode === 'pi'  ? (() => { if (!(M > 0) || r === 0) return '0'; const g0 = gcd(2 * r, M), a = 2 * r / g0, b = M / g0; return (a === 1 ? '' : a) + '\u03c0' + (b === 1 ? '' : '/' + b); })()
     : mode === 'depth' ? (() => { const d = (typeof depthDir !== 'undefined' && depthDir === 'd') ? blockDepthDiag(r, M) : blockDepth(r, M); return d >= DEPTH_CAP ? DEPTH_CAP + '+' : '' + d; })()
     :                  r + '/' + M;   // 'rM', and the fallback
 }
@@ -3819,7 +3827,7 @@ const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
              pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
-             ptScale: 1, lblScale: 1, ringCCW: false };
+             ptScale: 1, lblScale: 1, ringCCW: true };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
@@ -4458,7 +4466,7 @@ function olSetRingDir(ccw) {
 // Font-size multiplier for the per-point labels (r / M / res / gcd / r/M),
 // on Grid, Ring and Cayley alike. 1x = the old fixed sizes.
 function olSetLblScale(v) {
-  const n = Number(v); OL.lblScale = isFinite(n) ? Math.max(0.5, Math.min(3, n)) : 1;
+  const n = Number(v); OL.lblScale = isFinite(n) ? Math.max(0.1, Math.min(3, n)) : 1;
   const lbl = $('ol-lbl-sz-v'); if (lbl) lbl.textContent = OL.lblScale.toFixed(1) + '\u00d7';
   openerOverlaySoon();
 }
@@ -8604,7 +8612,7 @@ function ringOuter(S) { return (S / 2) * RING_INSET; }
    −2π·r/M on paper); −1 gives the counter-clockwise, e^{+2πir/M} picture that
    Cayley draws. Every angle-bearing ring site goes through ringPt or
    ringCellAt, so this one value decides it. */
-let RING_H = 1;   // +1 clockwise on screen (default), -1 counter-clockwise; see setRingWinding
+let RING_H = -1;   // -1 counter-clockwise on screen (default, the classical e^{2πir/M} direction), +1 clockwise; see setRingWinding
 function setRingWinding(h) {
   RING_H = h < 0 ? -1 : 1;
   document.querySelectorAll('.windchip').forEach(b => b.classList.toggle('on', +b.dataset.h === RING_H));
@@ -14503,7 +14511,7 @@ async function msRender(doc, theme, opts) {
       });
     }
     const N = groups.length;
-    return groups.map((list, pi) => {
+    const buildPage = (list, pi) => {
       const pc = document.createElement('canvas'), K = MS.k || 1; pc.width = Math.round(W * K); pc.height = Math.round(PH * K);
       const g = pc.getContext('2d'); g.scale(K, K);
       g.fillStyle = th.bg; g.fillRect(0, 0, W, PH);
@@ -14520,7 +14528,11 @@ async function msRender(doc, theme, opts) {
       g.textAlign = 'right'; g.fillText('math sheet  \u00b7  page ' + (pi + 1) + ' / ' + N, W - MX, PH - 178);
       if (MS.usedFallback && pi === N - 1) { g.textAlign = 'left'; g.font = 'italic 22px ' + SERIF; g.fillText('Formulas set in plain Unicode: the typesetter could not be reached from this browser.', MX, PH - 140); }
       return pc;
-    });
+    };
+    /* Large pages (4K, 8K) are drawn one at a time as they are saved, then released, so a phone never has to hold
+       every page canvas at once. Callers that need all the canvases together (the PDF) do not ask for this. */
+    if (opts && opts.lazy) return groups.map((l, pi) => ({ lazy: true, build: () => buildPage(l, pi) }));
+    return groups.map(buildPage);
   }
   const H = Math.max(MS.minH, Math.round(y + 260));
   const KK = MS.k || 1, cv = document.createElement('canvas'); cv.width = Math.round(W * KK); cv.height = Math.round(H * KK);
@@ -15324,7 +15336,9 @@ async function msSavePages(cvs, base, host) {
   }
   for (let i = 0; i < N; i++) {
     const name = base + '-p' + String(i + 1).padStart(2, '0') + 'of' + String(N).padStart(2, '0') + '.png';
-    const blob = await new Promise(res => { try { cvs[i].toBlob(b => res(b), 'image/png'); } catch (e) { res(null); } });
+    let pcv = cvs[i]; if (pcv && pcv.lazy) pcv = pcv.build();
+    const blob = await new Promise(res => { try { pcv.toBlob(b => res(b), 'image/png'); } catch (e) { res(null); } });
+    try { pcv.width = 0; pcv.height = 0; } catch (e) {}   // release the page's pixels before drawing the next one
     if (!blob) { ok = false; continue; }
     const href = URL.createObjectURL(blob);
     const el = document.createElement('a'); el.href = href; el.download = name;
@@ -15482,7 +15496,7 @@ function msOpenPreview(doc) {
 function msLblSync() {
   const t = $('msp-lbl-tools'); if (!t) return;
   t.style.display = (MS_PREV.kind === 'opener' || MS_PREV.kind === 'main') ? 'inline-flex' : 'none';
-  const core = $('msp-lbl-core'); if (core) core.style.display = MS_PREV.kind === 'opener' ? 'contents' : 'none';
+  const core = $('msp-lbl-core'); if (core) core.style.display = 'contents';
   const ab = $('msp-adv-btn'), at = $('msp-adv-tools');
   if (ab) { ab.style.color = MS_ADV.on ? 'var(--gold)' : ''; ab.style.borderColor = MS_ADV.on ? 'var(--gold)' : ''; }
   if (at) at.style.display = MS_ADV.on ? 'inline-flex' : 'none';
@@ -15494,7 +15508,6 @@ function msLblSync() {
     cv.textContent = txt;
   }
   const gs = $('msp-g-sl'); if (gs) { gs.max = MS_PREV.kind === 'main' ? 512 : OPENER_COP_MAX; if (document.activeElement !== gs) gs.value = Math.min(msGNow(), +gs.max); $('msp-g-v').textContent = 'G = ' + msGNow(); }
-  if (MS_PREV.kind !== 'opener') return;
   const sel = $('msp-lbl-sel');
   if (sel) {
     if (!sel.options.length) OPENER_LABEL_MODES.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.short; o.title = m.t; sel.appendChild(o); });
@@ -15503,14 +15516,15 @@ function msLblSync() {
   $('msp-lbl-f').textContent = { all: 'all', co: 'gcd = 1', nco: 'gcd > 1' }[msLbFilter()];
   const sl = $('msp-lbl-sz'); if (sl && document.activeElement !== sl) sl.value = msLbScale();
   $('msp-lbl-sz-v').innerHTML = msLbScale().toFixed(1) + '&times;';
-  $('msp-lbl-note').textContent = OPENER_G > MS_LBL_MAXG_FILTERED ? 'no labels past G = ' + MS_LBL_MAXG_FILTERED
-    : OPENER_G > msLbMax() ? 'G > ' + MS_LBL_MAXG + ': pick gcd = 1 or gcd > 1' : '';
+  $('msp-lbl-note').textContent = msGNow() > MS_LBL_MAXG_FILTERED ? 'no labels past G = ' + MS_LBL_MAXG_FILTERED
+    : msGNow() > msLbMax() ? 'G > ' + MS_LBL_MAXG + ': pick gcd = 1 or gcd > 1' : '';
 }
 let _msLblTimer = null;
 function msLblRefresh() {
   clearTimeout(_msLblTimer);
   _msLblTimer = setTimeout(() => {
     if (MS_ADV.on) { msAdvRebuild(0); return; }   // isolated plates carry labels too, so the whole sheet is redrawn
+    if (MS_PREV.kind === 'main') { msAdvRebuild(0); return; }
     const body = $('ms-preview-body'), doc = MS_PREV.doc;
     if (!body || !doc || MS_PREV.kind !== 'opener') return;
     if (MS_PREV.G && OPENER_G !== MS_PREV.G) setOpenerG(MS_PREV.G);   // the sheet text is frozen at that G; never redraw plates at another
@@ -15532,7 +15546,7 @@ function msLblRefresh() {
 }
 /* Preview-only label controls: they change MS_LB, never the opener. */
 function msLblAutoFilter() {
-  if (MS_LB.mode !== 'off' && MS_LB.filter === 'all' && OPENER_G > MS_LBL_MAXG && OPENER_G <= MS_LBL_MAXG_FILTERED) MS_LB.filter = 'co';
+  if (MS_LB.mode !== 'off' && MS_LB.filter === 'all' && msGNow() > MS_LBL_MAXG && msGNow() <= MS_LBL_MAXG_FILTERED) MS_LB.filter = 'co';
 }
 /* ── ADVANCED MODE (preview only) ────────────────────────────────────────────
    Adds a C(n) stepper that rebuilds the sheet at its own depth (the opener keeps its C(n)), and puts an
@@ -15711,7 +15725,7 @@ function msLblPick(id) {
   const i = OPENER_LABEL_MODES.findIndex(m => m.id === id); if (i < 0) return;
   MS_LB.idx = i; MS_LB.mode = id; msLblAutoFilter(); msLblSync(); msLblRefresh();
 }
-function msLblSize(v) { const n = Number(v); MS_LB.scale = isFinite(n) ? Math.max(0.5, Math.min(3, n)) : 1; msLblSync(); msLblRefresh(); }
+function msLblSize(v) { const n = Number(v); MS_LB.scale = isFinite(n) ? Math.max(0.1, Math.min(3, n)) : 1; msLblSync(); msLblRefresh(); }
 function msLblFilterStep() {
   MS_LB.filter = { all: 'co', co: 'nco', nco: 'all' }[MS_LB.filter] || 'all';
   msLblSync(); msLblRefresh();
@@ -15751,8 +15765,8 @@ function msPlateShot(w, h, paint) {
         were shown is recorded and printed under the plate, so a thinned plate says so.
      4. A label whose box would cross the plate edge is dropped rather than clipped.
    Past MS_LBL_MAXG there is no size at which this reads, so the plate is left unlabelled. */
-const MS_LBL_MAXG = 40;
-const MS_LBL_MAXG_FILTERED = 128;   // with a gcd filter only about half the points carry a label, so more rings can be read
+const MS_LBL_MAXG = 200;
+const MS_LBL_MAXG_FILTERED = 320;   // with a gcd filter only about half the points carry a label, so more rings can be read
 /* The preview's own label settings. They apply to the sheet plates only (preview, PNG pages, PDF) and never
    change the opener's labels; while the preview is open they override the opener's, and they are dropped when it closes. */
 const MS_LB = { active: false, mode: 'off', idx: 0, scale: 1, filter: 'all' };
@@ -15762,10 +15776,14 @@ function msLbFilter() { return MS_LB.active ? MS_LB.filter : 'all'; }
 function msLbMax() { return msLbFilter() === 'all' ? MS_LBL_MAXG : MS_LBL_MAXG_FILTERED; }
 function msLbFilterText() { return { co: 'coprime cells (gcd(r, M) = 1)', nco: 'non-coprime cells (gcd(r, M) > 1)' }[msLbFilter()] || ''; }
 function msLblPlace(ctx, items, side, scale) {
-  scale = scale > 0 ? scale : 1;   // the opener's label-size slider; main-page plates pass nothing
+  /* EVERY point gets its label. The size is set per point from the room that point has: half again below the
+     distance to its nearest neighbour, so no two labels can touch, and capped at a readable maximum. Small M (or the
+     middle of Cayley) has room and gets large labels; toward the outer rings the spacing shrinks and so do the labels,
+     down to a few pixels, which stays legible once the PNG is zoomed in. Nothing is skipped to make room. */
+  scale = scale > 0 ? scale : 1;   // the label-size slider multiplies both the cap and the fit
   const W = ctx.canvas.width, H = ctx.canvas.height;
   items = items.filter(it => it.x >= 0 && it.x <= W && it.y >= 0 && it.y <= H);
-  items.sort((a, b) => (a.co ? 0 : 1) - (b.co ? 0 : 1) || a.M - b.M || a.r - b.r);
+  const n = items.length;
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
@@ -15773,52 +15791,54 @@ function msLblPlace(ctx, items, side, scale) {
   const probe = 100;
   ctx.font = probe + 'px "JetBrains Mono",monospace';
   const emW = Math.max(0.05, ctx.measureText('0').width / probe);
-  const want = side * 0.04 * scale, floor = side * 0.019 * scale, pad = 2, edge = 1;
-  const attempt = fs => {
-    const hh = fs * (LABEL_CAPH + LABEL_STROKE) + pad;
-    const cs = Math.max(hh, fs * emW * 3 + fs * LABEL_STROKE + pad);   // hash cell: any box spans at most 2 cells a side
-    const buckets = new Map(), out = [];
-    items.forEach(it => {
-      const ww = fs * emW * it.t.length + fs * LABEL_STROKE + pad;
-      const x0 = it.x - ww / 2, x1 = it.x + ww / 2, y0 = it.y - hh / 2, y1 = it.y + hh / 2;
-      if (x0 < edge || y0 < edge || x1 > W - edge || y1 > H - edge) return;
-      const gx0 = Math.floor(x0 / cs), gx1 = Math.floor(x1 / cs), gy0 = Math.floor(y0 / cs), gy1 = Math.floor(y1 / cs);
-      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-        const b = buckets.get(gx + ',' + gy);
-        if (b) for (let k = 0; k < b.length; k++) if (x0 < b[k].x1 && x1 > b[k].x0 && y0 < b[k].y1 && y1 > b[k].y0) return;
+  const cap = side * 0.04 * scale, FIT = 0.7;
+  // nearest-neighbour distance by a hash grid
+  const cs = Math.max(2, Math.sqrt(W * H / Math.max(1, n)));
+  const gx = Math.ceil(W / cs) + 1, gy = Math.ceil(H / cs) + 1, cell = new Map();
+  items.forEach((it, i) => { const k = Math.floor(it.x / cs) * gy + Math.floor(it.y / cs); const b = cell.get(k); if (b) b.push(i); else cell.set(k, [i]); });
+  const dmax = side * 0.25;
+  const nn = i => {
+    const it = items[i], cx = Math.floor(it.x / cs), cy = Math.floor(it.y / cs); let best = Infinity;
+    for (let k = 1; k <= 12; k++) {
+      for (let a = cx - k; a <= cx + k; a++) for (let b = cy - k; b <= cy + k; b++) {
+        const lst = cell.get(a * gy + b); if (!lst) continue;
+        for (let q = 0; q < lst.length; q++) { const j = lst[q]; if (j === i) continue; const d = Math.hypot(items[j].x - it.x, items[j].y - it.y); if (d < best) best = d; }
       }
-      const box = { x0: x0, x1: x1, y0: y0, y1: y1, it: it };
-      out.push(box);
-      for (let gx = gx0; gx <= gx1; gx++) for (let gy = gy0; gy <= gy1; gy++) {
-        const key = gx + ',' + gy; if (!buckets.has(key)) buckets.set(key, []);
-        buckets.get(key).push(box);
-      }
-    });
-    return out;
+      if (best <= k * cs) break;
+    }
+    return Math.min(best, dmax);
   };
-  let placed = null, fs = floor;
-  for (let i = 0; i <= 16 && !placed; i++) {
-    const f = want + (floor - want) * i / 16, p = attempt(f);
-    if (p.length === items.length) { placed = p; fs = f; }
+  const sizes = new Array(n); let fsMin = Infinity, fsMax = 0, skipped = 0;
+  for (let i = 0; i < n; i++) {
+    const it = items[i], d = nn(i);
+    if (d < 0.08) { sizes[i] = 0; skipped++; continue; }   // two points on the very same pixel (nothing to place a second label on)
+    const need = Math.max(emW * it.t.length + LABEL_STROKE, LABEL_CAPH + LABEL_STROKE);
+    sizes[i] = Math.min(cap, FIT * d * scale / need);
+    fsMin = Math.min(fsMin, sizes[i]); fsMax = Math.max(fsMax, sizes[i]);
   }
-  if (!placed) { fs = floor; placed = attempt(fs); }
-  ctx.font = fs + 'px "JetBrains Mono",monospace';
-  ctx.lineWidth = fs * LABEL_STROKE;
-  placed.forEach(b => {
-    ctx.strokeStyle = 'rgba(4,4,13,.94)'; ctx.strokeText(b.it.t, b.it.x, b.it.y);
-    ctx.fillStyle = b.it.co ? 'rgba(236,200,100,1)' : 'rgba(238,232,220,.96)'; ctx.fillText(b.it.t, b.it.x, b.it.y);
+  // non-coprime first, coprime (gold) on top
+  const order = items.map((_, i) => i).sort((a, b) => (items[a].co ? 1 : 0) - (items[b].co ? 1 : 0));
+  let shown = 0;
+  order.forEach(i => {
+    const it = items[i], f = sizes[i]; if (!(f > 0.04)) { return; }
+    ctx.font = f + 'px "JetBrains Mono",monospace';
+    ctx.lineWidth = f * LABEL_STROKE;
+    ctx.strokeStyle = 'rgba(4,4,13,.94)'; ctx.strokeText(it.t, it.x, it.y);
+    ctx.fillStyle = it.co ? 'rgba(236,200,100,1)' : 'rgba(238,232,220,.96)'; ctx.fillText(it.t, it.x, it.y);
+    shown++;
   });
   ctx.restore();
-  return { shown: placed.length, total: items.length, fs: fs };
+  return { shown: shown, total: n, fs: fsMax, fsMin: isFinite(fsMin) ? fsMin : 0 };
 }
 /* The line under the plates: says what the numbers are, and says so if any were left off. */
 function msLblNote(items) {
   const L = items.filter(it => it.total > 0);
   if (!L.length) return (items[0] && items[0].tooBig) ? 'Point labels are not drawn on a sheet plate past G = ' + (items[0].max || MS_LBL_MAXG) + '.' : '';
-  const cut = L.filter(it => it.shown < it.total);
-  return 'Each point is labelled with ' + (L[0].what || 'its M') + '; gold marks a coprime cell.' + (L[0].only ? ' Only ' + L[0].only + ' are labelled.' : '') + (cut.length
-    ? ' Where points crowd, some labels are left off so none overlap (' + cut.map(it => it.label + ' ' + it.shown + ' of ' + it.total).join(', ') + ').'
-    : '');
+  const tiny = L.filter(it => it.fsMin && it.fsMin < 7), cut = L.filter(it => it.shown < it.total);
+  return 'Each point is labelled with ' + (L[0].what || 'its M') + '; gold marks a coprime cell.' + (L[0].only ? ' Only ' + L[0].only + ' are labelled.' : '') +
+    ' Every point carries its label, sized to the room around it: large at small M and shrinking toward the outer rings' +
+    (tiny.length ? ' (down to ' + Math.min.apply(null, tiny.map(it => it.fsMin)).toFixed(1) + ' px on this page), where they read only when the PNG is zoomed in.' : '.') +
+    (cut.length ? ' ' + cut.map(it => (it.total - it.shown) + ' point' + (it.total - it.shown === 1 ? '' : 's') + ' in ' + it.label).join(', ') + ' sit within a hair of another at this size and show their label only at a larger PNG size.' : '');
 }
 function msLblXf(m, x, y) { return [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]; }
 /* On an isolated plate only the cells the layer paints get a label: a point is kept when its pixel differs from the plate background. */
@@ -15855,29 +15875,32 @@ function msLblOpener(ctx, xy, pts) {
 }
 function msLblMain(ctx, S, kind) {
   MS_LBL.stats = null;
-  const g = COP_G; if (g > MS_LBL_MAXG) return;
+  const mode = msLbMode(), flt = msLbFilter();
+  const g = COP_G; if (mode === 'off' || g > msLbMax()) return;
   const m = ctx.getTransform(), items = [], cell = S / g, keep = msLblMaskFn(ctx);
   for (let M = 1; M <= g; M++) {
     for (let r = 1; r <= g; r++) {
       if (kind !== 'grid' && thetaMode === 'clamp' && r > M) continue;   // clamp pins r > M onto the r = M point
       if (sectorVis(r, M) <= 0 || liftLabelGone(r, M)) continue;
+      const co0 = gcd(r, M) === 1;
+      if ((flt === 'co' && !co0) || (flt === 'nco' && co0)) continue;
       const q = kind === 'grid' ? [(r - 0.5) * cell, (M - 0.5) * cell]
               : kind === 'ring' ? ringPt(ringRad(M, S), ringRot + thetaOf(r, M), S)
               : cayleyXY(r, M, S);
       if (!q) continue;
       const s = msLblXf(m, q[0], q[1]);
       if (keep && !keep(s[0], s[1])) continue;
-      items.push({ x: s[0], y: s[1], t: '' + M, r: r, M: M, co: gcd(r, M) === 1 });
+      items.push({ x: s[0], y: s[1], t: openerLabelText(mode, r, M), r: r, M: M, co: co0 });
     }
   }
-  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height));
+  MS_LBL.stats = msLblPlace(ctx, items, Math.min(ctx.canvas.width, ctx.canvas.height), msLbScale());
 }
 /* Draws one plate with M labels on, and reports how many of its points got one. */
 function msLabelledShot(w, h, paint) {
   MS_LBL.on = true; MS_LBL.stats = null;
   let cv, st = null;
   try { cv = msPlateShot(w, h, paint); st = MS_LBL.stats; } finally { MS_LBL.on = false; MS_LBL.stats = null; }
-  return { cv: cv, shown: st ? st.shown : 0, total: st ? st.total : 0 };
+  return { cv: cv, shown: st ? st.shown : 0, total: st ? st.total : 0, fsMin: st ? st.fsMin : 0 };
 }
 function msOpenerPlateImages() { return msWithCN(msOpenerPlateImagesRaw); }
 function msOpenerPlateImagesRaw() {
@@ -15890,11 +15913,11 @@ function msOpenerPlateImagesRaw() {
     const wideCay = v === 'cayley';   // math-sheet plates always show Cayley at 2:1, alone or beside Grid and Ring
     const w = wideCay ? S * 2 : S, h = S;
     const sh = msLabelledShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
-    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && OPENER_G > msLbMax(), cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
+    return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, fsMin: sh.fsMin, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && OPENER_G > msLbMax(), cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
   });
 }
 function msOpenerLblWhat() {
-  return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', gcd: 'its gcd(r, M)', depth: 'its block-survival depth (columns M, M+1, \u2026 coprime to r, capped at ' + DEPTH_CAP + ')' }[msLbMode()] || 'its M';
+  return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', dec: 'its r/M as a decimal', deg: 'its angle 360\u00b7r/M in degrees', pi: 'its angle 2\u03c0\u00b7r/M in multiples of \u03c0', rad: 'its angle 2\u03c0\u00b7r/M in radians', gcd: 'its gcd(r, M)', depth: 'its block-survival depth (columns M, M+1, \u2026 coprime to r, capped at ' + DEPTH_CAP + ')' }[msLbMode()] || 'its M';
 }
 function msMainPlateImages(views) { return msWithCNMain(() => msMainPlateImagesRaw(views)); }
 function msMainPlateImagesRaw(views) {
@@ -15907,7 +15930,7 @@ function msMainPlateImagesRaw(views) {
       labelScale = LS[v] !== undefined ? LS[v] : lsWas;
       viewQuarter = VQ[v] !== undefined ? VQ[v] : vqWas;
       const sh = msLabelledShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side));
-      out.push({ label: names[v] || v, cv: sh.cv, shown: sh.shown, total: sh.total, cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
+      out.push({ label: names[v] || v, cv: sh.cv, shown: sh.shown, total: sh.total, fsMin: sh.fsMin, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && COP_G > msLbMax(), cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
     });
   } finally { viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
   return out;
@@ -15941,6 +15964,7 @@ function msPreviewOpener(sieve) {
 function msPreviewMain(sieve) {
   try {
     MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
+    MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = 'all'; msLblAutoFilter();
     const vs = orderedExportViews();
     MS_PREV.views = vs;
     if (sieve && G > LIFT_CHAIN_MAX) {   // the r-chain plates are drawn up to G = LIFT_CHAIN_MAX, so the sieve sheet opens there
@@ -15991,21 +16015,21 @@ async function msExportOpener(host) {
   MS.k = MS.res / MS.W;
   try {
     const doc = msBuildOpener();
-    const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
+    const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true, lazy: true });
     await new Promise(r => setTimeout(r, 350));   // a beat after the plate, so browsers treat these as separate downloads
     const ok = await msSavePages(pgs, 'strip2-opener-' + OE.view + '-G' + OPENER_G + (MS_ADV.on && MS_ADV.sieve ? '-sieve' : '-math') + '-' + MS_RES[MS.res] + '-' + Date.now(), host || $('ms-links-open'));
-    return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
+    return { ok: ok, pages: pgs.length };
   } finally { MS.k = 1; }
 }
 async function msExportMain(views, host) {
   MS.k = MS.res / MS.W;
   try {
   const doc = msBuildMain(views);
-  const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true });
+  const pgs = await msRender(doc, MS.theme, { pages: true, bySection: true, lazy: true });
   await new Promise(r => setTimeout(r, 350));
   const nm = 'strips2-' + (MS_ADV.on && MS_ADV.sieve ? 'sieve-' : 'math-') + MS_RES[MS.res] + '-' + (walkMode === 'band' ? 'band-w' + widthW : 'strip-' + slopeA + '_' + slopeB + '-s' + offS + '-w' + widthW) + '-G' + COP_G + '-' + views.join('+');
   const ok = await msSavePages(pgs, nm, host || $('ms-links-main'));
-  return { ok: ok, pages: pgs.length, w: pgs[0].width, h: pgs[0].height };
+  return { ok: ok, pages: pgs.length };
   } finally { MS.k = 1; }
 }
 
@@ -16014,7 +16038,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
