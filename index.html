@@ -1753,6 +1753,8 @@ walk anyway.</p>
 
   <div class="ctrls" style="margin-top:12px;">
     <span class="lbl">Export</span>
+    <button class="btn" onclick="msPreviewMain()" title="Open the math sheet for the current plate as a scrollable pop-up, with its labels, C(n), G and PNG-size controls.">&#128065; Math sheet</button>
+    <button class="btn" onclick="msPreviewMain(true)" title="Open just the sieve: D(n) and C(n) prime by prime, the r-chain plate and a depth table.">&#8984; Sieve</button>
     <button class="btn" onclick="openExportModal()" title="Pick any of Grid, Ring and Cayley — one, two, or all three — preview the composed plate, then export it.">Export &#9662;</button>
     <div class="sep"></div>
     <button class="btn" onclick="exportCSV()" title="Every cell on the current strip, with r, M and coprimality.">Strip CSV</button>
@@ -2115,7 +2117,8 @@ walk anyway.</p>
         </label>
       </div>
       <div class="prow">
-        <button class="btn" id="oe-go-btn" onclick="runOpenerExport()" title="Compose the selected view(s) at 4096px wide, with a title, subtitle and legend reading the opener's current settings, and download a PNG.">&#8681; Download 4K PNG</button>
+        <select class="chip" id="oe-res" onchange="msSetRes(this.value)" title="PNG width for the plate and for the math-sheet pages: 2K = 2048, 4K = 4096, 8K = 8192 px. 8K is very large; some phones cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select>
+        <button class="btn" id="oe-go-btn" onclick="runOpenerExport()" title="Compose the selected view(s) at the chosen width (2K / 4K / 8K), with a title, subtitle and legend reading the opener's current settings, and download a PNG.">&#8681; Download PNG</button>
         <span id="oe-msg" class="hint"></span>
         <div id="ms-links-open" class="hint" style="display:none;flex:1 1 100%;"></div>
       </div>
@@ -5190,13 +5193,15 @@ function oeDrawSidePanel(ctx, panel, x, y, w) {
   });
   ctx.restore();
 }
-async function runOpenerExport() {
-  const msg = $('oe-msg'), btn = $('oe-go-btn');
+async function runOpenerExport(opts) {
+  opts = opts || {};
+  const msg0 = $('oe-msg'), btn = $('oe-go-btn');
+  const msg = { set textContent(t) { if (msg0) msg0.textContent = t; if (opts.status) opts.status.textContent = t; } };
   if (msg) msg.textContent = 'Rendering\u2026';
   if (btn) btn.disabled = true;
   await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));   // let "Rendering..." actually paint
   try {
-    const W = 4096, ratio = OE.cayRatio === '1:1' ? 1 : 2;
+    const W = MS.res || 4096, ratio = OE.cayRatio === '1:1' ? 1 : 2;
     // Same width-to-scale convention the page's own export uses (S = px/1920),
     // so every font size, margin and gap below grows with the canvas the same
     // way the main plate's export does, instead of the fixed pixel values that
@@ -5299,17 +5304,17 @@ async function runOpenerExport() {
       a.href = url; a.download = 'strip2-opener-' + OE.view + '-' + Date.now() + '.png';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
-      if (msg) msg.textContent = 'Done \u2014 4096\u00d7' + H;
+      if (msg) msg.textContent = 'Done \u2014 ' + W + '\u00d7' + H;
       done();
     }, 'image/png'));
-    if (MS.on) {
+    if (MS.on || opts.sheet) {
       if (msg) msg.textContent = 'Typesetting the math sheet\u2026';
       try {
         const r = await msExportOpener();
-        if (msg) msg.textContent = 'Done \u2014 plate 4096\u00d7' + H + (r.ok ? ' + math sheet, ' + r.pages + ' PNG pages' : ' (math sheet could not be encoded)');
-      } catch (e) { if (msg) msg.textContent = 'Plate saved; math sheet failed: ' + (e && e.message || e); }
+        if (msg) msg.textContent = 'Done \u2014 plate ' + W + '\u00d7' + H + (r.ok ? ' + math sheet, ' + r.pages + ' PNG pages' : ' (math sheet could not be encoded)');
+      } catch (e) { if (opts.sheet) throw e; if (msg) msg.textContent = 'Plate saved; math sheet failed: ' + (e && e.message || e); }
     }
-    if (MS.pdf) {
+    if (MS.pdf && !opts.sheet) {
       if (msg) msg.textContent = 'Building the multi-page PDF\u2026';
       try {
         const r2 = await msExportPdfOpener(canvas);
@@ -5317,6 +5322,7 @@ async function runOpenerExport() {
       } catch (e) { if (msg) msg.textContent = 'PDF failed: ' + (e && e.message || e); }
     }
   } catch (e) {
+    if (opts.sheet) { if (btn) btn.disabled = false; throw e; }
     if (msg) msg.textContent = 'Export failed: ' + (e && e.message || e);
   } finally {
     if (btn) btn.disabled = false;
@@ -10998,7 +11004,7 @@ const EXPORT_VIEW_ORDER = ['grid', 'ring', 'cayley'];
 function orderedExportViews() { return EXPORT_VIEW_ORDER.filter(v => exportViews.includes(v)); }
 function openExportModal() {
   exportViews = [viewMode];
-  exportRes = 2048;
+  exportRes = MS.res || 2048;
   $('export-modal').style.display = 'flex';
   syncExportUI();
 }
@@ -11020,7 +11026,7 @@ function setExportCayShape(wide) {
   syncExportUI();
 }
 function setExportRes(px) {
-  exportRes = px;
+  exportRes = px; MS.res = px; { const se = $('msp-res'); if (se) se.value = String(px); const oe = $('oe-res'); if (oe) oe.value = String(px); }
   syncExportUI();
 }
 function syncExportUI() {
@@ -13906,6 +13912,7 @@ const MS_THEMES = {
   paper: { bg: '#f7f3ea', ink: '#15151c', mute: '#5f5a50', acc: '#7a5f16', rule: 'rgba(20,20,28,.24)', soft: 'rgba(122,95,22,.10)', edge: 'rgba(20,20,28,.30)' },
   night: { bg: '#04040d', ink: '#ddd8cc', mute: '#89837a', acc: '#c8a84a', rule: 'rgba(255,255,255,.16)', soft: 'rgba(200,168,74,.09)', edge: 'rgba(255,255,255,.22)' }
 };
+function msSetRes(v) { MS.res = +v || 4096; exportRes = MS.res; const oe = $('oe-res'); if (oe) oe.value = String(MS.res); document.querySelectorAll('#export-modal .erchip').forEach(b => b.classList.toggle('on', +b.dataset.er === exportRes)); }
 function msSetOn(v) {
   MS.on = !!v;
   document.querySelectorAll('.ms-chk').forEach(c => { c.checked = MS.on; });
@@ -14957,14 +14964,13 @@ function msBuildOpenerRaw(noPlates) {
         {
           const half = (E % 2 === 0 && ps.indexOf(E / 2) >= 0) ? 1 : 0, rE = 2 * ps.length - half, cap = 48, rows = [];
           doc.push({ t: 'eq', tex: msT`\#\{\text{gold markers}\}=k(E)=${ps.length},\qquad r(E)=2k(E)-\mathbf 1[E/2\ \text{prime}]=${rE}`, cap: 'Each marker is one unordered Goldbach pair g + s = ' + E + ', so the number of gold points outside the lattice is exactly the pair count k(E); r(E) counts ordered pairs. The count is an exact integer from a sieve of primes, not an estimate.' });
-          ps.slice(0, cap).forEach((q, i) => {
-            const sq = E - q, row = [String(i + 1), q + ' + ' + sq, '(' + q + ', ' + sq + ')', msf(360 * q / sq, 2) + '\u00b0', msf(OPENER_RHO0 + OPENER_RHOD * sq / G, 3)];
-            if (showRing) row.push(msf(OPENER_RING_HOLE + (1 - OPENER_RING_HOLE) * (sq - 0.5) / G, 3) + ' R');
-            rows.push(row);
+          ps.slice(0, cap).forEach(q => {
+            const sq = E - q, f = gbDetailFacts(G, q).L, tc = f.a.cop + f.b.cop + f.c.cop + f.d.cop, tt = f.a.tot + f.b.tot + f.c.tot + f.d.tot;
+            rows.push({ label: q + ' + ' + sq + ' \u00b7 \u03b8 ' + msf(360 * q / sq, 1) + '\u00b0 \u00b7 c ' + f.c.cop + '/' + f.c.tot + ' d ' + f.d.cop + '/' + f.d.tot + ' a ' + f.a.cop + '/' + f.a.tot + ' b ' + f.b.cop + '/' + f.b.tot, n: tc + '/' + tt, pct: tt ? (100 * tc / tt).toFixed(1) + '%' : '\u2013' });
           });
-          if (ps.length > cap) rows.push(['\u2026', (ps.length - cap) + ' more pairs, same pattern', '', '', ''].concat(showRing ? [''] : []));
-          doc.push({ t: 'table', head: ['#', 'pair g + s', 'marker (g, s)', '\u03b8 = 2\u03c0g/s', '\u03c1 Cayley'].concat(showRing ? ['\u03c1 Ring'] : []), rows: rows });
-          doc.push({ t: 'note', text: 'Labels on the plates: with 14 or fewer markers each is written g + s; with more, just g, and a label that would sit on top of another is skipped, so the table is the complete list. Markers beyond the plate edge are counted in the caption as off plate.' });
+          if (ps.length > cap) rows.push({ label: '\u2026 ' + (ps.length - cap) + ' more pairs, same pattern', n: '', pct: '' });
+          doc.push({ t: 'table', head: ['pair g + s \u00b7 angle \u00b7 the four strips c, d, a, b (coprime / cells)', 'coprime / cells', 'share'], rows: rows });
+          doc.push({ t: 'note', text: 'Each row is one gold marker P_g = (g, s): its pair, its angle \u03b8 = 2\u03c0g/s, and the counts of coprime cells on its four strips (c: r+M=g, d: r+M=s, a: M\u2212r=g, b: r\u2212M=g) on the G \u00d7 G lattice. Line c is fully coprime when g is prime and line d when s is prime (the Goldbach section above gives the exact conditions), so the counts read straight off as the pair test. Labels on the plates: with 14 or fewer markers each is written g + s; with more, just g, and a label that would sit on top of another is skipped, so the table is the complete list. Markers beyond the plate edge are counted in the caption as off plate.' });
         }
       } catch (e) {}
     }
@@ -15766,12 +15772,31 @@ function msPreviewMain(sieve) {
 async function msExportFromPreview() {
   const btn = $('msp-export'), st = $('msp-status'), lk = $('msp-links');
   if (btn) btn.disabled = true;
-  if (st) st.textContent = 'Typesetting the sheet at ' + MS_RES[MS.res] + ' (' + MS.res + ' px wide)\u2026';
+  let stage = 'plate';
   try {
-    const r = MS_PREV.kind === 'opener' ? await msExportOpener(lk) : await msExportMain(orderedExportViews(), lk);
-    if (st) st.textContent = r.ok ? 'Saved ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Could not encode the pages.';
+    /* The plate with its legend first (same width as the pages), then the sheet pages. If the browser
+       cannot make a canvas that large, say so and drop one size instead of failing outright. */
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        stage = 'plate'; if (st) st.textContent = 'Composing the plate and legend at ' + MS_RES[MS.res] + ' (' + MS.res + ' px wide)\u2026';
+        if (MS_PREV.kind === 'opener') { await runOpenerExport({ sheet: true, status: st }); }
+        else {
+          guardFSForExport();
+          await exportPNG(MS.res, orderedExportViews());
+          stage = 'sheet'; if (st) st.textContent = 'Typesetting the sheet at ' + MS_RES[MS.res] + '\u2026';
+          const r = await msExportMain(orderedExportViews(), lk);
+          if (st) st.textContent = r.ok ? 'Saved plate + ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Plate saved; could not encode the pages.';
+        }
+        break;
+      } catch (e) {
+        const lower = MS.res > 2048;
+        if (lower && attempt < 2) { msSetRes(MS.res / 2); const se = $('msp-res'); if (se) se.value = String(MS.res); if (st) st.textContent = 'That size failed at the ' + stage + ' stage (' + (e && e.message || e) + '); retrying at ' + MS_RES[MS.res] + '\u2026'; await new Promise(r => setTimeout(r, 400)); continue; }
+        throw e;
+      }
+    }
   } catch (e) {
-    if (st) st.textContent = 'Export failed: ' + (e && e.message || e);
+    const where = (e && e.stack || '').split('\n').slice(1, 3).map(l => l.trim().replace(/^at\s+/, '').replace(/\(.*[\/]/, '(')).join(' < ');
+    if (st) st.textContent = 'Export failed at the ' + stage + ' stage: ' + (e && e.message || e) + (where ? ' [' + where.slice(0, 120) + ']' : '');
   } finally { if (btn) btn.disabled = false; }
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') msClosePreview(); });
@@ -15803,7 +15828,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="MS.res=+this.value" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.5" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
