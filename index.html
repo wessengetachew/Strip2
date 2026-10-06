@@ -3044,12 +3044,12 @@ function buildBase(S, mode) {
       for (let M = M0; M < Math.max(M1, M0 + 1); M++) {
         for (let r = r0; r < Math.max(r1, r0 + 1); r++) {
           tot++; if (isCop(r, M)) hit += sectorVis(r, M);
-          if (hideBrokenMain && hbKept(r, M)) kept++;
+          if (hbOn() && hbKept(r, M)) kept++;
         }
       }
       const frac = tot ? hit / tot : 0;
       const o = (py * S + px) * 4;
-      if (hideBrokenMain && !kept) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; continue; }   // a broken cell is removed whatever the colouring mode paints it
+      if (hbOn() && !kept) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; continue; }   // a broken cell is removed whatever the colouring mode paints it
       const c = cellRGBA(mode, frac, r0, M0);
       d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = c[3];
     }
@@ -3090,10 +3090,12 @@ function sectorKeeps(r, m) {
 let hideBrokenMain = false;
 function setHideBrokenMain(v) { hideBrokenMain = !!v; redraw(true); }
 /* "Hide broken cells": a cell survives at the C(n) depth when gcd(r,M) = 1 and gcd(r, M+j) = 1 for j = 1..n. */
-function hbKeys() { return hideBrokenMain ? '|hb' + liftChainNEff() : ''; }
+/* Broken cells are removed when the switch is on, and always once C(n) is above 0: moving the depth removes nodes and labels in every colouring. */
+function hbOn() { return hideBrokenMain || liftChainNEff() > 0; }
+function hbKeys() { return hbOn() ? '|hb' + liftChainNEff() : ''; }
 function hbKept(r, m) { const n = liftChainNEff(); if (gcd(r, m) !== 1) return false; for (let j = 1; j <= n; j++) if (gcd(r, m + j) !== 1) return false; return true; }
 function sectorVis(r, m) {
-  if (hideBrokenMain && !hbKept(r, m)) return 0;
+  if (hbOn() && !hbKept(r, m)) return 0;
   if (!sectorOn || sectorPick <= 0) return 1;
   return sectorKeeps(r, m) ? 1 : sectorDim / 100;
 }
@@ -3364,10 +3366,14 @@ function ethioInvRGBA(r, M) {
    itself counts: (r,M) survives the block of width n+1 iff depth(r,M) > n.
    Capped at DEPTH_CAP since the colour only needs to distinguish "shallow"
    from "deep", not the exact count for depths nobody will dial to. */
-const DEPTH_CAP = 16;
+const DEPTH_CAP = 16;   // the floor; the live cap is depthCap()
+/* The deepest run a block can have on the lattice: a prime r stops at r - 1 columns (the next multiple of r is at most r columns on), and r = 1 never
+   stops, so the longest run the lattice can hold is G - 1. The cap follows G instead of sitting at 16, so a long chain keeps its real depth. */
+function depthCap() { return Math.max(DEPTH_CAP, Math.max(typeof COP_G !== 'undefined' ? COP_G : 0, typeof OPENER_G !== 'undefined' ? OPENER_G : 0) - 1); }
 function blockDepth(r, M) {
   let n = 0;
-  while (n < DEPTH_CAP && gcd(r, M + n) === 1) n++;
+  const cp = depthCap();
+  while (n < cp && gcd(r, M + n) === 1) n++;
   return n;
 }
 /* General survival-run length along ANY of the four partition strips
@@ -3381,14 +3387,14 @@ function blockDepth(r, M) {
    strip's actual on-grid length, so a short strip that survives end to end
    still reads full instead of shallow for lack of room to walk. */
 function stripSurvivalDepth(rLo, rHi, c) {
-  const cap = Math.min(DEPTH_CAP, rHi - rLo + 1);
+  const cap = Math.min(depthCap(), rHi - rLo + 1);
   let n = 0;
   while (n < cap && gcd(rLo + n, c) === 1) n++;
   return n;
 }
 function depthGradientRGB(d) {
   if (d === 0) return [92, 46, 52];
-  const t = d / DEPTH_CAP;                             // 0 shallow -> 1 deep
+  const cp = depthCap(), t = cp <= DEPTH_CAP ? d / DEPTH_CAP : Math.log(1 + d) / Math.log(1 + cp);   // 0 shallow -> 1 deep (log scale once the cap grows with G)
   return hsl2rgb(4 + t * 132, 0.62, 0.36 + t * 0.30);   // red -> green
 }
 function blockDepthDiag(r, M) {
@@ -3493,8 +3499,8 @@ function openerRule(mode) {
     case 'bomega':   return '\u03a9(g) = prime factors of g = gcd(r, M), counted with multiplicity';
     case 'gcdband':  return 'g = gcd(r, M) in bands: 1 \u00b7 2 \u00b7 3 \u00b7 4\u20136 \u00b7 7\u201312 \u00b7 13+';
     case 'depth':    return depthDir === 'd'
-      ? 'depth = run of gcd(r+j, g) = 1 along the sum-diagonal g = r + M, capped at ' + DEPTH_CAP
-      : 'depth d = length of the run gcd(r, M+j) = 1, j = 0, 1, 2, \u2026, capped at ' + DEPTH_CAP;
+      ? 'depth = run of gcd(r+j, g) = 1 along the sum-diagonal g = r + M, capped at ' + depthCap()
+      : 'depth d = length of the run gcd(r, M+j) = 1, j = 0, 1, 2, \u2026, up to the longest the lattice can hold, G \u2212 1 = ' + depthCap();
     case 'resmod':   return 'gcd = 1 cells: hue = 300\u00b0\u00b7(r mod M)/M, the fraction behind Ring\u2019s angle 2\u03c0r/M';
     case 'moddist':  return 'gcd = 1 cells: hue by min(r, M\u2212r)/\u230aM/2\u230b, the distance to the nearer end of the ring';
     case 'phipos':   return 'gcd = 1 cells: hue by the rank of r among the residues coprime to M';
@@ -3530,10 +3536,15 @@ function openerClass(mode, r, M) {
       const b = g === 2 ? 0 : g === 3 ? 1 : g <= 6 ? 2 : g <= 12 ? 3 : 4;
       return C(['gcd = 2', 'gcd = 3', 'gcd 4\u20136', 'gcd 7\u201312', 'gcd \u2265 13'][b], b + 1);
     }
-    case 'depth': { const d = depthDir === 'd' ? blockDepthDiag(r, M) : blockDepth(r, M); return C('depth ' + d + (d >= DEPTH_CAP ? ' (cap)' : ''), d); }
+    case 'depth': { const d = depthDir === 'd' ? blockDepthDiag(r, M) : blockDepth(r, M); return C('depth ' + d + (d >= depthCap() ? ' (cap)' : ''), d); }
     case 'resmod': case 'moddist': case 'phipos':
       return cop ? C('gcd = 1 \u00b7 hue by position', 0) : C('gcd > 1 \u00b7 flat', 1);
     case 'ethiopia': case 'ethiodepth': case 'ethioinv': {
+      if (r > M && mode === 'ethiodepth') { const d = depthDir === 'd' ? blockDepthDiag(r, M) : blockDepth(r, M); return C('above 1/1 \u00b7 depth ' + d + (d >= depthCap() ? ' (cap)' : ''), 100 + d); }
+      if (r > M && mode === 'ethioinv') {
+        const b2 = ethiopiaBand(M, r), nm2 = ['', 'complement of green', 'complement of yellow', 'complement of red'][b2] || 'beyond the bands';
+        return C('above 1/1 \u00b7 ' + nm2 + (cop ? '' : ' \u00b7 gcd > 1, dim'), 100 + b2 * 2 + (cop ? 0 : 1));
+      }
       const b = ethiopiaBand(r, M);   // r <= M throughout the wedge, so 1..3
       const nm = ['', 'green \u00b7 r/M \u2265 2/3', 'yellow \u00b7 1/3 \u2264 r/M < 2/3', 'red \u00b7 r/M < 1/3'][b];
       return C(nm + (cop ? '' : ' \u00b7 gcd > 1, dim'), b * 2 + (cop ? 0 : 1));
@@ -3587,7 +3598,8 @@ function renderOpenerWork() {
   const mode = $('cmode').value, G = OPENER_G;
   try { gaussSieve(Math.max(COP_G, G)); } catch (e) {}
   const map = new Map(); let total = 0, cop = 0;
-  for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) {
+  const fullTab = mode === 'ethiodepth' || mode === 'ethioinv';
+  for (let M = 1; M <= G; M++) for (let r = 1; r <= (fullTab ? G : M); r++) {
     total++; if (openerIsCop(r, M)) cop++;
     const c = openerClass(mode, r, M);
     let e = map.get(c.l);
@@ -3596,10 +3608,10 @@ function renderOpenerWork() {
   }
   let rows = [...map.values()].sort((a, b) => a.k - b.k || b.n - a.n);
   let more = null;
-  if (rows.length > 10) {
-    const rest = rows.slice(9);
-    more = { classes: rest.length, n: rest.reduce((t, e) => t + e.n, 0) };
-    rows = rows.slice(0, 9);
+  if (rows.length > 26) {
+    const rest = rows.slice(25);
+    more = { classes: rest.length, n: rest.reduce((t, e) => t + e.n, 0), from: rest[0].l, to: rest[rest.length - 1].l };
+    rows = rows.slice(0, 25);
   }
   const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const sw = e => {
@@ -3609,14 +3621,15 @@ function renderOpenerWork() {
   };
   const pct = n => (100 * n / total).toFixed(n * 1000 < total ? 2 : 1) + '%';
   let h = '<div class="rule">' + esc(openerRule(mode)) + '</div>' +
-    '<div class="hd">the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2</div><table>';
+    '<div class="hd">' + (fullTab ? 'the full lattice \u00b7 1 \u2264 r, M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b2' : 'the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2') + '</div><table>';
   rows.forEach(e => { h += '<tr><td>' + sw(e) + '</td><td>' + esc(e.l) + '</td><td class="n">' + e.n + '</td><td class="p">' + pct(e.n) + '</td></tr>'; });
-  if (more) h += '<tr><td></td><td>+ ' + more.classes + ' more classes</td><td class="n">' + more.n + '</td><td class="p">' + pct(more.n) + '</td></tr>';
+  if (more) h += '<tr><td></td><td>+ ' + more.classes + ' more classes (' + esc(more.from) + ' \u2026 ' + esc(more.to) + ')</td><td class="n">' + more.n + '</td><td class="p">' + pct(more.n) + '</td></tr>';
   h += '</table>';
   const sum = rows.reduce((t, e) => t + e.n, 0) + (more ? more.n : 0);
   h += '<div class="foot">classes sum to ' + sum + (sum === total ? ' <span class="ok">\u2713</span>' : ' <span class="bad">\u2260 ' + total + '</span>') + '</div>';
   const ph = openerPhiTerms(G);
-  h += '<div class="foot">gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' +
+  if (fullTab) { const ex = 2 * ph.sum - 1; h += '<div class="foot">gcd = 1 cells: ' + cop + ' = 2\u00b7(\u03c6(1)+\u2026+\u03c6(' + G + ')) \u2212 1 = ' + ex + (cop === ex ? ' <span class="ok">\u2713</span>' : ' <span class="bad">\u2260</span>') + '</div>'; }
+  else h += '<div class="foot">gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' +
     (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum +
     (cop === ph.sum ? ' <span class="ok">\u2713</span>' : ' <span class="bad">\u2260</span>') + '</div>';
   if (mode === 'ethiopia' || mode === 'ethiodepth' || mode === 'ethioinv')
@@ -3707,7 +3720,7 @@ const OPENER_LABEL_MODES = [
   { id: 'deg',   short: 'angle \u00b0',   t: 'The Ring angle 360\u00b7r/M in degrees (wrap and clamp modes; unit mode uses 360\u00b7r/G).' },
   { id: 'pi',    short: 'angle \u00b7\u03c0',   t: 'The Ring angle 2\u03c0\u00b7r/M written as a multiple of \u03c0, reduced: 5/13 reads 10\u03c0/13, a half turn reads \u03c0.' },
   { id: 'rad',   short: 'angle rad', t: 'The Ring angle 2\u03c0\u00b7r/M in radians, to three places.' },
-  { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; 16+ = capped). The cell survives a block of width n+1 exactly when its depth is more than n.' }
+  { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; runs on up to G \u2212 1, the longest the lattice holds). The cell survives a block of width n+1 exactly when its depth is more than n.' }
 ];
 let _openerLblIdx = 0;
 let OPENER_LABEL_MODE = OPENER_LABEL_MODES[0].id;
@@ -3722,7 +3735,7 @@ function openerLabelText(mode, r, M) {
     : mode === 'deg' ? (M > 0 ? '' + (+(360 * r / M).toFixed(1)) + '\u00b0' : '0\u00b0')
     : mode === 'rad' ? (M > 0 ? '' + (+(2 * Math.PI * r / M).toFixed(3)) : '0')
     : mode === 'pi'  ? (() => { if (!(M > 0) || r === 0) return '0'; const g0 = gcd(2 * r, M), a = 2 * r / g0, b = M / g0; return (a === 1 ? '' : a) + '\u03c0' + (b === 1 ? '' : '/' + b); })()
-    : mode === 'depth' ? (() => { const d = (typeof depthDir !== 'undefined' && depthDir === 'd') ? blockDepthDiag(r, M) : blockDepth(r, M); return d >= DEPTH_CAP ? DEPTH_CAP + '+' : '' + d; })()
+    : mode === 'depth' ? (() => { const d = (typeof depthDir !== 'undefined' && depthDir === 'd') ? blockDepthDiag(r, M) : blockDepth(r, M); return d >= depthCap() ? depthCap() + '+' : '' + d; })()
     :                  r + '/' + M;   // 'rM', and the fallback
 }
 function stepOpenerLabelMode(d) {
@@ -4067,7 +4080,7 @@ function olStrip(ctx, xy, G, lw) {
 let _olStripCache = null, _olStripKey = '';
 function olStripPoints(G) {
   const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
-  const cn = openerChainN(), hide = !!OL.hideBroken;
+  const cn = openerChainN(), hide = olHB();
   const key = G + '|' + a + '|' + b + '|' + s + '|' + w + '|' + cn + '|' + hide;
   if (_olStripCache && _olStripKey === key) return _olStripCache;
   const pts = [], all = []; let total = 0, cop = 0, blk = 0;
@@ -4483,12 +4496,13 @@ function olTogglePPlay() {
   olSyncPPlayChip(); olRedraw();
 }
 function olToggleChain(v) { OL.chain = !!v; olRedraw(); }
+function olHB() { return !!OL.hideBroken || openerChainN() > 0; }
 function olToggleHideBroken(v) { OL.hideBroken = !!v; olRedraw(); }
 /* With "hide broken cells" on, only the cells the block keeps at the C(n) depth are drawn (and labelled):
    gcd(r,M) = 1 and gcd(r, M+j) = 1 for j = 1..n. The filtered list is cached per set, G and depth. */
 const _olVisC = new Map();
 function olVis(arr) {
-  if (!OL.hideBroken || !arr) return arr;
+  if (!olHB() || !arr) return arr;
   const n = openerChainN(), key = OPENER_G + ':' + n + ':' + arr.length, hit = _olVisC.get(arr);
   if (hit && hit.key === key) return hit.out;
   const out = arr.filter(p => gcd(p[0], p[1]) === 1 && (n === 0 || firstFail(p[0], p[1], n, OPENER_G)[0] === -1));
@@ -4979,6 +4993,7 @@ function oeSummary() {
 // current coloring mode), returned as data instead of HTML so the export can draw it.
 function oeTallyData(Gopt, full) {
   const mode = $('cmode').value, G = Gopt || OPENER_G;
+  if (mode === 'ethiodepth' || mode === 'ethioinv') full = true;   // these two paint r > M as well, so the table counts it
   try { gaussSieve(Math.max(COP_G, G)); } catch (e) {}
   const map = new Map(); let total = 0, cop = 0;
   for (let M = 1; M <= G; M++) for (let r = 1; r <= (full ? G : M); r++) {
@@ -4990,7 +5005,7 @@ function oeTallyData(Gopt, full) {
   }
   let rows = [...map.values()].sort((a, b) => a.k - b.k || b.n - a.n);
   let more = null;
-  if (rows.length > 10) { const rest = rows.slice(9); more = { classes: rest.length, n: rest.reduce((t, e) => t + e.n, 0) }; rows = rows.slice(0, 9); }
+  if (rows.length > 26) { const rest = rows.slice(25); more = { classes: rest.length, n: rest.reduce((t, e) => t + e.n, 0), from: rest[0].l, to: rest[rest.length - 1].l }; rows = rows.slice(0, 25); }
   const pct = n => (100 * n / total).toFixed(n * 1000 < total ? 2 : 1) + '%';
   const swatch = e => { let col; try { col = openerColor(e.r, e.M); } catch (x) { col = COPRIME_RGBA; } return col[3] === 0 ? null : 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (col[3] / 255).toFixed(2) + ')'; };
   const sum = rows.reduce((t, e) => t + e.n, 0) + (more ? more.n : 0);
@@ -5000,7 +5015,7 @@ function oeTallyData(Gopt, full) {
     header: full ? 'the full lattice \u00b7 1 \u2264 r, M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b2' : 'the finite set \u00b7 r \u2264 M \u2264 ' + G + ' \u00b7 ' + total + ' cells = ' + G + '\u00b7' + (G + 1) + '/2',
     cop: cop, copExpect: full ? 2 * ph.sum - 1 : ph.sum,
     rows: rows.map(e => ({ sw: swatch(e), label: e.l, n: e.n, pct: pct(e.n) })),
-    more: more ? { label: '+ ' + more.classes + ' more classes', n: more.n, pct: pct(more.n) } : null,
+    more: more ? { label: '+ ' + more.classes + ' more classes (' + more.from + ' \u2026 ' + more.to + ')', n: more.n, pct: pct(more.n) } : null,
     sumOk: sum === total, sum: sum, total: total, byLabel: map,
     gcdLine: full ? 'gcd = 1 cells: ' + cop + ' = 2\u00b7(\u03c6(1)+\u2026+\u03c6(' + G + ')) \u2212 1 = ' + (2 * ph.sum - 1) : 'gcd = 1 cells: ' + cop + ' = \u03c6(1)+\u2026+\u03c6(' + G + ') = ' + (G <= 16 ? ph.terms.join('+') + ' = ' : '') + ph.sum,
     gcdOk: cop === (full ? 2 * ph.sum - 1 : ph.sum),
@@ -15707,6 +15722,16 @@ function msWithCNMain(fn) {
   if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
   try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
 }
+async function msWithCNAsync(fn) {
+  const cn0 = OL.cn, lk0 = OL.lockN;
+  if (MS_ADV.on && MS_ADV.cn != null) { OL.cn = Math.max(0, Math.min(OPENER_G - 1, MS_ADV.cn)); OL.lockN = false; }
+  try { return await fn(); } finally { OL.cn = cn0; OL.lockN = lk0; }
+}
+async function msWithCNMainAsync(fn) {
+  const cn0 = liftChainN, lk0 = liftLockN, ov0 = MS_CN_MAIN;
+  if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
+  try { return await fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
+}
 function msGNow() { return MS_PREV.kind === 'main' ? G : OPENER_G; }
 function msCnNow() { return MS_PREV.kind === 'main' ? msWithCNMain(liftChainNEff) : msWithCN(openerChainN); }
 function msIsoCapMain(kind, vs) {
@@ -16147,10 +16172,10 @@ async function msExportFromPreview() {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         stage = 'plate'; if (st) st.textContent = 'Composing the plate and legend at ' + MS_RES[MS.res] + ' (' + MS.res + ' px wide)\u2026';
-        if (MS_PREV.kind === 'opener') { await runOpenerExport({ sheet: true, status: st }); }
+        if (MS_PREV.kind === 'opener') { await msWithCNAsync(() => runOpenerExport({ sheet: true, status: st })); }
         else {
           guardFSForExport();
-          await exportPNG(MS.res, orderedExportViews());
+          await msWithCNMainAsync(() => exportPNG(MS.res, orderedExportViews()));
           stage = 'sheet'; if (st) st.textContent = 'Typesetting the sheet at ' + MS_RES[MS.res] + '\u2026';
           const r = await msExportMain(orderedExportViews(), lk);
           if (st) st.textContent = r.ok ? 'Saved plate + ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Plate saved; could not encode the pages.';
