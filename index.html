@@ -4218,6 +4218,15 @@ function olGbFit(ctx, xy, w, h) {
   const gs = all ? olGoldbachPairs() : [Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1))];
   let d = 0;
   for (const q of gs) { const m = olGbMarker(q, N - q), pt = xy(m[0], m[1]); if (!pt || !isFinite(pt[0]) || !isFinite(pt[1])) continue; d = Math.max(d, Math.hypot(pt[0] - cx, pt[1] - cy) / (Math.min(w, h) / 2)); }
+  if (MS_ISO.on && MS_ISO.noStrips && gs.length) {   // the markers-only sheet plate: centre their bounding box and fill the frame
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const q of gs) { const m = olGbMarker(q, N - q), pt = xy(m[0], m[1]); if (!pt || !isFinite(pt[0]) || !isFinite(pt[1])) continue; x0 = Math.min(x0, pt[0]); x1 = Math.max(x1, pt[0]); y0 = Math.min(y0, pt[1]); y1 = Math.max(y1, pt[1]); }
+    if (isFinite(x0)) {
+      const half = Math.max((x1 - x0) / 2, (y1 - y0) / 2, 1), k2 = Math.max(0.05, Math.min(3, 0.40 * Math.min(w, h) / half));
+      ctx.translate(cx, cy); ctx.scale(k2, k2); ctx.translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+      return k2;
+    }
+  }
   const k = d > 0.86 ? 0.86 / d : 1;
   if (k < 1) { ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy); }
   return k;
@@ -7042,7 +7051,7 @@ var MS_ISOM = null;   // main math-sheet isolated plates: { only: 'base' | 'stri
 function paintViewInner(ctx, S, cap) {
   const I = MS_ISOM, on = k => !I || I.only === k;
   if (I) {
-    if (viewMode === 'cayley') { if (on('base')) drawCayley(ctx, S); if (on('strip') && bandChainNow()) liftDrawChain(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (on('marker')) drawGoldMarkers(ctx, S); if (MS_LBL.on && !on('marker')) drawCayleyLabels(ctx, S); return; }
+    if (viewMode === 'cayley') { if (on('base')) { drawCayleyField(ctx, S); drawSectorBands(ctx, S); } if (on('strip')) { if (walkMode === 'band') drawCayleyBand(ctx, S); if (bandChainNow()) liftDrawChain(ctx, S); if (showStrip) drawCayleyStripAt(ctx, S, offS, 'rgba(61,200,184,.95)'); } if (on('part')) drawPartitionsOverlay(ctx, S); if (on('lift')) drawLiftOverlay(ctx, S); if (on('marker')) drawGoldMarkers(ctx, S); if (MS_LBL.on && !on('marker')) drawCayleyLabels(ctx, S); return; }
     if (viewMode === 'ring') {
       if (on('base')) drawRingBase(ctx, S, cap);
       if (on('strip')) { if (walkMode === 'band') { drawRingBand(ctx, S); if (bandChainNow()) liftDrawChain(ctx, S); } if (showStrip) drawRingStrip(ctx, S); }
@@ -7385,10 +7394,14 @@ function drawGoldMarkers(ctx, S) {
   const E = partE(), g = Math.max(1, Math.min(Math.floor(E / 2), partG || 1)), s = E - g;
   const pairs = gbMarkPairs(), pts = [];
   let zfit = 1;
-  if (MS_ISOM && MS_ISOM.only === 'marker') {   /* the sheet's own plate: zoom out about its centre until every marker is in view */
-    const tm0 = ctx.getTransform(), cvw0 = ctx.canvas.width, cvh0 = ctx.canvas.height, cx = cvw0 / 2, cy = cvh0 / 2; let d = 0;
-    for (const q of pairs) { const m = liftXY(q, E - q, S); if (!m || !isFinite(m[0]) || !isFinite(m[1])) continue; const dp = tm0.transformPoint(new DOMPoint(m[0], m[1])); d = Math.max(d, Math.abs(dp.x - cx) / (cvw0 * 0.46), Math.abs(dp.y - cy) / (cvh0 * 0.46)); }
-    if (d > 1) { zfit = 1 / d; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(cx, cy); ctx.scale(zfit, zfit); ctx.translate(-cx, -cy); ctx.transform(tm0.a, tm0.b, tm0.c, tm0.d, tm0.e, tm0.f); }
+  if (MS_ISOM && MS_ISOM.only === 'marker') {   /* the sheet's own plate: centre the markers' bounding box and scale it to fill the frame */
+    const tm0 = ctx.getTransform(), cvw0 = ctx.canvas.width, cvh0 = ctx.canvas.height, cx = cvw0 / 2, cy = cvh0 / 2;
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const q of pairs.concat([g])) { const m = liftXY(q, E - q, S); if (!m || !isFinite(m[0]) || !isFinite(m[1])) continue; const dp = tm0.transformPoint(new DOMPoint(m[0], m[1])); x0 = Math.min(x0, dp.x); x1 = Math.max(x1, dp.x); y0 = Math.min(y0, dp.y); y1 = Math.max(y1, dp.y); }
+    if (isFinite(x0)) {
+      const half = Math.max((x1 - x0) / 2, (y1 - y0) / 2, 1), k = Math.max(0.05, Math.min(3, 0.40 * Math.min(cvw0, cvh0) / half)), bx = (x0 + x1) / 2, by = (y0 + y1) / 2;
+      zfit = k; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-bx, -by); ctx.transform(tm0.a, tm0.b, tm0.c, tm0.d, tm0.e, tm0.f);
+    }
   }
   const ptk = S / 700, dot = Math.max(2.2 * ptk, 2) * (gbMarkScale > 1 ? 1 : gbMarkScale) / zfit;
   for (const q of pairs) { const m = liftXY(q, E - q, S); pts.push(m && isFinite(m[0]) && isFinite(m[1]) ? m : null); }
@@ -14501,7 +14514,7 @@ async function msRender(doc, theme, opts) {
         if (py > TOP && BOT - py < SLACK && tot <= FULL) newPage();
         if (py === TOP && tot <= FULL) { ch.forEach(place); return; }
         ch.forEach((it, i) => {
-          let need = it.h; if (it.t === 'h' && ch[i + 1]) need += ch[i + 1].h;
+          let need = it.h; if (it.t === 'h' && ch[i + 1]) { need += ch[i + 1].h; const n2 = ch[i + 2]; if (ch[i + 1].t === 'p' && n2 && n2.t === 'table' && need + n2.h <= (BOT - TOP) * 0.7) need += n2.h; }   // heading + intro + table stay together when they fit
           if (it.t === 'p' && ch[i + 1] && (ch[i + 1].t === 'table' || ch[i + 1].t === 'key')) need += ch[i + 1].h;   // intro stays with its table
           // A bare formula right after another bare formula (no paragraph between them) is one
           // train of thought — e.g. the short one-line facts in §6 — so a page break never lands
@@ -14867,6 +14880,57 @@ function msSingularSeries(G, cn, a, b, s, w, stripEmpty, partOn, predShown) {
     let hl = NaN; try { hl = S * li2(E); } catch (e) {}
     out.push({ t: 'eq', tex: msT`r(E)\sim\mathfrak S(E)\,\mathrm{li}_{2}(E):\qquad r(${E})=${ordered},\qquad \mathfrak S(${E})\,\mathrm{li}_{2}(${E})=${msf(hl, 1)},\qquad \text{ratio}=${msf(hl ? ordered / hl : NaN, 3)}`, cap: 'r(E) counts the ordered ways E = q + q\u2032 with both prime; li\u2082(E) = \u222b\u2082\u1d31 dt/ln\u00b2t. The finer form \ud835\udd16(E)\u00b7\u222b\u2082^{E\u22122} dt/(ln t \u00b7 ln(E\u2212t)) gives ' + msf(S * msHLJ(E), 1) + '. The asymptotic is a statement about large E; at this size it is a rough guide.' });
   }
+  // ── extension: the product built up prime by prime, how fast it converges, and what it predicts around E ──
+  try {
+    if (!_ssPrimes) _ssPrimes = primesUpTo(200000);
+    const PR = _ssPrimes, ff = x => (Math.abs(x) >= 100 ? x.toFixed(2) : x.toFixed(5));
+    // 1. block D(n) prime by prime
+    let run = 1; const rows1 = [];
+    for (let i = 0; i < 12 && i < PR.length; i++) {
+      const q = PR[i], v = Math.min(cn + 1, q), f = 1 - v / (q * q); run *= f;
+      rows1.push({ label: 'p = ' + q + ' \u00b7 \u03bd_p = ' + v + ' \u00b7 factor ' + f.toFixed(5) + (q <= cn + 1 ? ' \u25c0 saturated' : ''), n: run.toFixed(5), pct: (run * Math.PI * Math.PI / 6).toFixed(5) });
+    }
+    out.push({ t: 'h', text: 'The block product, prime by prime' });
+    out.push({ t: 'p', text: 'For the block X = {0, \u2026, n} at the plate\u2019s depth n = ' + cn + ' each prime multiplies in the factor 1 \u2212 \u03bd_p/p\u00b2 with \u03bd_p = min(n+1, p). The running product is D(n) over the primes listed; the last column is C(n) = \u03b6(2)\u00b7D(n) over the same primes.' });
+    out.push({ t: 'table', head: ['prime \u00b7 \u03bd_p \u00b7 local factor', 'running D', 'running C'], rows: rows1 });
+    // 2. Goldbach product prime by prime
+    let runG = 2 * 0.660161815846869573927812110014 * 0; runG = 1; const rows2 = [];
+    for (let i = 1; i < 14 && i < PR.length; i++) {   // p = 3, 5, 7, ...: the p = 2 factor is the leading 2 (nu = 1 at 2, E even)
+      const q = PR[i], v = (E % q === 0) ? 1 : 2, f = (1 - v / q) / ((1 - 1 / q) * (1 - 1 / q));
+      runG *= f; rows2.push({ label: 'p = ' + q + ' \u00b7 \u03bd_p = ' + v + (v === 1 ? ' (p | E)' : '') + ' \u00b7 factor ' + f.toFixed(5), n: (2 * runG).toFixed(5), pct: '' });
+    }
+    out.push({ t: 'h', text: 'The Goldbach product, prime by prime' });
+    out.push({ t: 'p', text: 'For E = ' + E + ' the prime 2 gives the leading 2 (E is even, so \u03bd_2 = 1 and its factor is 2). Each odd prime then multiplies in (1 \u2212 \u03bd_p/p)/(1 \u2212 1/p)\u00b2 with \u03bd_p = 1 when p | E and 2 otherwise. The running value is the singular series over the primes listed; the full series is ' + msf(S, 6) + '.' });
+    out.push({ t: 'table', head: ['prime \u00b7 \u03bd_p \u00b7 local factor', 'running S(E)', ''], rows: rows2 });
+    // 3. convergence of the truncation
+    const cuts = [10, 30, 100, 1000, 10000, 100000], rows3 = [];
+    cuts.forEach(P => { let pr = 1; for (const q of PR) { if (q > P) break; const v = (E % q === 0) ? 1 : 2; pr *= (1 - v / q) / ((1 - 1 / q) * (1 - 1 / q)); } rows3.push({ label: 'primes \u2264 ' + P.toLocaleString() + ' \u00b7 S = ' + pr.toFixed(6), n: ff(pr - S), pct: (100 * (pr - S) / S).toFixed(3) + '%' }); });
+    out.push({ t: 'h', text: 'How fast the series converges' });
+    out.push({ t: 'p', text: 'Truncating the product at P leaves a relative error of order 1/(P ln P). The table gives the truncated value and its distance from the closed form 2C\u2082\u220f(p\u22121)/(p\u22122) = ' + msf(S, 6) + '.' });
+    out.push({ t: 'table', head: ['truncation \u00b7 value', 'minus closed form', 'relative'], rows: rows3 });
+    // 4. diagonals of the strip (slope +-1)
+    if (!stripEmpty && b === 1 && (a === -1 || a === 1) && w >= 1 && w <= 30) {
+      const rows4 = [];
+      for (let c = s; c < s + w; c++) { const m = Math.abs(c); if (m < 1) { rows4.push({ label: 'v = ' + c + ' \u00b7 r = M \u00b7 gcd = M', n: '1/G', pct: '' }); continue; } rows4.push({ label: 'v = ' + c + ' \u00b7 gcd(r, M) = gcd(' + m + ', \u00b7)' + ' \u00b7 \u03c6(' + m + ')/' + m, n: (phi(m, SPF) / m).toFixed(5), pct: '' }); }
+      const mean = (() => { let t = 0, k = 0; for (let c = s; c < s + w; c++) { const m = Math.abs(c); if (m >= 1) { t += phi(m, SPF) / m; k++; } } return k ? t / k : NaN; })();
+      out.push({ t: 'h', text: 'The strip, diagonal by diagonal' });
+      out.push({ t: 'p', text: 'On the diagonal ' + (a === -1 ? 'r + M = c' : 'r \u2212 M = c') + ' one has gcd(r, M) = gcd(r, c) (or gcd(c, M)), so its coprime density tends to \u03c6(|c|)/|c|, the one-class singular factor \u220f_{p | c}(1 \u2212 1/p). The strip window is a stack of w = ' + w + ' such diagonals; its predicted density weights each by its length \u2113_c. The unweighted mean of the factors below is ' + msf(mean, 5) + '.' });
+      out.push({ t: 'table', head: ['diagonal \u00b7 factor', '\u03c6(|c|)/|c|', ''], rows: rows4 });
+    }
+    // 5. singular series around E
+    if (E <= 20000) {
+      const rows5 = [];
+      for (let e = Math.max(6, E - 12); e <= E + 12; e += 2) {
+        try { ensureSPFTo(e); } catch (x) {}
+        const Se = sigma(e, SPF); let k = 0; for (let q = 2; q <= e / 2; q++) if (isPrime(q) && isPrime(e - q)) k++;
+        const ord = 2 * k - (isPrime(e / 2) ? 1 : 0);
+        rows5.push({ label: 'E = ' + e + (e === E ? ' \u25c0 this sheet' : '') + ' \u00b7 S(E) = ' + Se.toFixed(4) + ' \u00b7 r(E) = ' + ord, n: ord, pct: (Se * li2(e)).toFixed(1) });
+      }
+      out.push({ t: 'h', text: 'The singular series around E' });
+      out.push({ t: 'p', text: 'S(E) is large when E has many small odd prime factors and small when it has few, which is what makes the Goldbach count r(E) rise and fall from one even E to the next. The table compares the actual count with the Hardy\u2013Littlewood value S(E)\u00b7li\u2082(E) for the even numbers either side of E. The asymptotic is a statement about large E; at this size it is only a guide.' });
+      out.push({ t: 'table', head: ['even E \u00b7 S(E) \u00b7 r(E)', 'r(E)', 'S\u00b7li\u2082'], rows: rows5 });
+    }
+  } catch (e) {}
   return out;
 }
 /* The sieve-only sheet: just the block-coprime machinery at the sheet's C(n) depth. Same numbers the full
