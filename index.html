@@ -1719,6 +1719,7 @@ walk anyway.</p>
     <div class="prow">
       <span class="plabel">r-chain</span>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;" title="For every coprime r on every ring M, draws r &rarr; r mod(M+1) &mdash; the literal one-step lift this whole panel is named for, generalised past just the spiral's fixed p or the &plusmn;n path's single trajectory. Teal = the lift survives, coral = it dies. Capped at G&le;400 since it's an O(G&sup2;) line count."><input type="checkbox" id="lift-chain-chk" checked onchange="liftToggleChain(this.checked)"> r &rarr; r mod(M+1), every r</label>
+      <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;" title="Remove every cell the block breaks at the C(n) depth, so the plate thins out as n grows and only the survivors are left."><input type="checkbox" id="hide-broken-chk" onchange="setHideBrokenMain(this.checked)"> hide broken cells</label>
       <span id="lift-chain-n-row" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;">
         <span class="lbl">depth n</span>
         <div class="stepper">
@@ -2035,6 +2036,7 @@ walk anyway.</p>
       </div>
       <div class="prow">
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="For every coprime r on every ring M, a line from r to r mod(M+1). Teal = the lift survives, coral = it breaks."><input type="checkbox" id="ol-chain-chk" checked onchange="olToggleChain(this.checked)"> r &rarr; r mod(M+1)</label>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="Remove every cell the block breaks at the C(n) depth, so the plate thins out as n grows and what is left is the C(n) survivors."><input type="checkbox" id="ol-hidebr-chk" onchange="olToggleHideBroken(this.checked)"> hide broken cells</label>
       </div>
       <div class="prow">
         <span class="lbl" style="flex-basis:100%;font-size:10px;color:rgba(232,227,219,.5);" title="Shared by Spiral, &plusmn;n path, Connect and the r-chain.">Spiral / &plusmn;n path / Connect / r-chain &mdash;</span>
@@ -2071,6 +2073,8 @@ walk anyway.</p>
         <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
         <button class="chip tl" id="ol-gb-play" onclick="olToggleGbPlay()" title="Draw all four Strip I lines for one Goldbach pair (g, N&minus;g) &mdash; c: r+M=g, d: r+M=s (gold/coral, the sum pair the verdict reads), a: M&minus;r=g, b: r&minus;M=g (teal/violet, the difference pair) &mdash; at a time, on loop. c and d come out fully lit exactly when g and s are both prime.">&#9654; Play Goldbach pairs</button>
         <button class="chip" onclick="olStepGb(1)" title="Next Goldbach pair of N.">pair &#9654;</button>
+        <button class="chip" id="ol-gb-off" onclick="olGbOff()" title="Switch the Goldbach overlay off: no strips, no markers, no spotlight. Any pair button turns it back on.">&#10005; Goldbach off</button>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Zoom Ring and Cayley out just enough that every gold marker (they sit past the outermost ring) is in the picture. Your own zoom still works on top."><input type="checkbox" id="ol-gbfit-chk" checked onchange="olToggleGbFit(this.checked)"> fit all markers</label>
         <button class="chip" id="ol-gb-dir" onclick="olToggleGbDir()" title="Direction Play Goldbach pairs walks: forward (small g to large) or backward.">dir: &#9654;</button>
         <button class="chip" id="ol-gb-all-btn" onclick="olToggleGbAll()" title="Draw the four strips of EVERY Goldbach pair of N at once. The pair you are on stays brightest; the rest are drawn softer underneath.">all at once</button>
         <button class="chip" id="ol-gb-list-btn" onclick="olToggleGbList()" title="Show every Goldbach pair of N as a list. Click one to draw it on the plate.">all pairs &#9662;</button>
@@ -3020,7 +3024,7 @@ function isCop(r, M) {                       // 1-indexed
    cost is bounded by canvas area, not by G². */
 function buildBase(S, mode) {
   const key = COP_G + '|' + S + '|' + mode + (isBlockMode(mode) ? '|n' + blockN() : '') +
-              (sectorOn && sectorPick > 0 ? '|sec' + sectorPick + '|dim' + sectorDim : '');
+              (sectorOn && sectorPick > 0 ? '|sec' + sectorPick + '|dim' + sectorDim : '') + hbKeys();
   if (baseCv && baseKey === key) return baseCv;
 
   const cv = document.createElement('canvas');
@@ -3081,7 +3085,13 @@ function sectorKeeps(r, m) {
 // Opacity multiplier for (r,m): 1 inside the isolated sector (or whenever
 // isolate is off), sectorDim/100 outside it. Every point-drawing loop that
 // used to `continue` past a non-member point now multiplies by this instead.
+let hideBrokenMain = false;
+function setHideBrokenMain(v) { hideBrokenMain = !!v; redraw(true); }
+/* "Hide broken cells": a cell survives at the C(n) depth when gcd(r,M) = 1 and gcd(r, M+j) = 1 for j = 1..n. */
+function hbKeys() { return hideBrokenMain ? '|hb' + liftChainNEff() : ''; }
+function hbKept(r, m) { const n = liftChainNEff(); if (gcd(r, m) !== 1) return false; for (let j = 1; j <= n; j++) if (gcd(r, m + j) !== 1) return false; return true; }
 function sectorVis(r, m) {
+  if (hideBrokenMain && !hbKept(r, m)) return 0;
   if (!sectorOn || sectorPick <= 0) return 1;
   return sectorKeeps(r, m) ? 1 : sectorDim / 100;
 }
@@ -3826,7 +3836,7 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
-             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
+             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: true };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4192,6 +4202,22 @@ function olSetGbSpotAmt(v) {
   olRedraw();
 }
 function olGbMarker(g, s) { return [Math.min(g, s), Math.max(g, s)]; }
+/* Zoom-out so every gold marker is in the picture. The markers sit on rings M = s > G, beyond the
+   outermost ring, so on Ring they fall outside the plate. This scales about the centre by just enough
+   (never zooms in) to bring the farthest marker, or the focused one when no trail is drawn, inside the
+   frame with room for its label. The user's own zoom is applied on top of it. */
+function olGbFit(ctx, xy, w, h) {
+  if (!OL.gbOn || OL.gbFit === false) return 1;
+  const N = olGoldbachN(), G = OPENER_G, all = (OL.gbMkAll || OL.gbTrail), cx = w / 2, cy = h / 2;
+  const gs = all ? olGoldbachPairs() : [Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1))];
+  let d = 0;
+  for (const q of gs) { const m = olGbMarker(q, N - q), pt = xy(m[0], m[1]); if (!pt || !isFinite(pt[0]) || !isFinite(pt[1])) continue; d = Math.max(d, Math.hypot(pt[0] - cx, pt[1] - cy) / (Math.min(w, h) / 2)); }
+  const k = d > 0.86 ? 0.86 / d : 1;
+  if (k < 1) { ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy); }
+  return k;
+}
+function olGbOff() { OL.gbOn = false; OL.gbAll = false; olStopGbPlay(); olStopGapPlay(); olRedraw(); }
+function olToggleGbFit(v) { OL.gbFit = !!v; olRedraw(); }
 function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
   const N = olGoldbachN(), maxG = Math.floor(N / 2);
   if (maxG < 1) return;
@@ -4442,6 +4468,19 @@ function olTogglePPlay() {
   olSyncPPlayChip(); olRedraw();
 }
 function olToggleChain(v) { OL.chain = !!v; olRedraw(); }
+function olToggleHideBroken(v) { OL.hideBroken = !!v; olRedraw(); }
+/* With "hide broken cells" on, only the cells the block keeps at the C(n) depth are drawn (and labelled):
+   gcd(r,M) = 1 and gcd(r, M+j) = 1 for j = 1..n. The filtered list is cached per set, G and depth. */
+const _olVisC = new Map();
+function olVis(arr) {
+  if (!OL.hideBroken || !arr) return arr;
+  const n = openerChainN(), key = OPENER_G + ':' + n + ':' + arr.length, hit = _olVisC.get(arr);
+  if (hit && hit.key === key) return hit.out;
+  const out = arr.filter(p => gcd(p[0], p[1]) === 1 && (n === 0 || firstFail(p[0], p[1], n, OPENER_G)[0] === -1));
+  _olVisC.set(arr, { key: key, out: out });
+  return out;
+}
+function olVisSet() { return olVis(olRingSet()); }
 function olSetSurv(v) { OL.surv = !!v; olRedraw(); }
 function olSetBroken(v) { OL.broken = !!v; olRedraw(); }
 // 0..1 slider, default .5 -> multiplier 1 (unchanged from the old fixed sizes); scales
@@ -4717,7 +4756,7 @@ function olSyncUI() {
   olSyncNPlayChips();
   const p1 = $('ol-p1'); if (p1) p1.classList.toggle('on', OL.p === 1);
   const chk = (id, v) => { const el = $(id); if (el && el.checked !== v) el.checked = v; };
-  chk('ol-chain-chk', OL.chain); chk('ol-surv-chk', OL.surv); chk('ol-broken-chk', OL.broken);
+  chk('ol-chain-chk', OL.chain); chk('ol-gbfit-chk', OL.gbFit !== false); chk('ol-hidebr-chk', OL.hideBroken); chk('ol-surv-chk', OL.surv); chk('ol-broken-chk', OL.broken);
   chk('ol-allp-chk', OL.allP); chk('ol-mirror-chk', OL.mirror);
   chk('ol-dropout-chk', OL.dropout); chk('ol-dropoutlbl-chk', OL.dropoutLbl);
   chk('ol-strip-chk', OL.stripOn);
@@ -5587,9 +5626,9 @@ function openerDrawGrid(t, forceC) {
   ctx.save();
   openerApplyZoomXform(ctx, 'grid', c.w, c.h);
   if (OPENER_ROT.g) { ctx.translate(c.w / 2, c.h / 2); ctx.rotate(-OPENER_ROT.g * Math.PI / 180); ctx.translate(-c.w / 2, -c.h / 2); }
-  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, _openerSq, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], cell * 0.8);
-  else _openerSq.forEach((p, i) => {
-    const a = openerPointAlpha(i, t, _openerSq.length); if (a <= 0) return;
+  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVis(_openerSq), (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], cell * 0.8);
+  else olVis(_openerSq).forEach((p, i) => {
+    const a = openerPointAlpha(i, t, olVis(_openerSq).length); if (a <= 0) return;
     const r = p[0], M = p[1], col = openerColor(r, M);
     ctx.globalAlpha = a * (col[3] / 255);
     ctx.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
@@ -5600,7 +5639,7 @@ function openerDrawGrid(t, forceC) {
   if (t >= 1) {
     const gxy = (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell];
     openerDrawLift(ctx, gxy, Math.min(c.w, c.h), c.w, c.h, 'grid');
-    openerDrawLabels(ctx, gxy, _openerSq, Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1), OPENER_ROT.g);
+    openerDrawLabels(ctx, gxy, olVis(_openerSq), Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1), OPENER_ROT.g);
   }
   ctx.restore();
 }
@@ -5636,13 +5675,14 @@ function openerDrawRing(t, forceC) {
   const outer = S / 2 * 0.92, dot = Math.max(0.5, Math.min(S * 0.018, outer / OPENER_G * 0.6) * (OL.ptScale || 1));
   const holeR = outer * OPENER_RING_HOLE, holeSpan = outer - holeR;   // rings 1..G pack into [holeR, outer]
   ctx.save();
-  openerApplyZoomXform(ctx, 'ring', c.w, c.h);
-  if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
   const ringDir = OL.ringCCW ? -1 : 1;
   const ringXY = (r, M) => { const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = ringDir * olTheta(r, M); return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)]; };
-  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olRingSet(), ringXY, dot * 2);
-  else olRingSet().forEach((p, i) => {
-    const a = openerPointAlpha(i, t, olRingSet().length); if (a <= 0) return;
+  olGbFit(ctx, ringXY, c.w, c.h);
+  openerApplyZoomXform(ctx, 'ring', c.w, c.h);
+  if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
+  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVisSet(), ringXY, dot * 2);
+  else olVisSet().forEach((p, i) => {
+    const a = openerPointAlpha(i, t, olVisSet().length); if (a <= 0) return;
     const r = p[0], M = p[1];
     const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G);
     const th = ringDir * olTheta(r, M);   // the opener's own angular mode (wrap / clamp / unit), independent of the live plate
@@ -5659,7 +5699,7 @@ function openerDrawRing(t, forceC) {
       return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)];
     };
     openerDrawLift(ctx, rxy, S, c.w, c.h, 'ring');
-    openerDrawLabels(ctx, rxy, olRingSet(), Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1), OPENER_ROT.r);
+    openerDrawLabels(ctx, rxy, olVisSet(), Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1), OPENER_ROT.r);
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
@@ -5826,11 +5866,12 @@ function openerDrawCayley(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-cayley'); if (!c) return;
   const ctx = c.ctx, cx = c.w / 2, cy = c.h / 2;
   ctx.save();
+  { const Rc0 = Math.min(c.w, c.h) * 0.44 * OPENER_CZ; olGbFit(ctx, (r, M) => openerCayleyXY(r, M, cx, cy, Rc0), c.w, c.h); }
   openerApplyZoomXform(ctx, 'cayley', c.w, c.h);
   const Rc = Math.min(c.w, c.h) * 0.44 * OPENER_CZ, dot = Math.max(0.5, Math.min(c.w, c.h) * 0.018 * Math.min(1, 13 / OPENER_G) * (OL.ptScale || 1));
-  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olRingSet(), (r, M) => openerCayleyXY(r, M, cx, cy, Rc), dot * 2);
-  else olRingSet().forEach((p, i) => {
-    const a = openerPointAlpha(i, t, olRingSet().length); if (a <= 0) return;
+  if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVisSet(), (r, M) => openerCayleyXY(r, M, cx, cy, Rc), dot * 2);
+  else olVisSet().forEach((p, i) => {
+    const a = openerPointAlpha(i, t, olVisSet().length); if (a <= 0) return;
     const r = p[0], M = p[1];
     const xy = openerCayleyXY(r, M, cx, cy, Rc); if (!xy) return;
     const col = openerColor(r, M);
@@ -5842,7 +5883,7 @@ function openerDrawCayley(t, forceC) {
   if (t >= 1) {
     const cxy = (r, M) => openerCayleyXY(r, M, cx, cy, Rc);
     openerDrawLift(ctx, cxy, Math.min(c.w, c.h), c.w, c.h, 'cayley');
-    openerDrawLabels(ctx, cxy, olRingSet(), Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)) * (OL.lblScale || 1));
+    openerDrawLabels(ctx, cxy, olVisSet(), Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)) * (OL.lblScale || 1));
   }
   ctx.restore();
 }
@@ -8852,7 +8893,7 @@ function ringBase(mode, S) {
   const boost = partMode !== 'off' ? partBgBoost : 1;
   const key = COP_G + '|' + RING_H + '|' + S + '|' + mode + '|' + ringHole.toFixed(4) + '|' + thetaMode + '|' + boost + '|' + ptScale + '|' + pointShape +
               '|surv' + survOn + '|brk' + brokenOn +
-              (sectorOn && sectorPick > 0 ? '|sec' + sectorPick + '|dim' + sectorDim : '');
+              (sectorOn && sectorPick > 0 ? '|sec' + sectorPick + '|dim' + sectorDim : '') + hbKeys();
   if (ringCv && ringKey === key) return ringCv;
   const cv = document.createElement('canvas');
   cv.width = S; cv.height = S;
@@ -9099,7 +9140,7 @@ let cayCv = null, cayKey = '';
 function cayleyBaseKey(S) {
   return [COP_G, S, cmap, rho0, rhoD, ba, baAng, cayleyRotX, cayleyRotY, cayleyZoomOut, cayleyZoomIn, thetaMode, ptScale, pointShape,
           survOn, brokenOn,
-          (sectorOn && sectorPick > 0 ? 'sec' + sectorPick + 'dim' + sectorDim : ''), $('cmode').value].join('|');
+          (sectorOn && sectorPick > 0 ? 'sec' + sectorPick + 'dim' + sectorDim : '') + hbKeys(), $('cmode').value].join('|');
 }
 /* Forward-plotted field: loop the lattice (capped, like Strip I) and stamp
    each coprime cell's Möbius image. Forward scatter can under-sample once
@@ -14319,7 +14360,8 @@ async function msRender(doc, theme, opts) {
       const chunkRows = [];
       if (opts && opts.pages && b.rows.length > 14) { let cur = [], hh = 0; b.rows.forEach(r => { const rh = (r.label.length > 62 ? 2 : 1) * 40 + 8; if (cur.length && hh + rh > 1300) { chunkRows.push(cur); cur = []; hh = 0; } cur.push(r); hh += rh; }); if (cur.length) chunkRows.push(cur); } else chunkRows.push(b.rows);
       chunkRows.forEach((rowsPart, ci) => {
-      const px = 27, lh = 40, swW = 34, numW = 130, pctW = 170, labW = TW - swW - numW - pctW - 20;
+      const hasErr = rowsPart.some(r => r.err), errW = hasErr ? 150 : 0;
+      const px = 27, lh = 40, swW = 34, numW = 130, pctW = 170, labW = TW - swW - numW - pctW - errW - 20;
       const laid = rowsPart.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
       const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
       const HH = b.head ? 46 : 0, labW0 = labW;
@@ -14334,8 +14376,9 @@ async function msRender(doc, theme, opts) {
           };
           c.fillStyle = th.acc;
           fit(b.head[0] + (ci > 0 ? ' (cont.)' : ''), labW0 - 10, 'left', MX + swW);
-          fit(b.head[1], numW + 40, 'right', W - MX - pctW);
-          fit(b.head[2], pctW - 10, 'right', W - MX);
+          fit(b.head[1], numW + 40, 'right', W - MX - pctW - errW);
+          fit(b.head[2], pctW - 10, 'right', W - MX - errW);
+          if (hasErr && b.head[3]) fit(b.head[3], errW - 10, 'right', W - MX);
         }
         c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8 + HH); c.lineTo(W - MX, y0 + 8 + HH); c.stroke();
         let yy = y0 + 50 + HH;
@@ -14343,8 +14386,9 @@ async function msRender(doc, theme, opts) {
           if (l.r.sw) { c.fillStyle = l.r.sw; c.fillRect(MX, yy - 24, swW - 8, swW - 8); c.strokeStyle = th.edge; c.lineWidth = 1.5; c.strokeRect(MX + .75, yy - 24 + .75, swW - 9.5, swW - 9.5); }
           c.textAlign = 'left'; c.fillStyle = th.ink; c.font = px + 'px ' + MONO;
           l.ls.forEach((t, i) => c.fillText(t, MX + swW, yy + i * lh));
-          c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW, yy);
-          c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX, yy);
+          c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW - errW, yy);
+          c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX - errW, yy);
+          if (l.r.err) { c.fillStyle = l.r.ec === 'neg' ? '#e8604c' : '#46c28a'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(l.r.err, W - MX, yy); }
           yy += Math.max(1, l.ls.length) * lh + 8;
         });
         c.strokeStyle = th.rule; c.beginPath(); c.moveTo(MX, yy - 22); c.lineTo(W - MX, yy - 22); c.stroke();
@@ -14396,7 +14440,7 @@ async function msRender(doc, theme, opts) {
       const rowW = (r, h) => h * asp(r) + gp * (r.length - 1);
       const capH = r => (TW - gp * (r.length - 1)) / asp(r);
       const used1 = items.reduce((a, it) => a + (it !== plateItem && it.sec <= (doc[0].sieve ? 1 : 2) ? it.h : 0), 0);
-      const tail = 54 + (lblNote ? 44 : 0), overhead = 12 + rows.length * labH + (rows.length - 1) * rgap + tail + 8;
+      const noteLs = lblNote ? wrap(lblNote, 'italic 300 28px ' + SERIF, TW - 40) : [], tail = 54 + (noteLs.length ? 14 + noteLs.length * 38 : 0), overhead = 12 + rows.length * labH + (rows.length - 1) * rgap + tail + 8;
       const avail = (MS.minH - 500) - used1 - 8 - overhead;
       let hs;
       if (rows.length === 1) hs = [Math.max(280, Math.min(capH(rows[0]), avail, 900))];
@@ -14424,7 +14468,7 @@ async function msRender(doc, theme, opts) {
         });
         c.textAlign = 'center'; c.fillStyle = th.mute; c.font = 'italic 300 28px ' + SERIF;
         c.fillText('The plate this sheet accompanies, redrawn from the same parameters.', MX + TW / 2, yy + 30);
-        if (lblNote) c.fillText(lblNote, MX + TW / 2, yy + 74);
+        noteLs.forEach((t, i) => c.fillText(t, MX + TW / 2, yy + 74 + i * 38));
       };
     }
     { let yy = 250; items.forEach(it => { it.y = yy; yy += it.h; }); y = yy; }
@@ -14741,10 +14785,10 @@ function msLiftDetail(G, o) {
         while (next <= k) { if (next >= 1) above -= hist[next]; next++; }   // drop cells whose f <= k
         if (ds.indexOf(k) < 0) continue;
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
-        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%' });
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / tot - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / tot - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / tot - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / tot - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
-      out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
-      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share'], rows: rows });
+      out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
+      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error'], rows: rows });
     }
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
@@ -14981,7 +15025,7 @@ function msBuildSieve(kind, views, noPlates) {
   if (!noPlates) {
     const tmp = [];
     try { if (main) msIsoPushMain(tmp, 'sieve', vs); else msIsoPush(tmp, 'sieve'); } catch (e) {}
-    if (tmp.length) { const ti = det.findIndex(x => x.t === 'table'); det.splice(ti > 0 ? ti - 1 : det.length, 0, ...tmp); }
+    if (tmp.length) { const ti = det.findIndex(x => x.t === 'table'); det.splice(det.length, 0, ...tmp); }
   }
   if (!det.length) doc.push({ t: 'p', text: 'The r-chain counts are not run at this G.' });
   det.forEach(b => doc.push(b));
@@ -15327,8 +15371,31 @@ function msSave(cv, name, host) {
 }
 
 /* Math sheet as separate PNG pages (A4-proportioned), one download each, with every link kept on screen. */
+/* Store-only ZIP (no library): the pages go in one file, in order, with the names they would have had. */
+async function msZipBlob(files) {
+  const crcT = msZipBlob._t || (msZipBlob._t = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })());
+  const crc = u => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = crcT[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  const d = new Date(), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate(), tm = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  for (const f of files) {
+    const data = new Uint8Array(await f.blob.arrayBuffer()), nm = enc.encode(f.name), c = crc(data);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint16(10, tm, true); lh.setUint16(12, dt, true);
+    lh.setUint32(14, c, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, nm.length, true); lh.setUint16(28, 0, true);
+    parts.push(lh.buffer, nm, data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true); ch.setUint16(12, tm, true); ch.setUint16(14, dt, true);
+    ch.setUint32(16, c, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true); ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+    cen.push(ch.buffer, nm);
+    off += 30 + nm.length + data.length;
+  }
+  let cs = 0; cen.forEach(x => { cs += x.byteLength; });
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cs, true); end.setUint32(16, off, true);
+  return new Blob(parts.concat(cen, [end.buffer]), { type: 'application/zip' });
+}
 async function msSavePages(cvs, base, host) {
-  const N = cvs.length; let ok = true;
+  const N = cvs.length; let ok = true; const got = [];
   if (host) {
     host.innerHTML = ''; host.style.display = '';
     const t = document.createElement('div'); t.style.color = 'var(--cream3)';
@@ -15340,6 +15407,7 @@ async function msSavePages(cvs, base, host) {
     const blob = await new Promise(res => { try { pcv.toBlob(b => res(b), 'image/png'); } catch (e) { res(null); } });
     try { pcv.width = 0; pcv.height = 0; } catch (e) {}   // release the page's pixels before drawing the next one
     if (!blob) { ok = false; continue; }
+    got.push({ name: name, blob: blob });
     const href = URL.createObjectURL(blob);
     const el = document.createElement('a'); el.href = href; el.download = name;
     document.body.appendChild(el); el.click(); el.remove();
@@ -15350,7 +15418,16 @@ async function msSavePages(cvs, base, host) {
       row.appendChild(l); host.appendChild(row);
     }
     setTimeout(() => URL.revokeObjectURL(href), 300000);
-    if (i < N - 1) await new Promise(r => setTimeout(r, 400));
+    if (i < N - 1) await new Promise(r => setTimeout(r, 900));   // phones write the files one by one; too short a gap lets a small page finish before a big one
+  }
+  if (host && got.length > 1) {
+    try {
+      const zb = await msZipBlob(got), zh = URL.createObjectURL(zb), row = document.createElement('div'), l = document.createElement('a');
+      l.href = zh; l.download = base + '-all-pages.zip'; l.textContent = '\u2b07 all ' + got.length + ' pages in order (.zip)';
+      l.style.cssText = 'color:var(--gold);text-decoration:underline;word-break:break-all;font-weight:600;';
+      row.appendChild(l); host.insertBefore(row, host.children[1] || null);
+      setTimeout(() => URL.revokeObjectURL(zh), 300000);
+    } catch (e) {}
   }
   return ok;
 }
@@ -15455,12 +15532,12 @@ function msDocToHtml(doc) {
       b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
       h += '</table></div>';
     } else if (b.t === 'table') {
-      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th><th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th></tr></thead>' : '') + '<tbody>';
+      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th><th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
       b.rows.forEach(r => {
         h += '<tr><td class="sw">' + (r.sw ? '<i style="background:' + r.sw + '"></i>' : '') + '</td>' +
           '<td class="lab">' + msEsc(r.label) + '</td>' +
           '<td class="n">' + msEsc(String(r.n)) + '</td>' +
-          '<td class="pct">' + msEsc(r.pct) + '</td></tr>';
+          '<td class="pct">' + msEsc(r.pct) + '</td>' + (r.err ? '<td class="pct" style="font-weight:600;color:' + (r.ec === 'neg' ? '#e8604c' : '#2fa874') + '">' + msEsc(r.err) + '</td>' : '') + '</tr>';
       });
       h += '</tbody></table>';
     } else if (b.t === 'key') {
@@ -15909,12 +15986,18 @@ function msOpenerPlateImagesRaw() {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' };
   const draw = { grid: openerDrawGrid, ring: openerDrawRing, cayley: openerDrawCayley };
   const vs = view === 'all3' ? ['grid', 'ring', 'cayley'] : [view];
+  /* Sieve-only sheet: the plate shows only what the sieve measures, the r-chain at the sheet's C(n) depth over the
+     lattice, so stepping C(n) visibly drops chains. The opener's own spiral / path / strip / Goldbach overlays are set aside. */
+  const sv = MS_ADV.on && MS_ADV.sieve, svKeep = {};
+  if (sv) { const spec = { mode: 'none', chain: true, stripOn: false, stripDots: false, stripPick: false, gbOn: false }; Object.keys(spec).forEach(k => { svKeep[k] = OL[k]; OL[k] = spec[k]; }); }
+  try {
   return vs.map(v => {
     const wideCay = v === 'cayley';   // math-sheet plates always show Cayley at 2:1, alone or beside Grid and Ring
     const w = wideCay ? S * 2 : S, h = S;
     const sh = msLabelledShot(w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h }));
     return { label: names[v], cv: sh.cv, shown: sh.shown, total: sh.total, fsMin: sh.fsMin, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && OPENER_G > msLbMax(), cls: wideCay ? 'wide' : (view === 'all3' ? '' : 'solo') };
   });
+  } finally { Object.keys(svKeep).forEach(k => { OL[k] = svKeep[k]; }); }
 }
 function msOpenerLblWhat() {
   return { rM: 'its r/M', r: 'its r', M: 'its M', res: 'its residue r mod M', dec: 'its r/M as a decimal', deg: 'its angle 360\u00b7r/M in degrees', pi: 'its angle 2\u03c0\u00b7r/M in multiples of \u03c0', rad: 'its angle 2\u03c0\u00b7r/M in radians', gcd: 'its gcd(r, M)', depth: 'its block-survival depth (columns M, M+1, \u2026 coprime to r, capped at ' + DEPTH_CAP + ')' }[msLbMode()] || 'its M';
@@ -15923,6 +16006,8 @@ function msMainPlateImages(views) { return msWithCNMain(() => msMainPlateImagesR
 function msMainPlateImagesRaw(views) {
   const names = { grid: 'Grid', ring: 'Ring', cayley: 'Cayley' }, side = Math.round(900 * msQ()), out = [];
   const vmWas = viewMode, lsWas = labelScale, vqWas = viewQuarter;
+  const svM = MS_ADV.on && MS_ADV.sieve, sk = { lo: liftOn, lm: liftMode, lc: liftChainOn, pm: partMode, ss: showStrip };
+  if (svM) { liftOn = true; liftMode = 'none'; liftChainOn = true; partMode = 'off'; showStrip = false; }   // sieve-only sheet: just the r-chain at the sheet's depth
   try {
     views.forEach(v => {
       const wide = v === 'cayley' && exportCayWide, w = wide ? side * 2 : side;
@@ -15932,7 +16017,7 @@ function msMainPlateImagesRaw(views) {
       const sh = msLabelledShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side));
       out.push({ label: names[v] || v, cv: sh.cv, shown: sh.shown, total: sh.total, fsMin: sh.fsMin, what: msOpenerLblWhat(), only: msLbFilterText(), max: msLbMax(), tooBig: msLbMode() !== 'off' && COP_G > msLbMax(), cls: views.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && views.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
     });
-  } finally { viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
+  } finally { viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; liftOn = sk.lo; liftMode = sk.lm; liftChainOn = sk.lc; partMode = sk.pm; showStrip = sk.ss; }
   return out;
 }
 /* The plate block sits right after the abstract, in the doc itself, so the on-screen preview, the
@@ -15956,7 +16041,7 @@ function msPreviewOpener(sieve) {
     if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
     MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G; MS_PREV.G0 = OPENER_G; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve;
     MS_LB.active = true; MS_LB.mode = OPENER_LABEL_MODE; MS_LB.idx = Math.max(0, OPENER_LABEL_MODES.findIndex(x => x.id === OPENER_LABEL_MODE));
-    MS_LB.scale = OL.lblScale || 1; MS_LB.filter = 'all';   // start from the opener's labels; changes stay in the preview
+    MS_LB.scale = OL.lblScale || 1; MS_LB.filter = (sieve && OPENER_G > 24) ? 'co' : 'all';   // start from the opener's labels; changes stay in the preview
     MS_PREV.doc = msBuildOpener();
     msOpenPreview(MS_PREV.doc);
   } catch (e) {}
@@ -15964,7 +16049,7 @@ function msPreviewOpener(sieve) {
 function msPreviewMain(sieve) {
   try {
     MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
-    MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = 'all'; msLblAutoFilter();
+    MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = (sieve && G > 24) ? 'co' : 'all'; msLblAutoFilter();
     const vs = orderedExportViews();
     MS_PREV.views = vs;
     if (sieve && G > LIFT_CHAIN_MAX) {   // the r-chain plates are drawn up to G = LIFT_CHAIN_MAX, so the sieve sheet opens there
