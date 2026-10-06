@@ -15722,6 +15722,13 @@ function msWithCNMain(fn) {
   if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
   try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
 }
+/* The plate PNG exported with the sheet carries the sheet's own labels: same mode, size, gcd filter and size-to-room placement as the plates on the pages. */
+async function msWithLblAsync(fn) {
+  const on0 = MS_LBL.on, mask0 = MS_LBL.mask, om0 = OPENER_LABEL_MODE, ls0 = OL.lblScale;
+  const want = MS_LB.active && MS_LB.mode !== 'off' && msGNow() <= msLbMax();
+  if (want) { MS_LBL.on = true; MS_LBL.mask = false; OPENER_LABEL_MODE = MS_LB.mode; OL.lblScale = MS_LB.scale; }
+  try { return await fn(); } finally { MS_LBL.on = on0; MS_LBL.mask = mask0; MS_LBL.stats = null; OPENER_LABEL_MODE = om0; OL.lblScale = ls0; }
+}
 async function msWithCNAsync(fn) {
   const cn0 = OL.cn, lk0 = OL.lockN;
   if (MS_ADV.on && MS_ADV.cn != null) { OL.cn = Math.max(0, Math.min(OPENER_G - 1, MS_ADV.cn)); OL.lockN = false; }
@@ -16172,10 +16179,10 @@ async function msExportFromPreview() {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         stage = 'plate'; if (st) st.textContent = 'Composing the plate and legend at ' + MS_RES[MS.res] + ' (' + MS.res + ' px wide)\u2026';
-        if (MS_PREV.kind === 'opener') { await msWithCNAsync(() => runOpenerExport({ sheet: true, status: st })); }
+        if (MS_PREV.kind === 'opener') { await msWithLblAsync(() => msWithCNAsync(() => runOpenerExport({ sheet: true, status: st }))); }
         else {
           guardFSForExport();
-          await msWithCNMainAsync(() => exportPNG(MS.res, orderedExportViews()));
+          await msWithLblAsync(() => msWithCNMainAsync(() => exportPNG(MS.res, orderedExportViews())));
           stage = 'sheet'; if (st) st.textContent = 'Typesetting the sheet at ' + MS_RES[MS.res] + '\u2026';
           const r = await msExportMain(orderedExportViews(), lk);
           if (st) st.textContent = r.ok ? 'Saved plate + ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Plate saved; could not encode the pages.';
