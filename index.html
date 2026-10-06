@@ -3040,14 +3040,16 @@ function buildBase(S, mode) {
     for (let px = 0; px < S; px++) {
       const r0 = Math.floor(px * scale) + 1;
       const r1 = Math.min(g, Math.floor((px + 1) * scale)) + 1;
-      let hit = 0, tot = 0;
+      let hit = 0, tot = 0, kept = 0;
       for (let M = M0; M < Math.max(M1, M0 + 1); M++) {
         for (let r = r0; r < Math.max(r1, r0 + 1); r++) {
           tot++; if (isCop(r, M)) hit += sectorVis(r, M);
+          if (hideBrokenMain && hbKept(r, M)) kept++;
         }
       }
       const frac = tot ? hit / tot : 0;
       const o = (py * S + px) * 4;
+      if (hideBrokenMain && !kept) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; continue; }   // a broken cell is removed whatever the colouring mode paints it
       const c = cellRGBA(mode, frac, r0, M0);
       d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = c[3];
     }
@@ -4065,21 +4067,25 @@ function olStrip(ctx, xy, G, lw) {
 let _olStripCache = null, _olStripKey = '';
 function olStripPoints(G) {
   const a = OL.slopeA, b = OL.slopeB, s = OL.offset, w = Math.max(1, OL.width);
-  const key = G + '|' + a + '|' + b + '|' + s + '|' + w;
+  const cn = openerChainN(), hide = !!OL.hideBroken;
+  const key = G + '|' + a + '|' + b + '|' + s + '|' + w + '|' + cn + '|' + hide;
   if (_olStripCache && _olStripKey === key) return _olStripCache;
-  const pts = [], all = []; let total = 0, cop = 0;
+  const pts = [], all = []; let total = 0, cop = 0, blk = 0;
   if (b) {
     for (let M = 1; M <= G; M++) {
       const lo = Math.ceil((s + a * M) / b), hi = Math.ceil((s + w + a * M) / b) - 1;
       for (let r = Math.max(1, lo); r <= Math.min(G, hi); r++) {
         total++;
         const ok = gcd(r, M) === 1;
+        const kept = ok && (cn === 0 || firstFail(r, M, cn, G)[0] === -1);   // block-coprime at the C(n) depth
         all.push([r, M, ok]);
-        if (ok) { cop++; pts.push([r, M]); }
+        if (ok) cop++;
+        if (kept) blk++;
+        if (hide ? kept : ok) pts.push([r, M]);
       }
     }
   }
-  _olStripKey = key; _olStripCache = { pts, all, total, cop };
+  _olStripKey = key; _olStripCache = { pts, all, total, cop, blk, cn };
   return _olStripCache;
 }
 // E = 2(G+1), read off the live preview lattice -- exactly the main page's
@@ -6774,9 +6780,9 @@ function stripPredict() {
   const tol = 0.005 + 2 * (Math.abs(offS) + w) / g;
   return wt ? { pred: acc / wt, tol } : null;
 }
-function walkStrip(limitPts) {
+function walkStrip(limitPts, blockN) {
   const pts = [];
-  let total = 0, cop = 0;
+  let total = 0, cop = 0, blk = 0;
   const a = slopeA, b = slopeB, g = COP_G;
   if (!b) return { pts, total, cop };
   for (let M = 1; M <= g; M++) {
@@ -6787,10 +6793,11 @@ function walkStrip(limitPts) {
       total++;
       const c = isCop(r, M);
       if (c) cop++;
+      if (blockN >= 0 && c) { let ok = true; for (let j = 1; j <= blockN && ok; j++) if (gcd(r, M + j) !== 1) ok = false; if (ok) blk++; }
       if (limitPts && pts.length < limitPts) pts.push([r, M, c ? 1 : 0]);
     }
   }
-  return { pts, total, cop };
+  return { pts, total, cop, blk };
 }
 
 /* ── block band ────────────────────────────────────────── */
@@ -15152,6 +15159,7 @@ function msBuildOpenerRaw(noPlates) {
         if (!sp.total) L.push({ t: 'p', text: 'This band holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (OL.slopeA === -1 && OL.slopeB === 1 ? ' For slope \u22121/1 the band is the anti-diagonal r + M = ' + OL.offset + (Math.max(1, OL.width) > 1 ? ' \u2026 ' + (OL.offset + Math.max(1, OL.width) - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
         else
         L.push({ t: 'eq', tex: msT`\#\text{cells in band}=${sp.total},\qquad \#\{\gcd=1\}=${sp.cop},\qquad \frac{${sp.cop}}{${sp.total}}=${msf(sp.total ? sp.cop / sp.total : 0, 6)}`, cap: 'Counted over the whole G \u00d7 G square (1 \u2264 r, M \u2264 G), the cells Grid draws; Ring and Cayley plot only the r \u2264 M half of it in clamp mode.' });
+        L.push({ t: 'eq', tex: msT`\text{block-coprime at depth }n_C=${sp.cn}:\quad \#\{\gcd(r,M+j)=1,\ 0\le j\le n_C\}=${sp.blk},\qquad \frac{${sp.blk}}{${sp.total}}=${msf(sp.total ? sp.blk / sp.total : 0, 6)},\qquad \frac{${sp.blk}}{${sp.cop}}=${msf(sp.cop ? sp.blk / sp.cop : 0, 6)}`, cap: 'The same band counted at the sheet\u2019s C(n) depth: a cell is kept only if r is coprime to every column M \u2026 M+n. Raising n in advanced mode lowers these counts, and with "hide broken cells" on, the band\u2019s points on the plate drop with them.' });
       } catch (e) {}
       msIsoPush(L, 'strip');   // under the band's own counts
     }
@@ -15277,12 +15285,13 @@ function msBuildMainRaw(views, noPlates) {
     doc.push({ t: 'p', text: 'The strip is the set of cells whose v = b·r − a·M lies in the window [s, s+w). The plate measures the coprime density inside it and compares it with the value the arithmetic predicts.' });
     msStripLines(a, b, s, w).forEach(x => doc.push(x));
     try {
-      const st = walkStrip(0);
+      const cnS = liftChainNEff(), st = walkStrip(0, cnS);
       if (!st.total) {
         const anti = (a === -1 && b === 1);
         doc.push({ t: 'p', text: 'This window holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (anti ? ' For slope \u22121/1 the window is the anti-diagonal r + M = ' + s + (w > 1 ? ' \u2026 ' + (s + w - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
       } else
       doc.push({ t: 'eq', tex: msT`\#\text{cells}=${st.total.toLocaleString()},\qquad \#\{\gcd=1\}=${st.cop.toLocaleString()},\qquad \delta=\frac{${st.cop.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.cop / st.total : 0, 9)}`, cap: 'Counted over the whole G \u00d7 G square (1 \u2264 r, M \u2264 G).' });
+      if (st.total) doc.push({ t: 'eq', tex: msT`\text{block-coprime at depth }n_C=${cnS}:\quad \#\{\gcd(r,M+j)=1,\ 0\le j\le n_C\}=${st.blk.toLocaleString()},\qquad \frac{${st.blk.toLocaleString()}}{${st.total.toLocaleString()}}=${msf(st.total ? st.blk / st.total : 0, 6)},\qquad \frac{${st.blk.toLocaleString()}}{${st.cop.toLocaleString()}}=${msf(st.cop ? st.blk / st.cop : 0, 6)}`, cap: 'The same window counted at the sheet\u2019s C(n) depth: a cell is kept only if r is coprime to every column M \u2026 M+n. Stepping n in advanced mode lowers these counts, and with "hide broken cells" on the plate drops the broken cells with them.' });
       if (a === 1 && b === 1 && w === 1 && s === 0) {
         doc.push({ t: 'eq', tex: msT`r=M\ \Longrightarrow\ \gcd(r,M)=M,\ \text{coprime only at }M=1\ \Longrightarrow\ \delta=\frac1G=\frac1{${G}}=${msf(1 / G, 9)}` });
       } else if (a === 1 && b === 1 && w === 1 && Math.abs(s) >= 1) {
@@ -15656,9 +15665,9 @@ function msIsoPushMain(doc, kind, vs) {
     if (kind === 'sieve') { liftOn = true; liftMode = 'none'; liftChainOn = true; }
     try {
       vs.forEach(v => {
-        const wide = v === 'cayley' && exportCayWide, w = wide ? side * 2 : side;
+        const mk = kind === 'marker', wide = v === 'cayley' && exportCayWide && !mk, w = wide ? side * 2 : side;   // marker plates: equal square boxes
         viewMode = v; labelScale = LS[v] !== undefined ? LS[v] : lsWas; viewQuarter = VQ[v] !== undefined ? VQ[v] : vqWas;
-        out.push({ label: names[v] || v, cv: msPlateShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side)), cls: vs.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && vs.length === 3 && !wide ? 'cay' : (wide ? 'wide' : '')) });
+        out.push({ label: names[v] || v, cv: msPlateShot(w, side, ctx => paintPlate(ctx, 0, 0, w, side)), cls: vs.length === 1 ? (wide ? 'wide' : 'solo') : (v === 'cayley' && vs.length === 3 && !wide && !mk ? 'cay' : (wide ? 'wide' : '')) });
       });
     } finally { liftOn = lo; liftMode = lm; liftChainOn = lc; MS_ISOM = null; MS_LBL.on = lbl; MS_LBL.mask = false; MS_LBL.stats = null; viewMode = vmWas; labelScale = lsWas; viewQuarter = vqWas; }
     if (out.length) doc.push({ t: 'iplate', items: out, cap: msIsoCapMain(kind, vs) });
@@ -15728,8 +15737,8 @@ function msIsoPush(doc, kind) {
     if (kind === 'gbmarker') vs = vs.filter(v => v !== 'grid');
     if (!vs.length) return;
     const items = vs.map(v => {
-      const wide = v === 'cayley', w = wide ? S * 2 : S, h = S;
-      return { label: names[v], cv: msIsoShot(MS_ISO_SPECS[kind], w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h })), cls: wide ? 'wide' : (view === 'all3' ? '' : 'solo') };
+      const mk = kind === 'gbmarker', wide = v === 'cayley' && !mk, w = wide ? S * 2 : S, h = S;   // the marker pair (Ring, Cayley) sit in equal square boxes
+      return { label: names[v], cv: msIsoShot(MS_ISO_SPECS[kind], w, h, ctx => draw[v](1, { ctx: ctx, w: w, h: h })), cls: wide ? 'wide' : ((view === 'all3' && !(mk && vs.length === 1)) ? '' : 'solo') };
     });
     doc.push({ t: 'iplate', items: items, cap: msIsoCap(kind) });
   } catch (e) {}
@@ -15795,12 +15804,12 @@ function msAdvCN(d) {
 }
 function msLblStep(d) {
   const n = OPENER_LABEL_MODES.length;
-  MS_LB.idx = ((MS_LB.idx + d) % n + n) % n; MS_LB.mode = OPENER_LABEL_MODES[MS_LB.idx].id; msLblAutoFilter();
+  const wasOff = MS_LB.mode === 'off'; MS_LB.idx = ((MS_LB.idx + d) % n + n) % n; MS_LB.mode = OPENER_LABEL_MODES[MS_LB.idx].id; if (wasOff && MS_LB.mode !== 'off') MS_LB.filter = 'co'; msLblAutoFilter();
   msLblSync(); msLblRefresh();
 }
 function msLblPick(id) {
   const i = OPENER_LABEL_MODES.findIndex(m => m.id === id); if (i < 0) return;
-  MS_LB.idx = i; MS_LB.mode = id; msLblAutoFilter(); msLblSync(); msLblRefresh();
+  const wasOff = MS_LB.mode === 'off'; MS_LB.idx = i; MS_LB.mode = id; if (wasOff && id !== 'off') MS_LB.filter = 'co'; msLblAutoFilter(); msLblSync(); msLblRefresh();
 }
 function msLblSize(v) { const n = Number(v); MS_LB.scale = isFinite(n) ? Math.max(0.1, Math.min(3, n)) : 1; msLblSync(); msLblRefresh(); }
 function msLblFilterStep() {
@@ -16041,7 +16050,7 @@ function msPreviewOpener(sieve) {
     if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
     MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G; MS_PREV.G0 = OPENER_G; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve;
     MS_LB.active = true; MS_LB.mode = OPENER_LABEL_MODE; MS_LB.idx = Math.max(0, OPENER_LABEL_MODES.findIndex(x => x.id === OPENER_LABEL_MODE));
-    MS_LB.scale = OL.lblScale || 1; MS_LB.filter = (sieve && OPENER_G > 24) ? 'co' : 'all';   // start from the opener's labels; changes stay in the preview
+    MS_LB.scale = OL.lblScale || 1; MS_LB.filter = 'co';   // start from the opener's labels; changes stay in the preview
     MS_PREV.doc = msBuildOpener();
     msOpenPreview(MS_PREV.doc);
   } catch (e) {}
@@ -16049,7 +16058,7 @@ function msPreviewOpener(sieve) {
 function msPreviewMain(sieve) {
   try {
     MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
-    MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = (sieve && G > 24) ? 'co' : 'all'; msLblAutoFilter();
+    MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = 'co'; msLblAutoFilter();
     const vs = orderedExportViews();
     MS_PREV.views = vs;
     if (sieve && G > LIFT_CHAIN_MAX) {   // the r-chain plates are drawn up to G = LIFT_CHAIN_MAX, so the sieve sheet opens there
