@@ -14751,6 +14751,86 @@ function gbLegendLines(G, gbG, showCurrent) {
    Surviving / Broken filter and Connect. Shared by the opener and main-page math sheets,
    so a setting that changes the plate always changes a line here. o = {mode, n, p, allP,
    mirror, dropout, chain, chainN, surv, broken, dir}. Counted on the live lattice. */
+/* Error chart for the ratio-as-n-grows table: the plate's measured share against the limiting C(n) (top), and the signed error
+   (share - C(n)) / C(n) at every depth (bottom; red below the limit, green above). Built from the same counts as the table,
+   so it follows any G and any lattice count. pts = [{n, kept, share, C, err}], tot = coprime cells with r < M. */
+function msErrChart(pts, G, tot, d) {
+  const W = 1800, H = 820, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'), mono = '"JetBrains Mono",monospace';
+  c.fillStyle = '#05060f'; c.fillRect(0, 0, W, H);
+  const L = 150, R = 50, T1 = 110, B1 = 400, T2 = 470, B2 = 740, pw = W - L - R;
+  const nmax = Math.max(1, pts[pts.length - 1].n), X = n => L + (n + 0.5) / (nmax + 1) * pw;
+  c.font = '26px ' + mono; c.fillStyle = '#c8a84a'; c.textAlign = 'left';
+  c.fillText('measured share vs C(n)  \u00b7  L_' + G + '  \u00b7  ' + tot + ' coprime cells with r < M', L, 40);
+  // top panel: share and C(n)
+  let lo = 1, hi = 0; pts.forEach(q => { lo = Math.min(lo, q.share, isFinite(q.C) ? q.C : q.share); hi = Math.max(hi, q.share, isFinite(q.C) ? q.C : q.share); });
+  lo = Math.max(0, lo - 0.03); hi = Math.min(1.02, hi + 0.03);
+  const Y1 = v => B1 - (v - lo) / (hi - lo || 1) * (B1 - T1);
+  c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.fillStyle = '#8a8a96'; c.font = '20px ' + mono; c.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, y = Y1(v); c.beginPath(); c.moveTo(L, y); c.lineTo(W - R, y); c.stroke(); c.fillText(v.toFixed(3), L - 12, y + 7); }
+  const line = (key, col, dash) => { c.beginPath(); let first = true; pts.forEach(q => { const v = q[key]; if (!isFinite(v)) return; const x = X(q.n), y = Y1(v); if (first) { c.moveTo(x, y); first = false; } else c.lineTo(x, y); }); c.strokeStyle = col; c.lineWidth = 4; c.setLineDash(dash || []); c.stroke(); c.setLineDash([]); };
+  line('C', '#3dc8b8', [14, 8]); line('share', '#e8c35a');
+  pts.forEach(q => { if (!q.mark) return; const x = X(q.n), y = Y1(q.share); c.fillStyle = '#e8c35a'; c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill();
+    c.save(); c.translate(x, y - 14); c.rotate(-Math.PI / 4); c.fillStyle = '#d8d2c4'; c.font = '18px ' + mono; c.textAlign = 'left'; c.fillText(String(q.kept), 0, 0); c.restore(); });
+  c.font = '22px ' + mono; c.textAlign = 'left'; c.fillStyle = '#e8c35a'; c.fillText('\u2014 plate share (kept / ' + tot + ')', L + 20, T1 + 28); c.fillStyle = '#3dc8b8'; c.fillText('- - limiting C(n)', L + 20, T1 + 58);
+  // bottom panel: signed error
+  let em = 0.5; pts.forEach(q => { if (isFinite(q.err)) em = Math.max(em, Math.abs(q.err)); }); em = Math.ceil(em / 0.5) * 0.5; if (em > 10) em = Math.ceil(em / 5) * 5;
+  const Y2 = v => (T2 + B2) / 2 - v / em * (B2 - T2) / 2;
+  c.fillStyle = '#8a8a96'; c.font = '20px ' + mono; c.textAlign = 'right';
+  [-em, -em / 2, 0, em / 2, em].forEach(v => { const y = Y2(v); c.strokeStyle = v === 0 ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.10)'; c.beginPath(); c.moveTo(L, y); c.lineTo(W - R, y); c.stroke(); c.fillText((v > 0 ? '+' : '') + v.toFixed(em < 4 ? 2 : 1) + '%', L - 12, y + 7); });
+  const bw = Math.max(2, Math.min(40, pw / (nmax + 1) * 0.7));
+  pts.forEach(q => { if (!isFinite(q.err)) return; const x = X(q.n), y0 = Y2(0), y1 = Y2(q.err); c.fillStyle = q.err < 0 ? '#e8604c' : '#46c28a'; c.fillRect(x - bw / 2, Math.min(y0, y1), bw, Math.max(1, Math.abs(y1 - y0))); });
+  c.fillStyle = '#d8d2c4'; c.font = '22px ' + mono; c.textAlign = 'left'; c.fillText('error = (share \u2212 C(n)) / C(n)   red below the limit \u00b7 green above', L + 10, T2 - 14);
+  // x axis
+  c.textAlign = 'center'; c.font = '20px ' + mono; c.fillStyle = '#8a8a96';
+  const step = nmax <= 16 ? 1 : nmax <= 40 ? 4 : nmax <= 70 ? 8 : 16;
+  for (let n = 0; n <= nmax; n += step) c.fillText(String(n), X(n), B2 + 30);
+  if (d >= 0 && d <= nmax) { c.strokeStyle = 'rgba(200,168,74,.8)'; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(X(d), T1); c.lineTo(X(d), B2); c.stroke(); c.setLineDash([]); c.fillStyle = '#e8c35a'; c.fillText('plate n = ' + d, X(d), B2 + 58); }
+  c.fillStyle = '#8a8a96'; c.textAlign = 'right'; c.fillText('depth n  (block of n + 1 columns)', W - R, B2 + 58);
+  return cv;
+}
+/* Error against G, and how large G has to be. Left: for several depths n, the signed error of the share of coprime cells kept at depth n
+   against C(n), as the lattice grows ring by ring from M = 2 (live, from the same first-failing-column count as the table; a cell's
+   status does not depend on G, so one pass gives every G). The green band is +-1%. Right: the offline reference sweep (G up to 40000, a
+   C program run once) of the smallest G beyond which the error stays inside 1%, with the fits ~110 n^1.5 and 35 n^2. */
+const MS_G1_REF = [[1,180],[2,230],[3,398],[4,788],[5,1152],[6,1514],[7,2018],[8,2502],[9,3002],[10,3470],[11,4058],[12,4644],[14,5762],[16,7208],[20,9902],[24,12974],[28,16458],[32,20048],[40,28278]];
+function msErrVsG(G) {
+  const Gs = Math.max(300, Math.min(2500, G)), NS = [2, 4, 8, 16, 32, 40], TOP = 40;
+  const hist = new Array(TOP + 2).fill(0), curves = NS.map(() => []), Cn = NS.map(n => { try { return Dn(n) * Math.PI * Math.PI / 6; } catch (e) { return NaN; } });
+  let tot = 0;
+  for (let g = 3; g <= Gs; g++) {
+    const M = g - 1;                                  // lattice L_g holds rings 2 .. g-1 (r < M)
+    for (let r = 1; r < M; r++) { if (gcd(r, M) !== 1) continue; let f = 1; while (f <= TOP && gcd(r, M + f) === 1) f++; hist[f]++; tot++; }
+    if (g >= 30 && tot > 0) NS.forEach((n, i) => { let drop = 0; for (let k = 1; k <= n; k++) drop += hist[k]; const sh = (tot - drop) / tot; curves[i].push([g, isFinite(Cn[i]) ? 100 * (sh - Cn[i]) / Cn[i] : NaN]); });
+  }
+  const W = 1800, H = 700, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'), mono = '"JetBrains Mono",monospace';
+  c.fillStyle = '#05060f'; c.fillRect(0, 0, W, H);
+  const pw = 760, L1 = 110, L2 = 1000, T = 90, B = 560, YM = 15;
+  const X1 = g => L1 + (Math.log10(g) - Math.log10(30)) / (Math.log10(Gs) - Math.log10(30)) * pw, Y1 = v => (T + B) / 2 - Math.max(-YM, Math.min(YM, v)) / YM * (B - T) / 2;
+  c.fillStyle = '#e8c35a'; c.font = '26px ' + mono; c.textAlign = 'left';
+  c.fillText('error against G  (green band = \u00b11%)', L1, 48); c.fillText('lattice size needed for 1%  (offline sweep)', L2, 48);
+  c.fillStyle = 'rgba(70,194,138,.16)'; c.fillRect(L1, Y1(1), pw, Y1(-1) - Y1(1));
+  c.font = '20px ' + mono; c.fillStyle = '#8a8a96'; c.textAlign = 'right';
+  [-15, -10, -5, 0, 5, 10, 15].forEach(v => { const y = Y1(v); c.strokeStyle = v === 0 ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.09)'; c.beginPath(); c.moveTo(L1, y); c.lineTo(L1 + pw, y); c.stroke(); c.fillText(v + '%', L1 - 10, y + 7); });
+  c.textAlign = 'center';
+  [30, 100, 300, 1000, 3000, 10000].forEach(g => { if (g > Gs) return; const x = X1(g); c.strokeStyle = 'rgba(255,255,255,.09)'; c.beginPath(); c.moveTo(x, T); c.lineTo(x, B); c.stroke(); c.fillText(String(g), x, B + 28); });
+  c.fillText('G', L1 + pw / 2, B + 60);
+  const cols = ['#6a3d9a', '#4d58c4', '#2f8fbf', '#22a99a', '#6cd05a', '#e5e32b'];
+  NS.forEach((n, i) => { c.beginPath(); c.lineWidth = 3; c.strokeStyle = cols[i]; curves[i].forEach((q, j) => { if (!isFinite(q[1])) return; const x = X1(q[0]), y = Y1(q[1]); if (j === 0) c.moveTo(x, y); else c.lineTo(x, y); }); c.stroke(); c.fillStyle = cols[i]; c.textAlign = 'left'; c.font = '20px ' + mono; c.fillText('n = ' + n, L1 + 12 + i * 112, T - 14 + 0); });
+  if (G >= 30 && G <= Gs) { const x = X1(G); c.strokeStyle = 'rgba(232,195,90,.85)'; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(x, T); c.lineTo(x, B); c.stroke(); c.setLineDash([]); c.fillStyle = '#e8c35a'; c.textAlign = 'center'; c.fillText('sheet G = ' + G, x, B + 90); }
+  else if (G > Gs) { c.fillStyle = '#e8c35a'; c.textAlign = 'left'; c.fillText('sheet G = ' + G + ' lies past the sweep (to ' + Gs + ')', L1, B + 90); }
+  // right panel: G needed, log-log
+  const nx0 = 1, nx1 = 45, gy0 = 100, gy1 = 60000, X2 = n => L2 + (Math.log(n) - Math.log(nx0)) / (Math.log(nx1) - Math.log(nx0)) * pw, Y2 = g => B - (Math.log10(g) - Math.log10(gy0)) / (Math.log10(gy1) - Math.log10(gy0)) * (B - T);
+  c.fillStyle = '#8a8a96'; c.font = '20px ' + mono; c.textAlign = 'right';
+  [100, 1000, 10000].forEach(g => { const y = Y2(g); c.strokeStyle = 'rgba(255,255,255,.09)'; c.beginPath(); c.moveTo(L2, y); c.lineTo(L2 + pw, y); c.stroke(); c.fillText(String(g), L2 - 10, y + 7); });
+  c.textAlign = 'center'; [1, 2, 4, 8, 16, 32].forEach(n => { c.fillText(String(n), X2(n), B + 28); }); c.fillText('n', L2 + pw / 2, B + 60);
+  const fit = (k, a, col, dash) => { c.beginPath(); c.setLineDash(dash); c.lineWidth = 3; c.strokeStyle = col; for (let n = 1.5; n <= 44; n *= 1.1) { const y = Y2(k * Math.pow(n, a)), x = X2(n); if (n === 1.5) c.moveTo(x, y); else c.lineTo(x, y); } c.stroke(); c.setLineDash([]); };
+  fit(110, 1.5, '#3dc8b8', [14, 8]); fit(35, 2, '#e8604c', [3, 7]);
+  c.fillStyle = '#e8c35a'; MS_G1_REF.forEach(q => { c.beginPath(); c.arc(X2(q[0]), Y2(q[1]), 8, 0, 7); c.fill(); });
+  c.textAlign = 'left'; c.font = '20px ' + mono; c.fillStyle = '#e8c35a'; c.fillText('\u25cf measured, stays within 1%', L2 + 14, T + 24); c.fillStyle = '#3dc8b8'; c.fillText('- - 110\u00b7n^1.5', L2 + 14, T + 52); c.fillStyle = '#e8604c'; c.fillText('\u00b7\u00b7\u00b7 35\u00b7n\u00b2', L2 + 14, T + 80);
+  return cv;
+}
 function msLiftDetail(G, o) {
   const out = [];
   const big = G > 3000;
@@ -14814,16 +14894,19 @@ function msLiftDetail(G, o) {
         let f = 1; while (f <= top && gcd(r, M + f) === 1) f++;
         hist[f]++;                                   // f = first failing j, or top + 1 if none up to top
       }
-      const rows = []; let above = tot;               // cells with f > n
+      const rows = [], cpts = []; let above = tot;    // cells with f > n
       let next = 0;
       for (let k = 0; k <= top; k++) {
         while (next <= k) { if (next >= 1) above -= hist[next]; next++; }   // drop cells whose f <= k
-        if (ds.indexOf(k) < 0) continue;
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
+        cpts.push({ n: k, kept: above, share: above / tot, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / tot - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
+        if (ds.indexOf(k) < 0) continue;
         rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / tot - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / tot - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / tot - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / tot - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
       out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
       out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error'], rows: rows });
+      try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; the measured points follow about 110\u00b7n^1.5 over n = 8 \u2026 40 (the exponent depends on the tolerance, and it is an empirical fit, not a theorem), not the 35\u00b7n\u00b2 curve.' }); } catch (e) {}
+      try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, tot, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
     }
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
