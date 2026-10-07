@@ -1201,11 +1201,11 @@ walk anyway.</p>
         <option value="moddist">modular distance (min(r,M&minus;r))</option>
         <option value="phipos">&phi;(M) progression</option>
         <option value="ethiopia">Ethiopian &mdash; green / yellow / red by slope r/M</option>
-        <option value="ethiodepth">Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
+        <option value="ethiodepth" selected>Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
         <option value="ethioinv">Ethiopian + inverse &mdash; flag at/below diagonal, complementary colors above</option>
       </optgroup>
       <optgroup label="The block &mdash; reads the width slider as n = w&minus;1">
-        <option value="sat" selected>saturation &mdash; smallest prime p &le; n+1 dividing r</option>
+        <option value="sat">saturation &mdash; smallest prime p &le; n+1 dividing r</option>
         <option value="failp">first failing prime in the block</option>
         <option value="jstar">j* &mdash; which slot in the block kills it</option>
       </optgroup>
@@ -2068,6 +2068,31 @@ walk anyway.</p>
         <button class="chip" id="ol-strip-list-btn" onclick="olToggleStripList()" title="List the lattice points in the band. Click one to mark it on the plate.">point list &#9662;</button>
       </div>
       <div id="ol-strip-list" style="display:none;padding:2px 0 8px;"></div>
+      <div class="prow" id="ol-sec-row">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:var(--gold);cursor:pointer;font-size:11.5px;" title="Sectors, as on the main page: S_s = cells with floor(M/r) = s, the wedge 1/(s+1) &lt; r/M &le; 1/s (mirrored above the diagonal). Pick one sector, or a window between two slopes, and everything outside it is dimmed."><input type="checkbox" id="ol-sec-chk" onchange="olSecToggle(this.checked)"> Sector</label>
+        <button class="chip ol-sec-mode" data-m="sector" onclick="olSecSetMode('sector')" title="Sectors S_s = floor(M/r): pick one, or 0 for all.">S_s</button>
+        <button class="chip ol-sec-mode" data-m="slopes" onclick="olSecSetMode('slopes')" title="A wedge between two slopes lo &le; r/M &le; hi. Same idea as the Strip, but the band opens out from the origin instead of running parallel.">between slopes</button>
+        <span class="lbl" title="Sector number s. 0 = All: the first k sectors are banded in their own colours.">s</span>
+        <div class="stepper"><button class="sbtn" onclick="olSecStepPick(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sec-pick" type="number" min="0" step="1" value="0" onchange="olSecSetPick(this.value)" style="width:40px;"><button class="sbtn" onclick="olSecStepPick(1)" title="+1">+</button></div>
+        <span class="lbl" title="With All (s = 0): how many sectors S_1 &hellip; S_k to band, and to keep when dimming the rest.">first k</span>
+        <div class="stepper"><button class="sbtn" onclick="olSecStepRays(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sec-rays" type="number" min="1" step="1" value="8" onchange="olSecSetRays(this.value)" style="width:38px;"><button class="sbtn" onclick="olSecStepRays(1)" title="+1">+</button></div>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="With All: dim every cell that is not in one of the first k sectors."><input type="checkbox" id="ol-sec-dimout" checked onchange="olSecSetDimOut(this.checked)"> dim non-sectors</label>
+        <span class="lbl">dim to</span>
+        <input type="range" id="ol-sec-dim" min="0" max="100" step="1" value="50" oninput="olSecSetDim(this.value)" style="max-width:100px;" title="How much of a cell outside the sector stays visible. 0 hides it, 100 leaves it untouched.">
+        <span class="val" id="ol-sec-dim-v">50%</span>
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="Draw the sector wedge as a see-through band on Grid, Ring and Cayley."><input type="checkbox" id="ol-sec-bands" checked onchange="olSecSetBands(this.checked)"> band</label>
+      </div>
+      <div class="prow" id="ol-sec-slopes-row">
+        <span class="lbl" title="Lower slope of the window: r/M &ge; a/b.">slope from</span>
+        <div class="stepper"><input class="sval" id="ol-sec-alo" type="number" min="0" step="1" value="1" onchange="olSecSetSlope('aLo',this.value)" style="width:38px;"></div><span class="lbl">/</span>
+        <div class="stepper"><input class="sval" id="ol-sec-blo" type="number" min="1" step="1" value="3" onchange="olSecSetSlope('bLo',this.value)" style="width:38px;"></div>
+        <span class="lbl" title="Upper slope of the window: r/M &le; a/b (at most 1/1).">to</span>
+        <div class="stepper"><input class="sval" id="ol-sec-ahi" type="number" min="1" step="1" value="1" onchange="olSecSetSlope('aHi',this.value)" style="width:38px;"></div><span class="lbl">/</span>
+        <div class="stepper"><input class="sval" id="ol-sec-bhi" type="number" min="1" step="1" value="2" onchange="olSecSetSlope('bHi',this.value)" style="width:38px;"></div>
+        <button class="chip" onclick="olSecFromSector()" title="Set the window to the sector s above: 1/(s+1) to 1/s. Then nudge either end.">&larr; from s</button>
+        <button class="chip" onclick="olSecFromStrip()" title="Use the Strip's slope a/b as the upper slope and half of it as the lower, to look at the wedge under the strip's line.">&larr; strip slope</button>
+        <span class="hint" id="ol-sec-note">&mdash;</span>
+      </div>
       <div class="prow">
         <button class="chip" id="ol-gap-play" onclick="olToggleGapPlay()" title="Walk every partition g = 1..N/2 of N and back, drawing all four Strip I lines live — same sweep as the main page's Play g. Most partitions are NOT Goldbach pairs.">&#9654; Play g</button>
         <button class="chip" onclick="olStepGb(-1)" title="Previous Goldbach pair of N.">&#9664; pair</button>
@@ -3439,7 +3464,7 @@ function cycleCMode(dir) {
    Swatches are built from colourKeyEntries, the same probes the export
    LEGEND uses, so a mode's preview here can never drift from what it
    actually draws on the plate. */
-const WELCOME_PRESET = { cmode: 'sat', label: 'r' };   // default colouring = option 16, saturation
+const WELCOME_PRESET = { cmode: 'ethiodepth', label: 'r' };   // default colouring = Ethiopian + depth
 function syncWelcomeUI() {
   const now = $('welcome-color-now'), sel = $('cmode');
   if (!now || !sel || sel.selectedIndex < 0) return;
@@ -3686,7 +3711,9 @@ function openerIsCop(r, M) {
 }
 function openerColor(r, M) {
   const mode = $('cmode') ? $('cmode').value : WELCOME_PRESET.cmode;
-  try { return cellRGBA(mode, openerIsCop(r, M) ? 1 : 0, r, M); } catch (e) { return COPRIME_RGBA; }
+  let c; try { c = cellRGBA(mode, openerIsCop(r, M) ? 1 : 0, r, M); } catch (e) { c = COPRIME_RGBA; }
+  if (OL.sec && OL.sec.on && c[3] > 0) { const k = olSecVis(r, M); if (k < 1) return [c[0], c[1], c[2], Math.round(c[3] * k)]; }
+  return c;
 }
 function openerPoints() {
   const pts = [];
@@ -3750,6 +3777,7 @@ function stepOpenerLabelMode(d) {
    loses its label too, so the labels follow the lines that are left. Only while the chain is on, and only for cells
    that had a line at n = 0 (non-coprime cells never did, so their labels stay). */
 function olLabelGone(r, M) {
+  if (OL.sec && OL.sec.on && !olSecKeeps(r, M)) return true;   // labels only on cells inside the sector / slope window
   if (!OL.chain) return false;
   const n = openerChainN();
   if (n <= 0 || M < 2 || M >= OPENER_G || r >= M || gcd(r, M) !== 1) return false;
@@ -3852,7 +3880,8 @@ const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
              pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
-             ptScale: 1, lblScale: 1, ringCCW: true };
+             ptScale: 1, lblScale: 1, ringCCW: true,
+             sec: { on: false, mode: 'sector', pick: 0, rays: 8, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 } };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
@@ -4021,22 +4050,99 @@ function olConnect(ctx, xy, G, n, lw) {
 // ones divisible by 2 (saturates first, at n = 1), then 3 (n = 2), and on up. A broken r loses its
 // LINE the moment it is caught — there is nothing left for it to connect to — but its point stays,
 // as a red dot, so you can watch the doomed set spread without the plate emptying out.
+/* SECTORS in the opener. S_s = { (r, M) : floor(M / r) = s } for r <= M, mirrored by floor(r / M) above the diagonal (the main page's
+   definition), so S_s is the wedge 1/(s+1) < min(r,M)/max(r,M) <= 1/s. "slopes" mode keeps the wedge lo <= r/M <= hi between any two
+   slopes instead. With a sector picked, or a slope window set, every cell outside it is dimmed to sec.dim %; with All (pick = 0) and
+   "dim others" on, the cells past the first `rays` sectors are dimmed. Labels are only drawn inside, and so are the r-chain lines
+   (outside they are faded the same way). */
+function olSecOn() { return !!(OL.sec && OL.sec.on); }
+function olSecKeeps(r, M) {
+  const S = OL.sec; if (!S || !S.on) return true;
+  if (S.mode === 'slopes') {
+    const a = Math.min(r, M), b = Math.max(r, M);
+    return S.aLo * b <= S.bLo * a && a * S.bHi <= S.aHi * b;
+  }
+  const k = sectorOf(r, M);
+  if (S.pick > 0) return k === S.pick;
+  return S.dimOut ? k <= S.rays : true;
+}
+function olSecVis(r, M) { return olSecKeeps(r, M) ? 1 : OL.sec.dim / 100; }
+function olSecSig() { const S = OL.sec; return !S || !S.on ? '' : [S.mode, S.pick, S.rays, S.dim, S.dimOut ? 1 : 0, S.aLo, S.bLo, S.aHi, S.bHi].join(','); }
+function olSecDesc() {
+  const S = OL.sec; if (!S) return '';
+  if (S.mode === 'slopes') return 'slopes ' + S.aLo + '/' + S.bLo + ' \u2264 r/M \u2264 ' + S.aHi + '/' + S.bHi;
+  if (S.pick > 0) return 'S_' + S.pick + ' (' + (S.pick === 1 ? '1/2 < r/M \u2264 1' : '1/' + (S.pick + 1) + ' < r/M \u2264 1/' + S.pick) + ')';
+  return 'all, S_1 \u2026 S_' + Math.min(S.rays, OPENER_G) + (S.dimOut ? ' kept, the rest dimmed' : ' banded');
+}
+function olSecBandList() {
+  const S = OL.sec;
+  if (S.mode === 'slopes') return [{ lo: S.aLo / S.bLo, hi: S.aHi / S.bHi, col: [61, 200, 184], s: 0 }];
+  if (S.pick > 0) return [{ lo: 1 / (S.pick + 1), hi: 1 / S.pick, col: sectorColorRGB(S.pick), s: S.pick }];
+  const out = []; for (let s = 1; s <= Math.min(S.rays, OPENER_G); s++) out.push({ lo: 1 / (s + 1), hi: 1 / s, col: sectorColorRGB(s), s: s });
+  return out;
+}
+function olSecBands(ctx, xy, G, lw, viewKind) {
+  if (!olSecOn() || !OL.sec.bands) return;
+  const list = olSecBandList(), single = list.length === 1, step = Math.max(1, G / 120);
+  ctx.save(); ctx.lineJoin = 'round';
+  list.forEach(b => {
+    if (!(b.lo >= 0 && b.hi > b.lo && isFinite(b.hi))) return;
+    const hi = Math.min(1, b.hi), lo = Math.min(b.lo, hi);
+    [false, true].forEach(mirror => {
+      if (mirror && viewKind !== 'grid') return;     // Ring and Cayley hold only the r <= M wedge in clamp mode
+      const at = (rho, t) => mirror ? xy(t, rho * t) : xy(rho * t, t);
+      const edge = rho => { const p = []; for (let t = 0; t < G + 1e-9; t += step) { const q = at(rho, t); if (q && isFinite(q[0]) && isFinite(q[1])) p.push(q); } const e = at(rho, G); if (e && isFinite(e[0]) && isFinite(e[1])) p.push(e); return p; };
+      const A = edge(lo), B = edge(hi); if (A.length < 2 || B.length < 2) return;
+      const arc = []; for (let i = 1; i < 8; i++) { const q = at(lo + (hi - lo) * i / 8, G); if (q && isFinite(q[0]) && isFinite(q[1])) arc.push(q); }
+      ctx.beginPath(); ctx.moveTo(A[0][0], A[0][1]);
+      A.forEach(q => ctx.lineTo(q[0], q[1])); arc.forEach(q => ctx.lineTo(q[0], q[1]));
+      for (let i = B.length - 1; i >= 0; i--) ctx.lineTo(B[i][0], B[i][1]);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(' + b.col[0] + ',' + b.col[1] + ',' + b.col[2] + ',' + (single ? 0.2 : 0.1) + ')'; ctx.fill();
+      ctx.strokeStyle = 'rgba(' + b.col[0] + ',' + b.col[1] + ',' + b.col[2] + ',' + (single ? 0.75 : 0.4) + ')'; ctx.lineWidth = lw; ctx.stroke();
+    });
+  });
+  ctx.restore();
+}
+/* Cells in the sector on the lattice L_G (r <= M <= G): all, coprime, and kept at the current C(n) depth. Cached per set. */
+let _olSecCnt = null, _olSecCntKey = '';
+function olSecCounts() {
+  const key = OPENER_G + '|' + olSecSig() + '|' + openerChainN();
+  if (_olSecCnt && _olSecCntKey === key) return _olSecCnt;
+  const G = OPENER_G, n = openerChainN(); let all = 0, cop = 0, kept = 0, allIn = 0;
+  for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) {
+    all++; if (!olSecKeeps(r, M)) continue;
+    allIn++; if (gcd(r, M) !== 1) continue;
+    cop++; let ok = true; for (let j = 1; j <= n && ok; j++) if (gcd(r, M + j) !== 1) ok = false; if (ok) kept++;
+  }
+  _olSecCntKey = key; return (_olSecCnt = { all: all, allIn: allIn, cop: cop, kept: kept, n: n });
+}
 function olChain(ctx, xy, G, n, lw) {
   // Same rule as the main page's liftDrawChain: only r that stays coprime to M, M+1, ..., M+n
   // (firstFail finds no break) get a line; it is teal if gcd(r, M+1) = 1, coral if not.
   // n here is the C(n) depth (openerChainN), not the +-n path's n.
-  const pathLift = new Path2D(), pathDie = new Path2D();
+  const pathLift = new Path2D(), pathDie = new Path2D(), pathLiftD = new Path2D(), pathDieD = new Path2D();
+  const secOn = olSecOn(), secDim = secOn ? OL.sec.dim / 100 : 1;
   for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
     if (gcd(r, M) !== 1) continue;
     if (n > 0 && firstFail(r, M, n, G)[0] !== -1) continue;
+    const out = secOn && !olSecKeeps(r, M);
+    if (out && secDim <= 0) continue;                 // sector picked and the rest fully dimmed: no line outside it
     const A = xy(r, M); if (!A) continue;
     const B = xy(r % (M + 1), M + 1); if (!B) continue;
-    const t = gcd(r % (M + 1), M + 1) === 1 ? pathLift : pathDie;
+    const lift = gcd(r % (M + 1), M + 1) === 1;
+    const t = out ? (lift ? pathLiftD : pathDieD) : (lift ? pathLift : pathDie);
     t.moveTo(A[0], A[1]); t.lineTo(B[0], B[1]);
   }
   ctx.lineWidth = lw;
   if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathLift); }
   if (OL.broken) { ctx.strokeStyle = 'rgba(224,80,96,.85)'; ctx.stroke(pathDie); }
+  if (secOn && secDim > 0) {
+    const ga = ctx.globalAlpha; ctx.globalAlpha = ga * secDim;
+    if (OL.surv) { ctx.strokeStyle = 'rgba(61,200,184,.65)'; ctx.stroke(pathLiftD); }
+    if (OL.broken) { ctx.strokeStyle = 'rgba(224,80,96,.85)'; ctx.stroke(pathDieD); }
+    ctx.globalAlpha = ga;
+  }
 }
 // Strip overlay, ported exactly from the main page's drawStripOverlay: the band
 // between two parallel edges r=(s+a*M)/b and r=(s+w+a*M)/b, filled as one
@@ -4349,13 +4455,14 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
 }
 function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
-  if (m === 'none' && !OL.chain && !OL.stripOn && !OL.gbOn) return;
+  if (m === 'none' && !OL.chain && !OL.stripOn && !OL.gbOn && !(olSecOn() && OL.sec.bands)) return;
   if (MS_ISO.on && MS_ISO.hideBase) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); }
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));   // line and dot sizes follow the cell, so G = 256 doesn't turn to felt
   const tk = Math.max(0.04, OL.survBrokenThick * 2);      // thickness slider: 0.5 default = unchanged size, 0..1 = 0x..2x
   ctx.save();
   const spOn = m === 'spiral' || m === 'both' || m === 'connect';
   const pdA = (OL.pDim && spOn && !MS_ISO.on) ? Math.max(0, Math.min(1, (OL.pDimAmt != null ? OL.pDimAmt : 50) / 100)) : 0;
+  olSecBands(ctx, xy, G, Math.max(0.8, cell * 0.1), viewKind);
   const spiralNow = () => olSpiral(ctx, xy, G, cl(cell * 0.42, 1, 2.2) * tk, cl(cell * 0.24, 0.6, 1.8) * tk);
   if (pdA > 0) {   // prime dim: wash the plate, draw the other overlays faded, then the spiral on top at full strength
     ctx.fillStyle = 'rgba(4,4,13,' + pdA + ')'; ctx.fillRect(0, 0, cw || S, ch || S);
@@ -4773,8 +4880,46 @@ function olStripDots(ctx, xy, G, dot) {
   ctx.restore();
 }
 // The header carries D(n) live; the table under "the math" is only rebuilt while it is open.
+function olSecToggle(v) { OL.sec.on = !!v; olRedraw(); }
+function olSecSetMode(m) { OL.sec.mode = m === 'slopes' ? 'slopes' : 'sector'; OL.sec.on = true; olRedraw(); }
+function olSecSetPick(v) { const k = Math.round(Number(v)); OL.sec.pick = isFinite(k) ? Math.max(0, Math.min(OPENER_G, k)) : 0; OL.sec.mode = 'sector'; OL.sec.on = true; olRedraw(); }
+function olSecStepPick(d) { olSecSetPick((OL.sec.pick || 0) + d); }
+function olSecSetRays(v) { const k = Math.round(Number(v)); OL.sec.rays = isFinite(k) ? Math.max(1, Math.min(OPENER_G, k)) : 8; olRedraw(); }
+function olSecStepRays(d) { olSecSetRays((OL.sec.rays || 1) + d); }
+function olSecSetDimOut(v) { OL.sec.dimOut = !!v; olRedraw(); }
+function olSecSetDim(v) { const k = Math.round(Number(v)); OL.sec.dim = isFinite(k) ? Math.max(0, Math.min(100, k)) : 50; const l = $('ol-sec-dim-v'); if (l) l.textContent = OL.sec.dim + '%'; olRedraw(); }
+function olSecSetBands(v) { OL.sec.bands = !!v; olRedraw(); }
+function olSecSetSlope(k, v) {
+  let x = Math.round(Number(v)); if (!isFinite(x)) x = 1;
+  x = (k === 'aLo') ? Math.max(0, x) : Math.max(1, x);
+  OL.sec[k] = x;
+  // keep the window ordered and inside (0, 1]: lo <= hi <= 1/1
+  if (OL.sec.aHi > OL.sec.bHi) OL.sec.aHi = OL.sec.bHi;
+  if (OL.sec.aLo * OL.sec.bHi > OL.sec.aHi * OL.sec.bLo) { OL.sec.aLo = 0; }
+  OL.sec.mode = 'slopes'; OL.sec.on = true; olRedraw();
+}
+function olSecFromSector() { const s = Math.max(1, OL.sec.pick || 1); OL.sec.aLo = 1; OL.sec.bLo = s + 1; OL.sec.aHi = 1; OL.sec.bHi = s; OL.sec.mode = 'slopes'; OL.sec.on = true; olRedraw(); }
+function olSecFromStrip() {
+  const a = Math.max(1, Math.round(Math.abs(OL.slopeA) || 1)), b = Math.max(1, Math.round(Math.abs(OL.slopeB) || 1));
+  let hiA = a, hiB = b; if (hiA > hiB) { hiA = 1; hiB = 1; }
+  OL.sec.aHi = hiA; OL.sec.bHi = hiB; OL.sec.aLo = hiA; OL.sec.bLo = hiB * 2;
+  OL.sec.mode = 'slopes'; OL.sec.on = true; olRedraw();
+}
+function olSecSync() {
+  const S = OL.sec; if (!S) return;
+  const chk = (id, v) => { const el = $(id); if (el && el.checked !== v) el.checked = v; };
+  const num = (id, v) => { const el = $(id); if (el && document.activeElement !== el) el.value = v; };
+  chk('ol-sec-chk', !!S.on); chk('ol-sec-dimout', !!S.dimOut); chk('ol-sec-bands', !!S.bands);
+  num('ol-sec-pick', S.pick); num('ol-sec-rays', S.rays); num('ol-sec-alo', S.aLo); num('ol-sec-blo', S.bLo); num('ol-sec-ahi', S.aHi); num('ol-sec-bhi', S.bHi);
+  const dm = $('ol-sec-dim'); if (dm && document.activeElement !== dm) dm.value = S.dim; const dv = $('ol-sec-dim-v'); if (dv) dv.textContent = S.dim + '%';
+  document.querySelectorAll('.ol-sec-mode').forEach(b => b.classList.toggle('on', S.on && b.dataset.m === S.mode));
+  const sr = $('ol-sec-slopes-row'); if (sr) sr.style.display = S.mode === 'slopes' ? '' : 'none';
+  const nt = $('ol-sec-note');
+  if (nt) { if (!S.on) nt.textContent = 'off'; else { const c = olSecCounts(); nt.textContent = olSecDesc() + ' \u00b7 ' + c.allIn + ' of ' + c.all + ' cells (r \u2264 M) \u00b7 ' + c.cop + ' coprime' + (c.n > 0 ? ' \u00b7 ' + c.kept + ' kept at n = ' + c.n : ''); } }
+}
 function olSyncUI() {
   olSyncLists();
+  try { olSecSync(); } catch (e) {}
   olSyncPresets();
   olSyncGapPresets();
   const n = openerLiftN(), cn = openerChainN(), ZETA2 = Math.PI * Math.PI / 6;
@@ -5123,6 +5268,7 @@ function oeLegendSections() {
       const sc = olStripPoints(OPENER_G);
       li.push({ c: PAL.teal, t: 'strip b\u00b7r \u2212 a\u00b7M \u2208 [s, s+w) \u00b7 a=' + OL.slopeA + ', b=' + OL.slopeB + ', s=' + OL.offset + ', w=' + OL.width + ' \u00b7 ' + sc.cop + '/' + sc.total + ' coprime' });
     }
+    if (olSecOn()) li.push({ c: PAL.gold, t: 'sector ' + olSecDesc() + ' \u00b7 outside dimmed to ' + OL.sec.dim + '%' + (function () { const k = olSecCounts(); return ' \u00b7 ' + k.cop + ' coprime cells inside'; })() });
     if (OL.gbOn) {
       const N = olGoldbachN(), pairs = olGoldbachPairs();
       li.push({ c: null, t: 'Goldbach partitions \u00b7 E = 2(G+1) = ' + N });
@@ -5607,12 +5753,12 @@ function openerColorPack(r, M) { const c = openerColor(r, M); return c[3] > 0 ? 
 function openerColorTable() {
   const G = OPENER_G, mode = $('cmode') ? $('cmode').value : WELCOME_PRESET.cmode, W = OPENER_COP_MAX;
   const probes = [[1, 1], [1, G], [G, G], [Math.max(1, G >> 1), G], [Math.max(1, G >> 2), Math.max(1, G >> 1)], [Math.max(1, G - 1), G], [2, Math.max(2, G >> 1)], [Math.max(1, G >> 1), Math.max(1, G >> 1)]];
-  let ok = _octTab && _octKey === mode && _octG >= G;
+  const ckey = mode + '|' + olSecSig(); let ok = _octTab && _octKey === ckey && _octG >= G;
   if (ok) for (const q of probes) if (_octTab[(q[1] - 1) * W + (q[0] - 1)] !== openerColorPack(q[0], q[1])) { ok = false; break; }
   if (ok) return _octTab;
   if (!_octTab) _octTab = new Uint32Array(W * W);
   for (let M = 1; M <= G; M++) for (let r = 1; r <= G; r++) _octTab[(M - 1) * W + (r - 1)] = openerColorPack(r, M);
-  _octKey = mode; _octG = G;
+  _octKey = ckey; _octG = G;
   return _octTab;
 }
 let _ofCv = null;
@@ -14751,6 +14897,55 @@ function gbLegendLines(G, gbG, showCurrent) {
    Surviving / Broken filter and Connect. Shared by the opener and main-page math sheets,
    so a setting that changes the plate always changes a line here. o = {mode, n, p, allP,
    mirror, dropout, chain, chainN, surv, broken, dir}. Counted on the live lattice. */
+/* SECTORS on the sheets. One selection (a sector S_s, the cells past/inside the first k sectors, or a window between two slopes) reaches the
+   parameters, a census with its own prediction, and the sieve table, which then counts only the cells inside it. */
+function msSecPred(kind) {
+  if (kind === 'main') return (typeof sectorOn !== 'undefined' && sectorOn && sectorPick > 0) ? ((r, M) => sectorOf(r, M) === sectorPick) : null;
+  return olSecOn() && !(OL.sec.mode === 'sector' && OL.sec.pick === 0 && !OL.sec.dimOut) ? olSecKeeps : null;
+}
+function msSecWindow(kind) {
+  if (kind === 'main') return (typeof sectorOn !== 'undefined' && sectorOn && sectorPick > 0) ? { lo: 1 / (sectorPick + 1), hi: 1 / sectorPick, desc: 'S_' + sectorPick, dim: sectorDim } : null;
+  if (!olSecOn()) return null;
+  const S = OL.sec;
+  if (S.mode === 'slopes') return { lo: S.aLo / S.bLo, hi: S.aHi / S.bHi, desc: olSecDesc(), dim: S.dim };
+  if (S.pick > 0) return { lo: 1 / (S.pick + 1), hi: 1 / S.pick, desc: olSecDesc(), dim: S.dim };
+  if (S.dimOut) { const k = Math.min(S.rays, OPENER_G); return { lo: 1 / (k + 1), hi: 1, desc: olSecDesc(), dim: S.dim }; }
+  return null;
+}
+function msSecDesc(kind) { const w = msSecWindow(kind); return w ? w.desc : ''; }
+function msSectorSection(kind, G) {
+  const out = [], on = kind === 'main' ? (typeof sectorOn !== 'undefined' && sectorOn) : olSecOn();
+  if (!on) return out;
+  const win = msSecWindow(kind), picked = kind === 'main' ? sectorPick : (OL.sec.mode === 'sector' ? OL.sec.pick : 0);
+  const Z = 3 / (Math.PI * Math.PI);
+  out.push({ t: 'h', text: 'Sectors' });
+  out.push({ t: 'p', text: 'A sector S_s collects the cells (r, M) with r ≤ M whose slope r/M lies between two consecutive unit fractions, 1/(s+1) < r/M ≤ 1/s, which is the same as ⌊M/r⌋ = s. Above the diagonal the Grid mirrors it with ⌊r/M⌋ = s. A window between two slopes, lo ≤ r/M ≤ hi, is the same idea for any pair. ' + (win ? 'On the plate ' + win.desc + ' is kept and every cell outside it is drawn at ' + win.dim + '%.' : 'No cell is dimmed: the sector wedges are drawn as bands only.') });
+  out.push({ t: 'eq', tex: msT`S_s=\{(r,M):\ \lfloor M/r\rfloor=s\}=\{\tfrac{1}{s+1}<\tfrac{r}{M}\le\tfrac{1}{s}\},\qquad F(s,G)=\frac{3}{\pi^{2}}\,\frac{G^{2}}{s(s+1)}`, cap: 'F(s, G) is the expected number of coprime cells of L_G in S_s: the lattice holds 3G²/π² coprime cells in all, and the wedge takes the share 1/s − 1/(s+1) of the area.' });
+  if (G > 1500) { out.push({ t: 'note', text: 'The census is not tabulated past G = 1500.' }); return out; }
+  const cnt = new Map(); let total = 0, win_n = 0, win_all = 0;
+  const keeps = msSecPred(kind);
+  for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) {
+    if (gcd(r, M) !== 1) { if (keeps && keeps(r, M)) win_all++; continue; }
+    total++; const sv = Math.floor(M / r); cnt.set(sv, (cnt.get(sv) || 0) + 1);
+    if (keeps) { win_all++; if (keeps(r, M)) win_n++; }
+  }
+  if (keeps && win) {
+    const pred = Z * G * G * (win.hi - win.lo), err = pred ? 100 * (win_n - pred) / pred : 0;
+    out.push({ t: 'eq', tex: msT`\#\{\gcd=1\ \text{in the selection}\}=${win_n},\qquad \text{expected}\ \frac{3G^{2}}{\pi^{2}}\,(\text{hi}-\text{lo})=${msf(pred, 1)},\qquad \text{error}=${msf(err, 2)}\%`, cap: 'The selection is ' + win.desc + '; hi − lo = ' + msf(win.hi - win.lo, 4) + '. Its coprime cells over all coprime cells of L_' + G + ' is ' + win_n + ' / ' + total + ' = ' + msf(total ? win_n / total : 0, 4) + '.' });
+  }
+  const K = Math.min(12, G), rows = [];
+  for (let sv = 1; sv <= K; sv++) {
+    const ex = cnt.get(sv) || 0, pr = Z * G * G / (sv * (sv + 1)), e = pr ? 100 * (ex - pr) / pr : 0;
+    rows.push({ label: 'S_' + sv + ' · 1/' + (sv + 1) + ' < r/M ≤ 1/' + sv + ' · F = ' + pr.toFixed(1) + (sv === picked ? ' ◀ selected' : ''), n: ex, pct: (total ? 100 * ex / total : 0).toFixed(2) + '%', err: Math.abs(e) < 0.05 ? '0.0%' : (e > 0 ? '+' : '−') + Math.abs(e).toFixed(1) + '%', ec: e < -0.05 ? 'neg' : 'pos' });
+  }
+  out.push({ t: 'p', text: 'The census of the first ' + K + ' sectors on L_' + G + '. Each row is the exact count of coprime cells in S_s, its share of all ' + total + ' coprime cells, and the error against F(s, G): red below the prediction, green above. The thin sectors converge slowest, since a narrow wedge holds few cells at small G.' });
+  out.push({ t: 'table', head: ['sector · slope range · F(s, G)', 'coprime cells', 'share', 'error'], rows: rows });
+  return out;
+}
+function msSectorParams(kind) {
+  const w = msSecWindow(kind); if (!w) return [];
+  return [['sector', w.desc], ['outside dimmed to', w.dim + '%']];
+}
 /* Error chart for the ratio-as-n-grows table: the plate's measured share against the limiting C(n) (top), and the signed error
    (share - C(n)) / C(n) at every depth (bottom; red below the limit, green above). Built from the same counts as the table,
    so it follows any G and any lattice count. pts = [{n, kept, share, C, err}], tot = coprime cells with r < M. */
@@ -14884,6 +15079,9 @@ function msLiftDetail(G, o) {
     // capped just above the deepest depth listed. A cell is kept at depth n exactly when f > n, so every
     // depth's count comes from the same histogram, and the kept sets are nested (the ratio never rises).
     if (tot > 0) {
+      const sk = o.sec || null; let TT = tot;
+      if (sk) { TT = 0; for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) if (gcd(r, M) === 1 && sk(r, M)) TT++; }
+      if (TT > 0) {
       const maxCell = Math.max(1, G - 1);
       const ds = []; for (let k = 0; k <= Math.min(o.dense ? 40 : 12, maxCell); k++) ds.push(k);
       (o.dense ? [48, 64, 96, 128, 192, 256] : [16, 24, 32, 48, 64, 96, 128]).forEach(k => { if (k <= maxCell && ds.indexOf(k) < 0) ds.push(k); });
@@ -14891,22 +15089,24 @@ function msLiftDetail(G, o) {
       const top = ds[ds.length - 1], hist = new Array(top + 2).fill(0);
       for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
         if (gcd(r, M) !== 1) continue;
+        if (sk && !sk(r, M)) continue;
         let f = 1; while (f <= top && gcd(r, M + f) === 1) f++;
         hist[f]++;                                   // f = first failing j, or top + 1 if none up to top
       }
-      const rows = [], cpts = []; let above = tot;    // cells with f > n
+      const rows = [], cpts = []; let above = TT;    // cells with f > n
       let next = 0;
       for (let k = 0; k <= top; k++) {
         while (next <= k) { if (next >= 1) above -= hist[next]; next++; }   // drop cells whose f <= k
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
-        cpts.push({ n: k, kept: above, share: above / tot, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / tot - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
+        cpts.push({ n: k, kept: above, share: above / TT, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / TT - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
         if (ds.indexOf(k) < 0) continue;
-        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / tot).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / tot - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / tot - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / tot - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / tot - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
-      out.push({ t: 'p', text: 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + tot + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
+      out.push({ t: 'p', text: (sk ? 'Restricted to the sector on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
       out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error'], rows: rows });
       try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; the measured points follow about 110\u00b7n^1.5 over n = 8 \u2026 40 (the exponent depends on the tolerance, and it is an empirical fit, not a theorem), not the 35\u00b7n\u00b2 curve.' }); } catch (e) {}
-      try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, tot, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
+      try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, TT, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
+      }
     }
   }
   out.push({ t: 'p', text: 'Showing on the plate: ' + ([o.surv ? 'surviving' : '', o.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing (both switched off)') + '. Surviving = the lift stays coprime; broken = it does not. The filter applies to the spiral, the \u00b1n path, Connect and the r-chain together.' });
@@ -15047,9 +15247,10 @@ function msBuildSieve(kind, views, noPlates) {
   let D = NaN; try { D = Dn(cn); } catch (e) {}
   const C = D * Math.PI * Math.PI / 6;
   doc.push({ t: 'h', text: 'Parameters' });
-  doc.push({ t: 'params', items: [['G', String(G)], ['C(n) depth n', String(cn)], ['block length n + 1', String(cn + 1)], ['saturated primes', sat.length ? sat.join(', ') : 'none'], ['D(n)', isFinite(D) ? msf(D, 6) : '\u2013'], ['C(n) = \u03b6(2)\u00b7D(n)', isFinite(C) ? msf(C, 6) : '\u2013']] });
+  doc.push({ t: 'params', items: [['G', String(G)], ['C(n) depth n', String(cn)], ['block length n + 1', String(cn + 1)], ['saturated primes', sat.length ? sat.join(', ') : 'none'], ['D(n)', isFinite(D) ? msf(D, 6) : '\u2013'], ['C(n) = \u03b6(2)\u00b7D(n)', isFinite(C) ? msf(C, 6) : '\u2013']].concat(msSectorParams(kind)) });
   const blk = msBlockSection(cn, []); blk[0] = { t: 'h', text: 'The block and C(n)' };
   blk.forEach(b => doc.push(b));
+  try { const sb = msSectorSection(kind, G); sb.forEach(b => doc.push(b)); if (sb.length && !main) { try { msIsoPush(doc, 'sector'); } catch (e) {} } } catch (e) {}
 
   // why the primes separate
   doc.push({ t: 'h', text: 'Why the primes separate' });
@@ -15189,7 +15390,7 @@ function msBuildSieve(kind, views, noPlates) {
   // measured survivors by depth (the same count the r-chain plate draws)
   doc.push({ t: 'h', text: 'Measured survivors by depth' });
   let det = [];
-  try { det = msLiftDetail(G, { mode: 'none', n: 0, p: 1, allP: false, mirror: false, dropout: false, chain: true, chainN: cn, surv: true, broken: true, dir: 'both', dense: true }); } catch (e) {}
+  try { det = msLiftDetail(G, { mode: 'none', n: 0, p: 1, allP: false, mirror: false, dropout: false, chain: true, chainN: cn, surv: true, broken: true, dir: 'both', dense: true, sec: msSecPred(kind), secDesc: msSecDesc(kind) }); } catch (e) {}
   if (det.length && det[det.length - 1].t === 'p' && /^Showing on the plate/.test(det[det.length - 1].text || '')) det.pop();   // that line describes overlay filters, not the sieve
   if (!noPlates) {
     const tmp = [];
@@ -15240,6 +15441,7 @@ function msBuildOpenerRaw(noPlates) {
   if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') P.push(['spiral p', OL.allP ? 'all p \u2264 G' : String(OL.p)]);
   if (liftActive) P.push(['showing', [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
   if (OL.stripOn) P.push(['strip a/b', OL.slopeA + '/' + OL.slopeB], ['offset s', String(OL.offset)], ['width w', String(Math.max(1, OL.width))]);
+  if (olSecOn()) msSectorParams('opener').forEach(q => P.push(q));
   if (OL.gbOn) P.push(['Goldbach g', String(OL.gbG) + ' (E = ' + olGoldbachN() + ')'], ['pair dot size', msf(OL.gbThick || 1, 1) + '\u00d7']);
   doc.push({ t: 'h', text: 'Parameters' });
   doc.push({ t: 'params', items: P });
@@ -15295,6 +15497,9 @@ function msBuildOpenerRaw(noPlates) {
   doc.push({ t: 'eq', tex: (wedge ? msT`\frac{\Phi(G)}{G(G+1)/2}` : msT`\frac{2\Phi(G)-1}{G^{2}}`) + msT`=\frac{${cop}}{${cells}}=${msf(pct, 4)}\%,\qquad \frac{6}{\pi^{2}}=\frac1{\zeta(2)}=${msf(target, 4)}\%,\qquad \Delta=${msf(pct - target, 4)}\%` });
   doc.push({ t: 'eq', tex: msT`\lim_{G\to\infty}\ \frac{\#\{(r,M)\in\mathcal L_G:\ \gcd(r,M)=1\}}{|\mathcal L_G|}=\frac{6}{\pi^{2}}` });
 
+  // sectors
+  if (olSecOn()) { try { const sb = msSectorSection('opener', G); sb.forEach(b => doc.push(b)); if (sb.length) { try { msIsoPush(doc, 'sector'); } catch (e) {} } } catch (e) {} }
+
   // 6 · lift
   let ssDone = false;
   const ssPush = () => {
@@ -15325,7 +15530,7 @@ function msBuildOpenerRaw(noPlates) {
       } catch (e) {}
       msIsoPush(L, 'strip');   // under the band's own counts
     }
-    msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: cn, surv: OL.surv, broken: OL.broken, dir: 'both' }).forEach(b => L.push(b));
+    msLiftDetail(G, { mode: OL.mode, n: n, p: OL.p, allP: OL.allP, mirror: OL.mirror, dropout: OL.dropout, chain: OL.chain, chainN: cn, surv: OL.surv, broken: OL.broken, dir: 'both', sec: msSecPred('opener'), secDesc: msSecDesc('opener') }).forEach(b => L.push(b));
     msBlockSection(cn, L).forEach(b => doc.push(b));
     if (OL.gbOn) {
       ssPush();
@@ -15378,6 +15583,7 @@ function msBuildMainRaw(views, noPlates) {
   const P = [['G', String(G)], ['views', vname], ['walk', walkMode], ['strip a/b', a + '/' + b], ['offset s', String(s)], ['width w', String(w)], ['colouring', label]];
   if (vs.includes('ring')) P.push(['θ mode', thetaMode], ['ring turn θ₀', msDeg(ringRot) + '°'], ['ring hole h', msf(ringHole, 2)], ['ring winding', RING_H > 0 ? 'clockwise' : 'counter-clockwise']);
   if (vs.includes('cayley')) P.push(['Cayley map', cmap + (cmap === 'A' ? '  ρ₀ ' + msf(rho0, 2) + '  ρ_d ' + msf(rhoD, 2) : '  a ' + msf(ba, 2) + '∠' + baAng + '°')], ['Cayley tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']);
+  if (typeof sectorOn !== 'undefined' && sectorOn) msSectorParams('main').forEach(q => P.push(q));
   P.push(['plate turns', vs.map(v => names[v] + ' ' + ((VQ[v] !== undefined ? VQ[v] : viewQuarter) * 90) + '\u00b0').join(', ')]);
   if (liveLift) {
     P.push(['lift mode', liftMode + ' \u00b7 \u00b1n path n = ' + liftN() + ' \u00b7 C(n) n = ' + liftChainNEff() + (liftLockN ? ' (locked)' : '')]);
@@ -15478,9 +15684,10 @@ function msBuildMainRaw(views, noPlates) {
     if (chainDrawn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(M+1)\quad\text{(survives where }\gcd(r,M+1)=1\text{)},\qquad n_C=${cn}` });
     else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = ' + LIFT_CHAIN_MAX + ', so no chain counts are given here.' });
     if (liftMode !== 'none' || chainDrawn) msIsoPushMain(L, 'lift', vs);   // under the spiral / path / chain equations it shows
-    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir }).forEach(x => L.push(x));
+    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir, sec: msSecPred('main'), secDesc: msSecDesc('main') }).forEach(x => L.push(x));
     msBlockSection(cn, L).forEach(x => doc.push(x));   // block length, D(n), C(n) at the C(n) depth, as the opener does
   }
+  try { if (typeof sectorOn !== 'undefined' && sectorOn) msSectorSection('main', G).forEach(b => doc.push(b)); } catch (e) {}
   try {
     let stripEmpty = false;
     if (walkMode !== 'band') { try { stripEmpty = !walkStrip(0).total; } catch (e) {} }
@@ -15862,6 +16069,7 @@ const MS_ISO_SPECS = {
   lift:     { ol: { stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: { hideBase: true } },
   strip:    { ol: { mode: 'none', chain: false, stripOn: true, stripDots: true, gbOn: false }, iso: { hideBase: true } },
   gbstrips: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: false, gbSpot: false, gbLabel: false, gbDim: false }, iso: { hideBase: true, noMarker: true } },
+  sector:   { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: { hideBase: true } },
   sieve:    { ol: { mode: 'none', chain: true, stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: { hideBase: true } },
   gbmarker: { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: true, gbTrail: true, gbSpot: false, gbLabel: true, gbMkAll: true, gbDim: false }, iso: { hideBase: true, noStrips: true } }
 };
@@ -15899,6 +16107,7 @@ function msIsoCap(kind) {
   const E = olGoldbachN(), g = Math.max(1, Math.min(Math.floor(E / 2), OL.gbG || 1)), sv = E - g;
   return {
     base: 'The colouring alone, no overlays: the cells this section counts.',
+    sector: 'Only the sector wedge' + (olSecOn() && OL.sec.mode === 'sector' && OL.sec.pick === 0 ? 's, S_1 \u2026 S_' + Math.min(OL.sec.rays, OPENER_G) + ', each in its own colour' : ', ' + olSecDesc()) + ', as a band on an empty plate; Grid also shows its mirror above the diagonal.',
     sieve: 'Only the r-chain at depth n = ' + openerChainN() + ' on an empty plate: one line per cell the block keeps, teal where its lift to ring M+1 stays coprime, coral where it breaks.',
     lift: 'Only the lift overlays (' + (OL.mode !== 'none' ? OL.mode : 'no spiral or path') + (OL.chain ? ', r-chain at C(n) = ' + openerChainN() : '') + ') on an empty plate.',
     strip: 'Only the strip band, a/b = ' + OL.slopeA + '/' + OL.slopeB + ', s = ' + OL.offset + ', w = ' + Math.max(1, OL.width) + ', with the lattice removed.',
