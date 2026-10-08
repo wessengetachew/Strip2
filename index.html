@@ -1231,6 +1231,7 @@ walk anyway.</p>
     <span class="val" id="w-v">1</span>
     <span class="lbl" id="w-blk">block n = 0</span>
     <button class="chip" onclick="onW(1)" title="Back to w = 1 — a single line, block n = 0.">reset w = 1</button>
+    <button class="chip tl" id="grow-btn" onclick="toggleGrow()" title="Play: each step sets offset s = &minus;k and width w = 2k (k = 1, 2, 3, &hellip;). At a prime k = p the width is 2p.">&#9654; grow 2w / &minus;1s</button>
     <button class="chip" onclick="onW(fullWidth())" id="w-full" title="Widen the band until it covers every cell of the lattice at the current slope.">full width</button>
   </div>
 
@@ -1240,6 +1241,7 @@ walk anyway.</p>
     <button class="chip cr" id="wk-band" onclick="setWalk('band')" title="Counts one whole block at a time: gcd(r, M+j)=1 for EVERY j, an AND across all n+1 columns. This is the walk that converges to D(n).">Block &mdash; per <b>block</b>, AND over n+1</button>
     <button class="chip bs-btn on" data-s="chain" onclick="setBandStyle('chain')" title="Block walk drawn like the opener's C(n): every coprime cell stays, the r-chain from each cell the block keeps is a line, teal where it lifts to the next ring and coral where it breaks. Width up or down is the depth n = w - 1, so raising it drops the chains the block can no longer keep.">look: chain</button>
     <button class="chip bs-btn" data-s="solid" onclick="setBandStyle('solid')" title="The earlier look: every cell the block keeps filled solid coral.">look: solid</button>
+    <span class="hint" title="The same cell (r, M) is the lattice point (x, y) = (r, M): gcd(x, y+j) = 1 says it is visible from (0, &minus;j). Grid reads naturally as x, y; Ring and Cayley as residue r mod M. The names are interchangeable.">notation: r, M &#8596; x, y (interchangeable)</span>
     <span class="hint" id="wk-note"></span>
     <span class="hint">overlay: <b style="color:var(--teal)">teal = strip</b> &middot; <b style="color:var(--coral)">coral = block</b></span>
   </div>
@@ -1754,7 +1756,8 @@ walk anyway.</p>
       <label class="lbl" style="cursor:pointer" title="Ring and Cayley: the gold point P_g = (g, s), where the column r = g meets r + M = E. s is past the last ring, so it floats outside the lattice (Grid has no image of it). One marker per Goldbach pair, so the markers number exactly k(E)."><input type="checkbox" checked onchange="setGbMark('on',this.checked)"> gold markers</label>
       <label class="lbl" style="cursor:pointer" title="Join the markers in order of g."><input type="checkbox" checked onchange="setGbMark('trail',this.checked)"> trail</label>
       <label class="lbl" style="cursor:pointer" title="Label each marker g + s (just g when there are many) and print the count k(E)."><input type="checkbox" checked onchange="setGbMark('labels',this.checked)"> labels</label>
-      <button class="chip" onclick="gbFitMarkers()" title="Zoom the plate out just far enough to bring every gold marker into view.">&#10530; fit markers</button>
+      <button class="chip" onclick="resetPlate()" title="Back to the default framing: zoom and pan reset, markers ignored.">&#8962; fit plate</button>
+      <button class="chip" onclick="gbFitMarkersCentered()" title="Zoom and pan so the whole path of gold markers is centred on the canvas and fits it. Ring and Cayley; on Grid it is the plain fit.">&#10530; fit + markers</button>
       <input type="range" min="0.3" max="3" step="0.1" value="1" oninput="setGbMark('scale',this.value)" style="width:80px" title="Marker label and dot size.">
       <span class="lbl" id="gbmk-sz-v">1.0&times;</span>
       <div class="sep"></div>
@@ -2117,6 +2120,7 @@ walk anyway.</p>
         <canvas id="welcome-cv-grid"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">GRID</div>
         <div class="wcrot wturn" title="Turn the Grid preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('g',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crg-v" style="min-width:30px;text-align:center;">90&deg;</span><button class="chip" onclick="openerTurn('g',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+        <div class="wcrot wturn" style="margin-top:2px"><span class="rw"><button class="chip" onclick="olFitView('grid',false)" title="Back to the default framing: zoom and pan reset, and the grid sized to the canvas on its own (no zoom-out for the gold markers).">&#8962; fit grid</button><button class="chip ol-fitmk" onclick="olFitView('grid',true)" title="Reset zoom and pan, then centre the middle of the grid together with every gold marker on the canvas, zooming out so all of it is in view.">&#10530; fit + markers</button></span></div>
       </div>
       <div class="wp-allturn">
         <button class="chip tl" onclick="openerTurnAll(90)" title="Turn Grid, Ring, and the Cayley z axis all by +90&deg; at once. Preview only.">&#8634;<br>90&deg;<br>all</button>
@@ -2125,6 +2129,7 @@ walk anyway.</p>
         <canvas id="welcome-cv-ring"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">RING</div>
         <div class="wcrot wturn" title="Turn the Ring preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('r',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crr-v" style="min-width:30px;text-align:center;">0&deg;</span><button class="chip" onclick="openerTurn('r',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+        <div class="wcrot wturn" style="margin-top:2px"><span class="rw"><button class="chip" onclick="olFitView('ring',false)" title="Back to the default framing: zoom and pan reset, and the ring sized to the canvas on its own (no zoom-out for the gold markers).">&#8962; fit ring</button><button class="chip ol-fitmk" onclick="olFitView('ring',true)" title="Reset zoom and pan, then fit the path of the gold markers on the ring into the canvas.">&#10530; fit + markers</button></span></div>
       </div>
       <div class="wp-tile wp-cay">
         <canvas id="welcome-cv-cayley" onwheel="openerCayleyWheel(event)" ondblclick="setOpenerCZ(0,true)"></canvas>
@@ -2179,15 +2184,15 @@ walk anyway.</p>
       </div>
       <div class="prow">
         <span class="lbl" title="Path depth n: drives the &plusmn;n path r = (M&plusmn;n)/2 and which primes the spiral skips as saturated.">&plusmn;n path</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-n-val">0</span><button class="sbtn" onclick="olStepN(1)" title="+1">+</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olStepN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-n-val">0</span><button class="sbtn" onclick="olStepN(1)" title="+1">+</button></div><button class="chip" onclick="olResetN()" title="Reset the &plusmn;n path to n = 0">0</button>
         <button class="chip tl" id="ol-n-play" onclick="olNPlay()" title="Step the &plusmn;n path n from 0 up to G&minus;1, then loop back to 0.">&#9654;</button>
         <span class="lbl" style="margin-left:6px;" title="C(n) block depth: the r-chain keeps only r coprime to M, M+1, &hellip;, M+n, and D(n)/C(n) are read at this n.">C(n)</span>
-        <div class="stepper"><button class="sbtn" onclick="olStepCN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-cn-val">0</span><button class="sbtn" onclick="olStepCN(1)" title="+1">+</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olStepCN(-1)" title="&minus;1">&minus;</button><span class="val" id="ol-cn-val">0</span><button class="sbtn" onclick="olStepCN(1)" title="+1">+</button></div><button class="chip" onclick="olResetCN()" title="Reset C(n) depth to n = 0">0</button>
         <button class="chip tl" id="ol-cn-play" onclick="olCNPlay()" title="Step the C(n) depth from 0 up to G&minus;1, then loop back to 0. While locked it moves both n together.">&#9654;</button>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;margin-left:4px;" title="Lock the C(n) depth to the &plusmn;n path n, so one stepper moves both."><input type="checkbox" id="ol-lockn-chk" onchange="olToggleLockN(this.checked)"> &#128279; lock</label>
         <span class="lbl" style="margin-left:6px;" title="The spiral's prime">p</span>
         <div class="stepper"><button class="sbtn" onclick="olStepP(-1)" title="Previous prime">&#9664;</button><span class="val" id="ol-p-val">1</span><button class="sbtn" onclick="olStepP(1)" title="Next prime">&#9654;</button></div>
-        <button class="chip" id="ol-p1" onclick="olLockOne()" title="Lock to residue 1: r = 1 across every ring M. gcd(1, M) = 1 always, so this line never breaks. Stepping &#9664; from p = 2 lands here too.">1</button>
+        <button class="chip" id="ol-p1" onclick="olLockOne()" title="Reset p to 0 (no prime): the residue-1 line, r = 1 across every ring M, which never breaks. Stepping &#9664; from p = 2 lands here too.">0</button>
         <button class="chip tl" id="ol-p-play" onclick="olTogglePPlay()" title="Step p through every prime up to the preview G, on loop. The range follows the G slider live.">&#9654; Play</button>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.75);cursor:pointer;font-size:11.5px;" title="Dim the plate and every other overlay so the spiral of p reads clearly while p plays. Slide to 0 to turn it off."><input type="checkbox" id="ol-pdim-chk" onchange="olTogglePDim(this.checked)"> Dim</label>
         <input type="range" id="ol-pdim-amt" min="0" max="100" step="1" value="0" oninput="olSetPDimAmt(this.value)" style="max-width:100px;" title="Prime dim amount, 0–100%. 0 is off.">
@@ -2228,6 +2233,8 @@ walk anyway.</p>
         <div class="stepper"><button class="sbtn" onclick="olStepWidth(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-w" type="number" min="1" step="1" value="1" onchange="olSetWidth(this.value)" style="width:42px;"><button class="sbtn" onclick="olStepWidth(1)" title="+1">+</button></div>
         <button class="chip" onclick="olResetWidth()" title="Back to w = 1.">reset w=1</button>
         <button class="chip" onclick="olFullWidth()" title="Widen the band to cover the whole lattice.">full width</button>
+        <button class="chip tl" id="ol-grow-btn" onclick="olToggleGrow()" title="Play: each step sets offset s = &minus;k and width w = 2k (k = 1, 2, 3, &hellip;), so the band grows by 2 while the offset drops by 1. At a prime k = p the width is 2p.">&#9654; grow 2w / &minus;1s</button>
+        <span class="hint" title="The same cell (r, M) is the lattice point (x, y) = (r, M): gcd(x, y+j) = 1 says it is visible from (0, &minus;j). Grid reads naturally as x, y; Ring and Cayley as residue r mod M. The names are interchangeable.">notation: r, M &#8596; x, y (interchangeable)</span>
         <span class="hint" id="ol-strip-note">&mdash;</span>
         <button class="chip" id="ol-strip-dots-btn" onclick="olToggleStripDots()" title="Draw every lattice point inside the band on the plate: coprime ones bright, misses dim.">show points</button>
         <button class="chip" id="ol-strip-list-btn" onclick="olToggleStripList()" title="List the lattice points in the band. Click one to mark it on the plate.">point list &#9662;</button>
@@ -4164,7 +4171,7 @@ function setOpenerG(v) {
    lift survives and coral where it breaks. Preview only, like G and the
    Cayley tilt: it doesn't touch the Lift panel on the page. Connect and the
    chain are on by default. */
-const OL = { gp: { on: false, g: 2, i: 0, all: false }, mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
+const OL = { gbFitG: 'auto', gbFitR: 'auto', gp: { on: false, g: 2, i: 0, all: false }, mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
              pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, pf: false, pfE: 0, thetaMode: 'clamp', survBrokenThick: 0.5,
@@ -4695,7 +4702,36 @@ function olGbMarker(g, s) { return [Math.min(g, s), Math.max(g, s)]; }
    outermost ring, so on Ring they fall outside the plate. This scales about the centre by just enough
    (never zooms in) to bring the farthest marker, or the focused one when no trail is drawn, inside the
    frame with room for its label. The user's own zoom is applied on top of it. */
-function olGbFit(ctx, xy, w, h) {
+function olFitView(key, withMarkers) {
+  OPENER_ZOOM[key] = { k: 1, x: 0, y: 0 };
+  if (key === 'grid') OL.gbFitG = withMarkers ? 'markers' : 'plate'; else OL.gbFitR = withMarkers ? 'markers' : 'plate';
+  if (key === 'ring') { const sl = $('ol-rz'); if (sl) sl.value = 0; const lb = $('ol-rz-v'); if (lb) lb.textContent = '1.00\u00d7'; }
+  olRedraw(); openerRedrawTile(key);
+}
+function olGbFit(ctx, xy, w, h, key) {
+  const fm = (MS_ISO.on && MS_ISO.noStrips) ? 'auto' : key === 'grid' ? OL.gbFitG : key === 'ring' ? OL.gbFitR : 'auto';
+  if (fm === 'plate') return 1;   // "fit grid / ring": the default framing, no zoom-out for the markers
+  if (fm === 'markers' && key) {
+    /* "fit + markers": bounding box of the markers (grid: together with the whole grid square), measured after the tile's
+       own turn, centred on the canvas and scaled to fit with a margin. Markers off: just the plate. */
+    const N = olGoldbachN(), cx = w / 2, cy = h / 2, rotDeg = key === 'grid' ? OPENER_ROT.g : OPENER_ROT.r, a = -rotDeg * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    const rot = pt => { const dx = pt[0] - cx, dy = pt[1] - cy; return [cx + dx * ca - dy * sa, cy + dx * sa + dy * ca]; };
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const add = pt => { if (!pt || !isFinite(pt[0]) || !isFinite(pt[1])) return; const q = rot(pt); x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); };
+    if (key === 'grid') [[0, 0], [w, 0], [0, h], [w, h]].forEach(add);
+    if (OL.gbOn) {
+      const gs = (OL.gbMkAll || OL.gbTrail) ? olGoldbachPairs() : [];
+      const cur = Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1)); if (gs.indexOf(cur) < 0) gs.push(cur);
+      for (const q of gs) { const m = olGbMarker(q, N - q); add(xy(m[0], m[1])); }
+    }
+    if (isFinite(x0)) {
+      const bw = Math.max(x1 - x0, 0.12 * w), bh = Math.max(y1 - y0, 0.12 * h), mg = 0.86;
+      const k = Math.max(0.05, Math.min(key === 'grid' ? 1 : 3, mg * Math.min(w / bw, h / bh)));
+      ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+      return k;
+    }
+    return 1;
+  }
   if (!OL.gbOn || OL.gbFit === false) return 1;
   if (OL.pf && OPENER_G >= olGoldbachN() - 2) return 1;   // pair finder: the whole E-line is inside the square
   const N = olGoldbachN(), G = OPENER_G, all = (OL.gbMkAll || OL.gbTrail), cx = w / 2, cy = h / 2;
@@ -4890,6 +4926,8 @@ function olStepCN(d) {
   OL.cn = Math.max(0, Math.min(255, openerChainN() + d));
   olRedraw();
 }
+function olResetN() { olStopNPlay(); OL.n = 0; olRedraw(); }
+function olResetCN() { olStopCNPlay(); if (OL.lockN) olStopNPlay(); OL.lockN = false; OL.cn = 0; olRedraw(); }
 function olToggleLockN(v) {
   olStopCNPlay();
   if (!v) OL.cn = openerChainN();   // unlocking keeps the depth where it is instead of jumping to a stale value
@@ -5036,6 +5074,19 @@ function olStepSlopeA(d) { OL.slopeA = (Number(OL.slopeA) || 0) + d; olRedraw();
 function olStepSlopeB(d) { const nb = (Number(OL.slopeB) || 1) + d; OL.slopeB = nb === 0 ? (d > 0 ? 1 : -1) : nb; olRedraw(); }
 function olStepOffset(d) { OL.offset = (Number(OL.offset) || 0) + d; olRedraw(); }
 function olStepWidth(d) { OL.width = Math.max(1, (Number(OL.width) || 1) + d); olRedraw(); }
+let _olGrowT = 0, _olGrowK = 0;
+function olStopGrow() { if (_olGrowT) { clearInterval(_olGrowT); _olGrowT = 0; } const b = $('ol-grow-btn'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
+function olToggleGrow() {
+  if (_olGrowT) { olStopGrow(); return; }
+  const o = Number(OL.offset) || 0; _olGrowK = o < 0 ? -o : 0;
+  OL.stripOn = true; const chk = $('ol-strip-chk'); if (chk) chk.checked = true;
+  const b = $('ol-grow-btn'); if (b) { b.innerHTML = '&#9632; Stop'; b.classList.add('on'); }
+  _olGrowT = setInterval(() => {
+    const mx = Math.max(2, OPENER_G + 1);
+    _olGrowK = _olGrowK >= mx ? 1 : _olGrowK + 1;
+    OL.offset = -_olGrowK; OL.width = 2 * _olGrowK; olRedraw();
+  }, 160);
+}
 function olResetOffset() { OL.offset = 0; olRedraw(); }
 function olPresetStrip(a, b, s, w) {
   OL.slopeA = a; OL.slopeB = b; OL.offset = s; OL.width = w; OL.stripOn = true;
@@ -6215,7 +6266,7 @@ function openerDrawGrid(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-grid'); if (!c) return;
   const ctx = c.ctx, cell = Math.min(c.w, c.h) / OPENER_G, dot = Math.max(0.45, cell * 0.34);
   ctx.save();
-  olGbFit(ctx, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], c.w, c.h);   // gold markers sit on M = s > G, past the grid's edge: zoom out to keep them in frame
+  olGbFit(ctx, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], c.w, c.h, 'grid');   // gold markers sit on M = s > G, past the grid's edge: zoom out to keep them in frame
   openerApplyZoomXform(ctx, 'grid', c.w, c.h);
   if (OPENER_ROT.g) { ctx.translate(c.w / 2, c.h / 2); ctx.rotate(-OPENER_ROT.g * Math.PI / 180); ctx.translate(-c.w / 2, -c.h / 2); }
   if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVis(_openerSq), (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], cell * 0.8);
@@ -6269,7 +6320,7 @@ function openerDrawRing(t, forceC) {
   ctx.save();
   const ringDir = OL.ringCCW ? -1 : 1;
   const ringXY = (r, M) => { const rad = holeR + holeSpan * ((M - 0.5) / OPENER_G), th = ringDir * olTheta(r, M); return [cx + rad * Math.cos(th), cy + rad * Math.sin(th)]; };
-  olGbFit(ctx, ringXY, c.w, c.h);
+  olGbFit(ctx, ringXY, c.w, c.h, 'ring');
   openerApplyZoomXform(ctx, 'ring', c.w, c.h);
   if (OPENER_ROT.r) { ctx.translate(cx, cy); ctx.rotate(-OPENER_ROT.r * Math.PI / 180); ctx.translate(-cx, -cy); }
   if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVisSet(), ringXY, dot * 2);
@@ -6483,7 +6534,7 @@ function openerDrawCayley(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-cayley'); if (!c) return;
   const ctx = c.ctx, cx = c.w / 2, cy = c.h / 2;
   ctx.save();
-  { const Rc0 = Math.min(c.w, c.h) * 0.44 * OPENER_CZ; olGbFit(ctx, (r, M) => openerCayleyXY(r, M, cx, cy, Rc0), c.w, c.h); }
+  { const Rc0 = Math.min(c.w, c.h) * 0.44 * OPENER_CZ; olGbFit(ctx, (r, M) => openerCayleyXY(r, M, cx, cy, Rc0), c.w, c.h, 'cayley'); }
   openerApplyZoomXform(ctx, 'cayley', c.w, c.h);
   const Rc = Math.min(c.w, c.h) * 0.44 * OPENER_CZ, dot = Math.max(0.5, Math.min(c.w, c.h) * 0.018 * Math.min(1, 13 / OPENER_G) * (OL.ptScale || 1));
   if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVisSet(), (r, M) => openerCayleyXY(r, M, cx, cy, Rc), dot * 2);
@@ -8146,6 +8197,24 @@ function gbFitMarkers() {
   if (!d) return;
   plateZoomAt(Math.min(1, 0.46 * S / d), c, c, S); syncPlateUI(); lensParkForZoom(); redraw(false);
 }
+/* "fit + markers": reset the plate, then zoom (down to the plate's own minimum) and pan so the bounding box of the gold
+   markers is centred on the canvas and fits it with a margin. Ring and Cayley only: Grid has no image of the markers, so
+   there it is the same as the plain fit. Pan is set directly, since the usual pan limit would forbid centring a zoomed-out plate. */
+function gbFitMarkersCentered() {
+  if (partMode === 'off') setPartMode('single');
+  if (viewMode === 'grid') { resetPlate(); return; }
+  const S = plateS(), E = partE(), c = S / 2;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const q of gbMarkPairs()) {
+    const m = liftXY(q, E - q, S); if (!m || !isFinite(m[0]) || !isFinite(m[1])) continue;
+    const r = rotPt(m[0], m[1], S); x0 = Math.min(x0, r[0]); x1 = Math.max(x1, r[0]); y0 = Math.min(y0, r[1]); y1 = Math.max(y1, r[1]);
+  }
+  if (!isFinite(x0)) return;
+  const bw = Math.max(x1 - x0, 0.1 * S), bh = Math.max(y1 - y0, 0.1 * S);
+  plateK = Math.max(PLATE_KMIN, Math.min(PLATE_KMAX, 0.84 * S / Math.max(bw, bh)));
+  plateX = -((x0 + x1) / 2 - c) * plateK; plateY = -((y0 + y1) / 2 - c) * plateK;
+  syncPlateUI(); lensParkForZoom(); hideLens(); redraw(false);
+}
 function drawGoldMarkers(ctx, S) {
   if (!gbMarkOn || partMode === 'off' || !COP || !COP_G || viewMode === 'grid') return;
   const E = partE(), g = Math.max(1, Math.min(Math.floor(E / 2), partG || 1)), s = E - g;
@@ -9527,7 +9596,7 @@ function setVoidM(v) {
   redraw(false);
 }
 let plateK = 1, plateX = 0, plateY = 0, plateMoved = false;
-const PLATE_KMIN = 0.6, PLATE_KMAX = 40;
+const PLATE_KMIN = 0.15, PLATE_KMAX = 40;   // below 1 zooms out, so far-off gold markers can be fitted
 
 function plateClamp(S) {
   // At k > 1 you may pan by as much as the overhang and no further, so the
@@ -10591,6 +10660,17 @@ function reslope() {
   syncPresetChips();
   if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
   redraw(false);
+}
+let _growT = 0, _growK = 0;
+function stopGrow() { if (_growT) { clearInterval(_growT); _growT = 0; } const b = $('grow-btn'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
+function toggleGrow() {
+  if (_growT) { stopGrow(); return; }
+  _growK = Math.max(0, -(+$('off-num').value || 0));
+  const b = $('grow-btn'); if (b) { b.innerHTML = '&#9632; Stop'; b.classList.add('on'); }
+  _growT = setInterval(() => {
+    _growK = _growK >= G + 1 ? 1 : _growK + 1;
+    onOff(-_growK); onW(2 * _growK);
+  }, 160);
 }
 function onOff(v) {
   if (partLockEdit('off', v)) return;
