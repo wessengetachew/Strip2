@@ -6409,7 +6409,7 @@ function openerDrawCircleMethod(ctx, cx, cy, R, strength, G) {
    the primitive ones, and the gold arrow is their vector sum = mu(M): it can only land
    on 1, on -1, or at the centre, by the same three-way argument as the main page. */
 function openerDrawVoid(ctx, cx, cy, R, rot) {
-  if (OPENER_CIRCLE_METHOD && OPENER_RING_HOLE > 0) openerDrawCircleMethod(ctx, cx, cy, R, OPENER_RING_HOLE);
+  if (OPENER_CIRCLE_METHOD && OPENER_RING_HOLE > 0) { openerDrawCircleMethod(ctx, cx, cy, R, OPENER_RING_HOLE); return; }   // the roots-of-unity reading (order M, mu(M)) would overlay it, so it is skipped
   if (OPENER_RING_HOLE < 0.5 || R < 8) return;
   const M = Math.max(1, Math.min(OPENER_COP_MAX, OL.p));
   ctx.save();
@@ -10118,6 +10118,7 @@ function drawCayleyStripAt(ctx, S, s, color) {
    count this page keeps measuring is that degree. */
 function drawUnitVoid(ctx, S) {
   if (ringHole < 0.9) return;                 // only once there is a void
+  if (circleMethodOn) return;                 // the circle-method picture owns the void; the roots-of-unity reading would sit on top of it
   const c = S / 2, R = ringOuter(S) * ringHole;
   ctx.save();
   // axes and the four quarter marks: 1, i, -1, -i
@@ -15188,8 +15189,8 @@ async function msRender(doc, theme, opts) {
       const chunkRows = [];
       if (opts && opts.pages && b.rows.length > 14) { let cur = [], hh = 0; b.rows.forEach(r => { const rh = (r.label.length > 62 ? 2 : 1) * 40 + 8; if (cur.length && hh + rh > 1300) { chunkRows.push(cur); cur = []; hh = 0; } cur.push(r); hh += rh; }); if (cur.length) chunkRows.push(cur); } else chunkRows.push(b.rows);
       chunkRows.forEach((rowsPart, ci) => {
-      const hasErr = rowsPart.some(r => r.err), hasRaw = rowsPart.some(r => r.raw), errW = hasErr ? (hasRaw ? 120 : 150) : 0, rawW = hasRaw ? 260 : 0;
-      const px = 27, lh = 40, swW = 34, numW = hasRaw ? 120 : 130, pctW = hasRaw ? 140 : 170, labW = TW - swW - numW - pctW - errW - rawW - 20;
+      const hasErr = rowsPart.some(r => r.err), hasRaw = rowsPart.some(r => r.raw), hasRem = rowsPart.some(r => r.rem), hasPred = rowsPart.some(r => r.pred), errW = hasErr ? (hasRaw ? 120 : 150) : 0, rawW = hasRaw ? 230 : 0, remW = hasRem ? 360 : 0, predW = hasPred ? 220 : 0;
+      const px = 27, lh = 40, swW = 34, numW = hasRaw ? 340 : 130, pctW = hasRaw ? 140 : 170, labW = TW - swW - numW - pctW - errW - rawW - remW - predW - 20;
       const laid = rowsPart.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
       const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
       const HH = b.head ? 46 : 0, labW0 = labW;
@@ -15207,7 +15208,9 @@ async function msRender(doc, theme, opts) {
           fit(b.head[1], numW + 40, 'right', W - MX - pctW - errW);
           fit(b.head[2], pctW - 10, 'right', W - MX - errW);
           if (hasErr && b.head[3]) fit(b.head[3], errW - 10, 'right', W - MX);
-          if (hasRaw && b.head[4]) fit(b.head[4], rawW - 10, 'right', W - MX - pctW - errW - numW - 70);
+          if (hasRaw && b.head[4]) fit(b.head[4], rawW - 10, 'right', W - MX - pctW - errW - numW - 40);
+          if (hasRem && b.head[5]) fit(b.head[5], remW - 10, 'right', W - MX - pctW - errW - numW - 40 - 230);
+          if (hasPred && b.head[6]) fit(b.head[6], predW - 10, 'right', W - MX - pctW - errW - numW - 40 - 230 - 360);
         }
         c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8 + HH); c.lineTo(W - MX, y0 + 8 + HH); c.stroke();
         let yy = y0 + 50 + HH;
@@ -15217,7 +15220,9 @@ async function msRender(doc, theme, opts) {
           l.ls.forEach((t, i) => c.fillText(t, MX + swW, yy + i * lh));
           c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW - errW, yy);
           c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX - errW, yy);
-          if (hasRaw && l.r.raw) c.fillText(l.r.raw, W - MX - pctW - errW - numW - 70, yy);
+          if (hasRaw && l.r.raw) c.fillText(l.r.raw, W - MX - pctW - errW - numW - 40, yy);
+          if (hasRem && l.r.rem) c.fillText(l.r.rem, W - MX - pctW - errW - numW - 40 - 230, yy);
+          if (hasPred && l.r.pred) c.fillText(l.r.pred, W - MX - pctW - errW - numW - 40 - 230 - 360, yy);
           if (l.r.err) { c.fillStyle = l.r.ec === 'neg' ? '#e8604c' : '#46c28a'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(l.r.err, W - MX, yy); }
           yy += Math.max(1, l.ls.length) * lh + 8;
         });
@@ -15722,9 +15727,51 @@ function msErrMap(G) {
   c.fillStyle = '#8a8a96'; c.fillText('+15%', lx + 46, T + 16); c.fillText('0', lx + 46, T + 20 * 14 + 4); c.fillText('−15%', lx + 46, T + 40 * 14); c.fillStyle = '#17413d'; c.fillRect(lx, T + 640, 36, 22); c.fillStyle = '#8a8a96'; c.fillText('±1%', lx + 46, T + 658);
   return cv;
 }
+/* Fast chain statistics for the default block (consecutive columns). For r with distinct primes P, the first failing
+   column of cell (r, M) is f = min over p | r of (p - M mod p), and the cell is coprime iff no p divides M. That is a few
+   modulo operations per cell instead of a gcd per column, so G = 10,000 (about 5x10^7 cells) takes seconds. Returns the
+   same tot / ok / dead / histogram / TT the slow loops give; checked against them in the test run. */
+function msFastChain(G, d, top, sk) {
+  const spf = new Int32Array(G + 1);
+  for (let i = 2; i <= G; i++) if (!spf[i]) for (let j = i; j <= G; j += i) if (!spf[j]) spf[j] = i;
+  const hist = new Array(top + 2).fill(0), stride = G + 1, kill = new Int32Array((top + 2) * stride);
+  let tot = 0, ok = 0, dead = 0, TT = 0;
+  for (let r = 1; r < G; r++) {
+    const ps = []; let x = r; while (x > 1) { const q = spf[x]; ps.push(q); while (x % q === 0) x = (x / q) | 0; }
+    const np = ps.length, p0 = ps[0] || 0, p1 = ps[1] || 0;
+    for (let M = r + 1; M < G; M++) {
+      let f = 1e9, cop = true, kq = 0;
+      if (np === 1) { const m = M % p0; if (m === 0) cop = false; else { f = p0 - m; kq = p0; } }
+      else if (np === 2) { const m0 = M % p0, m1 = M % p1; if (m0 === 0 || m1 === 0) cop = false; else if (p0 - m0 <= p1 - m1) { f = p0 - m0; kq = p0; } else { f = p1 - m1; kq = p1; } }
+      else for (let i = 0; i < np; i++) { const q = ps[i], m = M % q; if (m === 0) { cop = false; break; } if (q - m < f) { f = q - m; kq = q; } }
+      if (!cop) continue;
+      tot++;
+      if (d === 0 || f > d) { if (f >= 2) ok++; else dead++; }
+      if (sk && !sk(r, M)) continue;
+      TT++; if (f <= top) { hist[f]++; kill[f * stride + kq]++; } else hist[top + 1]++;
+    }
+  }
+  return { tot, ok, dead, TT, hist, kill, stride };
+}
+/* Row-product prediction of the kept counts (default block, no selection). In row M the phi(M) coprime cells are thinned by
+   (1 - 1/p) for each prime p < M with p not dividing M but dividing some M + j, j <= n. This treats divisibility by the
+   different p as independent, which is the sieve approximation; it fails once the primes' product outgrows the range of r.
+   Returns pred[n] for n = 0..top. */
+function msRowProduct(G, top) {
+  const sv = new Uint8Array(G + 1), pr = []; for (let i = 2; i <= G; i++) { if (!sv[i]) { pr.push(i); for (let j = i * i; j <= G; j += i) sv[j] = 1; } }
+  const phi = new Int32Array(G + 1); for (let i = 0; i <= G; i++) phi[i] = i; for (const q of pr) for (let j = q; j <= G; j += q) phi[j] -= phi[j] / q | 0;
+  const lg = pr.map(q => Math.log1p(-1 / q)), pred = new Float64Array(top + 1), acc = new Float64Array(top + 1);
+  for (let M = 2; M < G; M++) {
+    acc.fill(0);
+    for (let i = 0; i < pr.length; i++) { const q = pr[i]; if (q >= M) break; const m = M % q; if (m === 0) continue; const d = q - m; if (d <= top) acc[d] += lg[i]; }
+    let c = 0; for (let n = 0; n <= top; n++) { c += acc[n]; pred[n] += phi[M] * Math.exp(c); }
+  }
+  return pred;
+}
 function msLiftDetail(G, o) {
   const out = [];
-  const big = G > 3000;
+  const fastChain = blkIsDefault() && G <= 10000;   // default block only: the closed-form first-failure rule above
+  const big = G > 3000 && !(fastChain && o.chain);
   const M0 = Math.max(0, o.n | 0);
   if (o.mode === 'connect') out.push({ t: 'p', text: 'Connect mode draws the spiral and the \u00b1n path together and joins them with a thin line at every ring M they share.' });
   if (o.mode === 'connect') {
@@ -15767,8 +15814,12 @@ function msLiftDetail(G, o) {
     // Same rule the plate draws: a coprime cell (r < M) gets a chain line only if it stays coprime
     // to M, M+1, ..., M+d (d = the C(n) depth); teal if gcd(r, M+1) = 1, coral if not.
     const d = Math.max(0, o.chainN | 0);
-    let tot = 0, ok = 0, dead = 0;
+    let tot = 0, ok = 0, dead = 0, FC = null;
     const s1 = Math.max(1, blkOff(1));
+    if (fastChain) {
+      const mc = Math.max(1, G - 1), tp = Math.max(Math.min(40, mc), [48, 64, 96, 128, 192, 256].filter(k => k <= mc).pop() || 0, d <= mc ? d : 0);
+      FC = msFastChain(G, d, tp, o.sec || null); tot = FC.tot; ok = FC.ok; dead = FC.dead;
+    } else
     for (let M = 2; M + s1 <= G; M++) for (let r = 1; r < M; r++) {
       if (gcd(r, M) !== 1) continue;
       tot++;
@@ -15786,19 +15837,26 @@ function msLiftDetail(G, o) {
     // depth's count comes from the same histogram, and the kept sets are nested (the ratio never rises).
     if (tot > 0) {
       const sk = o.sec || null; let TT = tot;
-      if (sk) { TT = 0; for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) if (gcd(r, M) === 1 && sk(r, M)) TT++; }
+      if (sk) { if (FC) TT = FC.TT; else { TT = 0; for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) if (gcd(r, M) === 1 && sk(r, M)) TT++; } }
       if (TT > 0) {
       const maxCell = Math.max(1, G - 1);
       const ds = []; for (let k = 0; k <= Math.min(40, maxCell); k++) ds.push(k);
       [48, 64, 96, 128, 192, 256].forEach(k => { if (k <= maxCell && ds.indexOf(k) < 0) ds.push(k); });
       if (d <= maxCell && ds.indexOf(d) < 0) { ds.push(d); ds.sort((x, y) => x - y); }
       const top = ds[ds.length - 1], hist = new Array(top + 2).fill(0);
-      for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
+      if (FC) { for (let i = 0; i < hist.length; i++) hist[i] = FC.hist[i]; }
+      else for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
         if (gcd(r, M) !== 1) continue;
         if (sk && !sk(r, M)) continue;
         let f = 1; while (f <= top && gcd(r, M + blkOff(f)) === 1) f++;
         hist[f]++;                                   // f = first failing j, or top + 1 if none up to top
       }
+      const remText = k => {   // cells deleted going to depth k, and the prime that deletes most of them
+        if (!FC || k < 1 || k > top) return '';
+        let bq = 0, bc = 0; const base = k * FC.stride; for (let q = 2; q < FC.stride; q++) { const c = FC.kill[base + q]; if (c > bc) { bc = c; bq = q; } }
+        return hist[k] ? '\u2212' + hist[k] + ' \u00b7 p=' + bq + ' ' + Math.round(100 * bc / hist[k]) + '%' : '\u22120';
+      };
+      const RP = (FC && !sk && G <= 10000) ? msRowProduct(G, top) : null;
       const rows = [], cpts = []; let above = TT;    // cells with f > n
       let next = 0;
       for (let k = 0; k <= top; k++) {
@@ -15806,10 +15864,10 @@ function msLiftDetail(G, o) {
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
         cpts.push({ n: k, kept: above, share: above / TT, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / TT - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
         if (ds.indexOf(k) < 0) continue;
-        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(8) : '\u2013'), raw: isFinite(Ck) ? (Ck / (Math.PI * Math.PI / 6)).toFixed(8) : '', n: above, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(8) : '\u2013'), raw: isFinite(Ck) ? (Ck / (Math.PI * Math.PI / 6)).toFixed(8) : '', rem: remText(k), pred: RP && k <= top ? (RP[k] / above).toFixed(4) : '', n: above + ' / ' + TT, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
       out.push({ t: 'p', text: (sk ? 'Restricted to the selection on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it, and the raw density D(n) = C(n)/\u03b6(2) in its own column. C(n) is normalised to the coprime cells and D(n) to all cells: D(n) is the limiting share of the whole lattice that is coprime to every column of the block, and C(n) = \u03b6(2)\u00b7D(n) is the share of the coprime cells that stay so. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
-      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error', 'raw D(n)'], rows: rows });
+      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept / coprime cells', 'share', 'error', 'raw D(n)', 'removed at this step \u00b7 main prime', 'row-product \u00f7 exact'], rows: rows });
       try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; these are measured values only, with no fitted curve drawn through them.' }); } catch (e) {}
       try { out.push({ t: 'iplate', items: [{ label: 'error map, all n', cv: msErrMap(G) }], cap: 'The same error for every depth n = 1 \u2026 40 at once, against G (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). Green: the kept share is above C(n); red: below; dark teal: inside \u00b11%. Reading across a row shows one depth settling as G grows; reading down a column shows how depth costs accuracy at a fixed G.' }); } catch (e) {}
       try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, TT, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
@@ -16120,7 +16178,21 @@ function msStripLines(a, b, s, w) {
 function msDate() { const d = new Date(), p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
 /* ══ OPENER ════════════════════════════════════════════════════════════════ */
-function msBuildOpener(noPlates) { return msWithCN(() => (MS_ADV.on && MS_ADV.sieve) ? msBuildSieve('opener', null, noPlates) : msBuildOpenerRaw(noPlates)); }
+/* The survivors-by-depth table (kept / coprime, raw D(n), removed at each step) goes on every math sheet, whether or not the
+   r-chain is switched on, the same way the sieve-only sheet always has it. If the sheet was built without it, append it. */
+function msEnsureSurvTable(doc, kind) {
+  try {
+    if (doc.some(b => b && b.t === 'table' && b.head && b.head[4] === 'raw D(n)')) return doc;
+    const G = kind === 'main' ? COP_G : OPENER_G, cn = kind === 'main' ? liftChainNEff() : openerChainN();
+    const det = msLiftDetail(G, { mode: 'none', n: 0, p: 1, allP: false, mirror: false, dropout: false, chain: true, chainN: cn, surv: true, broken: true, dir: 'both', dense: true, sec: msSecPred(kind), secDesc: msSecDesc(kind) });
+    if (det.length && det[det.length - 1].t === 'p' && /^Showing on the plate/.test(det[det.length - 1].text || '')) det.pop();
+    if (!det.length) return doc;
+    doc.push({ t: 'h', text: 'Measured survivors by depth' });
+    det.forEach(b => doc.push(b));
+  } catch (e) {}
+  return doc;
+}
+function msBuildOpener(noPlates) { return msWithCN(() => { const sv = MS_ADV.on && MS_ADV.sieve, d = sv ? msBuildSieve('opener', null, noPlates) : msBuildOpenerRaw(noPlates); return sv ? d : msEnsureSurvTable(d, 'opener'); }); }
 function msBuildOpenerRaw(noPlates) {
   const G = OPENER_G, view = OE.view, ratio = OE.cayRatio === '1:1' ? 1 : 2;
   const Wx = 4096, Sx = Wx / 1920, gap = 28 * Sx, tileW = (Wx - gap) / 2;
@@ -16280,7 +16352,7 @@ function msBuildOpenerRaw(noPlates) {
 }
 
 /* ══ MAIN PLATE ════════════════════════════════════════════════════════════ */
-function msBuildMain(views, noPlates) { return msWithCNMain(() => (MS_ADV.on && MS_ADV.sieve) ? msBuildSieve('main', views, noPlates) : msBuildMainRaw(views, noPlates)); }
+function msBuildMain(views, noPlates) { return msWithCNMain(() => { const sv = MS_ADV.on && MS_ADV.sieve, d = sv ? msBuildSieve('main', views, noPlates) : msBuildMainRaw(views, noPlates); return sv ? d : msEnsureSurvTable(d, 'main'); }); }
 function msBuildMainRaw(views, noPlates) {
   const G = COP_G, a = slopeA, b = slopeB, s = offS, w = widthW;
   const sel = $('cmode'), label = sel.options[sel.selectedIndex].textContent;
@@ -16405,7 +16477,7 @@ function msBuildMainRaw(views, noPlates) {
     if (chainDrawn) L.push({ t: 'eq', tex: msT`\text{chain: }\ r\ \longmapsto\ r\bmod(${blkTexNext()})\quad\text{(survives where }\gcd(r,${blkTexNext()})=1\text{)},\qquad n_C=${cn}` });
     else if (liftChainOn) L.push({ t: 'note', text: 'The r-chain is not drawn on the plate above G = ' + LIFT_CHAIN_MAX + ', so no chain counts are given here.' });
     if (liftMode !== 'none' || chainDrawn) msIsoPushMain(L, 'lift', vs);   // under the spiral / path / chain equations it shows
-    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn, chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir, sec: msSecPred('main'), secDesc: msSecDesc('main') }).forEach(x => L.push(x));
+    msLiftDetail(G, { mode: liftMode, n: n, p: liftSpiralP, allP: liftAllPOn, mirror: liftMirrorOn, dropout: liftDropoutOn, chain: chainDrawn || ((liftChainOn || bandChainNow()) && blkIsDefault()), chainN: cn, surv: liftSurvOn, broken: liftBrokenOn, dir: liftNPathDir, sec: msSecPred('main'), secDesc: msSecDesc('main') }).forEach(x => L.push(x));
     msBlockSection(cn, L).forEach(x => doc.push(x));   // block length, D(n), C(n) at the C(n) depth, as the opener does
   }
   if (TW.on) { try { msTowerSection(G, 'main', vs).forEach(b => doc.push(b)); } catch (e) {} }
@@ -16632,10 +16704,10 @@ function msDocToHtml(doc) {
       b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
       h += '</table></div>';
     } else if (b.t === 'table') {
-      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th>' + (b.rows.some(r => r.raw) && b.head[4] ? '<th style="text-align:right">' + msEsc(b.head[4]) + '</th>' : '') + '<th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
+      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th>' + (b.rows.some(r => r.raw) && b.head[4] ? '<th style="text-align:right">' + msEsc(b.head[4]) + '</th>' : '') + (b.rows.some(r => r.rem) && b.head[5] ? '<th style="text-align:right">' + msEsc(b.head[5]) + '</th>' : '') + (b.rows.some(r => r.pred) && b.head[6] ? '<th style="text-align:right">' + msEsc(b.head[6]) + '</th>' : '') + '<th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
       b.rows.forEach(r => {
         h += '<tr><td class="sw">' + (r.sw ? '<i style="background:' + r.sw + '"></i>' : '') + '</td>' +
-          '<td class="lab">' + msEsc(r.label) + '</td>' + (b.rows.some(q => q.raw) ? '<td class="pct">' + msEsc(r.raw || '') + '</td>' : '') +
+          '<td class="lab">' + msEsc(r.label) + '</td>' + (b.rows.some(q => q.raw) ? '<td class="pct">' + msEsc(r.raw || '') + '</td>' : '') + (b.rows.some(q => q.rem) ? '<td class="pct">' + msEsc(r.rem || '') + '</td>' : '') + (b.rows.some(q => q.pred) ? '<td class="pct">' + msEsc(r.pred || '') + '</td>' : '') +
           '<td class="n">' + msEsc(String(r.n)) + '</td>' +
           '<td class="pct">' + msEsc(r.pct) + '</td>' + (r.err ? '<td class="pct" style="font-weight:600;color:' + (r.ec === 'neg' ? '#e8604c' : '#2fa874') + '">' + msEsc(r.err) + '</td>' : '') + '</tr>';
       });
