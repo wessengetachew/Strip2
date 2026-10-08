@@ -1435,7 +1435,7 @@ walk anyway.</p>
     <input type="range" id="ring-hole" min="0" max="100" step="1" value="0" oninput="setRingHole(+this.value)" title="Inner radius as a fraction of the plate. At 1 every ring collapses onto one circle and the picture becomes the roots of unity: ring M contributes the Mth roots, all G of them superimposed.">
     <span class="val" id="ring-hole-v">0.00</span>
     <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.85);cursor:pointer;font-size:11.5px;" title="Draws the circle-method set-up in the hole: the Farey dissection into major arcs (coloured, by q) and minor arcs (grey), and the computed prime sum |S(a)|=|sum_{p<=N} e(pa)|, N=2(G+1), as a polar curve that spikes at rationals a/q with small q. Fades in with the hole slider.">
-      <input type="checkbox" id="cm-toggle-main" onchange="setCircleMethod(this.checked)"> circle method
+      <input type="checkbox" id="cm-toggle-main" onchange="cmUserToggle('m',this.checked)"> circle method
     </label>
     <button class="chip on" id="ring-gd" onclick="toggleRingGuides()" title="The four constant-M circles. At small G they draw as polygons, because that is genuinely how few lattice points sit on each ring.">Guides: on</button>
     <span class="lbl">order M</span>
@@ -1530,6 +1530,26 @@ walk anyway.</p>
     <span class="val" id="cay-gzoom-v">31</span>
     <span class="hint">shared with Grid &amp; Ring &mdash; the main grid size control above reaches further</span>
   </div>
+    </div>
+  </div>
+
+  <div class="panel collapsed" style="margin:14px 0 0;" id="gap-panel">
+    <div class="ptitle" onclick="togglePanel(this)"><span>Prime-gap pairs &mdash; track the residues p and p+g</span><span class="car">&#9662;</span></div>
+    <div class="pbody">
+      <div class="prow">
+        <span class="lbl">gap</span>
+        <button class="chip gpm-btn" data-g="1" onclick="gpmPick(1)" title="The pair (2, 3).">1</button>
+        <button class="chip gpm-btn" data-g="2" onclick="gpmPick(2)" title="Twin primes (p, p+2): (3,5), (5,7), (11,13)...">2 (twin)</button>
+        <button class="chip gpm-btn" data-g="4" onclick="gpmPick(4)" title="Cousin primes (p, p+4): (3,7), (7,11), (13,17)...">4 (cousin)</button>
+        <button class="chip gpm-btn" data-g="6" onclick="gpmPick(6)" title="Sexy primes (p, p+6): (5,11), (7,13), (11,17)...">6 (sexy)</button>
+        <button class="chip gpm-btn" data-g="8" onclick="gpmPick(8)">8</button>
+        <button class="chip gpm-btn" data-g="10" onclick="gpmPick(10)">10</button>
+        <button class="chip gpm-btn" data-g="12" onclick="gpmPick(12)">12</button>
+        <button class="chip" onclick="gpmStep(-1)" title="Previous prime pair for this gap.">&lsaquo; pair</button>
+        <button class="chip" onclick="gpmStep(1)" title="Next prime pair for this gap.">pair &rsaquo;</button>
+        <label style="font-size:11.5px;cursor:pointer;"><input type="checkbox" id="gpm-all" onchange="gpmAll(this.checked)"> all pairs</label>
+      </div>
+      <div class="hint" id="gpm-note"></div>
     </div>
   </div>
 
@@ -2004,11 +2024,16 @@ walk anyway.</p>
       </div>
       <div class="prow" style="padding:2px 0 4px;border-bottom:none;">
         <span class="lbl">gap presets</span>
-        <button class="chip ol-gap-btn" data-g="1" onclick="olGapPick(1)" title="The only odd prime gap &mdash; the single pair (2, 3).">1 (2&rarr;3)</button>
-        <button class="chip ol-gap-btn" data-g="2" onclick="olGapPick(2)" title="Twin primes (M, M+2).">2 (twin)</button>
-        <button class="chip ol-gap-btn" data-g="4" onclick="olGapPick(4)" title="Cousin primes (M, M+4).">4 (cousin)</button>
-        <button class="chip ol-gap-btn" data-g="6" onclick="olGapPick(6)" title="Sexy primes (M, M+6).">6 (sexy)</button>
-        <button class="chip ol-gap-btn" data-g="8" onclick="olGapPick(8)" title="Gap-8 prime pairs (M, M+8).">8</button>
+        <button class="chip ol-gap-btn" data-g="1" onclick="olGapPick(1)" title="The only odd prime gap: the pair (2, 3), columns r = 2 and r = 3.">1 (2&rarr;3)</button>
+        <button class="chip ol-gap-btn" data-g="2" onclick="olGapPick(2)" title="Twin primes (p, p+2): (3,5), (5,7), (11,13)... columns r = p and r = p+2.">2 (twin)</button>
+        <button class="chip ol-gap-btn" data-g="4" onclick="olGapPick(4)" title="Cousin primes (p, p+4): (3,7), (7,11), (13,17)...">4 (cousin)</button>
+        <button class="chip ol-gap-btn" data-g="6" onclick="olGapPick(6)" title="Sexy primes (p, p+6): (5,11), (7,13), (11,17)...">6 (sexy)</button>
+        <button class="chip ol-gap-btn" data-g="8" onclick="olGapPick(8)" title="Gap-8 prime pairs (p, p+8).">8</button>
+        <button class="chip ol-gap-btn" data-g="10" onclick="olGapPick(10)" title="Gap-10 prime pairs (p, p+10).">10</button>
+        <button class="chip ol-gap-btn" data-g="12" onclick="olGapPick(12)" title="Gap-12 prime pairs (p, p+12).">12</button>
+        <button class="chip" onclick="olGapStep(-1)" title="Previous prime pair for this gap.">&lsaquo; pair</button>
+        <button class="chip" onclick="olGapStep(1)" title="Next prime pair for this gap: (3,5), (5,7), (11,13), &hellip; for gap 2.">pair &rsaquo;</button>
+        <label style="font-size:11.5px;color:rgba(232,227,219,.85);cursor:pointer;"><input type="checkbox" id="ol-gp-all" onchange="olGapAll(this.checked)"> all pairs</label>
       </div>
       <div class="pnote ol-gap-cap" style="padding:0 0 10px;line-height:1.6;min-height:1.6em;"></div>
     </div>
@@ -2050,7 +2075,7 @@ walk anyway.</p>
       <input type="range" id="welcome-ring-hole" min="0" max="100" step="1" value="0" oninput="setOpenerRingHole(+this.value)" style="flex:1 1 140px;min-width:100px;">
       <span class="val" id="welcome-ring-hole-v" style="min-width:32px;">0.00</span>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.85);cursor:pointer;font-size:11.5px;" title="Draws the circle-method set-up in the hole: the Farey dissection into major arcs (coloured, by q) and minor arcs (grey), and the computed prime sum |S(a)|=|sum_{p<=N} e(pa)|, N=2(G+1), as a polar curve that spikes at rationals a/q with small q. Fades in with the hole slider.">
-        <input type="checkbox" id="cm-toggle" onchange="setOpenerCircleMethod(this.checked)"> circle method
+        <input type="checkbox" id="cm-toggle" onchange="cmUserToggle('o',this.checked)"> circle method
       </label>
     </div>
     <div class="prow" style="padding:2px 0 6px;">
@@ -2059,12 +2084,12 @@ walk anyway.</p>
       <button class="chip wv-view-btn" data-v="ring" onclick="olCountdownStop();wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
       <button class="chip wv-view-btn" data-v="cayley" onclick="olCountdownStop();wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
       <button class="chip wv-view-btn on" data-v="all3" onclick="olCountdownStop();wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
-      <button class="chip" id="wv-cd" onclick="olCountdownStop()" title="After 15 seconds the opener switches to Ring and turns on the labels by r. Click to cancel; touching the view or label buttons cancels it too." style="display:none;color:var(--gold);border-color:var(--gold)"></button>
+      <button class="chip" id="wv-cd" onclick="olCountdownStop()" title="After 15 seconds the opener switches to Ring and turns on the labels by angle &middot; &pi;. Click to cancel; touching the view or label buttons cancels it too." style="display:none;color:var(--gold);border-color:var(--gold)"></button>
       <button class="chip" id="welcome-lock-btn" onclick="toggleOpenerLock()" title="Pin the canvas(es) to the top of this panel so they stay on screen while you scroll the controls below them. Handy on a phone, where the canvas and a control further down don't otherwise fit on screen together.">⛶ Lock canvas</button>
       <span class="lbl" title="Print a small label at every point, on Grid, Ring and Cayley alike. Only while G &le; 31 &mdash; past that there isn't room to read them; stepping the mode has no visible effect until G comes back down.">labels</span>
       <button class="chip" onclick="stepOpenerLabelMode(-1)" title="Previous label mode">&#9650;</button>
       <button class="chip" onclick="stepOpenerLabelMode(1)" title="Next label mode">&#9660;</button>
-      <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="No per-point labels.">off</span>
+      <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="The Ring angle 2&pi;&middot;r/M written as a multiple of &pi;.">angle &middot;&pi;</span>
       <span class="lbl">size</span>
       <input type="range" id="ol-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="olSetLblScale(this.value)" style="max-width:90px;" title="Label text size, Grid/Ring/Cayley alike.">
       <span class="val" id="ol-lbl-sz-v">1.0&times;</span>
@@ -2099,7 +2124,7 @@ walk anyway.</p>
       <div class="wp-tile wp-ring">
         <canvas id="welcome-cv-ring"></canvas>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">RING</div>
-        <div class="wcrot wturn" title="Turn the Ring preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('r',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crr-v" style="min-width:30px;text-align:center;">90&deg;</span><button class="chip" onclick="openerTurn('r',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
+        <div class="wcrot wturn" title="Turn the Ring preview a quarter turn per click. +90&deg; is counter-clockwise. Preview only."><span class="rw"><button class="chip" onclick="openerTurn('r',-90)" title="Quarter turn clockwise (&minus;90&deg;)">&#8635; &minus;90&deg;</button><span class="val" id="welcome-crr-v" style="min-width:30px;text-align:center;">0&deg;</span><button class="chip" onclick="openerTurn('r',90)" title="Quarter turn counter-clockwise (+90&deg;)">+90&deg; &#8634;</button></span></div>
       </div>
       <div class="wp-tile wp-cay">
         <canvas id="welcome-cv-cayley" onwheel="openerCayleyWheel(event)" ondblclick="setOpenerCZ(0,true)"></canvas>
@@ -2138,7 +2163,7 @@ walk anyway.</p>
         <div class="prow" id="welcome-colrow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
       <button class="chip" onclick="stepWelcome(1)" title="Next coloring (Down arrow)">&#9660;</button>
-      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
+      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="180" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
     </div>
     <div id="welcome-color-now"></div>
     <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
@@ -2870,11 +2895,10 @@ Full attribution is in the credits panel below.
   <tr><th>Whose</th><th>What it is doing here</th></tr>
 
   <tr><td><b>Alphonse de Polignac</b> (1849);<br><b>Yitang Zhang</b> (2013); <b>James Maynard</b>, <b>Terence Tao</b> and the Polymath8 project</td>
-  <td>The prime-gap presets. A gap $g$ is the diagonal $|M-r|=g$, and its coprime cells are the pairs $(r,\,r+g)$:
-  gap 2 is the twin-prime line, 4 the cousin line, 6 the sexy line. De Polignac conjectured every even gap occurs
+  <td>The prime-gap presets. A gap $g$ is a pair of primes $(p,\,p+g)$; the residues are the columns $r=p$ and $r=p+g$, drawn as two prime spirals and joined at the rows $M$ where neither divides $M$ (density $(1-1/p)(1-1/(p+g))$). Gap 2 steps through $(3,5),(5,7),(11,13),\dots$, gap 4 through $(3,7),(7,11),\dots$. De Polignac conjectured every even gap occurs
   infinitely often; Zhang proved some gap below $7\times10^{7}$ does, and Maynard and Polymath8 brought that bound
-  down to 246. The page draws the lines and counts cells on them. It proves nothing about them, and the twin-prime
-  and de Polignac conjectures remain open.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'twin',scroll:'cv'})">twin line, gap 2</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'cousin',scroll:'cv'})">cousin, gap 4</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',preset:'diag',scroll:'cv'})">sexy, gap 6</button></div></td></tr>
+  down to 246. The page draws the pairs and counts the linked rows. It proves nothing about how many pairs there are, and the twin-prime
+  and de Polignac conjectures remain open.<div class="cgo"><button class="chip" onclick="cgo({ctl:'ctl-toggle',gp:2,scroll:'cv'})">twin pairs, gap 2</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',gp:4,scroll:'cv'})">cousin, gap 4</button><button class="chip" onclick="cgo({ctl:'ctl-toggle',gp:6,scroll:'cv'})">sexy, gap 6</button></div></td></tr>
 
   <tr><td><b>G. H. Hardy</b>, <b>J. E. Littlewood</b>, <b>S. Ramanujan</b>; <b>I. M. Vinogradov</b>; <b>Harald Helfgott</b>;<br><b>P. G. L. Dirichlet</b> (arithmetic progressions)</td>
   <td>The circle method, which the ring's hole picture illustrates. The picture draws the Farey dissection into major and minor arcs and the computed prime sum $|S(\alpha)|=|\sum_{p\le N}e(p\alpha)|$ with $N=2(G+1)$, whose peaks at $a/q$ the method studies, and the page's $\mathfrak S(E)$ and
@@ -4008,8 +4032,8 @@ const OPENER_LABEL_MODES = [
   { id: 'rad',   short: 'angle rad', t: 'The Ring angle 2\u03c0\u00b7r/M in radians, to three places.' },
   { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; runs on up to G \u2212 1, the longest the lattice holds). The cell survives a block of width n+1 exactly when its depth is more than n.' }
 ];
-let _openerLblIdx = 0;
-let OPENER_LABEL_MODE = OPENER_LABEL_MODES[0].id;
+let _openerLblIdx = OPENER_LABEL_MODES.findIndex(m => m.id === 'pi');   // opens on angle · π
+let OPENER_LABEL_MODE = 'pi';
 const OPENER_LABELS_MAXG = 31;
 function openerLabelsShow() { return OPENER_LABEL_MODE !== 'off' && OPENER_G <= OPENER_LABELS_MAXG; }
 function openerLabelText(mode, r, M) {
@@ -4138,12 +4162,12 @@ function setOpenerG(v) {
    lift survives and coral where it breaks. Preview only, like G and the
    Cayley tilt: it doesn't touch the Lift panel on the page. Connect and the
    chain are on by default. */
-const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
+const OL = { gp: { on: false, g: 2, i: 0, all: false }, mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
              pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, pf: false, pfE: 0, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: true,
-             sec: { on: false, mode: 'sector', pick: 0, rays: 8, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 },
+             sec: { on: true, all: true, mode: 'sector', pick: 0, rays: 13, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 },
              mf: { on: false, lo: 1, hi: 0, k: 1, c: 0, primes: false } };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4201,6 +4225,46 @@ function olDropoutRing(ctx, xy, p, lw) {
     ctx.fillText('p=' + p, labelXY[0] + 4, labelXY[1] - 6);
   }
   ctx.restore();
+}
+/* PRIME-GAP PAIR TRACKER. A gap g is a pair of primes (p, p+g). On the lattice the residues are the
+   columns r = p and r = p+g: each is the prime spiral of that prime. The tracker draws the two
+   columns (p gold, p+g violet) and joins them at every row M where both residues are coprime to M,
+   i.e. neither p nor p+g divides M. That happens for a fraction (1-1/p)(1-1/(p+g)) of rows. The
+   pair list is found by trial division and stepped one pair at a time. It shows pairs; it proves
+   nothing about how many there are. */
+function gpIsP(n) { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }
+function gpPairs(g, G) { const a = []; for (let p = 2; p + g <= G; p++) if (gpIsP(p) && gpIsP(p + g)) a.push(p); return a; }
+const GP_NAMES = { 1: 'the only odd prime gap', 2: 'twin primes', 4: 'cousin primes', 6: 'sexy primes', 8: 'gap-8 pairs', 10: 'gap-10 pairs', 12: 'gap-12 pairs' };
+function gpCur(st, G) { const ps = gpPairs(st.g, G); if (!ps.length) return null; const i = ((st.i % ps.length) + ps.length) % ps.length; return { ps, i, p: ps[i], q: ps[i] + st.g }; }
+function gpDraw(ctx, st, G, xy, vis, dot, lw) {
+  const c = gpCur(st, G); if (!c) return;
+  const one = (p, q, fade, links) => {
+    for (let M = p + 1; M <= G; M++) {
+      const okp = gcd(p, M) === 1, okq = M > q && gcd(q, M) === 1;
+      const v = vis ? vis(p, M) : 1; if (v <= 0) continue;
+      const a = pp => pp && xy(pp[0], pp[1]);
+      const P1 = okp ? xy(p, M) : null, P2 = okq ? xy(q, M) : null;
+      ctx.globalAlpha = v * fade;
+      if (links && P1 && P2) { ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(P1[0], P1[1]); ctx.lineTo(P2[0], P2[1]); ctx.stroke(); }
+      for (const [pt, col] of [[P1, GP_COL[0]], [P2, GP_COL[1]]]) {
+        if (!pt) continue;
+        if (links) { ctx.fillStyle = 'rgba(4,4,13,.85)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.55, 0, TAU); ctx.fill(); }
+        ctx.fillStyle = 'rgb(' + col + ')'; ctx.beginPath(); ctx.arc(pt[0], pt[1], links ? dot : dot * 0.6, 0, TAU); ctx.fill();
+      }
+    }
+  };
+  ctx.save();
+  if (st.all) for (let k = 0; k < c.ps.length; k++) if (k !== c.i) one(c.ps[k], c.ps[k] + st.g, 0.28, false);
+  one(c.p, c.q, 1, true);
+  ctx.restore();
+}
+const GP_COL = ['255,214,94', '190,130,255'];
+function gpText(st, G) {
+  const c = gpCur(st, G); const nm = GP_NAMES[st.g] || ('gap-' + st.g + ' pairs');
+  if (!c) return 'Gap ' + st.g + ' (' + nm + '): no pair (p, p+' + st.g + ') fits in G = ' + G + '.';
+  let both = 0; for (let M = c.q + 1; M <= G; M++) if (gcd(c.p, M) === 1 && gcd(c.q, M) === 1) both++;
+  const tot = Math.max(0, G - c.q), dens = (1 - 1 / c.p) * (1 - 1 / c.q);
+  return 'Gap ' + st.g + ' (' + nm + '): pair ' + (c.i + 1) + ' of ' + c.ps.length + ' for G = ' + G + ', (' + c.p + ', ' + c.q + '). Columns r = ' + c.p + ' (gold) and r = ' + c.q + ' (violet); linked at ' + both + ' of ' + tot + ' rows M > ' + c.q + ' where neither ' + c.p + ' nor ' + c.q + ' divides M (limit density (1−1/' + c.p + ')(1−1/' + c.q + ') = ' + dens.toFixed(3) + ').';
 }
 function olSpiral(ctx, xy, G, dot, lw) {
   const primes = OL.allP ? (PRIMES || []).filter(function (q) { return q <= G; }) : [OL.p];
@@ -4764,7 +4828,7 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
 }
 function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   const G = OPENER_G, cell = S / G, n = openerLiftN(), m = OL.mode;
-  if (m === 'none' && !OL.chain && !TW.on && !OL.stripOn && !OL.gbOn && !(OL.sec.on && OL.sec.bands)) return;
+  if (m === 'none' && !OL.chain && !TW.on && !OL.gp.on && !OL.stripOn && !OL.gbOn && !(OL.sec.on && OL.sec.bands)) return;
   if (MS_ISO.on && MS_ISO.hideBase) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.restore(); }
   const cl = (v, a, b) => Math.max(a, Math.min(b, v));   // line and dot sizes follow the cell, so G = 256 doesn't turn to felt
   const tk = Math.max(0.04, OL.survBrokenThick * 2);      // thickness slider: 0.5 default = unchanged size, 0..1 = 0x..2x
@@ -4790,6 +4854,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   // is the honest result of the same math under those views' own coordinates.
   if (OL.stripOn) { olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12)); if (OL.stripDots || OL.stripPick) olStripDots(ctx, xy, G, cl(cell * 0.4, 1.2, 2.6)); }
   if (pdA > 0) { ctx.globalAlpha = 1; spiralNow(); }
+  if (OL.gp.on) gpDraw(ctx, OL.gp, G, xy, olSecOn() ? olSecVis : null, cl(cell * 0.45, 1.2, 3), cl(cell * 0.18, 0.5, 1.2));
   if (OL.gbOn) {
     // Dim the base plate AND every other overlay above -- drawn so far, on this
     // same canvas -- by the slider's amount, so the Goldbach pair reads clearly
@@ -5007,18 +5072,14 @@ function olSyncPresets() {
    the previews plot the r <= M side, so r - M = -g: slope 1/1, offset -g, width 1. The strip walks the
    pairs (r, r + g), one lattice point per r. One gap at a time here, since the preview carries one strip. */
 const OL_GAP_NAMES = { 1: 'the only odd prime gap, the pair (2, 3)', 2: 'twin primes', 4: 'cousin primes', 6: 'sexy primes', 8: 'gap-8 prime pairs' };
-function olGapPick(g) { olPresetStrip(1, 1, -g, 1); }
-function olActiveGap() {
-  if (!OL.stripOn || +OL.slopeA !== 1 || +OL.slopeB !== 1 || +OL.width !== 1) return null;
-  const g = -(+OL.offset);
-  return OL_GAP_NAMES[g] ? g : null;
-}
+function olGapPick(g) { OL.gp.on = !(OL.gp.on && OL.gp.g === g); OL.gp.g = g; OL.gp.i = 0; olRedraw(); }
+function olGapStep(d) { OL.gp.on = true; OL.gp.i += d; olRedraw(); }
+function olGapAll(v) { OL.gp.all = !!v; if (OL.gp.on) olRedraw(); }
 function olSyncGapPresets() {
-  const on = olActiveGap();
-  document.querySelectorAll('.ol-gap-btn').forEach(b => b.classList.toggle('on', on !== null && +b.dataset.g === on));
-  document.querySelectorAll('.ol-gap-cap').forEach(c => {
-    c.textContent = on === null ? '' : 'Gap ' + on + ': ' + OL_GAP_NAMES[on] + '. Slope +1, width 1, offset \u2212' + on + ': the diagonal r \u2212 M = \u2212' + on + ', pairs (r, r+' + on + ').';
-  });
+  const on = OL.gp.on;
+  document.querySelectorAll('.ol-gap-btn').forEach(b => b.classList.toggle('on', on && +b.dataset.g === OL.gp.g));
+  const ck = $('ol-gp-all'); if (ck) ck.checked = !!OL.gp.all;
+  document.querySelectorAll('.ol-gap-cap').forEach(c => { c.textContent = on ? gpText(OL.gp, OPENER_G) : 'Pick a gap: the two prime residues of a pair (p, p+g) are drawn as columns and linked where both survive. Click it again to switch off.'; });
 }
 function olPresetDiag() { olPresetStrip(1, 1, 0, 1); }
 function olPresetAnti() { olPresetStrip(-1, 1, olGoldbachN(), 1); }
@@ -5388,7 +5449,7 @@ const OPENER_AXES = ['x', 'y', 'z'];
 const OPENER_ROT_STEP = { x: 2, y: 1.3, z: 1.5 };   // degrees per 60 ms tick while that axis plays
 /* Grid opens at -i, a quarter turn counter-clockwise, exactly as the main page does: M runs left to right and r
    runs upward, so r = (a/b)M is rise over run and slope 1/1 climbs from bottom-left to top-right. */
-let OPENER_ROT = { x: 0, y: 0, z: 0, g: 90, r: 90 };   // Ring also opens at -i, as on the main page: the seam at the top, winding clockwise
+let OPENER_ROT = { x: 0, y: 0, z: 180, g: 90, r: 0 };   // Ring opens at 0 degrees; the grid keeps its quarter turn
 let _openerRotOn = { x: false, y: false, z: false }, _openerRotTimer = 0, _openerRotRaf = 0, _openerRotDirty = {};
 function openerNormDeg(v) { v = +v; if (!isFinite(v)) v = 0; return ((v % 360) + 360) % 360; }
 // Redraw only the tile the axis belongs to; the reveal animation, if running, already reads the live angles.
@@ -6058,6 +6119,11 @@ function setOpenerRingHole(pct) {
   const l = $('welcome-ring-hole-v'); if (l) l.textContent = OPENER_RING_HOLE.toFixed(2);
   openerRotSoon('r');   // Ring tile only
 }
+/* Turning the circle method on from the checkbox opens the hole to 0.50 if it is smaller, so the picture is visible. */
+function cmUserToggle(which, v) {
+  if (which === 'o') { if (v && OPENER_RING_HOLE < 0.5) setOpenerRingHole(50); setOpenerCircleMethod(v); }
+  else { if (v && ringHole < 0.5) setRingHole(50); setCircleMethod(v); }
+}
 function setOpenerCircleMethod(v) {
   OPENER_CIRCLE_METHOD = !!v;
   const chk = $('cm-toggle'); if (chk && chk.checked !== OPENER_CIRCLE_METHOD) chk.checked = OPENER_CIRCLE_METHOD;
@@ -6563,8 +6629,8 @@ function olCountdownStart(sec) {
     olCountdownStop();
     try {
       wvSetView('ring');
-      const i = OPENER_LABEL_MODES.findIndex(m => m.id === 'r');
-      if (i >= 0) { _openerLblIdx = i; OPENER_LABEL_MODE = 'r'; const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = OPENER_LABEL_MODES[i].short; v.title = OPENER_LABEL_MODES[i].t; } renderOpenerPreview(false); }
+      const i = OPENER_LABEL_MODES.findIndex(m => m.id === 'pi');
+      if (i >= 0) { _openerLblIdx = i; OPENER_LABEL_MODE = 'pi'; const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = OPENER_LABEL_MODES[i].short; v.title = OPENER_LABEL_MODES[i].t; } renderOpenerPreview(false); }
     } catch (e) {}
   }, 1000);
 }
@@ -8583,7 +8649,7 @@ function liftDrawChain(ctx, S) {
 
 function drawLiftOverlay(ctx, S) {
   if (!COP_G) return;
-  if (!liftOn) { if (bandChainNow()) { ctx.save(); liftDrawChain(ctx, S); ctx.restore(); } liftDrawTower(ctx, S); return; }
+  if (!liftOn) { if (bandChainNow()) { ctx.save(); liftDrawChain(ctx, S); ctx.restore(); } liftDrawTower(ctx, S); liftDrawGap(ctx, S); return; }
   ctx.save();
   if (liftDimOn) { ctx.fillStyle = 'rgba(4,4,13,' + (1 - liftDimPct / 100).toFixed(3) + ')'; ctx.fillRect(0, 0, S, S); }
   if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') liftDrawSpiral(ctx, S);
@@ -8592,6 +8658,22 @@ function drawLiftOverlay(ctx, S) {
   if (liftChainOn || bandChainNow()) liftDrawChain(ctx, S);
   ctx.restore();
   liftDrawTower(ctx, S);
+  liftDrawGap(ctx, S);
+}
+const GPM = { on: false, g: 2, i: 0, all: false };
+function gpmPick(g) { GPM.on = !(GPM.on && GPM.g === g); GPM.g = g; GPM.i = 0; gpmSync(); redraw(false); }
+function gpmSet(g) { GPM.on = true; GPM.g = g; GPM.i = 0; gpmSync(); redraw(false); }
+function gpmStep(d) { GPM.on = true; GPM.i += d; gpmSync(); redraw(false); }
+function gpmAll(v) { GPM.all = !!v; gpmSync(); if (GPM.on) redraw(false); }
+function gpmSync() {
+  document.querySelectorAll('.gpm-btn').forEach(b => b.classList.toggle('on', GPM.on && +b.dataset.g === GPM.g));
+  const ck = $('gpm-all'); if (ck) ck.checked = !!GPM.all;
+  const t = $('gpm-note'); if (t) t.textContent = GPM.on && COP_G ? gpText(GPM, COP_G) : 'Pick a gap: the two prime residues of a pair (p, p+g) are drawn as columns and linked where both survive. Click it again to switch off.';
+}
+function liftDrawGap(ctx, S) {
+  if (!GPM.on || !COP_G) return;
+  const ptk = S / 700;
+  gpDraw(ctx, GPM, COP_G, (r, M) => liftXY(r, M, S), (r, M) => sectorVis(r, M), Math.max(1.4, 2.2 * ptk) * liftDotScale, Math.max(0.5, 0.9 * ptk));
 }
 function liftDrawTower(ctx, S) {
   if (!TW.on || !COP_G || (MS_ISOM && !MS_ISOM.tower)) return;
@@ -10480,7 +10562,7 @@ function onG(v) {
   if (sectorPick > v) setSectorPick(v);
   syncCayleyGZoomUI(v);
   if (sectorOn) renderSectorCensus();   // full census depends on G directly
-  try { twSyncUI(); } catch (e) {}
+  try { twSyncUI(); gpmSync(); } catch (e) {}
   buildPhi(Math.max(4096, v));   // exports quote Phi(G); keep the table ahead of G
   buildCoprime(v, ok => { if (ok !== false) { if (sectorAll) { setSectorRays(v); sectorAll = true; { const b = $('sec-all'); if (b) b.classList.add('on'); } } onGridChanged(); redraw(true); } });
 }
@@ -14613,6 +14695,7 @@ function cgo(o) {
   if (o.sector)        _cTry(() => { if (!sectorOn) toggleSector(); if (o.sector.all) secAllRays(); else if (o.sector.pick != null) setSectorPick(o.sector.pick); if (o.sector.rays) setSectorRays(o.sector.rays); });
   if (o.lift)          _cTry(() => { if (typeof liftOn !== 'undefined' && !liftOn) liftToggleOn(); if (o.lift.mode) liftSetMode(o.lift.mode); if (o.lift.mirror != null) { liftToggleMirror(o.lift.mirror); const c = $('lift-mirror-chk'); if (c) c.checked = o.lift.mirror; } if (o.lift.n != null) liftSetChainN(o.lift.n); });
   if (o.pf)            _cTry(() => pfFind(o.pf));
+  if (o.gp)            _cTry(() => gpmSet(o.gp));
   if (o.blk != null)   _cTry(() => blkSet(o.blk));
   if (o.mset)          _cTry(() => mmPreset(o.mset));
   if (o.run === 'selftest') setTimeout(() => _cTry(selfTest), 120);
@@ -16052,6 +16135,7 @@ function msBuildOpenerRaw(noPlates) {
   if (liftActive && (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect' || OL.mirror)) P.push(['mirror \u03c3(r) = M \u2212 r', OL.mirror ? 'on' : 'off']);
   if (liftActive && typeof olHB === 'function' && olHB()) P.push(['hide broken cells', 'on']);
   if (OL.pf && OL.pfE >= 4) P.push(['pair finder', 'E = ' + OL.pfE + ', G = ' + OPENER_G]);
+  if (OL.gp.on) P.push(['prime-gap pair', gpText(OL.gp, OPENER_G).replace(/^Gap /, 'gap ')]);
   if (liftActive) P.push(['showing', [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
   if (OL.stripOn) P.push(['strip a/b', OL.slopeA + '/' + OL.slopeB], ['offset s', String(OL.offset)], ['width w', String(Math.max(1, OL.width))]);
   if (OL.sec.on) msSectorParams('opener').forEach(q => P.push(q));
