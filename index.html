@@ -1201,11 +1201,11 @@ walk anyway.</p>
         <option value="moddist">modular distance (min(r,M&minus;r))</option>
         <option value="phipos">&phi;(M) progression</option>
         <option value="ethiopia">Ethiopian &mdash; green / yellow / red by slope r/M</option>
-        <option value="ethiodepth" selected>Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
+        <option value="ethiodepth">Ethiopian + depth &mdash; flag at/below diagonal, C(n) depth above</option>
         <option value="ethioinv">Ethiopian + inverse &mdash; flag at/below diagonal, complementary colors above</option>
       </optgroup>
       <optgroup label="The block &mdash; reads the width slider as n = w&minus;1">
-        <option value="sat">saturation &mdash; smallest prime p &le; n+1 dividing r</option>
+        <option value="sat" selected>saturation &mdash; smallest prime p &le; n+1 dividing r</option>
         <option value="failp">first failing prime in the block</option>
         <option value="jstar">j* &mdash; which slot in the block kills it</option>
       </optgroup>
@@ -2092,6 +2092,14 @@ walk anyway.</p>
         <button class="chip" onclick="olSecFromSector()" title="Set the window to the sector s above: 1/(s+1) to 1/s. Then nudge either end.">&larr; from s</button>
         <button class="chip" onclick="olSecFromStrip()" title="Use the Strip's slope a/b as the upper slope and half of it as the lower, to look at the wedge under the strip's line.">&larr; strip slope</button>
         <span class="hint" id="ol-sec-note">&mdash;</span>
+      </div>
+      <div class="prow" id="ol-pf-row">
+        <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.85);cursor:pointer;font-size:11.5px;" title="Pair finder: choose an even E. The lattice is set to G = E &minus; 2 so the whole line r + M = E is inside the grid, and every point on it with g and E&minus;g both prime lights up."><input type="checkbox" id="ol-pf-chk" onchange="olPfToggle(this.checked)"> pair finder</label>
+        <span class="lbl" title="The even number to split. G is set to E &minus; 2, up to 1024.">E</span>
+        <button class="chip" onclick="olPfStep(-1)">&minus;2</button>
+        <div class="stepper"><input class="sval" id="ol-pf-e" type="number" min="4" step="2" value="30" onchange="olPfSetE(this.value)" style="width:64px;"></div>
+        <button class="chip" onclick="olPfStep(1)">+2</button>
+        <span class="hint" id="ol-pf-note">&mdash;</span>
       </div>
       <div class="prow">
         <button class="chip" id="ol-gap-play" onclick="olToggleGapPlay()" title="Walk every partition g = 1..N/2 of N and back, drawing all four Strip I lines live — same sweep as the main page's Play g. Most partitions are NOT Goldbach pairs.">&#9654; Play g</button>
@@ -3464,7 +3472,7 @@ function cycleCMode(dir) {
    Swatches are built from colourKeyEntries, the same probes the export
    LEGEND uses, so a mode's preview here can never drift from what it
    actually draws on the plate. */
-const WELCOME_PRESET = { cmode: 'ethiodepth', label: 'r' };   // default colouring = Ethiopian + depth
+const WELCOME_PRESET = { cmode: 'sat', label: 'r' };   // default colouring = saturation (colouring 16)
 function syncWelcomeUI() {
   const now = $('welcome-color-now'), sel = $('cmode');
   if (!now || !sel || sel.selectedIndex < 0) return;
@@ -3879,7 +3887,7 @@ function setOpenerG(v) {
 const OL = { mode: 'connect', n: 0, cn: 0, lockN: false, p: 1, chain: true, surv: true, broken: true,
              allP: false, mirror: true, dropout: false, dropoutLbl: false,
              stripOn: true, slopeA: 1, slopeB: 2, offset: 0, width: 1,
-             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, thetaMode: 'clamp', survBrokenThick: 0.5,
+             pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, pf: false, pfE: 0, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: true,
              sec: { on: false, mode: 'sector', pick: 0, rays: 8, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 } };
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
@@ -4210,7 +4218,20 @@ function olStripPoints(G) {
 // E = 2(G+1), read off the live preview lattice -- exactly the main page's
 // Goldbach-partitions formula, just fed OPENER_G instead of COP_G, so the
 // same g/s/E numbers you'd see there show up here at the preview's own size.
-function olGoldbachN() { return 2 * (OPENER_G + 1); }
+function olGoldbachN() { return (OL.pf && OL.pfE >= 4) ? OL.pfE : 2 * (OPENER_G + 1); }
+/* Pair finder: pick an even E, the lattice is set to G = E - 2 (the largest M any pair needs is s = E - 2), and the
+   whole anti-diagonal r + M = E sits inside the grid. The pairs are the points on that line with g and E - g both prime. */
+function olPfApply() {
+  const E = OL.pfE; if (!(E >= 4)) return;
+  setOpenerG(Math.min(OPENER_COP_MAX, Math.max(2, E - 2)));
+  OL.gbOn = true; const ps = olGoldbachPairs(); OL.gbG = ps.length ? ps[0] : 2; olRedraw();
+}
+function olPfToggle(v) {
+  OL.pf = !!v;
+  if (OL.pf) { if (!(OL.pfE >= 4)) OL.pfE = Math.max(4, 2 * (OPENER_G + 1)); olPfApply(); } else olRedraw();
+}
+function olPfSetE(v) { let e = Math.round(+v) || 4; e = Math.max(4, Math.min(2 * OPENER_COP_MAX, e + (e % 2))); OL.pfE = e; if (OL.pf) olPfApply(); else olRedraw(); }
+function olPfStep(d) { olPfSetE((OL.pfE >= 4 ? OL.pfE : 4) + 2 * d); }
 // Memoized on G: this used to redo the whole trial-division sieve up to four times
 // per redraw (once in olSyncUI for the note, once more inside olGoldbach for every
 // canvas that draws it) -- one redraw, one sieve now, unless G actually changed.
@@ -4333,6 +4354,7 @@ function olGbMarker(g, s) { return [Math.min(g, s), Math.max(g, s)]; }
    frame with room for its label. The user's own zoom is applied on top of it. */
 function olGbFit(ctx, xy, w, h) {
   if (!OL.gbOn || OL.gbFit === false) return 1;
+  if (OL.pf && OPENER_G >= olGoldbachN() - 2) return 1;   // pair finder: the whole E-line is inside the square
   const N = olGoldbachN(), G = OPENER_G, all = (OL.gbMkAll || OL.gbTrail), cx = w / 2, cy = h / 2;
   const gs = all ? olGoldbachPairs() : [Math.max(1, Math.min(Math.floor(N / 2), OL.gbG || 1))];
   let d = 0;
@@ -4357,6 +4379,16 @@ function olGoldbach(ctx, xy, G, dot, cw, ch, viewKind) {
   if (maxG < 1) return;
   const g = Math.max(1, Math.min(maxG, OL.gbG || 1)), s = N - g;
   ctx.save();
+  if (OL.pf && viewKind === 'grid') {   // the E-line r + M = E across the square, and a lit cell for every prime pair (both mirror images)
+    const lo = Math.max(1, N - G), hi = Math.min(G, N - 1), a = xy(lo, N - lo), b = xy(hi, N - hi);
+    if (a && b && lo <= hi) { ctx.strokeStyle = 'rgba(242,200,96,.55)'; ctx.lineWidth = Math.max(1, dot * 0.5); ctx.setLineDash([dot * 2.5, dot * 1.5]); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); }
+    for (const q of olGoldbachPairs()) for (const [r0, M0] of [[q, N - q], [N - q, q]]) {
+      if (r0 < 1 || M0 < 1 || r0 > G || M0 > G) continue;
+      const pt = xy(r0, M0); if (!pt) continue;
+      ctx.fillStyle = 'rgba(4,4,13,.8)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 2.2, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(242,200,96,.98)'; ctx.beginPath(); ctx.arc(pt[0], pt[1], dot * 1.3, 0, TAU); ctx.fill();
+    }
+  }
   if (OL.gbSpot && viewKind && viewKind !== 'grid' && cw && ch) olGbSpotlight(ctx, xy, G, g, s, cw, ch);
   const gapsAll = (OL.gbAll && !(MS_ISO.on && MS_ISO.noStrips)) ? olGoldbachPairs().filter(q => q !== g) : [];
   if (gapsAll.length) {   // every other pair first, softer; the pair on show is then drawn over them at full strength
@@ -4941,6 +4973,10 @@ function olSyncUI() {
   if (gbDimAmt && document.activeElement !== gbDimAmt) gbDimAmt.value = OL.gbDimAmt != null ? OL.gbDimAmt : 50;
   document.querySelectorAll('.ol-theta-btn').forEach(b => b.classList.toggle('on', b.dataset.tm === OL.thetaMode));
   const chkT = $('ol-gbtrail-chk'); if (chkT) chkT.checked = !!OL.gbTrail;
+  { const c = $('ol-pf-chk'); if (c) c.checked = !!OL.pf; const e = $('ol-pf-e'); if (e && document.activeElement !== e) e.value = OL.pfE >= 4 ? OL.pfE : olGoldbachN();
+    const nt = $('ol-pf-note');
+    if (nt) { if (!OL.pf) nt.textContent = 'pick E; the grid is set to G = E \u2212 2 and the line r + M = E is drawn'; else { const N = olGoldbachN(), ps = olGoldbachPairs(), tot = Math.floor(N / 2) - 1;
+      nt.textContent = 'E = ' + N + ' \u00b7 G = ' + OPENER_G + (OPENER_G < N - 2 ? ' (capped, line runs off the grid)' : '') + ' \u00b7 ' + ps.length + ' prime pair' + (ps.length === 1 ? '' : 's') + ' of ' + tot + ' splits g = 2..' + Math.floor(N / 2) + ' \u00b7 ' + ps.slice(0, 8).map(q => q + '+' + (N - q)).join(', ') + (ps.length > 8 ? ' \u2026' : ''); } } }
   const chkL = $('ol-gblabel-chk'); if (chkL) chkL.checked = !!OL.gbLabel;
   const chkA = $('ol-gbmkall-chk'); if (chkA) chkA.checked = !!OL.gbMkAll;
   const chkS = $('ol-gbspot-chk'); if (chkS) chkS.checked = !!OL.gbSpot;
@@ -5800,6 +5836,7 @@ function openerDrawGrid(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-grid'); if (!c) return;
   const ctx = c.ctx, cell = Math.min(c.w, c.h) / OPENER_G, dot = Math.max(0.45, cell * 0.34);
   ctx.save();
+  olGbFit(ctx, (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], c.w, c.h);   // gold markers sit on M = s > G, past the grid's edge: zoom out to keep them in frame
   openerApplyZoomXform(ctx, 'grid', c.w, c.h);
   if (OPENER_ROT.g) { ctx.translate(c.w / 2, c.h / 2); ctx.rotate(-OPENER_ROT.g * Math.PI / 180); ctx.translate(-c.w / 2, -c.h / 2); }
   if (OPENER_G > OPENER_FAST_G) openerFastDots(ctx, olVis(_openerSq), (r, M) => [(r - 0.5) * cell, (M - 0.5) * cell], cell * 0.8);
@@ -15026,6 +15063,53 @@ function msErrVsG(G) {
   c.textAlign = 'left'; c.font = '20px ' + mono; c.fillStyle = '#e8c35a'; c.fillText('\u25cf measured, stays within 1%', L2 + 14, T + 24); c.fillStyle = '#3dc8b8'; c.fillText('- - 110\u00b7n^1.5', L2 + 14, T + 52); c.fillStyle = '#e8604c'; c.fillText('\u00b7\u00b7\u00b7 35\u00b7n\u00b2', L2 + 14, T + 80);
   return cv;
 }
+/* Error map: every depth n = 1..40 against G on one picture (rows n, columns G on a log axis), coloured by the signed error
+   (share - C(n)) / C(n): green above the limit, red below, dark teal inside +-1%. The dashed curve is the empirical G = 110 n^1.5. */
+function msErrMap(G) {
+  const Gs = Math.max(300, Math.min(2500, G)), TOP = 40, NN = 40;
+  const hist = new Array(TOP + 2).fill(0), Cn = [NaN];
+  for (let n = 1; n <= NN; n++) { let v = NaN; try { v = Dn(n) * Math.PI * Math.PI / 6; } catch (e) {} Cn.push(v); }
+  const cols = []; let tot = 0;
+  for (let g = 3; g <= Gs; g++) {
+    const M = g - 1;
+    for (let r = 1; r < M; r++) { if (gcd(r, M) !== 1) continue; let f = 1; while (f <= TOP && gcd(r, M + f) === 1) f++; hist[f]++; tot++; }
+    if (g >= 30 && tot > 0) { const col = new Array(NN + 1); let drop = 0; for (let n = 1; n <= NN; n++) { drop += hist[n]; const sh = (tot - drop) / tot; col[n] = isFinite(Cn[n]) ? 100 * (sh - Cn[n]) / Cn[n] : NaN; } cols.push([g, col]); }
+  }
+  const W = 1800, H = 900, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'), mono = '"JetBrains Mono",monospace';
+  c.fillStyle = '#05060f'; c.fillRect(0, 0, W, H);
+  const L = 120, R = 1560, T = 90, B = 790, lg0 = Math.log10(30), lg1 = Math.log10(Gs);
+  const XG = g => L + (Math.log10(g) - lg0) / (lg1 - lg0) * (R - L), YN = n => B - (n - 0.5) / NN * (B - T);
+  c.fillStyle = '#e8c35a'; c.font = '26px ' + mono; c.textAlign = 'left'; c.fillText('error map: every depth n against G  (signed error vs C(n))', L, 48);
+  const colour = e => {
+    if (!isFinite(e)) return '#05060f';
+    if (Math.abs(e) <= 1) return '#17413d';
+    const k = Math.min(1, (Math.abs(e) - 1) / 14);
+    return e > 0 ? 'rgb(' + Math.round(20 + 30 * (1 - k)) + ',' + Math.round(90 + 125 * k) + ',' + Math.round(70 + 30 * (1 - k)) + ')' : 'rgb(' + Math.round(110 + 135 * k) + ',' + Math.round(40 + 20 * (1 - k)) + ',' + Math.round(40 + 20 * (1 - k)) + ')';
+  };
+  for (let i = 0; i < cols.length; i++) {
+    const g = cols[i][0], x0 = XG(g), x1 = i + 1 < cols.length ? XG(cols[i + 1][0]) : XG(g) + 2, w = Math.max(1, x1 - x0 + 0.6);
+    for (let n = 1; n <= NN; n++) { c.fillStyle = colour(cols[i][1][n]); c.fillRect(x0, YN(n), w, (B - T) / NN + 0.6); }
+  }
+  c.strokeStyle = 'rgba(255,255,255,.25)'; c.strokeRect(L, T, R - L, B - T);
+  c.fillStyle = '#8a8a96'; c.font = '20px ' + mono; c.textAlign = 'right';
+  [1, 2, 4, 8, 16, 24, 32, 40].forEach(n => c.fillText(String(n), L - 10, YN(n) + 7));
+  c.save(); c.translate(36, (T + B) / 2); c.rotate(-Math.PI / 2); c.textAlign = 'center'; c.fillText('depth n', 0, 0); c.restore();
+  c.textAlign = 'center'; [30, 100, 300, 1000, 3000].forEach(g => { if (g > Gs) return; const x = XG(g); c.strokeStyle = 'rgba(255,255,255,.18)'; c.beginPath(); c.moveTo(x, B); c.lineTo(x, B + 8); c.stroke(); c.fillText(String(g), x, B + 32); });
+  c.fillText('G', (L + R) / 2, B + 64);
+  c.setLineDash([12, 8]); c.lineWidth = 3; c.strokeStyle = 'rgba(255,255,255,.85)'; c.beginPath(); let st = false;
+  for (let n = 1; n <= NN + 0.01; n += 0.25) { const g = 110 * Math.pow(n, 1.5); if (g < 30 || g > Gs) continue; const x = XG(g), y = YN(n); if (!st) { c.moveTo(x, y); st = true; } else c.lineTo(x, y); }
+  c.stroke(); c.setLineDash([]);
+  if (G >= 30 && G <= Gs) { const x = XG(G); c.strokeStyle = 'rgba(232,195,90,.95)'; c.lineWidth = 3; c.setLineDash([6, 6]); c.beginPath(); c.moveTo(x, T); c.lineTo(x, B); c.stroke(); c.setLineDash([]); c.fillStyle = '#e8c35a'; c.textAlign = 'center'; c.fillText('sheet G = ' + G, x, T - 12); }
+  else if (G > Gs) { c.fillStyle = '#e8c35a'; c.textAlign = 'left'; c.fillText('sheet G = ' + G + ' lies past the map (to ' + Gs + ')', L, B + 96); }
+  // legend
+  const lx = 1620, steps = [[-15, 'red  −15%'], [-5, ''], [-1.5, '−1%'], [0, 'within ±1%'], [1.5, '+1%'], [5, ''], [15, 'green +15%']];
+  c.textAlign = 'left'; c.font = '20px ' + mono;
+  for (let i = 0; i < 40; i++) { const e = 15 - i * 30 / 39; c.fillStyle = colour(e); c.fillRect(lx, T + i * 14, 36, 15); }
+  c.fillStyle = '#8a8a96'; c.fillText('+15%', lx + 46, T + 16); c.fillText('0', lx + 46, T + 20 * 14 + 4); c.fillText('−15%', lx + 46, T + 40 * 14); c.fillStyle = '#17413d'; c.fillRect(lx, T + 640, 36, 22); c.fillStyle = '#8a8a96'; c.fillText('±1%', lx + 46, T + 658);
+  c.fillStyle = 'rgba(255,255,255,.85)'; c.fillText('- - G = 110·n^1.5', L + 14, B - 14);
+  return cv;
+}
 function msLiftDetail(G, o) {
   const out = [];
   const big = G > 3000;
@@ -15083,8 +15167,8 @@ function msLiftDetail(G, o) {
       if (sk) { TT = 0; for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) if (gcd(r, M) === 1 && sk(r, M)) TT++; }
       if (TT > 0) {
       const maxCell = Math.max(1, G - 1);
-      const ds = []; for (let k = 0; k <= Math.min(o.dense ? 40 : 12, maxCell); k++) ds.push(k);
-      (o.dense ? [48, 64, 96, 128, 192, 256] : [16, 24, 32, 48, 64, 96, 128]).forEach(k => { if (k <= maxCell && ds.indexOf(k) < 0) ds.push(k); });
+      const ds = []; for (let k = 0; k <= Math.min(40, maxCell); k++) ds.push(k);
+      [48, 64, 96, 128, 192, 256].forEach(k => { if (k <= maxCell && ds.indexOf(k) < 0) ds.push(k); });
       if (d <= maxCell && ds.indexOf(d) < 0) { ds.push(d); ds.sort((x, y) => x - y); }
       const top = ds[ds.length - 1], hist = new Array(top + 2).fill(0);
       for (let M = 2; M < G; M++) for (let r = 1; r < M; r++) {
@@ -15105,6 +15189,7 @@ function msLiftDetail(G, o) {
       out.push({ t: 'p', text: (sk ? 'Restricted to the sector on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
       out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error'], rows: rows });
       try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; the measured points follow about 110\u00b7n^1.5 over n = 8 \u2026 40 (the exponent depends on the tolerance, and it is an empirical fit, not a theorem), not the 35\u00b7n\u00b2 curve.' }); } catch (e) {}
+      try { out.push({ t: 'iplate', items: [{ label: 'error map, all n', cv: msErrMap(G) }], cap: 'The same error for every depth n = 1 \u2026 40 at once, against G (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). Green: the kept share is above C(n); red: below; dark teal: inside \u00b11%. Reading across a row shows one depth settling as G grows; reading down a column shows how depth costs accuracy at a fixed G. The dashed line is the empirical G = 110\u00b7n^1.5 from the offline sweep, not a theorem.' }); } catch (e) {}
       try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, TT, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
       }
     }
