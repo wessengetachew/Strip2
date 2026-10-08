@@ -2932,6 +2932,8 @@ Full attribution is in the credits panel below.
   The spiral prime $p$ is the column $r=p$: coprime except at $M=p$ and its multiples (the dropout ring). The $\pm n$ path $r=(M\pm n)/2$ is where $2r\equiv\pm n \pmod M$, i.e. $2r\mp n$ vanishes mod $M$,
   a B&eacute;zout-type condition. The page's &ldquo;spiral&rdquo; has no relation to the Ulam prime spiral (1963).<div class="cgo"><button class="chip" onclick="cgo({lift:{mode:'spiral',mirror:true},scroll:'cv'})">spiral + mirror</button><button class="chip" onclick="cgo({lift:{mode:'npath',n:6},scroll:'cv'})">&plusmn;n path</button><button class="chip" onclick="cgo({lift:{mode:'connect',n:6},scroll:'cv'})">connect</button></div></td></tr>
 
+  <tr><td><b>Leonhard Euler</b> (product over primes); <b>Dirichlet</b> and <b>Möbius</b> (inversion); the prime zeta function $P(s)=\sum_p p^{-s}=\sum_d \mu(d)\,d^{-1}\ln\zeta(ds)$</td>
+  <td>How $C(n)$ is computed to about 11 digits. The factors for $p\le 200{,}000$ are multiplied exactly. For the primes beyond, every $\nu_p$ equals the same $k$, so $\ln\prod_{p>P}(1-k/p^{2})=-\sum_m \frac{k^m}{m}T_m$ with $T_m=P(2m)-\sum_{p\le P}p^{-2m}$; the stored $T_1,T_2,T_3$ were computed once at 60 digits. A plain truncated product is high by about $kT_1\approx 4\times10^{-7}k$. For $n=0$ the result is exactly 1; for $n=1$ it is $\zeta(2)(2F-1)=0.53071182047204\ldots$ with $F$ the Feller&ndash;Tornier constant. Checked against an independent 40-digit run to about 15 digits. This is standard numerical analysis of Euler products, not a new method.</td></tr>
   <tr><td><b>Goldbach</b> &amp; <b>Euler</b>; <b>Eratosthenes</b>; <b>Hardy</b>&ndash;<b>Littlewood</b></td>
   <td>The pair finder. For an even $E$ every pair $g+(E-g)$ is a point on the anti-diagonal $r+M=E$; the pairs with both $g$ and $E-g$ prime are found by sieve. On this page $E=2(G+1)$,
   so the finder sets $G=E/2-1$ and selects the first pair. It restates the conjecture in lattice coordinates and checks cases; it is not progress on it, and the Hardy&ndash;Littlewood count remains a heuristic.<div class="cgo"><button class="chip" onclick="cgo({pf:98,scroll:'cv'})">E = 98</button><button class="chip" onclick="cgo({pf:1000,scroll:'cv'})">E = 1000</button></div></td></tr>
@@ -5390,7 +5392,7 @@ function olSyncUI() {
   const rows = [
     ['n \u2014 \u00b1n path', n], ['n \u2014 C(n) block depth' + (OL.lockN ? ' (locked)' : ''), cn], ['block length n+1', cn + 1], ['spiral prime p', OL.p + (OL.p > OPENER_G ? ' \u2014 off-plate, G < p' : '')],
     ['saturated primes (' + blkSatText() + ')', satTxt], ['count saturated', sat.length],
-    ['D(n) \u2014 raw density', D.toFixed(9)], ['C(n) = \u03b6(2)\u00b7D(n)', (D * ZETA2).toFixed(9)],
+    ['D(n) \u2014 raw density', D.toFixed(11)], ['C(n) = \u03b6(2)\u00b7D(n)', (D * ZETA2).toFixed(11)],
     ['\u03b6(2) = \u03c0\u00b2/6', ZETA2.toFixed(9)], ['G (preview lattice)', OPENER_G]
   ];
   let h = '<table>';
@@ -5661,7 +5663,7 @@ function oeLegendSections() {
     const sat = blkSatPrimes(cn);
     li.push({ c: null, t: 'saturated (' + blkSatText() + '): ' + (sat.length ? (sat.length > 14 ? sat.slice(0, 14).join(', ') + ', \u2026' : sat.join(', ')) + ' \u00b7 count ' + sat.length : 'none') });
     if (isFinite(D)) {
-      li.push({ c: null, t: 'D(n) = ' + D.toFixed(6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(6) });
+      li.push({ c: null, t: 'D(n) = ' + D.toFixed(10) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + (D * Math.PI * Math.PI / 6).toFixed(10) });
       // D(0) collapses to plain gcd(r,M)=1 density, 6/pi^2 -- the same "global"
       // baseline the header stat compares against -- so D(n) at any n reads
       // naturally as a multiple of it: how much a block of n+1 narrows the
@@ -7573,17 +7575,25 @@ function setWalk(m) {
 }
 /* D(n) = prod_p (1 - min(n+1,p)/p^2), cached — the product runs over ~18k
    primes and the width control can move every frame. */
+const DN_T1 = 3.80169013366455226127e-7, DN_T2 = 3.320381193769734297671e-18, DN_T3 = 5.030687698432008849773e-29;
 const _Dcache = new Map();
 let _Dprimes = null;
 function Dn(n) {
   const ck = blkSig() + ':' + n;
   if (_Dcache.has(ck)) return _Dcache.get(ck);
   if (!_Dprimes) _Dprimes = primesUpTo(200000);
-  let v = 1;
+  /* Exact factors for every prime p <= 200,000, summed as logs with Kahan compensation; then the tail over
+     p > 200,000 by prime-zeta sums. Past 200,000 every prime has the same nu (k = number of distinct offsets),
+     so log prod_{p>P}(1 - k/p^2) = -sum_m (k^m/m) T_m with T_m = sum_{p>P} p^(-2m) = P(2m) - sum_{p<=P} p^(-2m).
+     T_1, T_2, T_3 below were computed once at 60 digits from the prime zeta function P(s) = sum mu(d)/d log zeta(d s). */
+  let sum = 0, comp = 0;
   for (let i = 0; i < _Dprimes.length; i++) {
-    const p = _Dprimes[i];
-    v *= 1 - blkNu(p, n) / (p * p);
+    const p = _Dprimes[i], y = Math.log1p(-blkNu(p, n) / (p * p)) - comp, t = sum + y;
+    comp = (t - sum) - y; sum = t;
   }
+  const k = blkNu(200003, n);
+  sum -= k * DN_T1 + k * k * DN_T2 / 2 + k * k * k * DN_T3 / 3;
+  const v = Math.exp(sum);
   _Dcache.set(ck, v);
   return v;
 }
@@ -8694,8 +8704,8 @@ function liftRenderTable() {
     ['spiral prime p', liftSpiralP + (liftSpiralP > COP_G ? ' \u2014 off-plate, G < p' : '')],
     ['saturated primes (' + blkSatText() + ')', satPrimes.length ? satPrimes.join(', ') : '\u2014 none \u2014'],
     ['count saturated', r.sat],
-    ['D(n) \u2014 raw density', r.D.toFixed(9)],
-    ['C(n) = \u03b6(2)\u00b7D(n)', r.C.toFixed(9)],
+    ['D(n) \u2014 raw density', r.D.toFixed(11)],
+    ['C(n) = \u03b6(2)\u00b7D(n)', r.C.toFixed(11)],
     ['\u03b6(2) = \u03c0\u00b2/6', r.zeta2.toFixed(9)],
     ['G (lattice size)', COP_G]
   ];
@@ -11454,7 +11464,7 @@ function exportDetailSections(views) {
       ' \u00b7 dot ' + liftDotScale.toFixed(2) + '\u00d7 \u00b7 thickness ' + liftThick.toFixed(2) + '\u00d7' +
       (liftDimOn ? ' \u00b7 base plate dimmed to ' + liftDimPct + '%' : '') });
     li.push({ rgb: null, text: 'saturated (' + blkSatText() + '): ' + (sat.length ? sat.join(', ') : 'none') + ' (' + cd.sat + ')' });
-    li.push({ rgb: null, text: 'D(n) = ' + fmt(cd.D, 6) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + fmt(cd.C, 6) + (liftChainNEff() !== n ? ' \u00b7 at \u00b1n path n = ' + n : '') });
+    li.push({ rgb: null, text: 'D(n) = ' + fmt(cd.D, 10) + ' \u00b7 C(n) = \u03b6(2)\u00b7D(n) = ' + fmt(cd.C, 10) + (liftChainNEff() !== n ? ' \u00b7 at \u00b1n path n = ' + n : '') });
     if (liftChainNEff() !== n) { const nc = liftChainNEff(), cc = liftComputeCD(nc); li.push({ rgb: null, text: 'at C(n) depth n = ' + nc + ': D(n) = ' + fmt(cc.D, 6) + ' \u00b7 C(n) = ' + fmt(cc.C, 6) + ' \u00b7 saturated p \u2264 n+1: ' + (PRIMES.filter(q => q <= nc + 1).join(', ') || 'none') }); }
     {
       const globalCop = 6 / (Math.PI * Math.PI), ratioD = cd.D / globalCop, deltaD = 100 * (ratioD - 1);
@@ -15178,8 +15188,8 @@ async function msRender(doc, theme, opts) {
       const chunkRows = [];
       if (opts && opts.pages && b.rows.length > 14) { let cur = [], hh = 0; b.rows.forEach(r => { const rh = (r.label.length > 62 ? 2 : 1) * 40 + 8; if (cur.length && hh + rh > 1300) { chunkRows.push(cur); cur = []; hh = 0; } cur.push(r); hh += rh; }); if (cur.length) chunkRows.push(cur); } else chunkRows.push(b.rows);
       chunkRows.forEach((rowsPart, ci) => {
-      const hasErr = rowsPart.some(r => r.err), errW = hasErr ? 150 : 0;
-      const px = 27, lh = 40, swW = 34, numW = 130, pctW = 170, labW = TW - swW - numW - pctW - errW - 20;
+      const hasErr = rowsPart.some(r => r.err), hasRaw = rowsPart.some(r => r.raw), errW = hasErr ? (hasRaw ? 120 : 150) : 0, rawW = hasRaw ? 260 : 0;
+      const px = 27, lh = 40, swW = 34, numW = hasRaw ? 120 : 130, pctW = hasRaw ? 140 : 170, labW = TW - swW - numW - pctW - errW - rawW - 20;
       const laid = rowsPart.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
       const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
       const HH = b.head ? 46 : 0, labW0 = labW;
@@ -15197,6 +15207,7 @@ async function msRender(doc, theme, opts) {
           fit(b.head[1], numW + 40, 'right', W - MX - pctW - errW);
           fit(b.head[2], pctW - 10, 'right', W - MX - errW);
           if (hasErr && b.head[3]) fit(b.head[3], errW - 10, 'right', W - MX);
+          if (hasRaw && b.head[4]) fit(b.head[4], rawW - 10, 'right', W - MX - pctW - errW - numW - 70);
         }
         c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8 + HH); c.lineTo(W - MX, y0 + 8 + HH); c.stroke();
         let yy = y0 + 50 + HH;
@@ -15206,6 +15217,7 @@ async function msRender(doc, theme, opts) {
           l.ls.forEach((t, i) => c.fillText(t, MX + swW, yy + i * lh));
           c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW - errW, yy);
           c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX - errW, yy);
+          if (hasRaw && l.r.raw) c.fillText(l.r.raw, W - MX - pctW - errW - numW - 70, yy);
           if (l.r.err) { c.fillStyle = l.r.ec === 'neg' ? '#e8604c' : '#46c28a'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(l.r.err, W - MX, yy); }
           yy += Math.max(1, l.ls.length) * lh + 8;
         });
@@ -15472,7 +15484,9 @@ function msBlockSection(n, lines) {
   out.push({ t: 'p', text: 'A block of length n + 1 = ' + (n + 1) + ' asks that r be coprime to every column ' + (blkIsDefault() ? 'M, M+1, …, M+n' : 'M + o_j, o = ' + [0, 1, 2, 3].map(blkOff).join(', ') + ', …') + ' at once. At a prime p a cell is spoiled when p | r and M ≡ −o_j (mod p) for some j ≤ n: that is ν_p of the p classes of M, so the share ν_p/p² of the lattice is removed. ' + blkNuText() + ' counts those classes.' });
   const D = Dn(n), C = D * Math.PI * Math.PI / 6;
   out.push({ t: 'eq', tex: msT`D(n)=\prod_{p}\left(1-\frac{\nu_p}{p^{2}}\right),\qquad ${blkNuTex()},\qquad C(n)=\zeta(2)\,D(n)` });
-  out.push({ t: 'eq', tex: msT`n=${n}:\qquad D(${n})=${msf(D, 6)},\qquad C(${n})=\tfrac{\pi^{2}}{6}\,D(${n})=${msf(C, 6)}`, cap: 'The product is evaluated over the primes below 200,000; the truncated tail moves D(n) by less than ' + msf((n + 1) * 5e-7, 7) + '.' });
+  out.push({ t: 'eq', tex: msT`n=${n}:\qquad D(${n})=${msf(D, 12)},\qquad C(${n})=\tfrac{\pi^{2}}{6}\,D(${n})=${msf(C, 12)}`, cap: 'Twelve decimals, about eleven of them reliable (double-precision rounding over 18,000 factors). Not a truncated product: see the next paragraph for how the tail is handled.' });
+  out.push({ t: 'p', text: 'How D(n) is computed. The factors for every prime p \u2264 200,000 are multiplied exactly (as a compensated sum of logarithms). For the primes beyond that, every prime has the same \u03bd_p = k (the number of distinct offsets), so log \u220f_{p>P}(1 \u2212 k/p\u00b2) = \u2212\u03a3_m (k\u1d50/m)\u00b7T_m with T_m = \u03a3_{p>P} p^{\u22122m}. Each T_m is the prime zeta value P(2m) minus the sum over the small primes, and P(s) = \u03a3_d \u03bc(d)/d \u00b7 ln \u03b6(ds) is classical (Euler\u2019s product plus M\u00f6bius inversion). T_1, T_2 and T_3 were computed once to 60 digits and are stored; T_1 \u2248 3.8\u00d710\u207b\u2077, T_2 \u2248 3.3\u00d710\u207b\u00b9\u2078, so three terms are far more than double precision needs for k up to 10,000. A plain truncation at 200,000 would instead be high by about k\u00b7T_1 in D(n), which is the 6th decimal for small n. Checked against an independent 40-digit run (exact product for p \u2264 3000 plus the prime-zeta tail), the stored method agrees to about 15 digits at n = 0, 1, 2, 3, 4, 64 and 256.' });
+  if (blkIsDefault() && n <= 1) out.push({ t: 'p', text: n === 0 ? 'Closed form: for n = 0 every \u03bd_p = 1, so D(0) = \u220f(1 \u2212 1/p\u00b2) = 1/\u03b6(2) and C(0) = 1 exactly. The coprime density is 1/\u03b6(2) of the lattice, and C(0) is the share of those that stay coprime.' : 'Closed form: for n = 1 every \u03bd_p = 2 (with \u03bd_2 = 2 as well), so D(1) = \u220f(1 \u2212 2/p\u00b2). This product is tied to the Feller\u2013Tornier constant F = \u00bd(1 + \u220f(1 \u2212 2/p\u00b2)) \u2248 0.6613170495, so C(1) = \u03b6(2)(2F \u2212 1) = 0.5307118204720448\u2026. The constant F is classical and has been computed to many digits.' });
   const sat = blkSatPrimes(n);
   out.push({ t: 'eq', tex: msT`\{\,p\ \mathrm{prime}\ \text{saturated at depth }n\,\}=\{${sat.length ? sat.join(',') : msT`\varnothing`}\}\quad\text{(saturated: }\nu_p=p\text{)}` });
   return out.concat(lines || []);
@@ -15765,7 +15779,7 @@ function msLiftDetail(G, o) {
     let offRing = 0; if (G >= 2) for (let r = 1; r < G; r++) if (gcd(r, G) === 1) offRing++;
     let Cd = NaN; try { Cd = Dn(d) * Math.PI * Math.PI / 6; } catch (e) {}
     out.push({ t: 'eq', tex: msT`\text{r-chain, depth } n_C=${d}:\quad \text{coprime cells}=${tot},\quad \text{kept (block-coprime)}=${kept},\quad \text{teal}=${ok},\quad \text{coral}=${dead}`, cap: 'Counted over every coprime cell with r < M on rings 2 \u2026 G\u22121. A cell is kept when gcd(r, M+j) = 1 for every j = 0 \u2026 ' + d + '; teal = its lift to ring M+1 stays coprime, coral = it breaks. For depth 1 or more every kept cell is teal, so coral lines exist only at depth 0. Ring M = G is left out: its lift lands on ring G+1, off the lattice (' + offRing + ' coprime cells).' });
-    if (isFinite(Cd)) out.push({ t: 'eq', tex: msT`\frac{\text{kept}}{\text{coprime}}=\frac{${kept}}{${tot}}=${msf(tot ? kept / tot : 0, 4)}\quad\text{against}\quad C(${d})=\zeta(2)\,D(${d})=${msf(Cd, 4)}`, cap: 'The kept share is the plate\u2019s own measurement of C(n). It tends to C(n) as G grows with the depth fixed; at finite G, and when the depth is a large fraction of G, it differs by sampling and edge effects.' });
+    if (isFinite(Cd)) out.push({ t: 'eq', tex: msT`\frac{\text{kept}}{\text{coprime}}=\frac{${kept}}{${tot}}=${msf(tot ? kept / tot : 0, 4)}\quad\text{against}\quad C(${d})=\zeta(2)\,D(${d})=${msf(Cd, 8)}`, cap: 'The kept share is the plate\u2019s own measurement of C(n). It tends to C(n) as G grows with the depth fixed; at finite G, and when the depth is a large fraction of G, it differs by sampling and edge effects.' });
 
     // The ratio as n grows: one pass records each cell's first failing column f (>= 1 since gcd(r, M) = 1),
     // capped just above the deepest depth listed. A cell is kept at depth n exactly when f > n, so every
@@ -15792,10 +15806,10 @@ function msLiftDetail(G, o) {
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
         cpts.push({ n: k, kept: above, share: above / TT, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / TT - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
         if (ds.indexOf(k) < 0) continue;
-        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(4) : '\u2013'), n: above, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(8) : '\u2013'), raw: isFinite(Ck) ? (Ck / (Math.PI * Math.PI / 6)).toFixed(8) : '', n: above, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
-      out.push({ t: 'p', text: (sk ? 'Restricted to the selection on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
-      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error'], rows: rows });
+      out.push({ t: 'p', text: (sk ? 'Restricted to the selection on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it, and the raw density D(n) = C(n)/\u03b6(2) in its own column. C(n) is normalised to the coprime cells and D(n) to all cells: D(n) is the limiting share of the whole lattice that is coprime to every column of the block, and C(n) = \u03b6(2)\u00b7D(n) is the share of the coprime cells that stay so. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
+      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept', 'share', 'error', 'raw D(n)'], rows: rows });
       try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; these are measured values only, with no fitted curve drawn through them.' }); } catch (e) {}
       try { out.push({ t: 'iplate', items: [{ label: 'error map, all n', cv: msErrMap(G) }], cap: 'The same error for every depth n = 1 \u2026 40 at once, against G (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). Green: the kept share is above C(n); red: below; dark teal: inside \u00b11%. Reading across a row shows one depth settling as G grows; reading down a column shows how depth costs accuracy at a fixed G.' }); } catch (e) {}
       try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, TT, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
@@ -16618,10 +16632,10 @@ function msDocToHtml(doc) {
       b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
       h += '</table></div>';
     } else if (b.t === 'table') {
-      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th><th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
+      h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th>' + (b.rows.some(r => r.raw) && b.head[4] ? '<th style="text-align:right">' + msEsc(b.head[4]) + '</th>' : '') + '<th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
       b.rows.forEach(r => {
         h += '<tr><td class="sw">' + (r.sw ? '<i style="background:' + r.sw + '"></i>' : '') + '</td>' +
-          '<td class="lab">' + msEsc(r.label) + '</td>' +
+          '<td class="lab">' + msEsc(r.label) + '</td>' + (b.rows.some(q => q.raw) ? '<td class="pct">' + msEsc(r.raw || '') + '</td>' : '') +
           '<td class="n">' + msEsc(String(r.n)) + '</td>' +
           '<td class="pct">' + msEsc(r.pct) + '</td>' + (r.err ? '<td class="pct" style="font-weight:600;color:' + (r.ec === 'neg' ? '#e8604c' : '#2fa874') + '">' + msEsc(r.err) + '</td>' : '') + '</tr>';
       });
