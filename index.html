@@ -510,11 +510,13 @@ select{cursor:pointer;}
    the canvas stays on screen, hovering above the controls, while the rest of
    the opener's panel scrolls underneath it. Mainly for mobile, where there's
    no room to see both the canvas and a control far down the page at once. */
-#welcome-preview.wp-locked{position:sticky;top:0;z-index:40;background:var(--bg1);
+#welcome-stage.wp-locked{position:sticky;top:0;z-index:40;background:var(--bg1);
   padding:8px 8px 4px;margin-left:-8px;margin-right:-8px;
   box-shadow:0 8px 16px -6px rgba(0,0,0,.5);}
+#welcome-stage.wp-locked #welcome-growrow .hint{display:none;}
+#welcome-stage.wp-locked #welcome-growrow{padding:4px 0 0;}
 @media (min-width:900px){
-  #welcome-preview.wp-locked{margin-left:-34px;margin-right:-34px;padding-left:34px;padding-right:34px;}
+  #welcome-stage.wp-locked{margin-left:-34px;margin-right:-34px;padding-left:34px;padding-right:34px;}
 }
 #welcome-preview.wv-solo .wp-tile{grid-area:solo;justify-self:center;}
 /* Lines up with the bottom of the Grid/Ring tiles, right beside their own turn rows. */
@@ -776,6 +778,65 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   single geometric setting in which these familiar densities are one computation, and a
   browser that recomputes each of them from scratch.</div>
 </div>
+
+<section id="sec0" class="dsec collapsed">
+<h2 class="dsec-h" onclick="toggleSec('sec0')"><span class="num">§0 · Guide</span>What the opener and this page show, in classical terms<span class="car">&#9662;</span></h2>
+<div class="dsec-b">
+
+<div class="lead">
+<p>The opener and this page draw one object: the triangle of cells $(r, M)$ with $1\le r\le M\le G$. A cell is <i>coprime</i> when $\gcd(r,M)=1$. Everything below is a different way of looking at that triangle, and each way rests on a classical result. Nothing here is a new theorem; the exact counts are computed in your browser, and anything only observed is labelled as such.</p>
+</div>
+
+<h3>The three views</h3>
+<p><b>Grid</b> plots $(r, M)$ as a square lattice. <b>Ring</b> places ring $M$ at a radius and cell $r$ at angle $2\pi r/M$, so ring $M$ holds the fractions $r/M$ (the Farey structure). <b>Cayley</b> maps the ring plane with $\Gamma(z)=(z-1)/(z+1)$, a M&ouml;bius transformation, with radius $\rho=\rho_0+\rho_D M/G$. The views are presentation only; no count depends on which one is shown. Colouring, labels (r, M, gcd, residue, degrees, and so on) and the G slider are shared by all three.</p>
+
+<h3>The sieve, step by step (what C(n) does)</h3>
+<p>A cell survives to depth $n$ when $r$ is coprime to every one of $M, M+1, \dots, M+n$.</p>
+<ul>
+<li><b>$n=0$.</b> Only $\gcd(r,M)=1$ is asked, so every coprime cell is kept.</li>
+<li><b>$n=1$.</b> Two consecutive numbers $M, M+1$ always include an even one, so every cell with $2\mid r$ is removed, whatever $M$ is. Depth $p-1$ saturates the prime $p$.</li>
+<li><b>$n=2$.</b> Three consecutive numbers always include a multiple of 3, so every cell with $3\mid r$ goes too. In general a prime $p\le n+1$ removes every cell with $p\mid r$.</li>
+<li><b>A prime $p>n+1$</b> removes only the cells with $p\mid r$ and $M$ in one of $n+1$ of the $p$ residue classes mod $p$: a fraction $(n+1)/p^2$ of all cells.</li>
+</ul>
+<p>The Chinese remainder theorem lets the primes act independently, so the surviving share of coprime cells tends to $C(n)=\zeta(2)\prod_p\bigl(1-\min(n+1,p)/p^2\bigr)=\prod_p\frac{1-\min(n+1,p)/p^2}{1-1/p^2}$, an Euler product with $C(0)=1$, $C(1)\approx0.5307$, $C(2)\approx0.4128$. $C(n)$ is a limiting density, the share of coprime cells that are kept; it is not a count of zeros, and the only zeta value that appears is $\zeta(2)=\pi^2/6$. The opener's <i>r-chain</i> draws, for each $r$, the line $(r,M)\to(r,M+1)$ and cuts it once a saturated prime divides $r$; <i>hide broken cells</i> removes the cells that no longer survive; the <i>C(n)</i> stepper moves $n$, and the lock ties the chain depth to the $\pm n$ path's $n$.</p>
+<p>The sheets compare the plate's own count with $C(n)$ at finite $G$: exact counts by inclusion&ndash;exclusion with M&ouml;bius weights, an error table for every $n$, and an error map. What is seen there &mdash; the error shrinking roughly tenfold per decade of $G$ at fixed $n$, and changing sign at larger $n$ &mdash; is an observation made on this page, not a theorem.</p>
+
+<h3>The lift overlays</h3>
+<ul>
+<li><b>Mirror</b> $\sigma(r)=M-r$: $\gcd(r,M)=\gcd(M-r,M)$, so coprime cells map to coprime cells ($\varphi(M)$ is even for $M>2$).</li>
+<li><b>Spiral prime $p$</b>: the column $r=p$ is coprime to $M$ unless $p\mid M$; the ring $M=p$ is the dropout ring. <b>All p</b> draws every prime $p\le G$. (It is unrelated to the Ulam spiral.)</li>
+<li><b>$\pm n$ path</b> $r=(M\pm n)/2$: the solutions of $2r\equiv\pm n \pmod M$.</li>
+<li><b>Connect</b> joins the spiral and the path at shared rings. As $n\to n+1$ the lines change only when $n+2$ is prime (the red "about to be cut" set); the sheets list kept / about to be cut / cut for $n-1, n, n+1$.</li>
+</ul>
+
+<h3>Sectors, strips and slopes</h3>
+<p><b>Sector $S_s$</b> is the set $\lfloor M/r\rfloor=s$: the first step of the Euclidean algorithm, with wedge $\tfrac1{s+1}<r/M\le\tfrac1s$ between consecutive unit fractions (Farey intervals). A wedge holds about $1/(s(s+1))$ of the triangle by area; <i>all</i> draws every sector up to $S_G$, and the slope-window mode is a general Stern&ndash;Brocot interval. A <b>strip</b> is the band $s\le br-aM<s+w$; on the line $br-aM=c$ the coprime density is $\varphi(|c|)/|c|$, and a band's density is the weighted mean of those.</p>
+
+<h3>Goldbach, and the pair finder</h3>
+<p>For even $E$ the points $(g,E-g)$ lie on the anti-diagonal $r+M=E$ (slope $-1$); a pair is a point where $g$ and $E-g$ are both prime, found by sieve. The opener's <i>pair finder</i> draws the $E$-line across the grid and lights every pair; on this page $E=2(G+1)$, so the finder sets $G=E/2-1$ and selects the first pair. This restates Goldbach in lattice coordinates and checks cases. It is not progress on the conjecture, and the Hardy&ndash;Littlewood count it is compared with is a heuristic.</p>
+
+<h3>The sheets</h3>
+<p>The math sheet and the sieve-only sheet export the state shown: parameters, derivations with the exact numbers, plates, and (in advanced mode) isolated plates for each layer, sheet-only switches for the spiral, mirror and $\pm n$ path, and a C(n) stepper that rebuilds the sheet at its own depth without changing the opener.</p>
+
+<h3>Which classical result is behind which control</h3>
+<div class="scroll"><table>
+<tr><th>Control</th><th>Classical ingredient</th><th>Status</th></tr>
+<tr><td>Coprime colouring, G</td><td>Euclid, B&eacute;zout, $\Phi(G)=\sum\varphi(M)$, density $1/\zeta(2)$ (Dirichlet, Mertens, Ces&agrave;ro)</td><td>theorem</td></tr>
+<tr><td>C(n), r-chain, hide broken</td><td>Eratosthenes&ndash;Legendre sieve, CRT, Euler product, Hardy&ndash;Littlewood local factors</td><td>elementary proof</td></tr>
+<tr><td>C(n) decay, saturated primes</td><td>Mertens' third theorem: $C(n)\sim\zeta(2)e^{-\gamma}/\ln n$ to leading order</td><td>classical asymptotic, quoted</td></tr>
+<tr><td>Exact counts on sheets</td><td>M&ouml;bius inversion, inclusion&ndash;exclusion</td><td>exact</td></tr>
+<tr><td>Error vs C(n) at finite G</td><td>none</td><td>observed only</td></tr>
+<tr><td>Mirror, spiral, $\pm n$, connect</td><td>Euclid (gcd), Euler ($\varphi$), B&eacute;zout</td><td>drawing of elementary facts</td></tr>
+<tr><td>Sectors, slope window</td><td>Euclidean algorithm, Farey and Stern&ndash;Brocot</td><td>drawing, with area estimate</td></tr>
+<tr><td>Strips and slope</td><td>$\varphi(|c|)/|c|$ on a line</td><td>classical identity</td></tr>
+<tr><td>Ring view, circle method fill</td><td>Farey fractions; Dirichlet kernel, Hardy&ndash;Littlewood</td><td>rendering, not the method</td></tr>
+<tr><td>Cayley view</td><td>M&ouml;bius transformation, Riemann sphere</td><td>presentation</td></tr>
+<tr><td>Goldbach E-line, pair finder</td><td>Goldbach, Euler, Hardy&ndash;Littlewood</td><td>restatement and case-checking</td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--cream3);">The most accurate name for the object is an <i>Euler-product block sieve on the coprime lattice</i>. Full attribution, with chips that open each result on the page, is in the credits panel at the bottom.</p>
+
+</div>
+</section>
 
 <section id="sec1" class="dsec collapsed">
 <h2 class="dsec-h" onclick="toggleSec('sec1')"><span class="num">§1 · Setup</span>Blocks, strips, and the residue count<span class="car">&#9662;</span></h2>
@@ -1484,6 +1545,7 @@ walk anyway.</p>
           <button class="sbtn" onclick="stepSectorRays(1)">+</button>
         </div>
         <input type="range" id="sec-rays-sl" min="1" max="4096" step="1" value="8" oninput="setSectorRays(+this.value)">
+        <button class="chip" id="sec-all" onclick="secAllRays()" title="Draw every sector S_1 &hellip; S_G, and keep it at S_G as G changes.">all</button>
         <span class="hint">how many sectors S&#8321;&hellip;S_rays draw as bands when nothing below is isolated &mdash; goes up to the last sector this G has, S_G</span>
       </div>
       <div class="prow" id="sector-pick-row" style="display:none">
@@ -1576,6 +1638,11 @@ walk anyway.</p>
       <div class="sep"></div>
       <button class="chip" onclick="stepPair(-1)" title="previous Goldbach pair of E">&#9664; pair</button>
       <button class="chip" onclick="stepPair(1)" title="next Goldbach pair of E">pair &#9654;</button>
+      <div class="sep"></div>
+      <span class="lbl" title="Pair finder: type an even E. The grid is set to G = E/2 &minus; 1 so that E = 2(G+1), and the first Goldbach pair of E is selected.">E</span>
+      <input type="number" id="pf-e" value="100" min="6" step="2" style="width:80px" onchange="pfFind(+this.value)">
+      <button class="chip" onclick="pfFind(+$('pf-e').value)" title="Set G = E/2 &minus; 1 and show the first pair g + (E &minus; g)">find pair</button>
+      <span class="lbl" id="pf-note"></span>
       <div class="sep"></div>
       <button class="chip" id="part-playg" onclick="togglePlayGap()" title="Walk g from 1 to G+1 and back, drawing every partition's four strips live.">&#9654; Play g</button>
       <button class="chip" id="part-playp" onclick="togglePlayPairs()" title="Walk only the Goldbach pairs of E, one at a time, looping. In pair &rarr; pair mode it walks the runs themselves instead.">&#9654; Play Goldbach pairs</button>
@@ -1904,19 +1971,9 @@ walk anyway.</p>
       </div>
       <div class="pnote ol-preset-cap" style="padding:0 0 10px;line-height:1.6;min-height:1.6em;"></div>
     </div>
-    <div class="prow">
-      <span class="plabel">Live preview &middot; G = <b id="welcome-g-v">13</b></span>
-      <button class="chip ms-prev-btn" onclick="msPreviewOpener()" title="Open the math sheet right here as a scrollable pop-up &mdash; the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
-      <span style="flex-basis:100%;height:0"></span>
-      <button class="chip ms-prev-btn" onclick="msPreviewOpener(true)" title="Open just the sieve as a pop-up: D(n) and C(n) prime by prime, the r-chain plate and a dense depth table. Has the C(n) and G controls built in.">&#8984; Preview the sieve only</button>
-      <span style="flex-basis:100%;height:0"></span>
-      <button class="chip" onclick="stepOpenerG(-1)" title="G &minus; 1">&minus;</button>
-      <button class="chip" onclick="stepOpenerG(1)" title="G + 1">+</button>
-      <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
-      <button class="chip" onclick="stepOpenerGPrime(1)" title="Next prime G">p&#9654;</button>
-      <button class="chip tl on" id="welcome-g-play" onclick="toggleOpenerPlay()" title="Loop the preview lattice from G = 2 up to 100 and back. Plays when the opener opens; dragging the slider stops it.">&#9632; Stop</button>
-      <input type="range" id="welcome-g" min="2" max="1024" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 1024. Doesn't change the G on the page.">
-      <span class="hint">preview only</span>
+    <div class="prow" id="welcome-sheetbtns" style="flex-wrap:nowrap;gap:8px;">
+      <button class="chip ms-prev-btn" style="flex:1 1 0;min-width:0;white-space:normal;" onclick="msPreviewOpener()" title="Open the math sheet right here as a scrollable pop-up &mdash; the exact same content the PNG pages export, before you download anything.">&#128065; Preview the math sheet</button>
+      <button class="chip ms-prev-btn" style="flex:1 1 0;min-width:0;white-space:normal;" onclick="msPreviewOpener(true)" title="Open just the sieve as a pop-up: D(n) and C(n) prime by prime, the r-chain plate and a dense depth table. Has the C(n) and G controls built in.">&#8984; Preview the sieve only</button>
     </div>
     <div class="prow" id="welcome-holerow" style="padding:3px 0 6px;" title="Ring preview&#39;s inner radius, as a fraction of the plate. At 1 every ring collapses onto one circle &mdash; the roots of unity. Preview only.">
       <span class="lbl">hole</span>
@@ -1928,10 +1985,11 @@ walk anyway.</p>
     </div>
     <div class="prow" style="padding:2px 0 6px;">
       <span class="lbl">view</span>
-      <button class="chip wv-view-btn" data-v="grid" onclick="wvSetView('grid')" title="Just the Grid tile — lighter to redraw and to Play than all three at once.">Grid</button>
-      <button class="chip wv-view-btn" data-v="ring" onclick="wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
-      <button class="chip wv-view-btn" data-v="cayley" onclick="wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
-      <button class="chip wv-view-btn on" data-v="all3" onclick="wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
+      <button class="chip wv-view-btn" data-v="grid" onclick="olCountdownStop();wvSetView('grid')" title="Just the Grid tile — lighter to redraw and to Play than all three at once.">Grid</button>
+      <button class="chip wv-view-btn" data-v="ring" onclick="olCountdownStop();wvSetView('ring')" title="Just the Ring tile — lighter to redraw and to Play than all three at once.">Ring</button>
+      <button class="chip wv-view-btn" data-v="cayley" onclick="olCountdownStop();wvSetView('cayley')" title="Just the Cayley tile — lighter to redraw and to Play than all three at once.">Cayley</button>
+      <button class="chip wv-view-btn on" data-v="all3" onclick="olCountdownStop();wvSetView('all3')" title="Grid, Ring and Cayley together, as before.">All 3</button>
+      <button class="chip" id="wv-cd" onclick="olCountdownStop()" title="After 15 seconds the opener switches to Ring and turns on the labels by r. Click to cancel; touching the view or label buttons cancels it too." style="display:none;color:var(--gold);border-color:var(--gold)"></button>
       <button class="chip" id="welcome-lock-btn" onclick="toggleOpenerLock()" title="Pin the canvas(es) to the top of this panel so they stay on screen while you scroll the controls below them. Handy on a phone, where the canvas and a control further down don't otherwise fit on screen together.">⛶ Lock canvas</button>
       <span class="lbl" title="Print a small label at every point, on Grid, Ring and Cayley alike. Only while G &le; 31 &mdash; past that there isn't room to read them; stepping the mode has no visible effect until G comes back down.">labels</span>
       <button class="chip" onclick="stepOpenerLabelMode(-1)" title="Previous label mode">&#9650;</button>
@@ -1958,6 +2016,7 @@ walk anyway.</p>
       <button class="chip ol-ringdir-btn" data-dir="cw" onclick="olSetRingDir(false)" title="&theta; = 0 at the right, increasing clockwise &mdash; the default.">&#8635; CW</button>
       <span class="hint">Ring &amp; Cayley only</span>
     </div>
+    <div id="welcome-stage">
     <div id="welcome-preview">
       <div class="wp-tile wp-grid">
         <canvas id="welcome-cv-grid"></canvas>
@@ -1977,12 +2036,23 @@ walk anyway.</p>
         <div style="font-size:11px;color:var(--cream3);margin-top:4px;letter-spacing:.04em;">CAYLEY</div>
       </div>
     </div>
+    <div class="prow" id="welcome-growrow" style="padding:6px 0 2px;flex-wrap:wrap;gap:6px;">
+      <span class="plabel" style="white-space:nowrap;">G = <b id="welcome-g-v">13</b></span>
+      <button class="chip" onclick="stepOpenerG(-1)" title="G &minus; 1">&minus;</button>
+      <button class="chip" onclick="stepOpenerG(1)" title="G + 1">+</button>
+      <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
+      <button class="chip" onclick="stepOpenerGPrime(1)" title="Next prime G">p&#9654;</button>
+      <button class="chip tl on" id="welcome-g-play" onclick="toggleOpenerPlay()" title="Loop the preview lattice from G = 2 up to 100 and back. Plays when the opener opens; dragging the slider stops it.">&#9632; Stop</button>
+      <input type="range" id="welcome-g" min="2" max="1024" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 1024. Doesn't change the G on the page.">
+      <span class="hint" style="white-space:nowrap;">preview only</span>
+    </div>
+    </div>
     <div class="prow" id="welcome-rhorow" style="padding:6px 0;" title="Cayley map A: z = &rho;&middot;e^{i&theta;}, &Gamma;(z) = (z&minus;1)/(z+1), &rho; = &rho;&#8320; + &rho;<sub>D</sub>&middot;M/G. Preview only.">
       <span class="lbl">&rho;&#8320;</span>
       <input type="range" id="welcome-rho0" min="0" max="4" step="0.05" value="0.4" oninput="setOpenerRho0(+this.value)" style="flex:1 1 60px;min-width:50px;">
       <span class="val" id="welcome-rho0-v" style="min-width:32px;">0.40</span>
       <span class="lbl">&rho;<sub>D</sub></span>
-      <input type="range" id="welcome-rhod" min="0" max="4" step="0.05" value="1.8" oninput="setOpenerRhoD(+this.value)" style="flex:1 1 60px;min-width:50px;">
+      <input type="range" id="welcome-rhod" min="0" max="16" step="0.05" value="1.8" oninput="setOpenerRhoD(+this.value)" style="flex:1 1 60px;min-width:50px;">
       <span class="val" id="welcome-rhod-v" style="min-width:32px;">1.80</span>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0,2)" title="&rho; runs 0 &rarr; 2, starting at the origin. The innermost rings pile up near &Gamma;(0) = &minus;1.">0&middot;2</button>
       <button class="chip" style="font-size:9.5px;padding:2px 6px;" onclick="setOpenerRhoPair(0.4,0.6)" title="&rho;&#8320; 0.40, &rho;<sub>D</sub> 0.60: &rho; runs 0.4 &rarr; 1.0, inside the unit circle.">.4&middot;.6</button>
@@ -2075,7 +2145,7 @@ walk anyway.</p>
         <span class="lbl" title="Sector number s. 0 = All: the first k sectors are banded in their own colours.">s</span>
         <div class="stepper"><button class="sbtn" onclick="olSecStepPick(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sec-pick" type="number" min="0" step="1" value="0" onchange="olSecSetPick(this.value)" style="width:40px;"><button class="sbtn" onclick="olSecStepPick(1)" title="+1">+</button></div>
         <span class="lbl" title="With All (s = 0): how many sectors S_1 &hellip; S_k to band, and to keep when dimming the rest.">first k</span>
-        <div class="stepper"><button class="sbtn" onclick="olSecStepRays(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sec-rays" type="number" min="1" step="1" value="8" onchange="olSecSetRays(this.value)" style="width:38px;"><button class="sbtn" onclick="olSecStepRays(1)" title="+1">+</button></div>
+        <div class="stepper"><button class="sbtn" onclick="olSecStepRays(-1)" title="&minus;1">&minus;</button><input class="sval" id="ol-sec-rays" type="number" min="1" step="1" value="8" onchange="olSecSetRays(this.value)" style="width:38px;"><button class="sbtn" onclick="olSecStepRays(1)" title="+1">+</button></div><button class="chip" id="ol-sec-all" onclick="olSecAllRays()" title="Take every sector S_1 … S_G the lattice has, not just the first k. It follows G when you move the slider.">all</button>
         <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(232,227,219,.9);cursor:pointer;font-size:11.5px;" title="With All: dim every cell that is not in one of the first k sectors."><input type="checkbox" id="ol-sec-dimout" checked onchange="olSecSetDimOut(this.checked)"> dim non-sectors</label>
         <span class="lbl">dim to</span>
         <input type="range" id="ol-sec-dim" min="0" max="100" step="1" value="50" oninput="olSecSetDim(this.value)" style="max-width:100px;" title="How much of a cell outside the sector stays visible. 0 hides it, 100 leaves it untouched.">
@@ -2703,6 +2773,28 @@ Full attribution is in the credits panel below.
   $e^{-\gamma}/\ln(n+1)$, and the prime number theorem behind the density $1/\ln t$ in the finer Goldbach integral
   $\int_2^{E-2}dt/(\ln t\,\ln(E-t))$ the sheets compare with the exact count.<div class="cgo"><button class="chip" onclick="cgo({panel:'Prime counter'})">the counter</button><button class="chip" onclick="cgo({sub:'one caveat'})">what li₂ is</button></div></td></tr>
 
+  <tr><td><b>Euclid</b> (the Euclidean algorithm); <b>John Farey</b>, <b>Moritz Stern</b>, <b>Achille Brocot</b>; <b>Gauss</b>&ndash;<b>Kuzmin</b> for context</td>
+  <td>The sectors. $S_s=\{(r,M):\lfloor M/r\rfloor=s\}$ is the first step of the Euclidean algorithm on $(M,r)$: $s$ is the first partial quotient of $M/r$,
+  and the wedge $\tfrac1{s+1}<r/M\le\tfrac1s$ is bounded by consecutive unit fractions, the simplest Farey/Stern&ndash;Brocot intervals. The slope-window mode is the general
+  Stern&ndash;Brocot interval. A wedge holds a share $\approx 1/(s(s+1))$ of the $r\le M$ triangle by area; that elementary count is what the sector table compares
+  with the exact coprime counts. The Gauss&ndash;Kuzmin law concerns the <i>later</i> partial quotients and is not displayed here. The plate counts, it proves nothing.<div class="cgo"><button class="chip" onclick="cgo({sector:{all:true},scroll:'cv'})">S&#8321;&hellip;S_G, all</button><button class="chip" onclick="cgo({sector:{pick:2},scroll:'cv'})">isolate S&#8322;</button></div></td></tr>
+
+  <tr><td><b>Eratosthenes</b>, <b>Legendre</b>; <b>Chinese remainder theorem</b>; <b>Euler</b> (product), <b>M&ouml;bius</b>; <b>Hardy</b>&ndash;<b>Littlewood</b> (local factors); <b>Viggo Brun</b> (the habit of a finite-depth sieve)</td>
+  <td>The block-coprime depth $n$ and $C(n)$, the Euler-product block sieve. A cell $(r,M)$ is kept at depth $n$ when $r$ is coprime to every $M,\dots,M+n$. Among $n+1$ consecutive
+  integers a prime $p\le n+1$ divides one of them whatever $M$ is (pigeonhole), so every cell with $p\mid r$ is removed: depth $p-1$ saturates $p$. A larger prime removes
+  only $n+1$ of its $p$ residue classes for $M$. By CRT the primes act independently, giving $D(n)=\prod_p(1-\nu_p/p^2)$ with $\nu_p=\min(n+1,p)$, and $C(n)=\zeta(2)D(n)$ is the limiting share of
+  coprime cells kept. The exact counts on the sheets are Legendre-style inclusion&ndash;exclusion with M&ouml;bius weights. The measured error against $C(n)$ at finite $G$ (its size, and its sign changes at larger $n$) is
+  an empirical observation made on this page, not a theorem.<div class="cgo"><button class="chip" onclick="cgo({lift:{mode:'none',n:4},scroll:'cv'})">depth n = 4</button><button class="chip" onclick="cgo({lift:{mode:'none',n:16},scroll:'cv'})">depth n = 16</button></div></td></tr>
+
+  <tr><td><b>Euclid</b> (gcd by subtraction); <b>Euler</b> ($\varphi$, $(\mathbb Z/M\mathbb Z)^{\times}$); <b>Bachet</b>&ndash;<b>B&eacute;zout</b></td>
+  <td>The mirror, the spiral and the $\pm n$ path. $\gcd(r,M)=\gcd(M-r,M)$, so $\sigma(r)=M-r$ maps coprime cells to coprime cells, which is why $\varphi(M)$ is even for $M>2$.
+  The spiral prime $p$ is the column $r=p$: coprime except at $M=p$ and its multiples (the dropout ring). The $\pm n$ path $r=(M\pm n)/2$ is where $2r\equiv\pm n \pmod M$, i.e. $2r\mp n$ vanishes mod $M$,
+  a B&eacute;zout-type condition. The page's &ldquo;spiral&rdquo; has no relation to the Ulam prime spiral (1963).<div class="cgo"><button class="chip" onclick="cgo({lift:{mode:'spiral',mirror:true},scroll:'cv'})">spiral + mirror</button><button class="chip" onclick="cgo({lift:{mode:'npath',n:6},scroll:'cv'})">&plusmn;n path</button><button class="chip" onclick="cgo({lift:{mode:'connect',n:6},scroll:'cv'})">connect</button></div></td></tr>
+
+  <tr><td><b>Goldbach</b> &amp; <b>Euler</b>; <b>Eratosthenes</b>; <b>Hardy</b>&ndash;<b>Littlewood</b></td>
+  <td>The pair finder. For an even $E$ every pair $g+(E-g)$ is a point on the anti-diagonal $r+M=E$; the pairs with both $g$ and $E-g$ prime are found by sieve. On this page $E=2(G+1)$,
+  so the finder sets $G=E/2-1$ and selects the first pair. It restates the conjecture in lattice coordinates and checks cases; it is not progress on it, and the Hardy&ndash;Littlewood count remains a heuristic.<div class="cgo"><button class="chip" onclick="cgo({pf:98,scroll:'cv'})">E = 98</button><button class="chip" onclick="cgo({pf:1000,scroll:'cv'})">E = 1000</button></div></td></tr>
+
   <tr><td>Presentation, not attribution &mdash;<br>the r-chain, Goldbach strips and gold markers</td>
   <td>The r-chain ($r\to r \bmod (M+1)$ kept while $\gcd(r,M+j)=1$), the four strips $r+M=g$, $r+M=s$, $M-r=g$,
   $r-M=g$, and the gold marker $P_g=(g,s)$ are ways of drawing the elementary Goldbach identity $g+s=E$ with
@@ -3300,7 +3392,10 @@ function toggleSector() {
   if (typeof LENS_REDRAW === 'function') LENS_REDRAW();
   redraw(true);   // isolate mode changes what the cached backdrops contain
 }
+let sectorAll = false;
+function secAllRays() { setSectorRays(COP_G || G); sectorAll = true; { const b = $('sec-all'); if (b) b.classList.add('on'); } }
 function setSectorRays(v) {
+  sectorAll = false; { const b = $('sec-all'); if (b) b.classList.remove('on'); }
   sectorRays = Math.max(1, Math.min(COP_G, Math.round(v) || 1));
   $('sec-rays-num').value = sectorRays;
   $('sec-rays-sl').value = Math.min(sectorRays, +$('sec-rays-sl').max);
@@ -3774,6 +3869,7 @@ function openerLabelText(mode, r, M) {
     :                  r + '/' + M;   // 'rM', and the fallback
 }
 function stepOpenerLabelMode(d) {
+  if (typeof olCountdownStop === 'function') olCountdownStop();
   const n = OPENER_LABEL_MODES.length;
   _openerLblIdx = ((_openerLblIdx + d) % n + n) % n;
   const m = OPENER_LABEL_MODES[_openerLblIdx];
@@ -3872,6 +3968,7 @@ function stepOpenerGPrime(dir) {
 }
 function setOpenerG(v) {
   OPENER_G = Math.max(2, Math.min(OPENER_COP_MAX, Math.round(+v) || 13));
+  if (typeof OL !== 'undefined' && OL.sec && OL.sec.all) OL.sec.rays = OPENER_G;   // "all" sectors follows G
   const l = $('welcome-g-v'); if (l) l.textContent = OPENER_G;
   const sl = $('welcome-g'); if (sl && +sl.value !== OPENER_G) sl.value = OPENER_G;   // so Play moves the thumb too
   openerRedrawSoon();
@@ -4527,7 +4624,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
 }
 // The lift settings only move the overlays, so redraw the three tiles and leave the tally alone.
 var MS_ISO = { on: false, hideBase: false, noStrips: false, noMarker: false };   // isolated section plates (math-sheet advanced mode)
-var MS_ADV = { on: false, cn: null, sieve: false };                                            // preview-only advanced mode; cn overrides C(n) on the sheet only
+var MS_ADV = { on: false, cn: null, sieve: false, off: {} };                                            // preview-only advanced mode; cn overrides C(n) on the sheet only
 let _olRaf = 0;
 function openerOverlaySoon() {
   if (_olRaf) return;
@@ -4916,7 +5013,8 @@ function olSecToggle(v) { OL.sec.on = !!v; olRedraw(); }
 function olSecSetMode(m) { OL.sec.mode = m === 'slopes' ? 'slopes' : 'sector'; OL.sec.on = true; olRedraw(); }
 function olSecSetPick(v) { const k = Math.round(Number(v)); OL.sec.pick = isFinite(k) ? Math.max(0, Math.min(OPENER_G, k)) : 0; OL.sec.mode = 'sector'; OL.sec.on = true; olRedraw(); }
 function olSecStepPick(d) { olSecSetPick((OL.sec.pick || 0) + d); }
-function olSecSetRays(v) { const k = Math.round(Number(v)); OL.sec.rays = isFinite(k) ? Math.max(1, Math.min(OPENER_G, k)) : 8; olRedraw(); }
+function olSecSetRays(v) { OL.sec.all = false; const k = Math.round(Number(v)); OL.sec.rays = isFinite(k) ? Math.max(1, Math.min(OPENER_G, k)) : 8; olRedraw(); }
+function olSecAllRays() { OL.sec.all = true; OL.sec.rays = OPENER_G; olRedraw(); }
 function olSecStepRays(d) { olSecSetRays((OL.sec.rays || 1) + d); }
 function olSecSetDimOut(v) { OL.sec.dimOut = !!v; olRedraw(); }
 function olSecSetDim(v) { const k = Math.round(Number(v)); OL.sec.dim = isFinite(k) ? Math.max(0, Math.min(100, k)) : 50; const l = $('ol-sec-dim-v'); if (l) l.textContent = OL.sec.dim + '%'; olRedraw(); }
@@ -4942,7 +5040,7 @@ function olSecSync() {
   const chk = (id, v) => { const el = $(id); if (el && el.checked !== v) el.checked = v; };
   const num = (id, v) => { const el = $(id); if (el && document.activeElement !== el) el.value = v; };
   chk('ol-sec-chk', !!S.on); chk('ol-sec-dimout', !!S.dimOut); chk('ol-sec-bands', !!S.bands);
-  num('ol-sec-pick', S.pick); num('ol-sec-rays', S.rays); num('ol-sec-alo', S.aLo); num('ol-sec-blo', S.bLo); num('ol-sec-ahi', S.aHi); num('ol-sec-bhi', S.bHi);
+  { const ab = $('ol-sec-all'); if (ab) { ab.style.color = S.all ? 'var(--gold)' : ''; ab.style.borderColor = S.all ? 'var(--gold)' : ''; } } num('ol-sec-pick', S.pick); num('ol-sec-rays', S.rays); num('ol-sec-alo', S.aLo); num('ol-sec-blo', S.bLo); num('ol-sec-ahi', S.aHi); num('ol-sec-bhi', S.bHi);
   const dm = $('ol-sec-dim'); if (dm && document.activeElement !== dm) dm.value = S.dim; const dv = $('ol-sec-dim-v'); if (dv) dv.textContent = S.dim + '%';
   document.querySelectorAll('.ol-sec-mode').forEach(b => b.classList.toggle('on', S.on && b.dataset.m === S.mode));
   const sr = $('ol-sec-slopes-row'); if (sr) sr.style.display = S.mode === 'slopes' ? '' : 'none';
@@ -5710,7 +5808,7 @@ function wireOpenerTileZoom(canvasId, key, opts) {
   cv.addEventListener('dblclick', () => openerZoomReset(key));
 }
 function toggleOpenerLock() {
-  const wp = $('welcome-preview'); if (!wp) return;
+  const wp = $('welcome-stage'); if (!wp) return;
   const on = wp.classList.toggle('wp-locked');
   const btn = $('welcome-lock-btn');
   if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? '⤫ Unlock canvas' : '⛶ Lock canvas'; }
@@ -5734,7 +5832,7 @@ function setOpenerRho0(v) {
   openerRotSoon('x');   // Cayley tile only
 }
 function setOpenerRhoD(v) {
-  OPENER_RHOD = Math.max(0, Math.min(4, +v || 0));
+  OPENER_RHOD = Math.max(0, Math.min(16, +v || 0));
   const sl = $('welcome-rhod'); if (sl && +sl.value !== OPENER_RHOD) sl.value = OPENER_RHOD;
   const l = $('welcome-rhod-v'); if (l) l.textContent = OPENER_RHOD.toFixed(2);
   openerRotSoon('x');
@@ -6216,6 +6314,22 @@ function toggleOpenerMusic() {
   const b = $('welcome-music-btn'); if (b) { b.classList.toggle('on', _openerMusicOn); b.textContent = (_openerMusicOn ? '\u266b' : '\u266a') + ' Music'; }
   if (_openerMusicOn) startOpenerMusic(); else stopOpenerMusic();
 }
+let _olCd = null;
+function olCountdownStop() { if (_olCd) { clearInterval(_olCd); _olCd = null; } const b = $('wv-cd'); if (b) b.style.display = 'none'; }
+function olCountdownStart(sec) {
+  olCountdownStop(); let left = sec; const b = $('wv-cd'); if (!b) return;
+  b.style.display = ''; b.textContent = 'Ring + labels in ' + left + 's \u2715';
+  _olCd = setInterval(() => {
+    left--;
+    if (left > 0) { b.textContent = 'Ring + labels in ' + left + 's \u2715'; return; }
+    olCountdownStop();
+    try {
+      wvSetView('ring');
+      const i = OPENER_LABEL_MODES.findIndex(m => m.id === 'r');
+      if (i >= 0) { _openerLblIdx = i; OPENER_LABEL_MODE = 'r'; const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = OPENER_LABEL_MODES[i].short; v.title = OPENER_LABEL_MODES[i].t; } renderOpenerPreview(false); }
+    } catch (e) {}
+  }, 1000);
+}
 function openWelcomeModal() {
   syncWelcomeUI();
   $('welcome-modal').style.display = 'flex';
@@ -6224,8 +6338,10 @@ function openWelcomeModal() {
   renderOpenerPreview(true);
   startOpenerPlay(700);   // plays by default, once the 550 ms reveal has finished
   startOpenerMusic();
+  olCountdownStart(15);
 }
 function closeWelcomeModal() {
+  olCountdownStop();
   stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay(); olStopGbPlay(); olStopGapPlay();
   stopOpenerMusic();
   if ($('welcome-noshow-chk') && $('welcome-noshow-chk').checked) {
@@ -8362,6 +8478,22 @@ function setPartG(g, keepMode) {
 function stepPartG(d) { setPartG(partG + d); }
 /* Walk the Goldbach pairs of E themselves, skipping every partition in
    between — the list the plate's c/d verdict is about. */
+/* Pair finder: E = 2(G+1) here, so any even E in 6..20002 is reached by setting G = E/2 - 1. */
+function pfFind(E) {
+  E = Math.round(E); if (!(E >= 6)) E = 6; if (E % 2) E++; E = Math.min(E, 20002);
+  $('pf-e').value = E; const g0 = E / 2 - 1;
+  ensureSPFTo(E);
+  let first = 0; for (let g = 2; g <= E / 2; g++) if (isPrime(g) && isPrime(E - g)) { first = g; break; }
+  const nt = $('pf-note'); if (nt) nt.textContent = first ? 'G = ' + g0 + ' \u00b7 first pair ' + first + ' + ' + (E - first) : 'no pair (counterexample!)';
+  stopGPlay(); onG(g0);
+  const t0 = Date.now(), iv = setInterval(() => {
+    if ((COP_G === g0 && partE() === E) || Date.now() - t0 > 30000) {
+      clearInterval(iv);
+      if (partMode === 'off') setPartMode('single');
+      if (first) setPartG(first);
+    }
+  }, 60);
+}
 function stepPair(dir) {
   const pairs = goldbachGaps();
   if (!pairs.length) return;
@@ -9967,7 +10099,7 @@ function onG(v) {
   // Sector S_s's last real sector is S_G itself (r=1, M=G) — the Rays
   // control's ceiling moves with G instead of sitting at a fixed number.
   $('sec-rays-num').max = v; $('sec-rays-sl').max = v;
-  if (sectorRays > v) setSectorRays(v);
+  if (sectorAll) { setSectorRays(v); sectorAll = true; { const b = $('sec-all'); if (b) b.classList.add('on'); } } else if (sectorRays > v) setSectorRays(v);
   // Isolate's own ceiling is the same S_G — a picked sector that no longer
   // exists at the new (smaller) G falls back to it instead of pointing at
   // nothing.
@@ -9976,7 +10108,7 @@ function onG(v) {
   syncCayleyGZoomUI(v);
   if (sectorOn) renderSectorCensus();   // full census depends on G directly
   buildPhi(Math.max(4096, v));   // exports quote Phi(G); keep the table ahead of G
-  buildCoprime(v, ok => { if (ok !== false) { onGridChanged(); redraw(true); } });
+  buildCoprime(v, ok => { if (ok !== false) { if (sectorAll) { setSectorRays(v); sectorAll = true; { const b = $('sec-all'); if (b) b.classList.add('on'); } } onGridChanged(); redraw(true); } });
 }
 function reslope() {
   // '0' is a valid slope-A value (a horizontal band, independent of M) —
@@ -14098,6 +14230,9 @@ function cgo(o) {
   if (o.preset)        _cTry(() => preset(o.preset));
   if (o.gn)            _cTry(() => setGN(o.gn));
   if (o.comet)         _cTry(() => setComet(o.comet));
+  if (o.sector)        _cTry(() => { if (!sectorOn) toggleSector(); if (o.sector.all) secAllRays(); else if (o.sector.pick != null) setSectorPick(o.sector.pick); if (o.sector.rays) setSectorRays(o.sector.rays); });
+  if (o.lift)          _cTry(() => { if (typeof liftOn !== 'undefined' && !liftOn) liftToggleOn(); if (o.lift.mode) liftSetMode(o.lift.mode); if (o.lift.mirror != null) { liftToggleMirror(o.lift.mirror); const c = $('lift-mirror-chk'); if (c) c.checked = o.lift.mirror; } if (o.lift.n != null) liftSetChainN(o.lift.n); });
+  if (o.pf)            _cTry(() => pfFind(o.pf));
   if (o.run === 'selftest') setTimeout(() => _cTry(selfTest), 120);
   // Scroll target: an explicit id wins, then whatever was opened.
   if (o.scroll && $(o.scroll)) target = $(o.scroll);
@@ -15115,6 +15250,15 @@ function msLiftDetail(G, o) {
   const big = G > 3000;
   const M0 = Math.max(0, o.n | 0);
   if (o.mode === 'connect') out.push({ t: 'p', text: 'Connect mode draws the spiral and the \u00b1n path together and joins them with a thin line at every ring M they share.' });
+  if (o.mode === 'connect') {
+    try {
+      const nn = Math.max(0, o.n | 0), cnt = k => { let live = 0, warn = 0, dead = 0; for (let r = 1; r <= G; r++) { const q = spfOf(r); if (!q) live++; else if (q <= k + 1) dead++; else if (q === k + 2) { warn++; live++; } else live++; } return { live: live, warn: warn, dead: dead }; };
+      const rowsC = [];
+      [nn - 1, nn, nn + 1].forEach(k => { if (k < 0 || k > G - 1) return; const c = cnt(k); rowsC.push(msT`n=${k}${k === nn ? '\\ \\ (\\text{plate})' : ''}:\qquad \text{lines kept}=${c.live},\quad \text{about to be cut}=${c.warn},\quad \text{cut}=${c.dead}`); });
+      rowsC.forEach(tx => out.push({ t: 'eq', tex: tx }));
+      out.push({ t: 'p', text: 'How Connect moves with n: each r joins (r, M) to (r, M+1) until a saturated prime p \u2264 n+1 divides r, then its line is cut (the point stays). Stepping n \u2192 n+1 changes the lines only when n+2 is prime \u2014 then every r whose smallest prime factor is n+2 (drawn red, \u201Cabout to be cut\u201D) loses its line. Rows give the counts over r = 1 \u2026 G at n\u22121, n and n+1; the ±n path itself always moves with n.' });
+    } catch (e) {}
+  }
   const ps = o.allP ? (typeof PRIMES !== 'undefined' && PRIMES ? PRIMES.filter(q => q <= G) : []) : [o.p];
   if ((o.mode === 'spiral' || o.mode === 'both' || o.mode === 'connect') && !big) {
     if (o.allP) {
@@ -15524,6 +15668,9 @@ function msBuildOpenerRaw(noPlates) {
   P.push(['turns', rots.length ? rots.join(', ') : 'none']);
   if (liftActive) P.push(['lift mode', OL.mode + ' \u00b7 \u00b1n path n = ' + n + ' \u00b7 C(n) n = ' + cn + (OL.lockN ? ' (locked)' : '')]);
   if (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect') P.push(['spiral p', OL.allP ? 'all p \u2264 G' : String(OL.p)]);
+  if (liftActive && (OL.mode === 'spiral' || OL.mode === 'both' || OL.mode === 'connect' || OL.mirror)) P.push(['mirror \u03c3(r) = M \u2212 r', OL.mirror ? 'on' : 'off']);
+  if (liftActive && typeof olHB === 'function' && olHB()) P.push(['hide broken cells', 'on']);
+  if (OL.pf && OL.pfE >= 4) P.push(['pair finder', 'E = ' + OL.pfE + ', G = ' + OPENER_G]);
   if (liftActive) P.push(['showing', [OL.surv ? 'surviving' : '', OL.broken ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
   if (OL.stripOn) P.push(['strip a/b', OL.slopeA + '/' + OL.slopeB], ['offset s', String(OL.offset)], ['width w', String(Math.max(1, OL.width))]);
   if (olSecOn()) msSectorParams('opener').forEach(q => P.push(q));
@@ -15673,6 +15820,7 @@ function msBuildMainRaw(views, noPlates) {
   if (liveLift) {
     P.push(['lift mode', liftMode + ' \u00b7 \u00b1n path n = ' + liftN() + ' \u00b7 C(n) n = ' + liftChainNEff() + (liftLockN ? ' (locked)' : '')]);
     if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect') P.push(['spiral p', liftAllPOn ? 'all p \u2264 G' : String(liftSpiralP)]);
+    if (liftMode === 'spiral' || liftMode === 'both' || liftMode === 'connect' || liftMirrorOn) P.push(['mirror \u03c3(r) = M \u2212 r', liftMirrorOn ? 'on' : 'off']);
     P.push(['showing', [liftSurvOn ? 'surviving' : '', liftBrokenOn ? 'broken' : ''].filter(Boolean).join(' + ') || 'nothing']);
   }
   doc.push({ t: 'h', text: 'Parameters' });
@@ -16040,6 +16188,7 @@ function msLblSync() {
   const ab = $('msp-adv-btn'), at = $('msp-adv-tools');
   if (ab) { ab.style.color = MS_ADV.on ? 'var(--gold)' : ''; ab.style.borderColor = MS_ADV.on ? 'var(--gold)' : ''; }
   if (at) at.style.display = MS_ADV.on ? 'inline-flex' : 'none';
+  ['spiral','mirror','npath'].forEach(k => { const b = $('msp-sw-' + k); if (b) { const off = !!MS_ADV.off[k]; b.style.color = off ? '' : 'var(--gold)'; b.style.borderColor = off ? '' : 'var(--gold)'; b.style.opacity = off ? '.5' : ''; } });
   { const sb = $('msp-sieve-btn'); if (sb) { sb.style.color = MS_ADV.sieve ? 'var(--gold)' : ''; sb.style.borderColor = MS_ADV.sieve ? 'var(--gold)' : ''; } }
   const cv = $('msp-cn-v');
   if (cv) {
@@ -16092,10 +16241,20 @@ function msLblAutoFilter() {
    Adds a C(n) stepper that rebuilds the sheet at its own depth (the opener keeps its C(n)), and puts an
    isolated picture of each section's own layer in the section it belongs to: just that overlay on an
    empty plate, drawn by the same painters as the plate, so it can never disagree with it. */
+/* Sheet-only switches: drop the prime spiral, the +-n path or the mirror from the sheet (text blocks, parameters, plates). */
+function msModeEff(m) {
+  if (!MS_ADV.on || !MS_ADV.off) return m;
+  let sp = (m === 'spiral' || m === 'both' || m === 'connect'), np = (m === 'npath' || m === 'both' || m === 'connect');
+  if (MS_ADV.off.spiral) sp = false; if (MS_ADV.off.npath) np = false;
+  return sp && np ? m : sp ? 'spiral' : np ? 'npath' : 'none';
+}
+function msMirrorEff(v) { return v && !(MS_ADV.on && MS_ADV.off && (MS_ADV.off.mirror || MS_ADV.off.spiral)); }
+function msSecSwitch(k) { MS_ADV.off[k] = !MS_ADV.off[k]; msLblSync(); msAdvRebuild(); }
 function msWithCNMain(fn) {
   const cn0 = liftChainN, lk0 = liftLockN, ov0 = MS_CN_MAIN;
   if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
-  try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
+  const md0 = liftMode, mi0 = liftMirrorOn; liftMode = msModeEff(liftMode); liftMirrorOn = msMirrorEff(liftMirrorOn);
+  try { return fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; liftMode = md0; liftMirrorOn = mi0; }
 }
 /* The plate PNG exported with the sheet carries the sheet's own labels: same mode, size, gcd filter and size-to-room placement as the plates on the pages. */
 async function msWithLblAsync(fn) {
@@ -16105,14 +16264,16 @@ async function msWithLblAsync(fn) {
   try { return await fn(); } finally { MS_LBL.on = on0; MS_LBL.mask = mask0; MS_LBL.stats = null; OPENER_LABEL_MODE = om0; OL.lblScale = ls0; }
 }
 async function msWithCNAsync(fn) {
-  const cn0 = OL.cn, lk0 = OL.lockN;
+  const cn0 = OL.cn, lk0 = OL.lockN, md0 = OL.mode, mi0 = OL.mirror;
   if (MS_ADV.on && MS_ADV.cn != null) { OL.cn = Math.max(0, Math.min(OPENER_G - 1, MS_ADV.cn)); OL.lockN = false; }
-  try { return await fn(); } finally { OL.cn = cn0; OL.lockN = lk0; }
+  OL.mode = msModeEff(OL.mode); OL.mirror = msMirrorEff(OL.mirror);
+  try { return await fn(); } finally { OL.cn = cn0; OL.lockN = lk0; OL.mode = md0; OL.mirror = mi0; }
 }
 async function msWithCNMainAsync(fn) {
   const cn0 = liftChainN, lk0 = liftLockN, ov0 = MS_CN_MAIN;
   if (MS_ADV.on && MS_ADV.cn != null) { liftLockN = false; liftChainN = Math.max(0, Math.min(liftMaxN(), MS_ADV.cn)); MS_CN_MAIN = MS_ADV.cn; }
-  try { return await fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; }
+  const md0 = liftMode, mi0 = liftMirrorOn; liftMode = msModeEff(liftMode); liftMirrorOn = msMirrorEff(liftMirrorOn);
+  try { return await fn(); } finally { liftChainN = cn0; liftLockN = lk0; MS_CN_MAIN = ov0; liftMode = md0; liftMirrorOn = mi0; }
 }
 function msGNow() { return MS_PREV.kind === 'main' ? G : OPENER_G; }
 function msCnNow() { return MS_PREV.kind === 'main' ? msWithCNMain(liftChainNEff) : msWithCN(openerChainN); }
@@ -16145,9 +16306,10 @@ function msIsoPushMain(doc, kind, vs) {
   } catch (e) { MS_ISOM = null; }
 }
 function msWithCN(fn) {
-  const cn0 = OL.cn, lk0 = OL.lockN;
+  const cn0 = OL.cn, lk0 = OL.lockN, md0 = OL.mode, mi0 = OL.mirror;
   if (MS_ADV.on && MS_ADV.cn != null) { OL.cn = Math.max(0, Math.min(OPENER_G - 1, MS_ADV.cn)); OL.lockN = false; }
-  try { return fn(); } finally { OL.cn = cn0; OL.lockN = lk0; }
+  OL.mode = msModeEff(OL.mode); OL.mirror = msMirrorEff(OL.mirror);
+  try { return fn(); } finally { OL.cn = cn0; OL.lockN = lk0; OL.mode = md0; OL.mirror = mi0; }
 }
 const MS_ISO_SPECS = {
   base:     { ol: { mode: 'none', chain: false, stripOn: false, stripDots: false, stripPick: false, gbOn: false }, iso: {} },
@@ -16269,7 +16431,7 @@ function msSieveToggle() {
   if (MS_ADV.sieve && MS_PREV.kind === 'main' && G > LIFT_CHAIN_MAX) { msMainSetG(LIFT_CHAIN_MAX, 0); return; }
   msAdvRebuild(0);
 }
-function msAdvToggle() { MS_ADV.on = !MS_ADV.on; if (!MS_ADV.on) { MS_ADV.cn = null; MS_ADV.sieve = false; } msLblSync(); msAdvRebuild(); }
+function msAdvToggle() { MS_ADV.on = !MS_ADV.on; if (!MS_ADV.on) { MS_ADV.cn = null; MS_ADV.sieve = false; MS_ADV.off = {}; } msLblSync(); msAdvRebuild(); }
 function msAdvCN(d) {
   const cur = MS_ADV.cn != null ? MS_ADV.cn : msCnNow();
   MS_ADV.cn = Math.max(0, Math.min(msGNow() - 1, cur + d));
@@ -16292,7 +16454,7 @@ function msLblFilterStep() {
 function msClosePreview() {
   MS_PREV.doc = null;
   MS_LB.active = false;   // the sheet goes back to the opener's own labels
-  MS_ADV.on = false; MS_ADV.cn = null; MS_ADV.sieve = false;
+  MS_ADV.on = false; MS_ADV.cn = null; MS_ADV.sieve = false; MS_ADV.off = {};
   clearInterval(_msGWait); clearTimeout(_msGDeb);
   if (MS_PREV.kind === 'opener' && MS_PREV.G0 && OPENER_G !== MS_PREV.G0) { try { setOpenerG(MS_PREV.G0); } catch (e) {} }   // the opener goes back to the G it had
   if (MS_PREV.kind === 'main' && MS_PREV.G0 && G !== MS_PREV.G0) { try { onG(MS_PREV.G0); } catch (e) {} }   // so does the main page
@@ -16521,7 +16683,7 @@ function msPreviewOpener(sieve) {
   try {
     msFreezeOpener();
     if (OE.view !== OPENER_VIEW) oeSetView(OPENER_VIEW);   // the sheet shows exactly the view being looked at
-    MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G; MS_PREV.G0 = OPENER_G; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve;
+    MS_PREV.kind = 'opener'; MS_PREV.G = OPENER_G; MS_PREV.G0 = OPENER_G; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.off = {}; MS_ADV.sieve = !!sieve;
     MS_LB.active = true; MS_LB.mode = OPENER_LABEL_MODE; MS_LB.idx = Math.max(0, OPENER_LABEL_MODES.findIndex(x => x.id === OPENER_LABEL_MODE));
     MS_LB.scale = OL.lblScale || 1; MS_LB.filter = 'co';   // start from the opener's labels; changes stay in the preview
     MS_PREV.doc = msBuildOpener();
@@ -16530,7 +16692,7 @@ function msPreviewOpener(sieve) {
 }
 function msPreviewMain(sieve) {
   try {
-    MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
+    MS_PREV.kind = 'main'; MS_ADV.on = !!sieve; MS_ADV.cn = null; MS_ADV.off = {}; MS_ADV.sieve = !!sieve; MS_PREV.G = G; MS_PREV.G0 = G;
     MS_LB.active = true; MS_LB.mode = 'M'; MS_LB.idx = OPENER_LABEL_MODES.findIndex(x => x.id === 'M'); MS_LB.scale = 1; MS_LB.filter = 'co'; msLblAutoFilter();
     const vs = orderedExportViews();
     MS_PREV.views = vs;
@@ -16605,7 +16767,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span title="Sheet only: show or hide these sections and their plate layers">show</span><button class="msp-lb" id="msp-sw-spiral" onclick="msSecSwitch('spiral')" title="Prime spiral on/off (sheet only)">spiral</button><button class="msp-lb" id="msp-sw-mirror" onclick="msSecSwitch('mirror')" title="Mirror on/off (sheet only)">mirror</button><button class="msp-lb" id="msp-sw-npath" onclick="msSecSwitch('npath')" title="&plusmn;n path on/off (sheet only)">&plusmn;n path</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
