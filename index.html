@@ -2163,7 +2163,7 @@ walk anyway.</p>
         <div class="prow" id="welcome-colrow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
       <button class="chip" onclick="stepWelcome(1)" title="Next coloring (Down arrow)">&#9660;</button>
-      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="0" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="180" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
+      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="180" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
     </div>
     <div id="welcome-color-now"></div>
     <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
@@ -5451,7 +5451,7 @@ const OPENER_AXES = ['x', 'y', 'z'];
 const OPENER_ROT_STEP = { x: 2, y: 1.3, z: 1.5 };   // degrees per 60 ms tick while that axis plays
 /* Grid opens at -i, a quarter turn counter-clockwise, exactly as the main page does: M runs left to right and r
    runs upward, so r = (a/b)M is rise over run and slope 1/1 climbs from bottom-left to top-right. */
-let OPENER_ROT = { x: 0, y: 0, z: 180, g: 90, r: 0 };   // Ring opens at 0 degrees; the grid keeps its quarter turn
+let OPENER_ROT = { x: 0, y: 180, z: 0, g: 90, r: 0 };   // Ring opens at 0 degrees; the grid keeps its quarter turn
 let _openerRotOn = { x: false, y: false, z: false }, _openerRotTimer = 0, _openerRotRaf = 0, _openerRotDirty = {};
 function openerNormDeg(v) { v = +v; if (!isFinite(v)) v = 0; return ((v % 360) + 360) % 360; }
 // Redraw only the tile the axis belongs to; the reveal animation, if running, already reads the live angles.
@@ -5951,14 +5951,14 @@ async function runOpenerExport(opts) {
       if (msg) msg.textContent = 'Done \u2014 ' + W + '\u00d7' + H;
       done();
     }, 'image/png'));
-    if (MS.on || opts.sheet) {
+    if (!opts.plateOnly && (MS.on || opts.sheet)) {
       if (msg) msg.textContent = 'Typesetting the math sheet\u2026';
       try {
         const r = await msExportOpener();
         if (msg) msg.textContent = 'Done \u2014 plate ' + W + '\u00d7' + H + (r.ok ? ' + math sheet, ' + r.pages + ' PNG pages' : ' (math sheet could not be encoded)');
       } catch (e) { if (opts.sheet) throw e; if (msg) msg.textContent = 'Plate saved; math sheet failed: ' + (e && e.message || e); }
     }
-    if (MS.pdf && !opts.sheet) {
+    if (MS.pdf && !opts.sheet && !opts.plateOnly) {
       if (msg) msg.textContent = 'Building the multi-page PDF\u2026';
       try {
         const r2 = await msExportPdfOpener(canvas);
@@ -15190,7 +15190,9 @@ async function msRender(doc, theme, opts) {
       if (opts && opts.pages && b.rows.length > 14) { let cur = [], hh = 0; b.rows.forEach(r => { const rh = (r.label.length > 62 ? 2 : 1) * 40 + 8; if (cur.length && hh + rh > 1300) { chunkRows.push(cur); cur = []; hh = 0; } cur.push(r); hh += rh; }); if (cur.length) chunkRows.push(cur); } else chunkRows.push(b.rows);
       chunkRows.forEach((rowsPart, ci) => {
       const hasErr = rowsPart.some(r => r.err), hasRaw = rowsPart.some(r => r.raw), hasRem = rowsPart.some(r => r.rem), hasPred = rowsPart.some(r => r.pred), errW = hasErr ? (hasRaw ? 120 : 150) : 0, rawW = hasRaw ? 230 : 0, remW = hasRem ? 360 : 0, predW = hasPred ? 220 : 0;
-      const px = 27, lh = 40, swW = 34, numW = hasRaw ? 340 : 130, pctW = hasRaw ? 140 : 170, labW = TW - swW - numW - pctW - errW - rawW - remW - predW - 20;
+      const CL = b.cols || null, clW = CL ? CL.reduce((t, q) => t + q.w, 0) : 0;
+      const px = 27, lh = 40, swW = 34, numW = hasRaw ? 340 : 130, pctW = hasRaw ? 140 : 170, labW = CL ? TW - swW - clW - 20 : TW - swW - numW - pctW - errW - rawW - remW - predW - 20;
+      const clX = CL ? (() => { let x = W - MX; const xs = []; for (let i = CL.length - 1; i >= 0; i--) { xs[i] = x; x -= CL[i].w; } return xs; })() : null;
       const laid = rowsPart.map(r => ({ r: r, ls: wrap(r.label, px + 'px ' + MONO, labW) }));
       const rowsH = laid.reduce((t, l) => t + Math.max(1, l.ls.length) * lh + 8, 0);
       const HH = b.head ? 46 : 0, labW0 = labW;
@@ -15205,12 +15207,15 @@ async function msRender(doc, theme, opts) {
           };
           c.fillStyle = th.acc;
           fit(b.head[0] + (ci > 0 ? ' (cont.)' : ''), labW0 - 10, 'left', MX + swW);
+          if (CL) CL.forEach((q, i) => fit(q.head, q.w - 14, 'right', clX[i]));
+          else {
           fit(b.head[1], numW + 40, 'right', W - MX - pctW - errW);
           fit(b.head[2], pctW - 10, 'right', W - MX - errW);
           if (hasErr && b.head[3]) fit(b.head[3], errW - 10, 'right', W - MX);
           if (hasRaw && b.head[4]) fit(b.head[4], rawW - 10, 'right', W - MX - pctW - errW - numW - 40);
           if (hasRem && b.head[5]) fit(b.head[5], remW - 10, 'right', W - MX - pctW - errW - numW - 40 - 230);
           if (hasPred && b.head[6]) fit(b.head[6], predW - 10, 'right', W - MX - pctW - errW - numW - 40 - 230 - 360);
+          }
         }
         c.strokeStyle = th.rule; c.lineWidth = 2; c.beginPath(); c.moveTo(MX, y0 + 8 + HH); c.lineTo(W - MX, y0 + 8 + HH); c.stroke();
         let yy = y0 + 50 + HH;
@@ -15218,6 +15223,17 @@ async function msRender(doc, theme, opts) {
           if (l.r.sw) { c.fillStyle = l.r.sw; c.fillRect(MX, yy - 24, swW - 8, swW - 8); c.strokeStyle = th.edge; c.lineWidth = 1.5; c.strokeRect(MX + .75, yy - 24 + .75, swW - 9.5, swW - 9.5); }
           c.textAlign = 'left'; c.fillStyle = th.ink; c.font = px + 'px ' + MONO;
           l.ls.forEach((t, i) => c.fillText(t, MX + swW, yy + i * lh));
+          if (CL) {
+            c.textAlign = 'right';
+            CL.forEach((q, i) => {
+              const v = l.r[q.key]; if (v === undefined || v === '') return;
+              if (q.key === 'err') { c.fillStyle = l.r.ec === 'neg' ? '#e8604c' : '#46c28a'; c.font = '600 ' + px + 'px ' + MONO; }
+              else if (q.key === 'n') { c.fillStyle = th.ink; c.font = '600 ' + px + 'px ' + MONO; }
+              else { c.fillStyle = th.mute; c.font = px + 'px ' + MONO; }
+              c.fillText(String(v), clX[i], yy);
+            });
+            yy += Math.max(1, l.ls.length) * lh + 8; return;
+          }
           c.textAlign = 'right'; c.font = '600 ' + px + 'px ' + MONO; c.fillText(String(l.r.n), W - MX - pctW - errW, yy);
           c.fillStyle = th.mute; c.font = px + 'px ' + MONO; c.fillText(l.r.pct, W - MX - errW, yy);
           if (hasRaw && l.r.raw) c.fillText(l.r.raw, W - MX - pctW - errW - numW - 40, yy);
@@ -15753,21 +15769,6 @@ function msFastChain(G, d, top, sk) {
   }
   return { tot, ok, dead, TT, hist, kill, stride };
 }
-/* Row-product prediction of the kept counts (default block, no selection). In row M the phi(M) coprime cells are thinned by
-   (1 - 1/p) for each prime p < M with p not dividing M but dividing some M + j, j <= n. This treats divisibility by the
-   different p as independent, which is the sieve approximation; it fails once the primes' product outgrows the range of r.
-   Returns pred[n] for n = 0..top. */
-function msRowProduct(G, top) {
-  const sv = new Uint8Array(G + 1), pr = []; for (let i = 2; i <= G; i++) { if (!sv[i]) { pr.push(i); for (let j = i * i; j <= G; j += i) sv[j] = 1; } }
-  const phi = new Int32Array(G + 1); for (let i = 0; i <= G; i++) phi[i] = i; for (const q of pr) for (let j = q; j <= G; j += q) phi[j] -= phi[j] / q | 0;
-  const lg = pr.map(q => Math.log1p(-1 / q)), pred = new Float64Array(top + 1), acc = new Float64Array(top + 1);
-  for (let M = 2; M < G; M++) {
-    acc.fill(0);
-    for (let i = 0; i < pr.length; i++) { const q = pr[i]; if (q >= M) break; const m = M % q; if (m === 0) continue; const d = q - m; if (d <= top) acc[d] += lg[i]; }
-    let c = 0; for (let n = 0; n <= top; n++) { c += acc[n]; pred[n] += phi[M] * Math.exp(c); }
-  }
-  return pred;
-}
 function msLiftDetail(G, o) {
   const out = [];
   const fastChain = blkIsDefault() && G <= 10000;   // default block only: the closed-form first-failure rule above
@@ -15856,7 +15857,6 @@ function msLiftDetail(G, o) {
         let bq = 0, bc = 0; const base = k * FC.stride; for (let q = 2; q < FC.stride; q++) { const c = FC.kill[base + q]; if (c > bc) { bc = c; bq = q; } }
         return hist[k] ? '\u2212' + hist[k] + ' \u00b7 p=' + bq + ' ' + Math.round(100 * bc / hist[k]) + '%' : '\u22120';
       };
-      const RP = (FC && !sk && G <= 10000) ? msRowProduct(G, top) : null;
       const rows = [], cpts = []; let above = TT;    // cells with f > n
       let next = 0;
       for (let k = 0; k <= top; k++) {
@@ -15864,10 +15864,10 @@ function msLiftDetail(G, o) {
         let Ck = NaN; try { Ck = Dn(k) * Math.PI * Math.PI / 6; } catch (e) {}
         cpts.push({ n: k, kept: above, share: above / TT, C: Ck, err: isFinite(Ck) && Ck > 0 ? (above / TT - Ck) / Ck * 100 : NaN, mark: ds.indexOf(k) >= 0 && (top <= 24 || k % 2 === 0 || k === d) });
         if (ds.indexOf(k) < 0) continue;
-        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(8) : '\u2013'), raw: isFinite(Ck) ? (Ck / (Math.PI * Math.PI / 6)).toFixed(8) : '', rem: remText(k), pred: RP && k <= top ? (RP[k] / above).toFixed(4) : '', n: above + ' / ' + TT, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
+        rows.push({ label: 'n = ' + k + (k === d ? ' \u25c0 plate' : '') + ' \u00b7 C(n) = ' + (isFinite(Ck) ? Ck.toFixed(8) : '\u2013'), raw: isFinite(Ck) ? (Ck / (Math.PI * Math.PI / 6)).toFixed(8) : '', rem: remText(k), n: above + ' / ' + TT, pct: (100 * above / TT).toFixed(2) + '%', err: isFinite(Ck) && Ck > 0 ? (Math.abs((above / TT - Ck) / Ck * 100) < 0.05 ? '0.0%' : ((above / TT - Ck) / Ck * 100 > 0 ? '+' : '\u2212') + Math.abs((above / TT - Ck) / Ck * 100).toFixed(1) + '%') : '', ec: isFinite(Ck) && (above / TT - Ck) / Ck * 100 < -0.05 ? 'neg' : 'pos' });
       }
       out.push({ t: 'p', text: (sk ? 'Restricted to the selection on the plate (' + (o.secDesc || 'the cells it keeps') + '): ' : '') + 'The ratio as n grows. Each row is the plate\u2019s own count of coprime cells (of ' + TT + ') that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it, and the raw density D(n) = C(n)/\u03b6(2) in its own column. C(n) is normalised to the coprime cells and D(n) to all cells: D(n) is the limiting share of the whole lattice that is coprime to every column of the block, and C(n) = \u03b6(2)\u00b7D(n) is the share of the coprime cells that stay so. The error column is (share \u2212 C(n)) / C(n): red when the plate falls below the limit, green when it sits above. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply, and the measured ratio sits well below C(n).' });
-      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept / coprime cells', 'share', 'error', 'raw D(n)', 'removed at this step \u00b7 main prime', 'row-product \u00f7 exact'], rows: rows });
+      out.push({ t: 'table', head: ['depth n  \u00b7  limiting C(n)', 'cells kept / coprime cells', 'share', 'error', 'raw D(n)', 'removed at this step \u00b7 main prime'], cols: [{ key: 'raw', head: 'raw D(n)', w: 200 }, { key: 'n', head: 'kept / coprime cells', w: 380 }, { key: 'pct', head: 'share', w: 140 }, { key: 'err', head: 'vs C(n)', w: 130 }, { key: 'rem', head: 'removed this step', w: 340 }], rows: rows });
       try { out.push({ t: 'iplate', items: [{ label: 'error against G', cv: msErrVsG(G) }], cap: 'Left: the error of the kept share against C(n) as the lattice grows, for n = 2, 4, 8, 16, 32, 40 (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). A deeper block needs a larger G before it settles inside the \u00b11% band. Right: the smallest G beyond which each n stays inside 1%, from a one-off sweep to G = 40000 run outside this page; these are measured values only, with no fitted curve drawn through them.' }); } catch (e) {}
       try { out.push({ t: 'iplate', items: [{ label: 'error map, all n', cv: msErrMap(G) }], cap: 'The same error for every depth n = 1 \u2026 40 at once, against G (computed live here, up to G = ' + Math.max(300, Math.min(2500, G)) + '). Green: the kept share is above C(n); red: below; dark teal: inside \u00b11%. Reading across a row shows one depth settling as G grows; reading down a column shows how depth costs accuracy at a fixed G.' }); } catch (e) {}
       try { if (cpts.length > 1) out.push({ t: 'iplate', items: [{ label: 'error against depth', cv: msErrChart(cpts.filter(q => q.n <= Math.max(16, Math.floor(G / 3), d)), G, TT, d) }], cap: 'The same counts as the table at every depth n, not only the listed rows. Top: the plate\u2019s share of coprime cells kept (the number at each dot is the cell count) against the limiting C(n). Bottom: the signed error, red below the limit and green above. It is drawn from L_' + G + ' itself, so it follows any G, and stops at n = max(16, G/3, plate n) because past that the lattice has too few r beyond n + 1 for C(n) to apply (the table lists the deeper rows).' }); } catch (e) {}
@@ -16703,6 +16703,10 @@ function msDocToHtml(doc) {
       h += '<div class="mp-params"><table>';
       b.items.forEach(kv => { h += '<tr><td class="k">' + msEsc(kv[0]) + '</td><td class="v">' + msEsc(String(kv[1])) + '</td></tr>'; });
       h += '</table></div>';
+    } else if (b.t === 'table' && b.cols) {
+      h += '<table class="mp-table"><thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th>' + b.cols.map(q => '<th style="text-align:right">' + msEsc(q.head) + '</th>').join('') + '</tr></thead><tbody>';
+      b.rows.forEach(r => { h += '<tr><td class="sw"></td><td class="lab">' + msEsc(r.label) + '</td>' + b.cols.map(q => '<td class="' + (q.key === 'n' ? 'n' : 'pct') + '"' + (q.key === 'err' ? ' style="font-weight:600;color:' + (r.ec === 'neg' ? '#e8604c' : '#2fa874') + '"' : '') + '>' + msEsc(String(r[q.key] === undefined ? '' : r[q.key])) + '</td>').join('') + '</tr>'; });
+      h += '</tbody></table>';
     } else if (b.t === 'table') {
       h += '<table class="mp-table">' + (b.head ? '<thead><tr><th></th><th style="text-align:left">' + msEsc(b.head[0]) + '</th>' + (b.rows.some(r => r.raw) && b.head[4] ? '<th style="text-align:right">' + msEsc(b.head[4]) + '</th>' : '') + (b.rows.some(r => r.rem) && b.head[5] ? '<th style="text-align:right">' + msEsc(b.head[5]) + '</th>' : '') + (b.rows.some(r => r.pred) && b.head[6] ? '<th style="text-align:right">' + msEsc(b.head[6]) + '</th>' : '') + '<th style="text-align:right">' + msEsc(b.head[1]) + '</th><th style="text-align:right">' + msEsc(b.head[2]) + '</th>' + (b.head[3] ? '<th style="text-align:right">' + msEsc(b.head[3]) + '</th>' : '') + '</tr></thead>' : '') + '<tbody>';
       b.rows.forEach(r => {
@@ -17289,16 +17293,18 @@ async function msExportFromPreview() {
   const btn = $('msp-export'), st = $('msp-status'), lk = $('msp-links');
   if (btn) btn.disabled = true;
   let stage = 'plate';
+  const plateOnly = ($('msp-exp-mode') || {}).value === 'png';
   try {
     /* The plate with its legend first (same width as the pages), then the sheet pages. If the browser
        cannot make a canvas that large, say so and drop one size instead of failing outright. */
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         stage = 'plate'; if (st) st.textContent = 'Composing the plate and legend at ' + MS_RES[MS.res] + ' (' + MS.res + ' px wide)\u2026';
-        if (MS_PREV.kind === 'opener') { await msWithLblAsync(() => msWithCNAsync(() => runOpenerExport({ sheet: true, status: st }))); }
+        if (MS_PREV.kind === 'opener') { await msWithLblAsync(() => msWithCNAsync(() => runOpenerExport(plateOnly ? { plateOnly: true, status: st } : { sheet: true, status: st }))); }
         else {
           guardFSForExport();
           await msWithLblAsync(() => msWithCNMainAsync(() => exportPNG(MS.res, orderedExportViews())));
+          if (plateOnly) { if (st) st.textContent = 'Saved the plate PNG only.'; break; }
           stage = 'sheet'; if (st) st.textContent = 'Typesetting the sheet at ' + MS_RES[MS.res] + '\u2026';
           const r = await msExportMain(orderedExportViews(), lk);
           if (st) st.textContent = r.ok ? 'Saved plate + ' + r.pages + ' PNG page' + (r.pages === 1 ? '' : 's') + '.' : 'Plate saved; could not encode the pages.';
@@ -17344,7 +17350,7 @@ async function msExportMain(views, host) {
   <div class="msp-backdrop" onclick="msClosePreview()"></div>
   <div class="msp-panel">
     <div class="msp-head"><span>The math behind this export</span>
-      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span title="Sheet only: show or hide these sections and their plate layers">show</span><button class="msp-lb" id="msp-sw-spiral" onclick="msSecSwitch('spiral')" title="Prime spiral on/off (sheet only)">spiral</button><button class="msp-lb" id="msp-sw-mirror" onclick="msSecSwitch('mirror')" title="Mirror on/off (sheet only)">mirror</button><button class="msp-lb" id="msp-sw-npath" onclick="msSecSwitch('npath')" title="&plusmn;n path on/off (sheet only)">&plusmn;n path</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
+      <div class="msp-tools"><div class="msp-lbl" id="msp-lbl-tools" title="Point labels on the sheet plates only. They start from the opener's labels, but changing them here does not change the opener. The exported pages match what you see here."><span id="msp-lbl-core" style="display:contents"><span>labels</span><button class="msp-lb" onclick="msLblStep(-1)" title="Previous label mode">&#9650;</button><button class="msp-lb" onclick="msLblStep(1)" title="Next label mode">&#9660;</button><select class="msp-lb" id="msp-lbl-sel" onchange="msLblPick(this.value)" title="Pick the label directly."></select><button class="msp-lb" id="msp-lbl-f" onclick="msLblFilterStep()" title="Which points get a label: all of them (up to G = 40), only coprime cells gcd(r, M) = 1, or only the rest gcd(r, M) &gt; 1. A filter allows labels up to G = 128.">all</button><span>size</span><input type="range" id="msp-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="msLblSize(this.value)"><span class="msp-lv" id="msp-lbl-sz-v" style="min-width:34px">1.0&times;</span><span class="msp-ln" id="msp-lbl-note"></span></span><button class="msp-lb" id="msp-adv-btn" onclick="msAdvToggle()" title="Advanced: step C(n) for this sheet only, and add an isolated picture of each section's own layer (lift, strip, the four Goldbach strips, the gold marker).">advanced</button><span id="msp-adv-tools" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%"><span>C(n)</span><button class="msp-lb" onclick="msAdvCN(1)" title="C(n) up">&#9650;</button><button class="msp-lb" onclick="msAdvCN(-1)" title="C(n) down">&#9660;</button><span class="msp-lv" id="msp-cn-v" style="min-width:0;text-align:left"></span><span style="flex-basis:100%;height:0"></span><button class="msp-lb" id="msp-sieve-btn" onclick="msSieveToggle()" title="Sieve only: replace the sheet with just the block-coprime machinery &mdash; D(n) and C(n) prime by prime, the r-chain plate, and a dense depth table. Follows the C(n) and G controls.">sieve only</button><span style="flex-basis:100%;height:0"></span><span title="Sheet only: show or hide these sections and their plate layers">show</span><button class="msp-lb" id="msp-sw-spiral" onclick="msSecSwitch('spiral')" title="Prime spiral on/off (sheet only)">spiral</button><button class="msp-lb" id="msp-sw-mirror" onclick="msSecSwitch('mirror')" title="Mirror on/off (sheet only)">mirror</button><button class="msp-lb" id="msp-sw-npath" onclick="msSecSwitch('npath')" title="&plusmn;n path on/off (sheet only)">&plusmn;n path</button><span style="flex-basis:100%;height:0"></span><span>G</span><button class="msp-lb" onclick="msGStep(1)" title="G up">&#9650;</button><button class="msp-lb" onclick="msGStep(-1)" title="G down">&#9660;</button><button class="msp-lb" onclick="msGPrime(-1)" title="Previous prime G">prev p</button><button class="msp-lb" onclick="msGPrime(1)" title="Next prime G">next p</button><input type="range" id="msp-g-sl" min="2" max="1024" step="1" value="13" oninput="msSetG(this.value, 300)" title="Sheet lattice size G. Rebuilds the math; the opener returns to its own G when you close the preview."><span class="msp-lv" id="msp-g-v" style="min-width:48px"></span></span></div><div class="msp-status" id="msp-status"></div><select class="msp-lb" id="msp-res" onchange="msSetRes(this.value)" title="PNG page width: 2K = 2048 px, 4K = 4096 px, 8K = 8192 px (A4 proportions). Plates and charts are redrawn at the larger size. 8K pages are very large: expect a long pause, and some phone browsers cannot make canvases that big."><option value="2048">2K</option><option value="4096" selected>4K</option><option value="8192">8K</option></select><select class="msp-lb" id="msp-exp-mode" title="What the export button writes: only the first PNG (the plate with its legend), or the plate plus all the math sheet pages."><option value="both">plate + math pages</option><option value="png">plate PNG only</option></select><button class="msp-export" id="msp-export" onclick="msExportFromPreview()" title="Download this math sheet as PNG pages, split at section titles, in the Paper or Night look chosen in the export panel.">&#8681; Export the math</button><button class="msp-close" onclick="msClosePreview()">&#10005; Close</button></div></div>
     <div class="msp-links" id="msp-links" style="display:none"></div>
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
