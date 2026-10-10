@@ -755,6 +755,8 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
      title="The opener — where this side quest started, and quick presets for coloring &amp; labels.">✦ Opener</button>
   <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
      title="Fullscreen: the lattice. Pins the plate to the top of the screen with its controls below.">⛶ Fullscreen</button>
+  <button class="navbtn" id="share-nav-btn" onclick="shareCopy(this)"
+     title="Copy a link that reopens this page with the current settings (the main page, or the opener if it is open).">&#128279; Share link</button>
 </div>
 
 
@@ -2000,6 +2002,7 @@ walk anyway.</p>
       <span style="min-width:0;">The Opener &middot; Strip Arithmetic II</span>
       <span style="display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;">
         <button class="chip tl on" id="welcome-music-btn" onclick="toggleOpenerMusic()" title="Riemann Zeta Function, by Vince Rubinetti &mdash; the track written for 3Blue1Brown's own zeta function video. Plays while the opener is open.">&#9835; Music</button>
+        <button class="chip tl" id="share-op-btn" onclick="shareCopy(this)" title="Copy a link that reopens the opener with these exact settings.">&#128279; Share link</button>
         <button class="btn" onclick="closeWelcomeModal()" title="Close">&times;</button>
       </span>
       <a href="https://soundcloud.com/vincerubinetti/riemann-zeta-function" target="_blank" rel="noopener" style="flex:1 1 100%;order:3;min-width:0;font-family:var(--mono);font-size:10.5px;line-height:1.35;color:var(--cream3);text-decoration:none;overflow-wrap:anywhere;" title="Open the track on SoundCloud">&#9835; Riemann Zeta Function &middot; Vince Rubinetti</a>
@@ -2092,9 +2095,16 @@ walk anyway.</p>
       <span class="lbl" title="Print a small label at every point, on Grid, Ring and Cayley alike. Only while G &le; 31 &mdash; past that there isn't room to read them; stepping the mode has no visible effect until G comes back down.">labels</span>
       <button class="chip" onclick="stepOpenerLabelMode(-1)" title="Previous label mode">&#9650;</button>
       <button class="chip" onclick="stepOpenerLabelMode(1)" title="Next label mode">&#9660;</button>
-      <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="The Ring angle 2&pi;&middot;r/M written as a multiple of &pi;.">angle &middot;&pi;</span>
+      <span class="val" id="welcome-lbl-mode-v" style="min-width:70px;" title="No per-point labels. They switch on (angle &middot; &pi;) when the view becomes Ring, unless you pick a mode first.">off</span>
       <span class="lbl">size</span>
       <input type="range" id="ol-lbl-sz" min="0.1" max="3" step="0.1" value="1" oninput="olSetLblScale(this.value)" style="max-width:90px;" title="Label text size, Grid/Ring/Cayley alike.">
+      <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:6px;font-size:11.5px;color:rgba(232,227,219,.9);" title="Ring tile, Goldbach off. Top left = coprime cells vs 6/&pi;&sup2;; top right = sectors S_1..S_4; bottom left = the C(n) sieve at depths 1..4; bottom right = primes up to G. Green above the prediction, red below. They switch on when the view becomes Ring.">
+        <label style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="ol-corners-chk" onchange="olCornerSet('corners',this.checked)"> corner stats</label>
+        <label style="cursor:pointer;"><input type="checkbox" id="ol-c-tl" checked onchange="olCornerSet('cTL',this.checked)"> gcd=1</label>
+        <label style="cursor:pointer;"><input type="checkbox" id="ol-c-tr" checked onchange="olCornerSet('cTR',this.checked)"> sectors</label>
+        <label style="cursor:pointer;"><input type="checkbox" id="ol-c-bl" checked onchange="olCornerSet('cBL',this.checked)"> sieve</label>
+        <label style="cursor:pointer;"><input type="checkbox" id="ol-c-br" checked onchange="olCornerSet('cBR',this.checked)"> primes</label>
+      </span>
       <span class="val" id="ol-lbl-sz-v">1.0&times;</span>
       <span class="hint">one view at a time redraws faster</span>
     </div>
@@ -2143,7 +2153,7 @@ walk anyway.</p>
       <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
       <button class="chip" onclick="stepOpenerGPrime(1)" title="Next prime G">p&#9654;</button>
       <button class="chip tl on" id="welcome-g-play" onclick="toggleOpenerPlay()" title="Loop the preview lattice from G = 2 up to 100 and back. Plays when the opener opens; dragging the slider stops it.">&#9632; Stop</button>
-      <input type="range" id="welcome-g" min="2" max="1024" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 1024. Doesn't change the G on the page.">
+      <input type="range" id="welcome-g" min="1" max="1024" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 1024. Doesn't change the G on the page.">
       <span class="hint" style="white-space:nowrap;">preview only</span>
     </div>
     </div>
@@ -4041,8 +4051,9 @@ const OPENER_LABEL_MODES = [
   { id: 'rad',   short: 'angle rad', t: 'The Ring angle 2\u03c0\u00b7r/M in radians, to three places.' },
   { id: 'depth', short: 'depth',     t: 'Block survival depth: how many consecutive columns M, M+1, \u2026 stay coprime to r before the first miss (0 = not coprime already; runs on up to G \u2212 1, the longest the lattice holds). The cell survives a block of width n+1 exactly when its depth is more than n.' }
 ];
-let _openerLblIdx = OPENER_LABEL_MODES.findIndex(m => m.id === 'pi');   // opens on angle · π
-let OPENER_LABEL_MODE = 'pi';
+let _openerLblIdx = 0;   // opens with labels off; they come on (angle · π) when the view becomes Ring
+let _openerLblTouched = false;
+let OPENER_LABEL_MODE = 'off';
 const OPENER_LABELS_MAXG = 31;
 function openerLabelsShow() { return OPENER_LABEL_MODE !== 'off' && OPENER_G <= OPENER_LABELS_MAXG; }
 function openerLabelText(mode, r, M) {
@@ -4060,6 +4071,7 @@ function openerLabelText(mode, r, M) {
 function stepOpenerLabelMode(d) {
   if (typeof olCountdownStop === 'function') olCountdownStop();
   const n = OPENER_LABEL_MODES.length;
+  _openerLblTouched = true;
   _openerLblIdx = ((_openerLblIdx + d) % n + n) % n;
   const m = OPENER_LABEL_MODES[_openerLblIdx];
   OPENER_LABEL_MODE = m.id;
@@ -4112,6 +4124,9 @@ let OPENER_VIEW = 'all3';
 function wvShows(which) { return OPENER_VIEW === 'all3' || OPENER_VIEW === which; }
 function wvSetView(v) {
   OPENER_VIEW = v;
+  if (v === 'ring' && !_olCornersTouched && !OL.corners) { OL.corners = true; try { olSyncCornerUI(); } catch (e) {} }
+  if (v === 'ring' && !_openerLblTouched && OPENER_LABEL_MODE === 'off') { const i = OPENER_LABEL_MODES.findIndex(m => m.id === 'pi'); if (i >= 0) { _openerLblIdx = i; OPENER_LABEL_MODE = 'pi'; const lv = $('welcome-lbl-mode-v'); if (lv) { lv.textContent = OPENER_LABEL_MODES[i].short; lv.title = OPENER_LABEL_MODES[i].t; } } }
+  OPENER_PLAY_MAX = (v === 'ring') ? Math.min(256, OPENER_COP_MAX) : 100;
   // The export and the math sheet follow whichever view is on screen: Grid only, Ring only, Cayley only, or all three.
   try { oeSetView(v); } catch (e) {}
   document.querySelectorAll('.wv-view-btn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
@@ -4156,7 +4171,7 @@ function stepOpenerGPrime(dir) {
   setOpenerG(q);
 }
 function setOpenerG(v) {
-  OPENER_G = Math.max(2, Math.min(OPENER_COP_MAX, Math.round(+v) || 13));
+  OPENER_G = Math.max(1, Math.min(OPENER_COP_MAX, isFinite(Math.round(+v)) && String(v).trim() !== '' ? Math.round(+v) : 13));
   if (typeof OL !== 'undefined' && OL.sec && OL.sec.all) OL.sec.rays = OPENER_G;   // "all" sectors follows G
   const l = $('welcome-g-v'); if (l) l.textContent = OPENER_G;
   try { twSyncUI(); } catch (e) {}
@@ -4177,7 +4192,8 @@ const OL = { gbFitG: 'auto', gbFitR: 'auto', gp: { on: false, g: 2, i: 0, all: f
              pDim: false, pDimAmt: 50, gbAll: false, gbOn: false, gbG: 1, gbDim: false, gbDimAmt: 50, gbThick: 1, hideBroken: false, gbTrail: true, gbLabel: true, gbMkAll: true, gbLblScale: 1, gbSpot: true, gbSpotAmt: 55, pf: false, pfE: 0, thetaMode: 'clamp', survBrokenThick: 0.5,
              ptScale: 1, lblScale: 1, ringCCW: true,
              sec: { on: true, all: true, mode: 'sector', pick: 0, rays: 13, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 },
-             mf: { on: false, lo: 1, hi: 0, k: 1, c: 0, primes: false } };
+             mf: { on: false, lo: 1, hi: 0, k: 1, c: 0, primes: false }, corners: false, cTL: true, cTR: true, cBL: true, cBR: true };
+let _olCornersTouched = false;   // corner stats come on by themselves when the view becomes Ring, unless you set them first
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
 // NOTE: surv/broken now filter the Spiral, +-n path, Connect AND the r-chain together --
@@ -5380,6 +5396,7 @@ function olSyncUI() {
   document.querySelectorAll('.ol-mode-btn').forEach(b => b.classList.toggle('on', b.dataset.m === OL.mode));
   const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
   set('ol-n-val', n); set('ol-cn-val', cn); set('ol-p-val', OL.p);
+  try { olSyncCornerUI(); } catch (e) {}
   { const lk = $('ol-lockn-chk'); if (lk && lk.checked !== OL.lockN) lk.checked = OL.lockN; }
   olSyncNPlayChips();
   const p1 = $('ol-p1'); if (p1) p1.classList.toggle('on', OL.p === 1);
@@ -5456,7 +5473,8 @@ function olSyncUI() {
    and dragging the slider, or closing the opener, stops it. A setTimeout
    chain rather than setInterval, so a slow frame at G near 100 can't queue
    ticks behind itself. */
-const OPENER_PLAY_MIN = 2, OPENER_PLAY_MAX = 100, OPENER_PLAY_MS = 90;
+const OPENER_PLAY_MIN = 2, OPENER_PLAY_MS = 90;
+let OPENER_PLAY_MAX = 100;   // G runs 2..100 on the opening view; once the view is Ring it runs to 256
 let _openerPlaying = false, _openerPlayTimer = 0, _openerPlayDir = 1;
 // The tiles are sized by the layout now, so a rotate or a resize needs a redraw.
 window.addEventListener('resize', () => { if (openerModalOpen()) openerRedrawSoon(); });
@@ -6312,6 +6330,73 @@ function olSetGbThick(v) {
   const lbl = $('ol-gbthick-v'); if (lbl) lbl.textContent = OL.gbThick.toFixed(1) + '\u00d7';
   olRedraw();
 }
+/* Ring corner stats. Rows M are added one at a time and the running totals kept, so any G is a prefix:
+   cumulative coprime cells (r <= M), the first four sectors S_s = {floor(M/r) = s}, the C(n) sieve at
+   depths 1..4 (rings 2..G-1 with r < M, as the sheet counts it) and the prime count. */
+const RC = { M: 0, phi: [0], sec: [[0, 0, 0, 0, 0]], sv: [[0, 0, 0, 0, 0]], cop: [0], pi: [0] };
+function rcExtend(G) {
+  for (; RC.M < G;) {
+    const M = ++RC.M;
+    let ph = 0; const sc = [0, 0, 0, 0, 0];
+    const kc = [0, 0, 0, 0, 0], cp = [0];   // kept at depth n (index n), and coprime r < M
+    for (let r = 1; r <= M; r++) {
+      if (gcd(r, M) !== 1) continue;
+      ph++;
+      const s = Math.floor(M / r); if (s >= 1 && s <= 4) sc[s]++;
+    }
+    let cop = 0;
+    if (M >= 2) {
+      for (let r = 1; r < M; r++) {
+        if (gcd(r, M) !== 1) continue;
+        cop++; kc[0]++;
+        for (let n = 1; n <= 4; n++) { if (gcd(r, M + n) !== 1) break; kc[n]++; }
+      }
+    }
+    const pv = RC.phi[M - 1] + ph; RC.phi[M] = pv;
+    RC.sec[M] = RC.sec[M - 1].map((v, i) => v + (i ? sc[i] : 0));
+    RC.sv[M] = RC.sv[M - 1].map((v, i) => v + kc[i]);
+    RC.cop[M] = RC.cop[M - 1] + cop;
+    let isP = M >= 2; for (let d = 2; d * d <= M; d++) if (M % d === 0) { isP = false; break; }
+    RC.pi[M] = RC.pi[M - 1] + (isP ? 1 : 0);
+  }
+}
+function olCornerSet(k, v) { _olCornersTouched = true; OL[k] = !!v; olRedraw(); }
+function olSyncCornerUI() {
+  [['ol-corners-chk', 'corners'], ['ol-c-tl', 'cTL'], ['ol-c-tr', 'cTR'], ['ol-c-bl', 'cBL'], ['ol-c-br', 'cBR']].forEach(a => { const e = $(a[0]); if (e && e.checked !== !!OL[a[1]]) e.checked = !!OL[a[1]]; });
+}
+function openerRingCorners(ctx, w, h) {
+  if (!OL.corners || OL.gbOn || OL.gbAll || OL.pf || MS_LBL.on) return;
+  const G = OPENER_G; rcExtend(G);
+  const S = Math.min(w, h), fs = Math.max(8, Math.min(15, S * 0.024)), lh = fs * 1.28, pad = Math.max(5, S * 0.012);
+  const GRN = '#5fd08a', RED = '#e06666', DIM = 'rgba(232,227,219,.78)', GOLD = '#d8b15a';
+  const Z2 = Math.PI * Math.PI / 6, tot = G * (G + 1) / 2, phi = RC.phi[G];
+  const col = d => d > 0 ? GRN : d < 0 ? RED : DIM, sg = d => (d >= 0 ? '+' : '') + d.toFixed(2) + '%';
+  const block = (lines, right, bottom) => {
+    ctx.save(); ctx.font = fs + 'px "JetBrains Mono",ui-monospace,monospace';
+    const wd = Math.max(...lines.map(l => ctx.measureText(l.t).width)) + 2 * pad, ht = lines.length * lh + 2 * pad;
+    const x0 = right ? w - pad - wd : pad, y0 = bottom ? h - pad - ht : pad;
+    ctx.fillStyle = 'rgba(5,6,16,.62)'; ctx.fillRect(x0, y0, wd, ht);
+    ctx.textBaseline = 'top'; ctx.textAlign = right ? 'right' : 'left';
+    lines.forEach((l, i) => { ctx.fillStyle = l.c || DIM; ctx.fillText(l.t, right ? x0 + wd - pad : x0 + pad, y0 + pad + i * lh); });
+    ctx.restore();
+  };
+  // top left: gcd = 1 cells against 6/pi^2
+  const ratio = phi / tot, dl = (ratio * Z2 - 1) * 100;
+  if (OL.cTL) block([{ t: 'gcd=1 / cells', c: GOLD }, { t: phi + ' / ' + tot, c: '#fff' }, { t: (ratio * 100).toFixed(2) + '%  ' + sg(dl), c: col(dl) }, { t: 'vs 6/π² = 60.79%', c: DIM }], false, false);
+  // top right: sectors S1..S4 against F(s,G) = 3 G^2 / (pi^2 s (s+1))
+  const sl = [{ t: 'sectors S_s', c: GOLD }];
+  for (let s = 1; s <= 4; s++) { const F = 3 * G * G / (Math.PI * Math.PI * s * (s + 1)), n = RC.sec[G][s], d = F > 0 ? (n / F - 1) * 100 : 0; sl.push({ t: 'S' + s + ' ' + n + ' ' + sg(d), c: col(d) }); }
+  if (OL.cTR) block(sl, true, false);
+  // bottom left: the C(n) sieve at depths 1..4, kept / coprime against the limit
+  const bl = [{ t: 'sieve  kept/coprime', c: GOLD }], cp = RC.cop[G];
+  if (G >= 3 && cp > 0) {
+    for (let n = 1; n <= 4; n++) { let Cn = NaN; try { Cn = Z2 * Dn(n); } catch (e) {} const k = RC.sv[G][n], d = isFinite(Cn) ? ((k / cp) / Cn - 1) * 100 : 0; bl.push({ t: 'n=' + n + ' ' + k + '/' + cp + ' ' + sg(d), c: col(d) }); }
+  } else bl.push({ t: 'needs G ≥ 3', c: DIM });
+  if (OL.cBL) block(bl, false, true);
+  // bottom right: primes up to G
+  const pg = RC.pi[G], est = G >= 2 ? G / Math.log(G) : 0;
+  if (OL.cBR) block([{ t: 'primes ≤ G', c: GOLD }, { t: 'π(' + G + ') = ' + pg, c: '#fff' }, { t: G >= 2 ? 'G/ln G = ' + est.toFixed(1) : '', c: DIM }, { t: G >= 2 ? 'ratio ' + (pg / est).toFixed(3) : '', c: DIM }], true, true);
+}
 function openerDrawRing(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-ring'); if (!c) return;
   const ctx = c.ctx, S = Math.min(c.w, c.h), cx = c.w / 2, cy = c.h / 2;
@@ -6346,6 +6431,7 @@ function openerDrawRing(t, forceC) {
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
+  try { openerRingCorners(ctx, c.w, c.h); } catch (e) {}
 }
 /* Circle-method fill for the ring's hole: |sin(N*theta/2)/sin(theta/2)|, N growing
    linearly from 0 at the centre to G at the rim. That is the plain exponential sum
@@ -6687,8 +6773,10 @@ function olCountdownStart(sec) {
     } catch (e) {}
   }, 1000);
 }
+let _openerLockDefaulted = false;
 function openWelcomeModal() {
   syncWelcomeUI();
+  if (!_openerLockDefaulted) { _openerLockDefaulted = true; const st = $('welcome-stage'); if (st && !st.classList.contains('wp-locked')) toggleOpenerLock(); }   // canvas locked by default, first open only
   $('welcome-modal').style.display = 'flex';
   // Sized off clientWidth, so the reveal has to wait for the modal to
   // actually be in the layout — hence display is set first, this after.
@@ -6776,7 +6864,111 @@ function sendOpenerToMainAndClose() {
   const cv = $('cv');
   if (cv && cv.scrollIntoView) cv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+
+/* ── Share link ──────────────────────────────────────────────────────────
+   The link is the page URL plus #s=<state>. State is only what differs from
+   the page's own defaults: every control with an id, plus the opener's OL,
+   G, turns and label mode. Opening the link restores it; the opener opens
+   first when it was open. Large states are deflated when the browser can. */
+const SHARE = { def: null, olDef: null, rotDef: null };
+function shareEls() {
+  return Array.from(document.querySelectorAll('input[id],select[id],textarea[id]'))
+    .filter(e => e.type !== 'file' && e.type !== 'button' && !/^share-/.test(e.id));
+}
+function shareVal(e) { return (e.type === 'checkbox' || e.type === 'radio') ? !!e.checked : e.value; }
+function shareSnapDefaults() {
+  if (SHARE.def) return;
+  SHARE.def = {}; shareEls().forEach(e => { SHARE.def[e.id] = shareVal(e); });
+  try { SHARE.olDef = JSON.parse(JSON.stringify(OL)); SHARE.rotDef = JSON.parse(JSON.stringify(OPENER_ROT)); } catch (e) {}
+}
+function shareDiff(cur, def) {
+  if (cur && typeof cur === 'object' && !Array.isArray(cur)) {
+    const o = {}; let any = false;
+    Object.keys(cur).forEach(k => { const d = shareDiff(cur[k], def ? def[k] : undefined); if (d !== undefined) { o[k] = d; any = true; } });
+    return any ? o : undefined;
+  }
+  return JSON.stringify(cur) === JSON.stringify(def) ? undefined : cur;
+}
+function shareCapture() {
+  shareSnapDefaults();
+  const st = { v: 1 };
+  const modal = $('welcome-modal');
+  if (modal && modal.style.display !== 'none') st.o = 1;
+  const d = {}; shareEls().forEach(e => { const v = shareVal(e); if (v !== SHARE.def[e.id]) d[e.id] = v; });
+  if (Object.keys(d).length) st.d = d;
+  st.G = OPENER_G; st.L = OPENER_LABEL_MODE;
+  const ol = shareDiff(JSON.parse(JSON.stringify(OL)), SHARE.olDef); if (ol) st.ol = ol;
+  const rt = shareDiff(OPENER_ROT, SHARE.rotDef); if (rt) st.rot = rt;
+  return st;
+}
+function shareB64(bytes) { let s = ''; bytes.forEach(b => { s += String.fromCharCode(b); }); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function shareUnB64(t) { t = t.replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; const s = atob(t); return Uint8Array.from(s, c => c.charCodeAt(0)); }
+async function shareEncode(st) {
+  const raw = new TextEncoder().encode(JSON.stringify(st));
+  try {
+    if (typeof CompressionStream === 'function') {
+      const cs = new CompressionStream('deflate-raw'), w = cs.writable.getWriter(); w.write(raw); w.close();
+      const out = new Uint8Array(await new Response(cs.readable).arrayBuffer());
+      return 'z' + shareB64(out);
+    }
+  } catch (e) {}
+  return 'p' + shareB64(raw);
+}
+async function shareDecode(t) {
+  const kind = t[0], bytes = shareUnB64(t.slice(1));
+  if (kind === 'z') {
+    const ds = new DecompressionStream('deflate-raw'), w = ds.writable.getWriter(); w.write(bytes); w.close();
+    return JSON.parse(new TextDecoder().decode(new Uint8Array(await new Response(ds.readable).arrayBuffer())));
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+async function shareLink() { return location.href.split('#')[0] + '#s=' + await shareEncode(shareCapture()); }
+async function shareCopy(btn) {
+  let url = ''; const old = btn ? btn.innerHTML : '';
+  try { url = await shareLink(); } catch (e) { url = ''; }
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch (e) {
+    try { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {}
+  }
+  if (!ok) { try { window.prompt('Copy this link:', url); ok = true; } catch (e) {} }
+  if (btn) { btn.innerHTML = ok ? 'Link copied ✓' : 'Copy failed'; setTimeout(() => { btn.innerHTML = old; }, 1600); }
+}
+function shareDeepAssign(dst, src) {
+  Object.keys(src).forEach(k => {
+    if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k]) && dst[k] && typeof dst[k] === 'object') shareDeepAssign(dst[k], src[k]);
+    else dst[k] = src[k];
+  });
+}
+function shareApply(st) {
+  shareSnapDefaults();
+  if (st.o) {
+    try { openWelcomeModal(); } catch (e) {}
+    try { olCountdownStop(); stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay(); olStopGbPlay(); olStopGapPlay(); stopOpenerMusic(); } catch (e) {}
+  }
+  if (st.ol) { shareDeepAssign(OL, st.ol); _olCornersTouched = true; }
+  if (st.rot) { Object.keys(st.rot).forEach(a => { try { setOpenerRot(a, st.rot[a]); } catch (e) { OPENER_ROT[a] = st.rot[a]; } }); }
+  if (st.L) { const i = OPENER_LABEL_MODES.findIndex(m => m.id === st.L); if (i >= 0) { _openerLblTouched = true; _openerLblIdx = i; OPENER_LABEL_MODE = st.L; const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = OPENER_LABEL_MODES[i].short; v.title = OPENER_LABEL_MODES[i].t; } } }
+  if (st.G) { try { setOpenerG(st.G); } catch (e) { OPENER_G = st.G; } }
+  if (st.ol) shareDeepAssign(OL, st.ol);   // setOpenerG may have touched sector rays
+  if (st.d) {
+    Object.keys(st.d).forEach(id => {
+      const e = $(id); if (!e || id.indexOf('welcome') === 0) return;
+      const v = st.d[id];
+      if (e.type === 'checkbox' || e.type === 'radio') { if (!!e.checked !== !!v) e.click(); }
+      else { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+  }
+  try { if (st.o) { olRedraw(); renderOpenerPreview(true); } else { redraw(true); } } catch (e) {}
+}
+async function shareBoot() {
+  const m = /[#&]s=([A-Za-z0-9_-]+)/.exec(location.hash || '');
+  if (!m) return false;
+  try { shareApply(await shareDecode(m[1])); return true; } catch (e) { return false; }
+}
+window.addEventListener('load', () => setTimeout(shareSnapDefaults, 0));
+
 function maybeAutoOpenWelcome() {
+  if (/[#&]s=/.test(location.hash || '')) { setTimeout(shareBoot, 1500); return; }
   try { if (localStorage.getItem('stripII_welcome_seen')) return; } catch (e) {}
   openWelcomeModal();
 }
