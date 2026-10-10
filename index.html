@@ -4124,6 +4124,7 @@ let OPENER_VIEW = 'all3';
 function wvShows(which) { return OPENER_VIEW === 'all3' || OPENER_VIEW === which; }
 function wvSetView(v) {
   OPENER_VIEW = v;
+  if (v === 'ring' && !_olRingAutoDone) { _olRingAutoDone = true; try { OL.mirror = true; if (!_olPTimer && !OL.gbOn) olTogglePPlay(); olSyncUI(); } catch (e) {} }
   if (v === 'ring' && !_olCornersTouched && !OL.corners) { OL.corners = true; try { olSyncCornerUI(); } catch (e) {} }
   if (v === 'ring' && !_openerLblTouched && OPENER_LABEL_MODE === 'off') { const i = OPENER_LABEL_MODES.findIndex(m => m.id === 'pi'); if (i >= 0) { _openerLblIdx = i; OPENER_LABEL_MODE = 'pi'; const lv = $('welcome-lbl-mode-v'); if (lv) { lv.textContent = OPENER_LABEL_MODES[i].short; lv.title = OPENER_LABEL_MODES[i].t; } } }
   OPENER_PLAY_MAX = (v === 'ring') ? Math.min(256, OPENER_COP_MAX) : 100;
@@ -4193,6 +4194,7 @@ const OL = { gbFitG: 'auto', gbFitR: 'auto', gp: { on: false, g: 2, i: 0, all: f
              ptScale: 1, lblScale: 1, ringCCW: true,
              sec: { on: true, all: true, mode: 'sector', pick: 0, rays: 13, dim: 50, dimOut: true, bands: true, aLo: 1, bLo: 3, aHi: 1, bHi: 2 },
              mf: { on: false, lo: 1, hi: 0, k: 1, c: 0, primes: false }, corners: false, cTL: true, cTR: true, cBL: true, cBR: true };
+let _olRingAutoDone = false;   // the first switch to Ring starts the prime spiral and the mirror, once
 let _olCornersTouched = false;   // corner stats come on by themselves when the view becomes Ring, unless you set them first
 // ringCCW: sweep direction of theta on the Ring and Cayley previews — false (default) sweeps
 // theta clockwise on screen, as the main page does; true turns it counter-clockwise. Preview only.
@@ -4964,12 +4966,15 @@ function olStopCNPlay() { if (_olCNTimer) { clearInterval(_olCNTimer); _olCNTime
 function olFixPForN() {
   if (_olPTimer) { const act = olActivePrimes(); if (act.length && act.indexOf(OL.p) < 0) OL.p = act.find(q => q > OL.p) || act[0]; }
 }
+let _olNDir = 1, _olCNDir = 1, _olPDir = 1, _olGrowDir = 1, _olGbBounce = 1;
 function olNPlay() {
   if (_olNTimer) { olStopNPlay(); return; }
+  _olNDir = 1;
   _olNTimer = setInterval(() => {
     if (!openerModalOpen()) { olStopNPlay(); return; }
     const mx = Math.max(0, OPENER_G - 1), cur = openerLiftN();
-    OL.n = cur >= mx ? 0 : cur + 1;
+    if (cur >= mx) _olNDir = -1; else if (cur <= 0) _olNDir = 1;   // bounce: up to G-1, then back down
+    OL.n = Math.max(0, Math.min(mx, cur + (mx === 0 ? 0 : _olNDir)));
     olFixPForN(); olRedraw();
   }, 140);
   olSyncNPlayChips();
@@ -4977,10 +4982,12 @@ function olNPlay() {
 function olCNPlay() {
   if (_olCNTimer) { olStopCNPlay(); return; }
   if (OL.lockN) { olNPlay(); return; }              // locked: one clock moves both n, so just run the shared one
+  _olCNDir = 1;
   _olCNTimer = setInterval(() => {
     if (!openerModalOpen()) { olStopCNPlay(); return; }
     const mx = Math.max(0, OPENER_G - 1), cur = openerChainN();
-    OL.cn = cur >= mx ? 0 : cur + 1;
+    if (cur >= mx) _olCNDir = -1; else if (cur <= 0) _olCNDir = 1;
+    OL.cn = Math.max(0, Math.min(mx, cur + (mx === 0 ? 0 : _olCNDir)));
     olRedraw();
   }, 140);
   olSyncNPlayChips();
@@ -5023,12 +5030,16 @@ function olTogglePPlay() {
   if (_olPTimer) { olStopPPlay(); return; }
   const first = olActivePrimes();
   if (!first.length) return;                       // every prime <= G is saturated at this n
+  _olPDir = 1;
   if (!(OL.p > openerLiftN() + 1) || first.indexOf(OL.p) < 0) OL.p = first.find(q => q >= OL.p) || first[0];
   _olPTimer = setInterval(() => {
     if (!openerModalOpen()) { olStopPPlay(); return; }
     const act = olActivePrimes();
     if (!act.length) { olStopPPlay(); return; }    // n saturated everything: nothing left to loop
-    OL.p = act.find(q => q > OL.p) || act[0];
+    let i = act.indexOf(OL.p);
+    if (i < 0) { i = act.findIndex(q => q > OL.p); if (i < 0) i = act.length - 1; _olPDir = 1; OL.p = act[i]; olRedraw(); return; }
+    if (act.length > 1) { if (i + _olPDir >= act.length) _olPDir = -1; else if (i + _olPDir < 0) _olPDir = 1; i += _olPDir; }
+    OL.p = act[i];   // bounce: up through the active primes, then back down
     olRedraw();
   }, 140);
   olSyncPPlayChip(); olRedraw();
@@ -5094,12 +5105,13 @@ let _olGrowT = 0, _olGrowK = 0;
 function olStopGrow() { if (_olGrowT) { clearInterval(_olGrowT); _olGrowT = 0; } const b = $('ol-grow-btn'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
 function olToggleGrow() {
   if (_olGrowT) { olStopGrow(); return; }
-  const o = Number(OL.offset) || 0; _olGrowK = o < 0 ? -o : 0;
+  const o = Number(OL.offset) || 0; _olGrowK = o < 0 ? -o : 0; _olGrowDir = 1;
   OL.stripOn = true; const chk = $('ol-strip-chk'); if (chk) chk.checked = true;
   const b = $('ol-grow-btn'); if (b) { b.innerHTML = '&#9632; Stop'; b.classList.add('on'); }
   _olGrowT = setInterval(() => {
     const mx = Math.max(2, OPENER_G + 1);
-    _olGrowK = _olGrowK >= mx ? 1 : _olGrowK + 1;
+    if (_olGrowK >= mx) _olGrowDir = -1; else if (_olGrowK <= 1) _olGrowDir = 1;
+    _olGrowK = Math.max(1, _olGrowK + _olGrowDir);
     OL.offset = -_olGrowK; OL.width = 2 * _olGrowK; olRedraw();
   }, 160);
 }
@@ -5205,7 +5217,7 @@ function olToggleGbPlay() {
     if (!openerModalOpen()) { olStopGbPlay(); return; }
     const live = olGoldbachPairs();
     if (!live.length) { olStopGbPlay(); return; }
-    i = (i + (OL.gbDir || 1) + live.length) % live.length;
+    { const d = (OL.gbDir || 1) * _olGbBounce; if (live.length > 1) { if (i + d >= live.length || i + d < 0) _olGbBounce = -_olGbBounce; i = Math.max(0, Math.min(live.length - 1, i + (OL.gbDir || 1) * _olGbBounce)); } }
     OL.gbG = live[i];
     olRedraw();
   }, 500);
@@ -6367,7 +6379,7 @@ function olSyncCornerUI() {
 function openerRingCorners(ctx, w, h) {
   if (!OL.corners || OL.gbOn || OL.gbAll || OL.pf || MS_LBL.on) return;
   const G = OPENER_G; rcExtend(G);
-  const S = Math.min(w, h), fs = Math.max(8, Math.min(15, S * 0.024)), lh = fs * 1.28, pad = Math.max(5, S * 0.012);
+  const S = Math.min(w, h), fs = Math.max(8, S * 0.024), lh = fs * 1.28, pad = Math.max(5, S * 0.012);
   const GRN = '#5fd08a', RED = '#e06666', DIM = 'rgba(232,227,219,.78)', GOLD = '#d8b15a';
   const Z2 = Math.PI * Math.PI / 6, tot = G * (G + 1) / 2, phi = RC.phi[G];
   const col = d => d > 0 ? GRN : d < 0 ? RED : DIM, sg = d => (d >= 0 ? '+' : '') + d.toFixed(2) + '%';
@@ -6395,7 +6407,7 @@ function openerRingCorners(ctx, w, h) {
   if (OL.cBL) block(bl, false, true);
   // bottom right: primes up to G
   const pg = RC.pi[G], est = G >= 2 ? G / Math.log(G) : 0;
-  if (OL.cBR) block([{ t: 'primes ≤ G', c: GOLD }, { t: 'π(' + G + ') = ' + pg, c: '#fff' }, { t: G >= 2 ? 'G/ln G = ' + est.toFixed(1) : '', c: DIM }, { t: G >= 2 ? 'ratio ' + (pg / est).toFixed(3) : '', c: DIM }], true, true);
+  if (OL.cBR) block([{ t: 'primes ≤ G', c: GOLD }, { t: 'π(' + G + ') = ' + pg, c: '#fff' }, { t: G >= 2 ? 'G/ln G = ' + est.toFixed(1) : '', c: DIM }, { t: G >= 2 ? 'ratio ' + (pg / est).toFixed(3) : '', c: DIM }].concat(OL.p > 1 || OL.mirror ? [{ t: 'spiral p = ' + OL.p + (OL.p > G ? ' (> G)' : ''), c: '#4fd1c5' }] : [], OL.mirror ? [{ t: 'mirror \u03c3(r) = M \u2212 r', c: '#9b7fe8' }] : []), true, true);
 }
 function openerDrawRing(t, forceC) {
   const c = forceC || openerDPRCanvas('welcome-cv-ring'); if (!c) return;
@@ -6945,6 +6957,7 @@ function shareApply(st) {
     try { openWelcomeModal(); } catch (e) {}
     try { olCountdownStop(); stopOpenerPlay(); stopOpenerRotPlay(); olStopPPlay(); olStopGbPlay(); olStopGapPlay(); stopOpenerMusic(); } catch (e) {}
   }
+  _olRingAutoDone = true;
   if (st.ol) { shareDeepAssign(OL, st.ol); _olCornersTouched = true; }
   if (st.rot) { Object.keys(st.rot).forEach(a => { try { setOpenerRot(a, st.rot[a]); } catch (e) { OPENER_ROT[a] = st.rot[a]; } }); }
   if (st.L) { const i = OPENER_LABEL_MODES.findIndex(m => m.id === st.L); if (i >= 0) { _openerLblTouched = true; _openerLblIdx = i; OPENER_LABEL_MODE = st.L; const v = $('welcome-lbl-mode-v'); if (v) { v.textContent = OPENER_LABEL_MODES[i].short; v.title = OPENER_LABEL_MODES[i].t; } } }
@@ -8638,6 +8651,7 @@ function liftChainFracInputs() {
   liftChainFrac($('lift-chain-fa').value, $('lift-chain-fb').value);
 }
 
+let liftNDir = 1, liftCNDir = 1, liftPDir = 1, _growDir = 1;
 function liftNPlay() {
   const btn = $('lift-n-play-btn');
   if (liftNPlayIv) {
@@ -8648,9 +8662,11 @@ function liftNPlay() {
   }
   if (btn) { btn.textContent = '\u25A0'; btn.classList.add('on'); }
   if (liftLockN) { const cb = $('lift-cn-play-btn'); if (cb) { cb.textContent = '\u25A0'; cb.classList.add('on'); } }
+  liftNDir = 1;
   liftNPlayIv = setInterval(function () {
     // Steps the lift depth n; while locked the r-chain depth moves with it.
-    liftNManual = (liftNManual + 1 > liftMaxN()) ? 0 : liftNManual + 1;
+    if (liftNManual >= liftMaxN()) liftNDir = -1; else if (liftNManual <= 0) liftNDir = 1;   // bounce
+    liftNManual = Math.max(0, Math.min(liftMaxN(), liftNManual + liftNDir));
     liftRenderNReadout(); liftRenderTable(); redraw(false);
   }, liftAnimSpeed);
 }
@@ -8665,9 +8681,11 @@ function liftCNPlay() {
   }
   if (liftLockN) { liftNPlay(); return; }
   if (btn) { btn.textContent = '\u25A0'; btn.classList.add('on'); }
+  liftCNDir = 1;
   liftCNPlayIv = setInterval(function () {
     if (liftLockN) { clearInterval(liftCNPlayIv); liftCNPlayIv = null; if (btn) { btn.textContent = '\u25B6'; btn.classList.remove('on'); } return; }
-    liftChainN = (liftChainN + 1 > liftMaxN()) ? 0 : liftChainN + 1;
+    if (liftChainN >= liftMaxN()) liftCNDir = -1; else if (liftChainN <= 0) liftCNDir = 1;
+    liftChainN = Math.max(0, Math.min(liftMaxN(), liftChainN + liftCNDir));
     liftRenderNReadout(); liftRenderTable(); redraw(false);
   }, liftAnimSpeed);
 }
@@ -8679,10 +8697,13 @@ function liftPPlay() {
     return;
   }
   if (btn) { btn.textContent = '\u25A0 Stop'; btn.classList.add('on'); }
+  liftPDir = 1;
   liftPPlayIv = setInterval(function () {
-    let p = nextPrime(liftSpiralP);
-    if (liftPSyncOn) { const cap = liftN() + 1; while (p <= cap) p = nextPrime(p); }
-    if (p > COP_G) p = 2;
+    const lo = liftPSyncOn ? liftN() + 1 : 1;   // primes at or below lo are saturated
+    let p = liftPDir > 0 ? nextPrime(liftSpiralP) : prevPrime(liftSpiralP);
+    if (liftPDir > 0 && p > COP_G) { liftPDir = -1; p = prevPrime(liftSpiralP); }
+    if (liftPDir < 0 && (p >= liftSpiralP || p <= lo)) { liftPDir = 1; p = nextPrime(liftSpiralP); if (p > COP_G) p = liftSpiralP; }
+    if (liftPSyncOn) { while (p <= lo && p <= COP_G) p = nextPrime(p); }
     liftSetSpiralP(p);
   }, liftAnimSpeed);
 }
@@ -10857,10 +10878,11 @@ let _growT = 0, _growK = 0;
 function stopGrow() { if (_growT) { clearInterval(_growT); _growT = 0; } const b = $('grow-btn'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
 function toggleGrow() {
   if (_growT) { stopGrow(); return; }
-  _growK = Math.max(0, -(+$('off-num').value || 0));
+  _growK = Math.max(0, -(+$('off-num').value || 0)); _growDir = 1;
   const b = $('grow-btn'); if (b) { b.innerHTML = '&#9632; Stop'; b.classList.add('on'); }
   _growT = setInterval(() => {
-    _growK = _growK >= G + 1 ? 1 : _growK + 1;
+    if (_growK >= G + 1) _growDir = -1; else if (_growK <= 1) _growDir = 1;
+    _growK = Math.max(1, _growK + _growDir);
     onOff(-_growK); onW(2 * _growK);
   }, 160);
 }
