@@ -286,6 +286,8 @@ tr.sthow b{color:var(--teal);font-weight:500;}
 .panel.collapsed .ptitle{margin-bottom:0;}
 .panel.collapsed .ptitle .car{transform:rotate(-90deg);}
 .panel.collapsed > .pbody{display:none;}
+.chip.pulse{animation:lvpulse 1s ease-in-out infinite;border-color:var(--gold);}
+@keyframes lvpulse{0%,100%{box-shadow:0 0 0 0 rgba(200,168,74,.0);}50%{box-shadow:0 0 0 4px rgba(200,168,74,.45);}}
 .subtoggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--cream3);padding:2px 0 12px;}
@@ -779,6 +781,27 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   Hardy–Littlewood singular series. Nothing here is claimed as new. What is offered is a
   single geometric setting in which these familiar densities are one computation, and a
   browser that recomputes each of them from scratch.</div>
+</div>
+
+<div id="lv2-panel" style="margin:14px auto 6px;max-width:1100px;padding:0 4px;">
+  <div class="subtoggle collapsed" id="lv2-toggle" onclick="toggleSub(this)">
+    <span class="car">&#9662;</span><span>Level 2 &middot; Predict C(n) &middot; main page, G up to 10,000</span><span id="lv2-stars" style="margin-left:auto;color:var(--gold);font-size:12px;"></span>
+  </div>
+  <div class="subbody">
+    <div id="lv2-box" style="padding:4px 0 14px;font-size:12.5px;line-height:1.6;">
+      <div class="pnote" style="padding:0 0 8px;">Level 1 had you cross out cells. Here you predict the answer before the formula shows it. At depth n a cell survives if r is coprime to M, M+1, &hellip;, M+n, and C(n) is the share of the coprime cells that survive. C(0) = 1 and C(n) falls as primes saturate. Guess it, lock it in, and see C(n) = &zeta;(2)&middot;D(n). Five rounds.</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;"><span class="lbl">grid</span>
+        <button class="chip" onclick="onG(1024)">G = 1,024</button><button class="chip" onclick="onG(4096)">4,096</button><button class="chip" onclick="onG(10000)">10,000</button>
+        <button class="chip" onclick="lv2Start()">new game</button></div>
+      <div id="lv2-round" style="font-family:var(--mono);font-size:13px;color:var(--gold);margin-bottom:6px;"></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="range" id="lv2-guess" min="0" max="100" step="0.1" value="50" oninput="lv2Show()" style="flex:1 1 200px;max-width:420px;">
+        <span class="val" id="lv2-guess-v" style="min-width:60px;">50.0%</span>
+        <button class="btn" id="lv2-lock" onclick="lv2Lock()">Lock in</button>
+      </div>
+      <div id="lv2-reveal" style="margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--cream2);white-space:pre-wrap;"></div>
+    </div>
+  </div>
 </div>
 
 <section id="sec0" class="dsec collapsed">
@@ -2001,6 +2024,21 @@ walk anyway.</p>
   </div>
 </div>
 
+<div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#04040d;overflow:hidden;">
+  <canvas id="intro-cv" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+  <div style="position:absolute;left:0;right:0;top:0;padding:max(18px,4vh) 16px 0;text-align:center;pointer-events:none;">
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:.38em;color:var(--gold);">WESSEN GETACHEW &middot; 2026</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(30px,7vw,64px);color:var(--cream);margin-top:8px;letter-spacing:.02em;">Strip Arithmetic II</div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--cream2);margin-top:6px;">a sieve you can watch &middot; Level 1: G up to 1024 &middot; Level 2: the main page, up to 10,000</div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:0 16px max(20px,4vh);text-align:center;">
+    <div id="intro-counter" style="font-family:var(--mono);font-size:clamp(11px,2.6vw,14px);color:var(--cream2);min-height:20px;"></div>
+    <div style="margin-top:14px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" id="intro-enter" onclick="introEnter()" style="font-size:15px;padding:10px 28px;border-color:var(--gold);color:var(--gold);">Enter &rarr;</button>
+      <button class="chip" onclick="introEnter()" title="Skip the animation and go straight to Level 1">skip</button>
+    </div>
+  </div>
+</div>
 <div id="welcome-modal" class="export-modal" style="display:none;" onclick="if(event.target===this)closeWelcomeModal()">
   <div class="export-box">
     <div class="export-hd" style="flex-wrap:wrap;row-gap:4px;">
@@ -2013,6 +2051,25 @@ walk anyway.</p>
       <a href="https://soundcloud.com/vincerubinetti/riemann-zeta-function" target="_blank" rel="noopener" style="flex:1 1 100%;order:3;min-width:0;font-family:var(--mono);font-size:10.5px;line-height:1.35;color:var(--cream3);text-decoration:none;overflow-wrap:anywhere;" title="Open the track on SoundCloud">&#9835; Riemann Zeta Function &middot; Vince Rubinetti</a>
     </div>
     <div id="welcome-music-slot" style="height:0;overflow:hidden;"></div>
+    <div class="subtoggle collapsed" id="lv1-toggle" onclick="toggleSub(this)">
+      <span class="car">&#9662;</span><span>Level 1 &middot; Run the sieve</span><span id="lv1-stars" style="margin-left:auto;color:var(--gold);font-size:12px;"></span>
+    </div>
+    <div class="subbody">
+      <div id="lv1-box" style="padding:4px 0 14px;font-size:12.5px;line-height:1.6;">
+        <div class="pnote" style="padding:0 0 8px;">A cell (r, M) with r &le; M is <b>crossed out</b> when a prime you pick divides gcd(r, M). Cross out 99% of the cells that share a factor, using as few primes as you can. Par is the best greedy order, found exactly from the counts. What is left is the coprime set, whose share tends to 6/&pi;&sup2; = 60.79%.</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;"><span class="lbl">G</span><span id="lv1-gchips"></span><button class="chip" onclick="lv1Reset()">reset</button><button class="chip" onclick="lv1Hint()" title="Shows the best next prime. Using a hint caps the stars at 2.">Hint</button></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
+          <canvas id="lv1-cv" width="360" height="360" style="width:min(100%,300px);aspect-ratio:1/1;border-radius:8px;background:#0c0e1a;flex:0 0 auto;"></canvas>
+          <div style="flex:1 1 200px;min-width:200px;">
+            <div id="lv1-primes" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;"></div>
+            <div id="lv1-stats" style="font-family:var(--mono);font-size:11.5px;color:var(--cream2);"></div>
+            <div id="lv1-msg" style="margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--gold);"></div>
+            <button class="btn" id="lv1-next" onclick="lv2Enter()" style="display:none;margin-top:8px;">Enter Level 2 &middot; main page, up to G = 10,000 &rarr;</button>
+          </div>
+        </div>
+        <div style="margin-top:6px;color:var(--cream3);font-size:11px;">Teal = coprime (never crossed out) &middot; dark = crossed out &middot; coral = shares a factor, still in the game. The Grid has r across and M up.</div>
+      </div>
+    </div>
     <div class="subtoggle collapsed" id="welcome-note-toggle" onclick="toggleSub(this)">
       <span class="car">&#9662;</span><span>What to know before exploring this framework</span>
     </div>
@@ -7007,10 +7064,229 @@ async function shareBoot() {
 }
 window.addEventListener('load', () => setTimeout(shareSnapDefaults, 0));
 
+
+/* ── Intro and Level 1 ───────────────────────────────────────────────────
+   Intro: a canvas animation of the real lattice (the Ring filling as G grows, with the gcd = 1 count ticking
+   toward 6/pi^2), then Enter opens Level 1, the opener. Level 1 is "Run the sieve": a cell (r, M), r <= M, is
+   crossed out when a picked prime divides gcd(r, M). Par is the greedy order, computed exactly from the counts
+   of cells by gcd. Level 2 is the main page. */
+let _introRaf = 0, _introT0 = 0, _introOn = false;
+function showIntro() {
+  const ov = $('intro-overlay'), cv = $('intro-cv'); if (!ov || !cv) { openWelcomeModal(); return; }
+  _introOn = true; ov.style.display = 'block'; _introT0 = performance.now();
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const draw = now => {
+    if (!_introOn) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    x.fillStyle = '#04040d'; x.fillRect(0, 0, W, H);
+    const T = calm ? 99 : (now - _introT0) / 1000, GMAX = 256, G = Math.max(1, Math.min(GMAX, Math.floor(1 + (GMAX - 1) * Math.min(1, T / 9) ** 1.4)));
+    const cx = W / 2, cy = H * 0.5, R = Math.min(W * 0.32, H * 0.22);
+    const spin = calm ? 0 : T * 0.05;
+    const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
+    let cop = 0; const sc = [0, 0, 0, 0, 0];
+    for (let M = 1; M <= G; M++) {
+      const rad = R * (M - 0.5) / GMAX * 1.0;
+      for (let r = 1; r <= M; r++) {
+        if (gcd(r, M) !== 1) continue; cop++; { const q = Math.floor(M / r); if (q <= 4) sc[q]++; }
+        const th = 2 * Math.PI * r / M + spin;
+        x.fillStyle = 'hsla(' + SECHUE[Math.min(8, Math.floor(M / r))] + ',' + (Math.floor(M / r) > 8 ? 12 : 62) + '%,' + (48 + 14 * M / GMAX) + '%,.9)';
+        x.fillRect(cx + rad * Math.cos(th) - 0.8, cy + rad * Math.sin(th) - 0.8, 1.7, 1.7);
+      }
+    }
+    const tot = G * (G + 1) / 2, sh = cop / tot * 100;
+    // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
+    const PS = []; for (let n = 2; n <= GMAX; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
+    const per = 2 * (PS.length - 1), ph = Math.floor(Math.max(0, T - 9.3) / 0.3) % per, pi = ph < PS.length ? ph : per - ph, sp = T < 9.3 ? 0 : PS[pi];  // scans up the primes, then back down
+    let spTxt = '';
+    if (sp) {
+      const ang = (r, M) => 2 * Math.PI * r / M + spin, rd = M => R * (M - 0.5) / GMAX;
+      [[0, 'rgba(79,209,197,', '#4fd1c5'], [1, 'rgba(155,127,232,', '#9b7fe8']].forEach(([mir, col, solid]) => {
+        let last = null, prev = null, pq = 0;
+        x.lineWidth = 1.3;
+        for (let M = Math.max(sp, 2); M <= G; M++) {
+          const r = mir ? M - sp : sp; if (r < 1) continue;
+          const px = cx + rd(M) * Math.cos(ang(r, M)), py = cy + rd(M) * Math.sin(ang(r, M)), q = Math.floor(M / r);
+          if (prev) { const hit = q !== pq; x.beginPath(); x.moveTo(prev[0], prev[1]); x.lineTo(px, py); x.strokeStyle = hit ? 'rgba(255,70,70,1)' : col + '.55)'; x.lineWidth = hit ? 2.4 : 1.1; x.stroke(); if (hit) { x.fillStyle = '#ff4646'; x.fillRect(px - 2, py - 2, 4, 4); } }
+          prev = last = [px, py]; pq = q;
+        }
+        if (last) {
+          x.fillStyle = solid; x.beginPath(); x.arc(last[0], last[1], 3.2, 0, 7); x.fill();
+          x.font = '11px monospace'; const tx = mir ? 'mirror σ: r = M − ' + sp : 'spiral: r = ' + sp, tw = x.measureText(tx).width, right = last[0] > cx;
+          let lx = right ? last[0] + 8 : last[0] - 8 - tw; lx = Math.max(6, Math.min(W - tw - 6, lx)); x.textAlign = 'left';
+          x.fillText(tx, lx, last[1] + (mir ? 14 : -6));
+        }
+      });
+      spTxt = '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan) · mirror σ(r) = M − r (violet)';
+    }
+    // corner stats: gcd = 1 share (TL), sector counts vs 3G^2/(pi^2 s(s+1)) (TR), the scanning prime's column (BL), primes <= G (BR)
+    {
+      const GR = '#5fd38d', RD = '#ff6b6b', DM = 'rgba(232,227,219,.7)', fs = Math.max(10, Math.min(12, W / 34)), lh = fs + 4;
+      const y0 = Math.max(150, H * 0.2), y1 = H - Math.max(150, H * 0.2) - 4;
+      const blk = (lines, xr, y, up) => { x.font = fs + 'px monospace'; x.textAlign = xr ? 'right' : 'left'; const X = xr ? W - 10 : 10; const n = lines.length; lines.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], X, y + (up ? (i - n + 1) : i) * lh); }); };
+      const six = 6 / (Math.PI * Math.PI);
+      blk([['gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], ['6/π² = 60.79%', DM]], false, y0, false);
+      const sec = [['sectors S_s', DM]];
+      for (let q = 1; q <= 4; q++) { const ex = 3 * G * G / (Math.PI * Math.PI * q * (q + 1)); sec.push(['s=' + q + ': ' + sc[q] + ' / ' + ex.toFixed(0), sc[q] >= ex ? GR : RD]); }
+      blk(sec, true, y0, false);
+      let pc = 0; for (let n = 2; n <= G; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) pc++; }
+      let colc = 0, colN = 0; if (sp) for (let M = sp; M <= G; M++) { colN++; if (gcd(sp, M) === 1) colc++; }
+      blk(sp ? [['sieve: prime p = ' + sp, '#4fd1c5'], ['column r = p: ' + colN + ' rings', DM], ['gcd = 1: ' + colc + ' (' + (100 * colc / Math.max(1, colN)).toFixed(1) + '%)', '#fff'], ['1 − 1/p = ' + (100 * (1 - 1 / sp)).toFixed(1) + '%', DM]] : [['sieve: waiting', DM]], false, y1, true);
+      const est = G / Math.log(Math.max(2, G));
+      blk([['primes ≤ G', DM], ['π(' + G + ') = ' + pc, '#fff'], ['G/ln G = ' + est.toFixed(1), DM], ['ratio ' + (pc / est).toFixed(3), '#e6c35c']], true, y1, true);
+    }
+    const c = $('intro-counter'); if (c) { c.style.whiteSpace = 'pre-line'; c.textContent = 'G = ' + G + '   gcd = 1: ' + cop + ' / ' + tot + ' = ' + sh.toFixed(2) + '%   (6/π² = 60.79%)' + '\ncolor = sector s = ⌊M/r⌋ (s=1 gold … s≥8 grey) · spiral turns red crossing a 1/n boundary' + spTxt; }
+    _introRaf = requestAnimationFrame(draw);
+  };
+  _introRaf = requestAnimationFrame(draw);
+}
+function introEnter() {
+  _introOn = false; if (_introRaf) cancelAnimationFrame(_introRaf);
+  const ov = $('intro-overlay'); if (ov) ov.style.display = 'none';
+  openWelcomeModal();
+  try { const t = $('lv1-box'); if (t && !LV1.ready) lv1Reset(); } catch (e) {}
+}
+const LV1 = { last: null, hintUsed: false, G: 256, gc: null, ref: null, cnt: null, picks: new Set(), par: 0, removable: 0, total: 0, phi: 0, removed: 0, ready: false, done: false };
+function lv1G(a, b) { while (b) { const t = a % b; a = b; b = t; } return a; }
+function lv1Reset(G) {
+  if (G) LV1.G = G;
+  const g = LV1.G, n = g * (g + 1) / 2;
+  LV1.gc = new Uint16Array(n); LV1.ref = new Uint8Array(n); LV1.cnt = new Uint32Array(g + 1);
+  let k = 0;
+  for (let M = 1; M <= g; M++) for (let r = 1; r <= M; r++) { const d = lv1G(r, M); LV1.gc[k++] = d; LV1.cnt[d]++; }
+  LV1.total = n; LV1.phi = LV1.cnt[1]; LV1.removable = n - LV1.phi; LV1.removed = 0; LV1.picks = new Set(); LV1.done = false; LV1.ready = true; LV1.last = null; LV1.hintUsed = false;
+  // par: greedy by exact marginal gain over cells counted by gcd value
+  const covered = new Uint8Array(g + 1); const ps = []; for (let p = 2; p <= g; p++) { let ok = true; for (let d = 2; d * d <= p; d++) if (p % d === 0) { ok = false; break; } if (ok) ps.push(p); }
+  let got = 0, par = 0; const need = Math.ceil(0.99 * LV1.removable), used = new Set();
+  while (got < need && used.size < ps.length) {
+    let best = 0, bp = 0;
+    ps.forEach(p => { if (used.has(p)) return; let gain = 0; for (let m = p; m <= g; m += p) if (!covered[m]) gain += LV1.cnt[m]; if (gain > best) { best = gain; bp = p; } });
+    if (!bp) break; used.add(bp); par++; got += best; for (let m = bp; m <= g; m += bp) covered[m] = 1;
+  }
+  LV1.par = par;
+  const gc = $('lv1-gchips'); if (gc) gc.innerHTML = [64, 128, 256, 512, 1024].map(v => '<button class="chip' + (v === g ? ' on' : '') + '" onclick="lv1Reset(' + v + ')">' + v + '</button>').join(' ');
+  const pc = $('lv1-primes'); if (pc) pc.innerHTML = ps.filter(p => p <= 100).map(p => '<button class="chip" data-p="' + p + '" onclick="lv1Pick(' + p + ')" style="min-width:34px;">' + p + '</button>').join('');
+  const nx = $('lv1-next'); if (nx) nx.style.display = 'none';
+  lv1Render();
+}
+function lv1Pick(p) {
+  if (!LV1.ready) return;
+  const add = !LV1.picks.has(p); if (add) LV1.picks.add(p); else LV1.picks.delete(p);
+  const g = LV1.G, gc = LV1.gc, ref = LV1.ref, d = add ? 1 : -1; let k = 0, rem = LV1.removed;
+  for (let M = 1; M <= g; M++) for (let r = 1; r <= M; r++, k++) {
+    const q = gc[k]; if (q > 1 && q % p === 0) { if (add) { if (ref[k] === 0) rem++; ref[k]++; } else { ref[k]--; if (ref[k] === 0) rem--; } }
+  }
+  if (add) LV1.last = { p: p, gain: rem - LV1.removed }; else LV1.last = null;
+  LV1.removed = rem; lv1Render();
+}
+function lv1Best() {
+  const g = LV1.G, cov = new Uint8Array(g + 1);
+  LV1.picks.forEach(p => { for (let m = p; m <= g; m += p) cov[m] = 1; });
+  let best = 0, bp = 0;
+  for (let p = 2; p <= g; p++) {
+    let pr = true; for (let d = 2; d * d <= p; d++) if (p % d === 0) { pr = false; break; } if (!pr || LV1.picks.has(p)) continue;
+    let gain = 0; for (let m = p; m <= g; m += p) if (!cov[m]) gain += LV1.cnt[m];
+    if (gain > best) { best = gain; bp = p; }
+  }
+  return { p: bp, gain: best };
+}
+function lv1Hint() {
+  if (!LV1.ready) return; const b = lv1Best(); if (!b.p) return;
+  LV1.hintUsed = true;
+  const msg = $('lv1-msg'); if (msg) msg.textContent = 'Hint: try ' + b.p + '. It crosses out ' + b.gain + ' more cells (' + (b.gain / LV1.total * 100).toFixed(2) + '% of all). A hint caps the stars at 2.';
+  const chip = document.querySelector('#lv1-primes .chip[data-p="' + b.p + '"]'); if (chip) { chip.classList.add('pulse'); setTimeout(() => chip.classList.remove('pulse'), 2500); }
+}
+function lv1Render() {
+  const cv = $('lv1-cv'); if (!cv) return;
+  const x = cv.getContext('2d'), S = cv.width, g = LV1.G, img = x.createImageData(S, S), d = img.data;
+  for (let py = 0; py < S; py++) {
+    const M = Math.min(g, Math.floor((S - 1 - py) / S * g) + 1);
+    for (let px = 0; px < S; px++) {
+      const r = Math.floor(px / S * g) + 1, o = (py * S + px) * 4;
+      if (r > M) { d[o] = 12; d[o + 1] = 14; d[o + 2] = 26; d[o + 3] = 255; continue; }
+      const k = M * (M - 1) / 2 + (r - 1), q = LV1.gc[k];
+      if (q === 1) { d[o] = 61; d[o + 1] = 200; d[o + 2] = 184; }
+      else if (LV1.ref[k] > 0) { d[o] = 22; d[o + 1] = 24; d[o + 2] = 40; }
+      else { d[o] = 224; d[o + 1] = 80; d[o + 2] = 96; }
+      d[o + 3] = 255;
+    }
+  }
+  x.putImageData(img, 0, 0);
+  const left = LV1.total - LV1.removed, share = left / LV1.total * 100, lim = 600 / (Math.PI * Math.PI);
+  const pct = LV1.removable ? LV1.removed / LV1.removable * 100 : 100, nP = LV1.picks.size;
+  const st = $('lv1-stats');
+  if (st) st.innerHTML = 'primes picked: <b style="color:#fff">' + nP + '</b> &nbsp; par: <b style="color:var(--gold)">' + LV1.par + '</b><br>crossed out: ' + LV1.removed + ' / ' + LV1.removable + ' shared-factor cells (' + pct.toFixed(1) + '%)<br>left: ' + left + ' / ' + LV1.total + ' = ' + share.toFixed(2) + '%<br>coprime share at the end: ' + (LV1.phi / LV1.total * 100).toFixed(2) + '% &nbsp; limit 6/&pi;&sup2; = ' + lim.toFixed(2) + '%';
+  document.querySelectorAll('#lv1-primes .chip').forEach(b => b.classList.toggle('on', LV1.picks.has(+b.dataset.p)));
+  const msg = $('lv1-msg'), nx = $('lv1-next'), stars = $('lv1-stars');
+  const done = LV1.removable === 0 || LV1.removed >= Math.ceil(0.99 * LV1.removable);
+  if (done && nP > 0) {
+    let sc = nP <= LV1.par ? 3 : nP <= LV1.par + 2 ? 2 : 1; if (LV1.hintUsed) sc = Math.min(sc, 2); const tag = '★'.repeat(sc) + '☆'.repeat(3 - sc);
+    if (msg) msg.textContent = 'Level 1 clear ' + tag + ' · ' + nP + ' primes (par ' + LV1.par + ')';
+    if (nx) nx.style.display = '';
+    let best = 0; const key = 'stripII_lv1_' + LV1.G; try { best = +localStorage.getItem(key) || 0; if (sc > best) { localStorage.setItem(key, String(sc)); best = sc; } } catch (e) { best = sc; }
+    if (stars) stars.textContent = 'best at G = ' + LV1.G + ': ' + '★'.repeat(best);
+  } else {
+    if (msg && !(msg.dataset.hint === '1' && false)) {
+      if (!nP) msg.textContent = 'Start with 2: a cell is crossed out when 2 divides both r and M, which is about 1/4 of all cells.';
+      else if (LV1.last) { const p = LV1.last.p; msg.textContent = p + ' crossed out ' + LV1.last.gain + ' new cells = ' + (LV1.last.gain / LV1.total * 100).toFixed(2) + '% of all. The rough rule is 1/p\u00b2 = ' + (100 / (p * p)).toFixed(2) + '% (less when earlier primes already took some). ' + (100 - pct).toFixed(1) + '% of shared-factor cells to go.'; }
+      else msg.textContent = (100 - pct).toFixed(1) + '% of shared-factor cells left (need under 1%)';
+    }
+    if (nx) nx.style.display = 'none';
+    const two = document.querySelector('#lv1-primes .chip[data-p="2"]'); if (two) two.classList.toggle('pulse', !nP);
+  }
+}
+
+/* Level 2: predict C(n). Five rounds at ascending depths; C(n) is computed here from the same Euler product the
+   page uses (primes below 200,000 exactly, then the prime-zeta tail) for the plain consecutive block. */
+const LV2 = { ns: [], i: 0, scores: [], locked: false };
+function lv2D(n) {
+  if (!_Dprimes) _Dprimes = primesUpTo(200000);
+  let sum = 0, comp = 0;
+  for (let i = 0; i < _Dprimes.length; i++) { const p = _Dprimes[i], y = Math.log1p(-Math.min(n + 1, p) / (p * p)) - comp, t = sum + y; comp = (t - sum) - y; sum = t; }
+  const k = n + 1; sum -= k * DN_T1 + k * k * DN_T2 / 2 + k * k * k * DN_T3 / 3;
+  return Math.exp(sum);
+}
+function lv2C(n) { return Math.PI * Math.PI / 6 * lv2D(n); }
+function lv2Start() {
+  const pool = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64].slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  LV2.ns = pool.slice(0, 5).sort((a, b) => a - b); LV2.i = 0; LV2.scores = []; LV2.locked = false;
+  const rv = $('lv2-reveal'); if (rv) rv.textContent = ''; lv2Round();
+}
+function lv2Round() {
+  const r = $('lv2-round'), g = $('lv2-guess'), lk = $('lv2-lock'); if (!r) return;
+  if (LV2.i >= LV2.ns.length) {
+    const tot = LV2.scores.reduce((a, b) => a + b, 0);
+    r.textContent = 'Level 2 done: ' + tot + ' / 15 stars';
+    if (lk) lk.style.display = 'none';
+    try { const key = 'stripII_lv2', best = +localStorage.getItem(key) || 0; if (tot > best) localStorage.setItem(key, String(tot)); const st = $('lv2-stars'); if (st) st.textContent = 'best ' + Math.max(best, tot) + ' / 15'; } catch (e) {}
+    return;
+  }
+  r.textContent = 'Round ' + (LV2.i + 1) + ' / ' + LV2.ns.length + ' · depth n = ' + LV2.ns[LV2.i] + ' (the block M, M+1, …, M+' + LV2.ns[LV2.i] + ')';
+  if (g) g.value = 50; if (lk) { lk.style.display = ''; lk.textContent = 'Lock in'; } LV2.locked = false; lv2Show();
+}
+function lv2Show() { const g = $('lv2-guess'), v = $('lv2-guess-v'); if (g && v) v.textContent = (+g.value).toFixed(1) + '%'; }
+function lv2Lock() {
+  if (!LV2.ns.length) lv2Start();
+  const lk = $('lv2-lock'), rv = $('lv2-reveal');
+  if (LV2.locked) { LV2.i++; LV2.locked = false; if (rv) rv.textContent = ''; lv2Round(); return; }
+  const n = LV2.ns[LV2.i], guess = (+$('lv2-guess').value) / 100, C = lv2C(n), D = lv2D(n);
+  const rel = guess > 0 ? Math.abs(Math.log(guess / C)) : 9, sc = rel < 0.01 ? 3 : rel < 0.04 ? 2 : rel < 0.12 ? 1 : 0;
+  LV2.scores.push(sc); LV2.locked = true;
+  const ps = [2, 3, 5, 7].map(p => 'p=' + p + ': 1 − ' + Math.min(n + 1, p) + '/' + (p * p) + ' = ' + (1 - Math.min(n + 1, p) / (p * p)).toFixed(4)).join('   ');
+  if (rv) rv.textContent = 'C(' + n + ') = ζ(2)·D(' + n + ') = ' + C.toFixed(6) + '   (D = ' + D.toFixed(6) + ')\nyour guess ' + (guess * 100).toFixed(1) + '% vs ' + (C * 100).toFixed(2) + '%: ' + '★'.repeat(sc) + '☆'.repeat(3 - sc) + '\nfirst local factors, ν_p = min(n+1, p):\n' + ps + '\nOnce p ≤ n+1 every residue class mod p is hit, so p | r kills the cell: that is why C(n) keeps falling.';
+  if (lk) lk.textContent = LV2.i + 1 >= LV2.ns.length ? 'Finish' : 'Next round →';
+}
+function lv2Enter() {
+  sendOpenerToMainAndClose();
+  setTimeout(() => { const t = $('lv2-toggle'), p = $('lv2-panel'); if (t && t.classList.contains('collapsed')) t.classList.remove('collapsed'); if (!LV2.ns.length) lv2Start(); if (p && p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+}
+
 function maybeAutoOpenWelcome() {
   if (/[#&]s=/.test(location.hash || '')) { setTimeout(shareBoot, 1500); return; }
   try { if (localStorage.getItem('stripII_welcome_seen')) return; } catch (e) {}
-  openWelcomeModal();
+  showIntro();
 }
 /* Residue of r mod M, as a hue — the same quantity Ring's own angle is built
    from (θ = 2π·r/M), made visible on Grid and Cayley too. */
