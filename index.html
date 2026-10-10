@@ -1146,9 +1146,6 @@ walk anyway.</p>
     <input type="range" id="g-sl" min="2" max="4096" step="1" value="31" oninput="onG(+this.value)">
     <span class="val" id="g-v">31</span>
     <button class="chip tl gplaychip" id="g-play" onclick="toggleGPlay()" title="Animate G: 2 up to current value and back, on loop">&#9654; Play</button>
-    <span class="lbl">speed</span>
-    <input type="range" id="g-speed" min="-0.7" max="0.9" step="0.05" value="0" oninput="setGPlaySpeed(this.value)" style="width:90px;" title="Speed of the G play (1.0&times; = default). Applies at once while it is playing.">
-    <span class="val" id="g-speed-v" style="min-width:34px;">1.0&times;</span>
     <button class="chip" onclick="onG(2)" title="The smallest lattice: four cells. Useful for checking the hit test, not the arithmetic.">2</button>
     <button class="chip" onclick="onG(16)" title="Small enough that every cell is separately visible with labels on.">16</button>
     <button class="chip" onclick="onG(64)" title="Cell labels still fit; the diagonal structure is already visible.">64</button>
@@ -1158,6 +1155,11 @@ walk anyway.</p>
     <button class="chip" onclick="onG(2048)" title="1 million cells. Build is still under a second.">2k</button>
     <button class="chip" onclick="onG(4096)" title="Slider maximum. 16.7M cells, ~2 MB of bitset.">4k</button>
     <button class="chip" onclick="onG(10000)" title="Hard cap. 100M cells at one bit each — 12.5 MB. A byte array here would be 100 MB and get killed on a phone.">10k</button>
+  </div>
+  <div class="row" id="g-speed-row" style="display:flex;align-items:center;gap:6px;padding:2px 0 4px;">
+    <span class="lbl">G play speed</span>
+    <input type="range" id="g-speed" min="-1" max="0.9" step="0.05" value="0" oninput="setGPlaySpeed(this.value)" style="width:130px;" title="Speed of the G play only, not G itself (1.0&times; = default). Applies at once while it is playing.">
+    <span class="val" id="g-speed-v" style="min-width:40px;">1.0&times;</span>
   </div>
 
   <div class="prow">
@@ -2156,11 +2158,13 @@ walk anyway.</p>
       <button class="chip" onclick="stepOpenerGPrime(-1)" title="Previous prime G">&#9664;p</button>
       <button class="chip" onclick="stepOpenerGPrime(1)" title="Next prime G">p&#9654;</button>
       <button class="chip tl on" id="welcome-g-play" onclick="toggleOpenerPlay()" title="Loop the preview lattice from G = 2 up to 100 and back. Plays when the opener opens; dragging the slider stops it.">&#9632; Stop</button>
-      <span class="lbl" style="margin-left:4px;">speed</span>
-      <input type="range" id="welcome-g-speed" min="-0.7" max="0.9" step="0.05" value="0" oninput="setOpenerPlaySpeed(this.value)" style="width:90px;" title="Speed of the G play: 1.0&times; is the default pace. Takes effect at once, while it is playing.">
-      <span class="val" id="welcome-g-speed-v" style="min-width:34px;">1.0&times;</span>
       <input type="range" id="welcome-g" min="1" max="1024" step="1" value="13" oninput="stopOpenerPlay();setOpenerG(this.value)" style="flex:1 1 120px;min-width:100px;" title="Size of the preview lattice only, 2 to 1024. Doesn't change the G on the page.">
       <span class="hint" style="white-space:nowrap;">preview only</span>
+    </div>
+    <div class="prow" id="welcome-speedrow" style="padding:0 0 4px;gap:6px;align-items:center;">
+      <span class="lbl" style="white-space:nowrap;">G play speed</span>
+      <input type="range" id="welcome-g-speed" min="-1" max="0.9" step="0.05" value="0" oninput="setOpenerPlaySpeed(this.value)" style="width:130px;" title="Speed of the G play only (not G itself): 1.0&times; is the default pace. Takes effect at once, while it is playing.">
+      <span class="val" id="welcome-g-speed-v" style="min-width:40px;">1.0&times;</span>
     </div>
     </div>
     <div class="prow" id="welcome-rhorow" style="padding:6px 0;" title="Cayley map A: z = &rho;&middot;e^{i&theta;}, &Gamma;(z) = (z&minus;1)/(z+1), &rho; = &rho;&#8320; + &rho;<sub>D</sub>&middot;M/G. Preview only.">
@@ -5495,7 +5499,7 @@ function olSyncUI() {
    ticks behind itself. */
 const OPENER_PLAY_MIN = 2; let OPENER_PLAY_MS = 90, OPENER_PLAY_X = 1;
 function setOpenerPlaySpeed(v) {
-  OPENER_PLAY_X = Math.pow(10, Math.max(-0.7, Math.min(0.9, +v || 0)));
+  OPENER_PLAY_X = Math.pow(10, Math.max(-1, Math.min(0.9, +v || 0)));
   OPENER_PLAY_MS = Math.max(8, Math.round(90 / OPENER_PLAY_X));
   const l = $('welcome-g-speed-v'); if (l) l.textContent = OPENER_PLAY_X.toFixed(OPENER_PLAY_X < 1 ? 2 : 1) + '\u00d7';
 }
@@ -10836,7 +10840,7 @@ function stopGPlay() {
 }
 let gPlayX = 1;
 function setGPlaySpeed(v) {
-  gPlayX = Math.pow(10, Math.max(-0.7, Math.min(0.9, +v || 0)));
+  gPlayX = Math.pow(10, Math.max(-1, Math.min(0.9, +v || 0)));
   const l = $('g-speed-v'); if (l) l.textContent = gPlayX.toFixed(gPlayX < 1 ? 2 : 1) + '\u00d7';
   if (gPlayTimer && window._gPlayStep) { clearInterval(gPlayTimer); gPlayTimer = setInterval(window._gPlayStep, Math.max(16, Math.round(140 / gPlayX))); }
 }
