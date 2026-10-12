@@ -7159,7 +7159,7 @@ function showIntro() {
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
     const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 9.3) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < 9.3 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
-    if (_introPAuto && T >= 9.3) _introPi = pi;
+    if (_introPAuto && T >= 9.3 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = '';
     if (sp) {
       const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GMAX);
@@ -7183,19 +7183,23 @@ function showIntro() {
       spTxt = '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan) · mirror σ(r) = M − r (violet)';
     }
     let gbTxt = '';
+    if (_introGbOn) {   // Goldbach follows the M slider: E = 2(G+1) for the ring count G on screen, and the pair list is rebuilt for that E
+      _introGbPairs = introGbPairsFor(G); if (_introGbI > _introGbPairs.length - 1) _introGbI = Math.max(0, _introGbPairs.length - 1);
+      const es0 = $('intro-e-sl'); if (es0 && +es0.max !== Math.max(0, _introGbPairs.length - 1)) es0.max = Math.max(0, _introGbPairs.length - 1);
+    }
     if (_introGbOn && _introGbPairs.length) {   // the Strip I dynamic: E = 2(G+1); for a pair g + s = E draw the four lines a, b, c, d and the marker (g, s)
-      const E = 2 * (GMAX + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
+      const E = 2 * (G + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
       const at = (r, M) => { const rd = _introRad(R, M, GMAX), th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
-      const ds = [[Math.max(1, g - GMAX), Math.min(GMAX, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - GMAX), Math.min(GMAX, sP - 1), -1, sP, '#e05060'], [1, GMAX - g, 1, g, '#3dc8b8'], [g + 1, GMAX, 1, -g, '#9b7fe8']];
+      const ds = [[Math.max(1, g - G), Math.min(G, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - G), Math.min(G, sP - 1), -1, sP, '#e05060'], [1, G - g, 1, g, '#3dc8b8'], [g + 1, G, 1, -g, '#9b7fe8']];
       const dp = Math.max(2, PT * 2.2);
       x.save();
-      ds.forEach(d => { x.fillStyle = d[4]; for (let r = d[0]; r <= d[1]; r++) { const M = d[2] * r + d[3]; if (M < 1 || M > GMAX || lv1G(r, M) !== 1) continue; const q = at(r, M); x.fillRect(q[0] - dp / 2, q[1] - dp / 2, dp, dp); } });
+      ds.forEach(d => { x.fillStyle = d[4]; for (let r = d[0]; r <= d[1]; r++) { const M = d[2] * r + d[3]; if (M < 1 || M > G || lv1G(r, M) !== 1) continue; const q = at(r, M); x.fillRect(q[0] - dp / 2, q[1] - dp / 2, dp, dp); } });
       // trail of every pair's marker (g', E - g') and the current marker
       x.strokeStyle = 'rgba(242,200,96,.35)'; x.lineWidth = 1; x.beginPath(); _introGbPairs.forEach((q, k) => { const m = at(q, E - q); if (k) x.lineTo(m[0], m[1]); else x.moveTo(m[0], m[1]); }); x.stroke();
       const mk = at(g, sP); x.fillStyle = '#ffd36b'; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke();
       x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; x.fillText('(' + g + ', ' + sP + ')', Math.min(W - 70, mk[0] + 8), mk[1] - 6);
       x.restore();
-      gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
+      gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
     x.restore();
     x.globalAlpha = _introV.k > 1.3 ? 0.4 : 1;   // the corner stats fade when you zoom in, so they do not sit on the ring
@@ -7241,6 +7245,8 @@ function showIntro() {
 }
 // coloring 16 (saturation) with an n-sweep: the cell is coloured by the smallest prime p <= n+1 dividing r; C(n) runs up and back
 const _introPrimes = (() => { const a = []; for (let n = 2; n <= 256; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) a.push(n); } return a; })();
+const _introGbMemo = {};
+function introGbPairsFor(G) { if (_introGbMemo[G]) return _introGbMemo[G]; const E = 2 * (G + 1), a = [], pr = n => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }; for (let g = 2; g <= E / 2; g++) if (pr(g) && pr(E - g)) a.push(g); return (_introGbMemo[G] = a); }
 let _introPAuto = true, _introPi = 0, _introMirror = true, _introGbOn = false, _introGbI = 0, _introGbDir = 1, _introGbTimer = 0, _introPtScale = 0.75, _introGbPairs = (() => { const E = 514, a = []; const pr = n => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }; for (let g = 2; g <= E / 2; g++) if (pr(g) && pr(E - g)) a.push(g); return a; })();
 let _introAng = 'clamp', _introExporting = false, _introGM = null, _introGcur = 1, _introGDir = 1, _introGTimer = 0;
 // the M slider is G: it scrubs the whole animation (rings 1..G) and every number on the screen follows
