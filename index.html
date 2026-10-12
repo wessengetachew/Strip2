@@ -2028,6 +2028,7 @@ walk anyway.</p>
 <style>@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
 <div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#04040d;overflow:hidden;">
   <canvas id="intro-cv" style="position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;"></canvas>
+  <div id="intro-sweep" style="display:none;position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94vw,560px);max-height:88vh;overflow:auto;padding:12px 14px;background:rgba(10,10,24,.97);border:1px solid var(--gold);border-radius:8px;font-family:var(--mono);font-size:11.5px;color:var(--cream);"></div>
   <div id="intro-pop" style="display:none;position:absolute;z-index:3;width:288px;padding:10px 12px;background:rgba(10,10,24,.94);border:1px solid var(--gold);border-radius:8px;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--cream);"></div>
   <div id="intro-head" style="position:absolute;left:0;right:0;top:0;padding:max(18px,4vh) 16px 0;text-align:center;pointer-events:none;">
     <div style="font-family:var(--mono);font-size:11px;letter-spacing:.38em;color:var(--gold);">WESSEN GETACHEW &middot; 2026</div>
@@ -2040,6 +2041,7 @@ walk anyway.</p>
       <button class="btn" id="intro-enter" onclick="introEnter()" style="font-size:15px;padding:10px 28px;border-color:var(--gold);color:var(--gold);">Enter &rarr;</button>
       <button class="chip" id="intro-ctl-btn" onclick="introToggleCtl()" title="Show or hide the controls: spiral, Goldbach, C(n), angle, size, export">controls &#9662;</button>
       <button class="chip" onclick="introEnter()" title="Skip the animation and go straight to Level 1">skip</button>
+      <button class="chip" id="intro-fs-btn" onclick="introFS()" title="Full screen">&#9974; full</button>
     </div>
     <div id="intro-ctl" style="margin-top:10px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <div style="flex:1 1 100%;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cream2);">
@@ -2056,7 +2058,7 @@ walk anyway.</p>
       <span style="display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--cream2);"><input type="range" id="intro-n-sl" min="0" max="255" value="0" oninput="introSetN(this.value)" style="width:150px;" title="C(n) depth n: cells the block M..M+n kills are removed. Moving it pauses the play."><span id="intro-n-val">n = 0</span></span>
       <button class="chip" id="intro-n-btn" onclick="introNPlay()" title="Play C(n) from n = 0 up to 255 and back: the cells the block kills are removed, so you watch the survivors thin toward C(n)">▶ C(n) play</button>
       <div style="flex:1 1 100%;height:0;"></div>
-      <button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button>
+      <button class="chip" onclick="introSweep(_introSwN)" title="G sweep: how far the observed sector counts sit from the predicted ones as G grows (64 to 1024), for the chosen n">G sweep</button><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button>
       <button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button>
       <button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button>
     </div>
@@ -7119,7 +7121,7 @@ function showIntro() {
   if (_introRaf) cancelAnimationFrame(_introRaf);
   try { closeWelcomeModal(); } catch (e) {}
   if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; } if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; }
-  _introGM = null; _introSel = null; _introPOff = 0; introSetHole(0); _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } _introPAuto = true;
+  _introGM = null; _introSel = null; _introGZ = 0; _introPOff = 0; introSetHole(0); _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } _introPAuto = true;
   _introOn = true; ov.style.display = 'block'; _introT0 = performance.now();
   try { startOpenerMusic(); } catch (e) {}
   const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -7129,7 +7131,12 @@ function showIntro() {
     _introGcur = G;
     const hd = $('intro-head'), ft = $('intro-foot'), cvTop = _introExporting ? 0 : $('intro-cv').getBoundingClientRect().top, top0 = _introExporting ? (LAND ? 175 : 285) : hd ? hd.getBoundingClientRect().bottom - cvTop + 6 : Math.max(146, H * 0.2), bot0 = _introExporting ? (LAND ? H - 175 : H - 290) : ft ? ft.getBoundingClientRect().top - cvTop - 4 : H - 152;
     const cx = W / 2 + _introV.fx * W, cy = (top0 + bot0) / 2 + (W < 600 ? 34 : 0) + _introV.fy * H, R = Math.max(Math.min(W, H) * 0.13, Math.min(W * (_introExporting ? 0.4 : 0.32), H * (_introExporting ? (LAND ? 0.42 : 0.25) : 0.22), (bot0 - top0) / 2 - (W < 600 ? 118 : 16))) * _introV.k;
-    _introGeo = { cx, cy, R, W, H, GMAX, G, cy0: cy - _introV.fy * H };
+    /* Auto-fit: once M is driven by the slider, the outer ring G fills the plate (zoomed in at small M, zooming out as M grows).
+       The fit eases in log space so the ring never jumps; the intro's own growth and exports keep the fixed GMAX scale. */
+    const gT = _introGM != null ? Math.max(12, G) : GMAX;
+    _introGZ = _introExporting || !_introGZ ? gT : Math.exp(Math.log(_introGZ) + (Math.log(gT) - Math.log(_introGZ)) * 0.2);
+    const GZ = _introGZ;
+    _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, cy0: cy - _introV.fy * H };
     x.save(); x.beginPath(); x.rect(0, top0, W, bot0 - top0); x.clip();   // the ring never covers the title or the controls
     const PT = 1.25 * (_introExporting ? 1.6 : 1) * _introPtScale * Math.max(1, Math.min(3.2, _introV.k));
     const spin = 0;   // no rotation: the ring stays at 0 degrees the whole way
@@ -7137,7 +7144,7 @@ function showIntro() {
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0; const sc = [0, 0, 0, 0, 0, 0];
     for (let M = 1; M <= G; M++) {
-      const rad = _introRad(R, M, GMAX);
+      const rad = _introRad(R, M, GZ);
       for (let r = 1; r <= (_introAng === 'clamp' ? M : G); r++) {
         if (gcd(r, M) !== 1) continue; const inW = r <= M, dead = _introN > 0 && introKilled(r, M, _introN); if (dead && !_introSat) continue; if (inW && !dead) { cop++; const q0 = Math.floor(M / r); sc[Math.min(q0, 5)]++; }
         const th = _introTh(r, M) + spin;
@@ -7148,7 +7155,7 @@ function showIntro() {
     }
     if (_introHole > 0.02) introDrawHole(x, cx, cy, R * _introHole * 0.97, G, UI);
     const tot = G * (G + 1) / 2, sh = cop / tot * 100;
-    if (_introSel) { const rd = _introRad(R, _introSel.M, GMAX), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
+    if (_introSel) { const rd = _introRad(R, _introSel.M, GZ), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
     let mTxt = '';
     // sector rays over the full ring: S_s = { 1/(s+1) < r/M <= 1/s }, so the boundaries sit at theta = 2*pi/n
     x.save(); x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 0.8; x.font = (10 * UI) + 'px monospace'; x.textAlign = 'center'; x.fillStyle = 'rgba(255,255,255,.75)';
@@ -7162,7 +7169,7 @@ function showIntro() {
     if (_introPAuto && T >= 9.3 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = '';
     if (sp) {
-      const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GMAX);
+      const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GZ);
       [[0, 'rgba(79,209,197,', '#4fd1c5'], [1, 'rgba(155,127,232,', '#9b7fe8']].forEach(([mir, col, solid]) => {
         if (mir && !_introMirror) return;
         let last = null, prev = null, pq = 0;
@@ -7177,7 +7184,7 @@ function showIntro() {
           x.fillStyle = solid; x.beginPath(); x.arc(last[0], last[1], 3.2, 0, 7); x.fill();
           x.font = (11 * UI) + 'px monospace'; const tx = mir ? 'mirror σ: r = M − ' + sp : 'spiral: r = ' + sp, tw = x.measureText(tx).width, right = last[0] > cx;
           let lx = right ? last[0] + 8 : last[0] - 8 - tw; lx = Math.max(6, Math.min(W - tw - 6, lx)); x.textAlign = 'left';
-          x.fillText(tx, lx, last[1] + (mir ? 14 : -6));
+          x.fillText(tx, lx, Math.max(top0 + 12 * UI, Math.min(bot0 - 6, last[1] + (mir ? 14 : -6))));
         }
       });
       spTxt = '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan) · mirror σ(r) = M − r (violet)';
@@ -7189,7 +7196,7 @@ function showIntro() {
     }
     if (_introGbOn && _introGbPairs.length) {   // the Strip I dynamic: E = 2(G+1); for a pair g + s = E draw the four lines a, b, c, d and the marker (g, s)
       const E = 2 * (G + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
-      const at = (r, M) => { const rd = _introRad(R, M, GMAX), th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
+      const at = (r, M) => { const rd = _introRad(R, M, GZ), th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
       const ds = [[Math.max(1, g - G), Math.min(G, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - G), Math.min(G, sP - 1), -1, sP, '#e05060'], [1, G - g, 1, g, '#3dc8b8'], [g + 1, G, 1, -g, '#9b7fe8']];
       const dp = Math.max(2, PT * 2.2);
       x.save();
@@ -7197,7 +7204,7 @@ function showIntro() {
       // trail of every pair's marker (g', E - g') and the current marker
       x.strokeStyle = 'rgba(242,200,96,.35)'; x.lineWidth = 1; x.beginPath(); _introGbPairs.forEach((q, k) => { const m = at(q, E - q); if (k) x.lineTo(m[0], m[1]); else x.moveTo(m[0], m[1]); }); x.stroke();
       const mk = at(g, sP); x.fillStyle = '#ffd36b'; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke();
-      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; x.fillText('(' + g + ', ' + sP + ')', Math.min(W - 70, mk[0] + 8), mk[1] - 6);
+      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')', lw = x.measureText(lt).width; x.fillText(lt, Math.max(6, Math.min(W - lw - 6, mk[0] + 8)), Math.max(top0 + 12 * UI, Math.min(bot0 - 6, mk[1] - 6))); }
       x.restore();
       gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
@@ -7236,6 +7243,7 @@ function showIntro() {
     { const sl = $('intro-n-sl'); if (sl && document.activeElement !== sl && +sl.value !== _introN) sl.value = _introN; const nv = $('intro-n-val'); if (nv) nv.textContent = 'n = ' + _introN;
       { const ms = $('intro-m-sl'); if (ms && document.activeElement !== ms && +ms.value !== _introGcur) ms.value = _introGcur; const ml = $('intro-m-val'); if (ml) ml.textContent = 'M ≤ ' + _introGcur; }
       const ps = $('intro-p-sl'); if (ps) { if (document.activeElement !== ps && +ps.value !== _introPi) ps.value = _introPi; const pv = $('intro-p-val'); if (pv) pv.textContent = 'p = ' + (_introPrimes[_introPi] || 2); }
+      { const pPlay = _introPAuto && !_introGbOn, gPlay = !!_introGbTimer, pb = $('intro-p-btn'), gb = $('intro-gb-btn'), set = (b, on, t) => { if (!b) return; const tx = (on ? '❚❚ ' : '▶ ') + t; if (b.textContent !== tx) b.textContent = tx; b.style.color = on ? '#5fd38d' : '#ff6b6b'; b.style.borderColor = on ? 'rgba(95,211,141,.7)' : 'rgba(255,107,107,.6)'; }; set(pb, pPlay, '× ÷'); set(gb, gPlay, '+ −'); }
       const es = $('intro-e-sl'); if (es && document.activeElement !== es && +es.value !== _introGbI) es.value = _introGbI; const ev = $('intro-e-val'); if (ev) ev.textContent = 'g = ' + (_introGbPairs[_introGbI] || 0); }
     _introRaf = requestAnimationFrame(draw);
   };
@@ -7260,7 +7268,7 @@ function introGPlay() {
 }
 function _introTh(r, M) { return _introAng === 'wrap' ? 2 * Math.PI * r / M : _introAng === 'unit' ? 2 * Math.PI * r / 256 : 2 * Math.PI * Math.min(r / M, 1); }
 function introCycleAng() { _introAng = _introAng === 'clamp' ? 'wrap' : _introAng === 'wrap' ? 'unit' : 'clamp'; const b = $('intro-ang-btn'); if (b) { b.textContent = 'angle: ' + _introAng; b.title = _introAng === 'clamp' ? 'θ = 2π·min(r/M, 1): the r ≤ M wedge (default)' : _introAng === 'wrap' ? 'θ = 2π·r/M, unbounded: r > M laps the ring (full G×G square)' : 'θ = 2π·r/G: radial spokes budgeted by G, not M (full G×G square)'; } }
-let _introHole = 0, _introCM = false;
+let _introHole = 0, _introCM = false, _introGZ = 0;
 function introSetHole(v) { _introHole = Math.max(0, Math.min(1, v)); const sl = $('intro-hole-sl'); if (sl && +sl.value !== Math.round(_introHole * 100)) sl.value = Math.round(_introHole * 100); const b = $('intro-hole-btn'); if (b) b.classList.toggle('on', Math.abs(_introHole - 0.5) < 0.005); }
 function introToggleCM() { _introCM = !_introCM; if (_introCM && _introHole < 0.5) introSetHole(0.5); const b = $('intro-cm-btn'); if (b) b.classList.toggle('on', _introCM); }
 /* What sits inside the hole, as in the opener: from h = 0.5 the roots-of-unity reading of the current order M = G
@@ -7316,6 +7324,36 @@ function introGbPlay() {
   _introGbTimer = setInterval(() => { const mx = _introGbPairs.length - 1; if (_introGbI >= mx) _introGbDir = -1; else if (_introGbI <= 0) _introGbDir = 1; _introGbI = Math.max(0, Math.min(mx, _introGbI + _introGbDir)); }, 650);
 }
 function introGbOff() { introGbStop(false); }
+/* G sweep: exact counts of kept cells (r <= M <= G, no prime of r dividing any of M..M+n) per sector s = floor(M/r), against
+   tot * D(n) / (s(s+1)); D(n) is the page's own lv2D. The sign and size of each deviation as G grows is the point. */
+let _introSwN = 2; const _introSwMemo = {};
+function introSweepData(n) {
+  if (_introSwMemo[n]) return _introSwMemo[n];
+  const GS = [64, 128, 256, 512, 1024], top = GS[GS.length - 1], pf = [null];
+  for (let r = 1; r <= top; r++) { const f = []; let t = r; for (let p = 2; p * p <= t; p++) if (t % p === 0) { f.push(p); while (t % p === 0) t /= p; } if (t > 1) f.push(t); pf.push(f); }
+  const sc = new Float64Array(6), snap = {}; let gi = 0;
+  for (let M = 1; M <= top; M++) {
+    for (let r = 1; r <= M; r++) { const f = pf[r]; let dead = false; for (let i = 0; i < f.length; i++) if ((f[i] - (M % f[i])) % f[i] <= n) { dead = true; break; } if (!dead) sc[Math.min(5, Math.floor(M / r))]++; }
+    if (M === GS[gi]) { snap[M] = Array.from(sc); gi++; }
+  }
+  const Dn = lv2D(n);
+  return (_introSwMemo[n] = GS.map(G => { const c = snap[G], k = c[1] + c[2] + c[3] + c[4] + c[5], tot = G * (G + 1) / 2, E = tot * Dn, ex = [E / 2, E / 6, E / 12, E / 20, E / 5]; return { G, k, E, dev: [(k - E) / E, ...[1, 2, 3, 4, 5].map((s, i) => (c[s] - ex[i]) / ex[i])] }; }));
+}
+function introSweep(n) {
+  const box = $('intro-sweep'); if (!box) return; if (n === 'close') { box.style.display = 'none'; return; }
+  _introSwN = n; const rows = introSweepData(n), pc = v => '<td style="text-align:right;padding:2px 6px;color:' + (v >= 0 ? '#5fd38d' : '#ff6b6b') + '">' + (v >= 0 ? '+' : '−') + Math.abs(v * 100).toFixed(2) + '%</td>';
+  box.innerHTML = '<div style="display:flex;justify-content:space-between;color:var(--gold);margin-bottom:6px"><b>G sweep · block M…M+' + n + '</b><span style="cursor:pointer" onclick="introSweep(\'close\')">✕</span></div>' +
+    '<div style="margin-bottom:8px">n: ' + [0, 1, 2, 4, 8].map(v => '<button class="chip' + (v === n ? ' on' : '') + '" onclick="introSweep(' + v + ')">' + v + '</button>').join(' ') + '</div>' +
+    '<table style="border-collapse:collapse;width:100%"><tr style="color:var(--cream2)"><td>G</td><td style="text-align:right">all</td><td style="text-align:right">s=1</td><td style="text-align:right">s=2</td><td style="text-align:right">s=3</td><td style="text-align:right">s=4</td><td style="text-align:right">s≥5</td></tr>' +
+    rows.map(r => '<tr><td style="padding:2px 6px">' + r.G + '</td>' + r.dev.map(pc).join('') + '</tr>').join('') + '</table>' +
+    '<div style="margin-top:8px;color:var(--cream2);line-height:1.5">Deviation of the exact count from tot·D(n)/(s(s+1)). Green = above the prediction, red = below. D(n) = ∏(1 − min(n+1,p)/p²). Look for the columns shrinking toward 0 as G doubles: at n = 0 the signs alternate and the size falls roughly like 1/G; a column that stays put would be a systematic effect.</div>';
+  box.style.display = 'block';
+}
+function introFS() {
+  const ov = $('intro-overlay'), d = document, on = d.fullscreenElement || d.webkitFullscreenElement;
+  try { if (on) (d.exitFullscreen || d.webkitExitFullscreen).call(d); else { const f = ov.requestFullscreen || ov.webkitRequestFullscreen; if (f) f.call(ov); else { const b = $('intro-fs-btn'); if (b) b.textContent = 'not supported'; } } } catch (e) {}
+}
+['fullscreenchange', 'webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => { const b = $('intro-fs-btn'); if (b) b.innerHTML = (document.fullscreenElement || document.webkitFullscreenElement) ? '&#10005; exit full' : '&#9974; full'; }));
 function introToggleCtl() {
   const c = $('intro-ctl'); if (!c) return; const open = c.style.display === 'none', ft = $('intro-foot');
   /* Opening extends the controls DOWN: the footer is pinned at its collapsed top and scrolls, so the ring and stats keep their size. */
@@ -7348,7 +7386,7 @@ function introCanvasClick(ev) {
   const gm = _introGeo, cv = $('intro-cv'); if (!gm || !cv) return;
   const b = cv.getBoundingClientRect(), px = ev.clientX - b.left, py = ev.clientY - b.top;
   let best = null, bd = 1e9;
-  for (let M = 1; M <= gm.G; M++) { const rd = _introRad(gm.R, M, gm.GMAX); if (Math.abs(Math.hypot(px - gm.cx, py - gm.cy) - rd) > 6) continue;
+  for (let M = 1; M <= gm.G; M++) { const rd = _introRad(gm.R, M, gm.GZ || gm.GMAX); if (Math.abs(Math.hypot(px - gm.cx, py - gm.cy) - rd) > 6) continue;
     for (let r = 1; r <= (_introAng === 'clamp' ? M : gm.G); r++) { if (lv1G(r, M) !== 1) continue; const th = _introTh(r, M), dx = gm.cx + rd * Math.cos(th) - px, dy = gm.cy - rd * Math.sin(th) - py, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = { r, M }; } } }
   if (!best || bd > 100) { introClosePop(); return; }
   _introSel = best; introShowPop(best.r, best.M);
