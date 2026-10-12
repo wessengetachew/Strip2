@@ -2044,7 +2044,7 @@ walk anyway.</p>
     <div id="intro-ctl" style="margin-top:10px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <div style="flex:1 1 100%;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cream2);">
         <span style="display:inline-flex;align-items:center;gap:6px;"><input type="range" id="intro-p-sl" min="0" max="53" value="0" oninput="introSetP(this.value)" style="width:120px;" title="Prime spiral p (and its mirror): drag to pick the prime"><span id="intro-p-val">p = 2</span></span>
-        <span style="display:inline-flex;align-items:center;gap:6px;"><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="width:70px;" title="Point size"></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="introSetHole(this.value / 100)" style="width:90px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="width:70px;" title="Point size"></span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="256" value="1" oninput="introSetM(this.value)" style="width:120px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val">M ≤ 1</span><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 256 and back">▶ M</button><button class="chip" onclick="introSetM(256)" title="All 256 rings">256</button></span>
         <button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button>
         <button class="chip" id="intro-p-btn" onclick="introPAutoToggle()" title="Multiplicative (× and ÷): the prime spiral r = p on every ring and its mirror. Click to scan the primes up and back, or pause on the slider's prime. Also hides the Goldbach overlay.">❚❚ × ÷</button>
@@ -2057,7 +2057,8 @@ walk anyway.</p>
       <button class="chip" id="intro-n-btn" onclick="introNPlay()" title="Play C(n) from n = 0 up to 255 and back: the cells the block kills are removed, so you watch the survivors thin toward C(n)">▶ C(n) play</button>
       <div style="flex:1 1 100%;height:0;"></div>
       <button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button>
-      <button class="chip" onclick="introExport4k()" title="Save the current frame as a portrait 1080 x 1920 PNG, rendered at 2x (2160 x 3840) so it stays sharp">1080×1920 PNG</button>
+      <button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button>
+      <button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button>
     </div>
   </div>
 </div>
@@ -7118,16 +7119,16 @@ function showIntro() {
   if (_introRaf) cancelAnimationFrame(_introRaf);
   try { closeWelcomeModal(); } catch (e) {}
   if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; } if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; }
-  _introGM = null; _introSel = null;
+  _introGM = null; _introSel = null; _introPOff = 0; introSetHole(0); _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } _introPAuto = true;
   _introOn = true; ov.style.display = 'block'; _introT0 = performance.now();
   try { startOpenerMusic(); } catch (e) {}
   const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const paint = (x, W, H, T) => {
     x.fillStyle = '#04040d'; x.fillRect(0, 0, W, H);
-    const UI = _introExporting ? 1.9 : 1, GMAX = 256, G = _introGM != null ? _introGM : Math.max(1, Math.min(GMAX, Math.floor(1 + (GMAX - 1) * Math.min(1, T / 9) ** 1.4)));
+    const LAND = _introExporting === 'land', UI = _introExporting ? (LAND ? 1.6 : 1.9) : 1, GMAX = 256, G = _introGM != null ? _introGM : Math.max(1, Math.min(GMAX, Math.floor(1 + (GMAX - 1) * Math.min(1, T / 9) ** 1.4)));
     _introGcur = G;
-    const hd = $('intro-head'), ft = $('intro-foot'), top0 = _introExporting ? 285 : hd ? hd.getBoundingClientRect().bottom + 6 : Math.max(146, H * 0.2), bot0 = _introExporting ? H - 290 : ft ? ft.getBoundingClientRect().top - 4 : H - 152;
-    const cx = W / 2 + _introV.fx * W, cy = (top0 + bot0) / 2 + (W < 600 ? 34 : 0) + _introV.fy * H, R = Math.max(Math.min(W, H) * 0.13, Math.min(W * (_introExporting ? 0.4 : 0.32), H * (_introExporting ? 0.25 : 0.22), (bot0 - top0) / 2 - (W < 600 ? 118 : 16))) * _introV.k;
+    const hd = $('intro-head'), ft = $('intro-foot'), cvTop = _introExporting ? 0 : $('intro-cv').getBoundingClientRect().top, top0 = _introExporting ? (LAND ? 175 : 285) : hd ? hd.getBoundingClientRect().bottom - cvTop + 6 : Math.max(146, H * 0.2), bot0 = _introExporting ? (LAND ? H - 175 : H - 290) : ft ? ft.getBoundingClientRect().top - cvTop - 4 : H - 152;
+    const cx = W / 2 + _introV.fx * W, cy = (top0 + bot0) / 2 + (W < 600 ? 34 : 0) + _introV.fy * H, R = Math.max(Math.min(W, H) * 0.13, Math.min(W * (_introExporting ? 0.4 : 0.32), H * (_introExporting ? (LAND ? 0.42 : 0.25) : 0.22), (bot0 - top0) / 2 - (W < 600 ? 118 : 16))) * _introV.k;
     _introGeo = { cx, cy, R, W, H, GMAX, G, cy0: cy - _introV.fy * H };
     x.save(); x.beginPath(); x.rect(0, top0, W, bot0 - top0); x.clip();   // the ring never covers the title or the controls
     const PT = 1.25 * (_introExporting ? 1.6 : 1) * _introPtScale * Math.max(1, Math.min(3.2, _introV.k));
@@ -7136,7 +7137,7 @@ function showIntro() {
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0; const sc = [0, 0, 0, 0, 0, 0];
     for (let M = 1; M <= G; M++) {
-      const rad = R * (M - 0.5) / GMAX * 1.0;
+      const rad = _introRad(R, M, GMAX);
       for (let r = 1; r <= (_introAng === 'clamp' ? M : G); r++) {
         if (gcd(r, M) !== 1) continue; const inW = r <= M, dead = _introN > 0 && introKilled(r, M, _introN); if (dead && !_introSat) continue; if (inW && !dead) { cop++; const q0 = Math.floor(M / r); sc[Math.min(q0, 5)]++; }
         const th = _introTh(r, M) + spin;
@@ -7145,8 +7146,9 @@ function showIntro() {
         x.fillRect(cx + rad * Math.cos(th) - PT / 2, cy - rad * Math.sin(th) - PT / 2, PT, PT);
       }
     }
+    if (_introHole > 0.02) introDrawHole(x, cx, cy, R * _introHole * 0.97, G, UI);
     const tot = G * (G + 1) / 2, sh = cop / tot * 100;
-    if (_introSel) { const rd = R * (_introSel.M - 0.5) / GMAX, th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
+    if (_introSel) { const rd = _introRad(R, _introSel.M, GMAX), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
     let mTxt = '';
     // sector rays over the full ring: S_s = { 1/(s+1) < r/M <= 1/s }, so the boundaries sit at theta = 2*pi/n
     x.save(); x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 0.8; x.font = (10 * UI) + 'px monospace'; x.textAlign = 'center'; x.fillStyle = 'rgba(255,255,255,.75)';
@@ -7154,12 +7156,13 @@ function showIntro() {
     for (let q = 1; q <= 4; q++) { const t = Math.PI * (1 / q + 1 / (q + 1)); x.fillText('s=' + q, cx + R * 0.82 * Math.cos(t), cy - R * 0.82 * Math.sin(t) + 3); }
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
-    const PS = []; for (let n = 2; n <= GMAX; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
-    const per = 2 * (PS.length - 1), ph = Math.floor(Math.max(0, T - 9.3) / 0.3) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < 9.3 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);  // scans up the primes and back, or follows the slider
+    const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
+    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 9.3) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < 9.3 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= 9.3) _introPi = pi;
     let spTxt = '';
     if (sp) {
-      const ang = (r, M) => _introTh(r, M) + spin, rd = M => R * (M - 0.5) / GMAX;
+      const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GMAX);
       [[0, 'rgba(79,209,197,', '#4fd1c5'], [1, 'rgba(155,127,232,', '#9b7fe8']].forEach(([mir, col, solid]) => {
         if (mir && !_introMirror) return;
         let last = null, prev = null, pq = 0;
@@ -7182,7 +7185,7 @@ function showIntro() {
     let gbTxt = '';
     if (_introGbOn && _introGbPairs.length) {   // the Strip I dynamic: E = 2(G+1); for a pair g + s = E draw the four lines a, b, c, d and the marker (g, s)
       const E = 2 * (GMAX + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
-      const at = (r, M) => { const rd = R * (M - 0.5) / GMAX, th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
+      const at = (r, M) => { const rd = _introRad(R, M, GMAX), th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
       const ds = [[Math.max(1, g - GMAX), Math.min(GMAX, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - GMAX), Math.min(GMAX, sP - 1), -1, sP, '#e05060'], [1, GMAX - g, 1, g, '#3dc8b8'], [g + 1, GMAX, 1, -g, '#9b7fe8']];
       const dp = Math.max(2, PT * 2.2);
       x.save();
@@ -7201,16 +7204,18 @@ function showIntro() {
     {
       const GR = '#5fd38d', RD = '#ff6b6b', DM = 'rgba(232,227,219,.7)', fs = Math.max(10, Math.min(12, W / 34)) * UI, lh = fs + 4;
       const y0 = top0 + fs + 2, y1 = bot0 - 2;
+      const pe = (o, e) => { const v = (o - e) / e * 100; return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(3) + '%'; };   // observed vs expected, signed, 3 decimals
       const blk = (lines, xr, y, up) => { x.font = fs + 'px monospace'; x.textAlign = xr ? 'right' : 'left'; const X = xr ? W - 10 : 10; const n = lines.length; lines.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], X, y + (up ? (i - n + 1) : i) * lh); }); };
          // expected share of kept cells: D(n) = C(n)/zeta(2)
-      blk([[nn ? 'kept, block M…M+' + _introN : 'gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], [(nn ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%', DM]], false, y0, false);
-      const sec = [['sectors S_s', DM]];
-      for (let q = 1; q <= 4; q++) { const ex = tot * six / (q * (q + 1)); sec.push(['s=' + q + ': ' + sc[q] + ' / ' + ex.toFixed(0), sc[q] >= ex ? GR : RD]); }
-      { const ex = tot * six / 5; sec.push(['s≥5: ' + sc[5] + ' / ' + ex.toFixed(0), sc[5] >= ex ? GR : RD]); sec.push(['expected ' + (tot * six).toFixed(0), DM]); }
+      blk([[nn ? 'kept, block M…M+' + _introN : 'gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], [(nn ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%', DM], ['err ' + pe(cop, tot * six), sh / 100 >= six ? GR : RD]], false, y0, false);
+      const sec = [['sectors S_s  (err)', DM]];
+      for (let q = 1; q <= 4; q++) { const ex = tot * six / (q * (q + 1)); sec.push(['s=' + q + ': ' + sc[q] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[q], ex), sc[q] >= ex ? GR : RD]); }
+      { const ex = tot * six / 5; sec.push(['s≥5: ' + sc[5] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[5], ex), sc[5] >= ex ? GR : RD]); sec.push(['expected ' + (tot * six).toFixed(0), DM]); }
       blk(sec, true, y0, false);
       let pc = 0; for (let n = 2; n <= G; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) pc++; }
-      let colc = 0, colN = 0; if (sp) for (let M = sp; M <= G; M++) { colN++; if (gcd(sp, M) === 1) colc++; }
-      blk(sp ? [['sieve: prime p = ' + sp, '#4fd1c5'], ['column r = p: ' + colN + ' rings', DM], ['gcd = 1: ' + colc + ' (' + (100 * colc / Math.max(1, colN)).toFixed(1) + '%)', '#fff'], ['1 − 1/p = ' + (100 * (1 - 1 / sp)).toFixed(1) + '%', DM]] : [['sieve: waiting', DM]], false, y1, true);
+      let colc = 0, colN = 0; if (sp) for (let M = sp; M <= G; M++) { colN++; if (_introN > 0 ? !introKilled(sp, M, _introN) : gcd(sp, M) === 1) colc++; }
+      const pexp = sp ? 1 - Math.min(_introN + 1, sp) / sp : 0;
+      blk(sp ? [['sieve: prime p = ' + sp, '#4fd1c5'], ['column r = p: ' + colN + ' rings', DM], [(nn ? 'kept (block M…M+' + _introN + '): ' : 'gcd = 1: ') + colc + ' (' + (100 * colc / Math.max(1, colN)).toFixed(1) + '%)', '#fff'], [(nn ? '1 − ' + Math.min(_introN + 1, sp) + '/p = ' : '1 − 1/p = ') + (100 * pexp).toFixed(1) + '%', DM]] : [['sieve: waiting', DM]], false, y1, true);
       const est = G / Math.log(Math.max(2, G));
       blk([['primes ≤ G', DM], ['π(' + G + ') = ' + pc, '#fff'], ['G/ln G = ' + est.toFixed(1), DM], ['ratio ' + (pc / est).toFixed(3), '#e6c35c']], true, y1, true);
     }
@@ -7249,6 +7254,31 @@ function introGPlay() {
 }
 function _introTh(r, M) { return _introAng === 'wrap' ? 2 * Math.PI * r / M : _introAng === 'unit' ? 2 * Math.PI * r / 256 : 2 * Math.PI * Math.min(r / M, 1); }
 function introCycleAng() { _introAng = _introAng === 'clamp' ? 'wrap' : _introAng === 'wrap' ? 'unit' : 'clamp'; const b = $('intro-ang-btn'); if (b) { b.textContent = 'angle: ' + _introAng; b.title = _introAng === 'clamp' ? 'θ = 2π·min(r/M, 1): the r ≤ M wedge (default)' : _introAng === 'wrap' ? 'θ = 2π·r/M, unbounded: r > M laps the ring (full G×G square)' : 'θ = 2π·r/G: radial spokes budgeted by G, not M (full G×G square)'; } }
+let _introHole = 0, _introCM = false;
+function introSetHole(v) { _introHole = Math.max(0, Math.min(1, v)); const sl = $('intro-hole-sl'); if (sl && +sl.value !== Math.round(_introHole * 100)) sl.value = Math.round(_introHole * 100); const b = $('intro-hole-btn'); if (b) b.classList.toggle('on', Math.abs(_introHole - 0.5) < 0.005); }
+function introToggleCM() { _introCM = !_introCM; if (_introCM && _introHole < 0.5) introSetHole(0.5); const b = $('intro-cm-btn'); if (b) b.classList.toggle('on', _introCM); }
+/* What sits inside the hole, as in the opener: from h = 0.5 the roots-of-unity reading of the current order M = G
+   (ticks at every M-th root, teal spokes for the primitive ones, gold arrow = their sum = mu(M), which can only be
+   1, -1 or 0); with "circle method" on, the Farey major/minor arcs and the prime sum |S(a)| for N = 2(G+1) instead. */
+function introDrawHole(x, cx, cy, Rh, M, UI) {
+  if (Rh < 8) return;
+  if (_introCM) { try { openerDrawCircleMethod(x, cx, cy, Rh, _introHole, M); } catch (e) {} return; }
+  if (_introHole < 0.5) return;
+  x.save(); x.beginPath(); x.arc(cx, cy, Rh, 0, 7); x.clip();
+  x.strokeStyle = 'rgba(255,255,255,.10)'; x.lineWidth = 0.8; x.beginPath(); x.moveTo(cx - Rh, cy); x.lineTo(cx + Rh, cy); x.moveTo(cx, cy - Rh); x.lineTo(cx, cy + Rh); x.stroke();
+  const pt = (th, f) => [cx + Math.cos(th) * Rh * f, cy - Math.sin(th) * Rh * f];
+  if (M <= 96) { x.strokeStyle = 'rgba(255,255,255,.18)'; x.lineWidth = 0.8; for (let r = 1; r <= M; r++) { const th = 2 * Math.PI * r / M, a = pt(th, .92), b = pt(th, 1); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); } }
+  let sx = 0, sy = 0, cnt = 0; x.strokeStyle = 'rgba(61,200,184,.30)'; x.lineWidth = 0.8;
+  for (let r = 1; r <= M; r++) { if (lv1G(r, M) !== 1) continue; const th = 2 * Math.PI * r / M; sx += Math.cos(th); sy += Math.sin(th); cnt++; if (cnt <= 96) { const b = pt(th, 1); x.beginPath(); x.moveTo(cx, cy); x.lineTo(b[0], b[1]); x.stroke(); } }
+  let mu = 1, t = M; for (let p = 2; p * p <= t; p++) if (t % p === 0) { t /= p; if (t % p === 0) { mu = 0; break; } mu = -mu; } if (mu !== 0 && t > 1) mu = -mu;
+  const mag = Math.hypot(sx, sy);
+  if (mag > 1e-9) { const th = Math.atan2(sy, sx), b = pt(th, Math.min(1, mag)); x.strokeStyle = x.fillStyle = 'rgba(242,200,96,.95)'; x.lineWidth = 2.2; x.beginPath(); x.moveTo(cx, cy); x.lineTo(b[0], b[1]); x.stroke(); x.beginPath(); x.arc(b[0], b[1], 3, 0, 7); x.fill(); }
+  else { const rr = Math.max(2, Rh / 24); x.strokeStyle = 'rgba(242,200,96,.8)'; x.lineWidth = 1.2; x.beginPath(); x.arc(cx, cy, rr, 0, 7); x.stroke(); x.beginPath(); x.moveTo(cx - rr, cy - rr); x.lineTo(cx + rr, cy + rr); x.moveTo(cx + rr, cy - rr); x.lineTo(cx - rr, cy + rr); x.stroke(); }
+  const fs = Math.max(8, Math.min(12 * UI, Rh / 6)); x.font = fs + 'px monospace'; x.textAlign = 'center';
+  [['M = ' + M, 'rgba(242,200,96,.9)'], ['φ(M) = ' + cnt, 'rgba(242,200,96,.9)'], [mu === 0 ? 'μ = 0 — cancel' : mu > 0 ? 'μ = 1 — → 1' : 'μ = −1 — → −1', 'rgba(238,232,220,.6)']].forEach((q, i) => { x.fillStyle = q[1]; x.fillText(q[0], cx, cy + Rh * 0.34 + i * fs * 1.4); });
+  x.restore();
+}
+function _introRad(R, M, GMAX) { return R * (_introHole + (1 - _introHole) * (M - 0.5) / GMAX); }   // inner radius h: rings pack into [h, 1] of the plate, as on the main Ring view
 let _introGeo = null, _introSel = null, _introV = { k: 1, fx: 0, fy: 0 };
 let _introT = 0, _introPaint = null, _introSat = false, _introN = 0, _introDir = 1, _introNTimer = 0; const _introCmemo = {};
 function introC(n) { return _introCmemo[n] || (_introCmemo[n] = lv2C(n)); }
@@ -7269,7 +7299,8 @@ function introNPlay() {
   }, 110);
 }
 function introSetP(i) { introGbStop(false); _introPAuto = false; introFull(); _introPi = i | 0; const b = $('intro-p-btn'); if (b) b.textContent = '▶ × ÷'; }
-function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
+let _introPOff = 0;
+function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); if (_introPAuto) _introPOff = _introPi - Math.floor(Math.max(0, Math.max(_introT, 9.5) - 9.3) / 0.3);   /* play resumes from the slider's prime, going up */ const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
 function introToggleMirror() { _introMirror = !_introMirror; const b = $('intro-mir-btn'); if (b) b.classList.toggle('on', _introMirror); }
 function introSetGb(i) { introFull(); _introGbI = Math.max(0, Math.min(_introGbPairs.length - 1, i | 0)); _introGbOn = true; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; } }
 function introGbStop(keepOn) { if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; if (!keepOn) _introGbOn = false; }
@@ -7279,7 +7310,11 @@ function introGbPlay() {
   _introGbTimer = setInterval(() => { const mx = _introGbPairs.length - 1; if (_introGbI >= mx) _introGbDir = -1; else if (_introGbI <= 0) _introGbDir = 1; _introGbI = Math.max(0, Math.min(mx, _introGbI + _introGbDir)); }, 650);
 }
 function introGbOff() { introGbStop(false); }
-function introToggleCtl() { const c = $('intro-ctl'); if (!c) return; const open = c.style.display === 'none'; c.style.display = open ? 'flex' : 'none'; const b = $('intro-ctl-btn'); if (b) b.innerHTML = open ? 'controls &#9662;' : 'controls &#9656;'; }
+function introToggleCtl() {
+  const c = $('intro-ctl'); if (!c) return; const open = c.style.display === 'none', ft = $('intro-foot');
+  /* Opening extends the controls DOWN: the footer is pinned at its collapsed top and scrolls, so the ring and stats keep their size. */
+  if (ft) { if (open) { const t = Math.round(ft.getBoundingClientRect().top); ft.style.top = t + 'px'; ft.style.bottom = 'auto'; ft.style.paddingBottom = '40px'; const ov = $('intro-overlay'); if (ov) ov.style.overflowY = 'auto'; } else { ft.style.top = ''; ft.style.bottom = '0'; ft.style.paddingBottom = ''; const ov = $('intro-overlay'); if (ov) { ov.scrollTop = 0; ov.style.overflowY = 'hidden'; } } }
+  c.style.display = open ? 'flex' : 'none'; const b = $('intro-ctl-btn'); if (b) b.innerHTML = open ? 'controls &#9662;' : 'controls &#9656;'; }
 function introFull() { if (_introT < 9.5) _introT0 -= (9.5 - _introT) * 1000; }
 function introSetN(v) {
   if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; const b = $('intro-n-btn'); if (b) b.textContent = '▶ C(n) play'; }
@@ -7307,7 +7342,7 @@ function introCanvasClick(ev) {
   const gm = _introGeo, cv = $('intro-cv'); if (!gm || !cv) return;
   const b = cv.getBoundingClientRect(), px = ev.clientX - b.left, py = ev.clientY - b.top;
   let best = null, bd = 1e9;
-  for (let M = 1; M <= gm.G; M++) { const rd = gm.R * (M - 0.5) / gm.GMAX; if (Math.abs(Math.hypot(px - gm.cx, py - gm.cy) - rd) > 6) continue;
+  for (let M = 1; M <= gm.G; M++) { const rd = _introRad(gm.R, M, gm.GMAX); if (Math.abs(Math.hypot(px - gm.cx, py - gm.cy) - rd) > 6) continue;
     for (let r = 1; r <= (_introAng === 'clamp' ? M : gm.G); r++) { if (lv1G(r, M) !== 1) continue; const th = _introTh(r, M), dx = gm.cx + rd * Math.cos(th) - px, dy = gm.cy - rd * Math.sin(th) - py, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = { r, M }; } } }
   if (!best || bd > 100) { introClosePop(); return; }
   _introSel = best; introShowPop(best.r, best.M);
@@ -7336,26 +7371,28 @@ function introWireView() {
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', e => { ptr.delete(e.pointerId); });
   cv.addEventListener('dblclick', () => introResetView());
 }
-async function introExport4k() {
+async function introExport4k(land) {
   if (!_introPaint) return;
-  const cv = document.createElement('canvas'); cv.width = 2160; cv.height = 3840;   // 1080 x 1920 layout at 2x, so it stays sharp
+  if (land === undefined) land = window.innerWidth > window.innerHeight;
+  const W = land ? 1920 : 1080, H = land ? 1080 : 1920, hx = W / 2;
+  const cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2;   // layout at 2x, so it stays sharp
   const x = cv.getContext('2d'); x.setTransform(2, 0, 0, 2, 0, 0);
-  _introExporting = true;
+  _introExporting = land ? 'land' : true;
   try {
-    _introPaint(x, 1080, 1920, Math.max(_introT, 9.5));
-    x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '24px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', 540, 90);
-    x.fillStyle = '#e8e3db'; x.font = '104px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', 540, 190);
-    x.fillStyle = 'rgba(232,227,219,.75)'; x.font = '19px monospace'; x.fillText('a sieve you can watch · Level 1: G up to 1024 · Level 2: main page, up to 10,000', 540, 232 - 4);
+    _introPaint(x, W, H, Math.max(_introT, 9.5));
+    x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '24px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', hx, land ? 40 : 90);
+    x.fillStyle = '#e8e3db'; x.font = (land ? 72 : 104) + 'px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', hx, land ? 112 : 190);
+    x.fillStyle = 'rgba(232,227,219,.75)'; x.font = '19px monospace'; x.fillText('a sieve you can watch · Level 1: G up to 1024 · Level 2: main page, up to 10,000', hx, land ? 150 : 228);
     x.font = '22px monospace'; x.fillStyle = 'rgba(232,227,219,.85)';
-    let yy = 1920 - 250;
+    let yy = H - (land ? 150 : 250);
     (($('intro-counter').textContent || '').split('\n')).forEach(line => {
-      let cur = ''; line.split(' ').forEach(wd => { const t = cur ? cur + ' ' + wd : wd; if (x.measureText(t).width > 1000 && cur) { x.fillText(cur, 540, yy); yy += 28; cur = wd; } else cur = t; });
-      if (cur) { x.fillText(cur, 540, yy); yy += 28; }
+      let cur = ''; line.split(' ').forEach(wd => { const t = cur ? cur + ' ' + wd : wd; if (x.measureText(t).width > (W - 80) && cur) { x.fillText(cur, hx, yy); yy += 28; cur = wd; } else cur = t; });
+      if (cur) { x.fillText(cur, hx, yy); yy += 28; }
     });
   } finally { _introExporting = false; }
   const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
   if (!blob) return;
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'strip-arithmetic-II-opener-4k.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'strip-arithmetic-II-opener-' + W + 'x' + H + '.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 function introEnter() {
   _introOn = false; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; } if (_introRaf) cancelAnimationFrame(_introRaf);
