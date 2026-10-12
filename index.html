@@ -2034,12 +2034,14 @@ walk anyway.</p>
     <div style="font-family:var(--mono);font-size:11px;letter-spacing:.38em;color:var(--gold);">WESSEN GETACHEW &middot; 2026</div>
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(30px,7vw,64px);color:var(--cream);margin-top:8px;letter-spacing:.02em;"><span id="intro-rs" onclick="introRestart()" style="pointer-events:auto;cursor:pointer;display:inline-block;color:var(--gold);margin-right:.35em;" title="Restart the animation from 0">&#10226;</span>Strip Arithmetic <span id="intro-ii" onclick="introPause()" style="pointer-events:auto;cursor:pointer;display:inline-block;min-width:.9em;" title="">II</span></div>
     <div style="font-family:var(--mono);font-size:12px;color:var(--cream2);margin-top:6px;">a sieve you can watch &middot; Level 1: G up to 1024 &middot; Level 2: the main page, up to 10,000</div>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:auto;font-family:var(--mono);font-size:11px;color:var(--cream2);"><span id="intro-tt" style="min-width:3.2em;text-align:right;">0.0s</span><input type="range" id="intro-time-sl" min="0" max="900" value="0" step="1" oninput="introScrub(this.value / 10)" style="width:min(62vw,360px);" title="Animation time: drag to scrub the intro (0 to 90 s)."></div>
   </div>
   <div id="intro-foot" style="position:absolute;z-index:1;left:0;right:0;bottom:0;padding:0 16px max(20px,4vh);text-align:center;">
     <div id="intro-counter" style="font-family:var(--mono);font-size:clamp(11px,2.6vw,14px);color:var(--cream2);min-height:20px;"></div>
     <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center;">
       <button class="btn" id="intro-enter" onclick="introEnter()" style="font-size:15px;padding:10px 28px;border-color:var(--gold);color:var(--gold);">Enter &rarr;</button>
       <button class="chip" id="intro-ctl-btn" onclick="introToggleCtl()" title="Show or hide the controls: spiral, Goldbach, C(n), angle, size, export">controls &#9662;</button>
+      <button class="chip" id="intro-sheet-btn" onclick="introMathSheet()" style="display:none;" title="Math sheet: the Ring, Cayley and Grid pictures with legend, definitions, tables and graphs for the current G and n (opens as a page you can print to PDF).">&#128196; math sheet</button>
       <button class="chip" onclick="introEnter()" title="Skip the animation and go straight to Level 1">skip</button>
       <button class="chip" id="intro-fs-btn" onclick="introFS()" title="Full screen">&#9974; full</button>
     </div>
@@ -2048,6 +2050,7 @@ walk anyway.</p>
         <div class="gr"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="256" value="1" oninput="introSetM(this.value)" style="flex:1 1 90px;min-width:70px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val" class="gv">M ≤ 1</span></div>
         <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 256 and back">▶ M</button><button class="chip" onclick="introSetM(256)" title="All 256 rings">256</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button></div>
         <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="_introSeq = false; introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="_introSeq = false; introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: cell (r, M) at column r, row M.">Grid</button><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate the Cayley sphere a full 360 degrees about x, then y.">&#9654; rotate x&middot;y</button></div>
+        <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null)" style="flex:1 1 70px;min-width:50px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value)" style="flex:1 1 70px;min-width:50px;" title="Tilt the Cayley sphere about y (degrees)."></div>
         <div class="gr"><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="flex:1 1 80px;min-width:60px;" title="Point size"><button class="chip" id="intro-col-btn" onclick="introToggleColor()" title="Switch between sector colours and the opener's coloring 16 (saturation)">color: sector</button></div>
       </div>
       <div class="ig"><div class="gl">Prime spiral &nbsp;× ÷</div>
@@ -7151,7 +7154,8 @@ function showIntro() {
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0; const sc = [0, 0, 0, 0, 0, 0];
-    const VW = _introVw, VM = _introExporting ? 0 : VW.m, VON = VM > 0.02;
+    const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
+    const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GMAX); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
     for (let M = 1; M <= G; M++) {
       const rad = _introRad(R, M, GZ);
       for (let r = 1; r <= (_introAng === 'clamp' ? M : G); r++) {
@@ -7181,7 +7185,7 @@ function showIntro() {
     }
     if (!VON && _introHole > 0.02) introDrawHole(x, cx, cy, R * _introHole * 0.97, G, UI);
     if (VON) { x.save(); x.globalAlpha = Math.min(1, (VM - 0.02) / 0.5); x.font = (11 * UI) + 'px monospace'; x.fillStyle = 'rgba(232,227,219,.85)'; x.textAlign = 'center';
-      x.fillText(VW.mode === 'grid' ? 'Grid: cell (r, M) at column r, row M' : 'Cayley: w = (z\u22121)/(z+1)   x = ' + Math.round(VW.x) + '\u00b0   y = ' + Math.round(VW.y) + '\u00b0', W / 2, top0 + 12 * UI); x.restore(); }
+      x.fillText(VW.mode === 'grid' ? 'Grid: cell (r, M) at column r, row M' : 'Cayley: w = (z\u22121)/(z+1)   x = ' + Math.round(VW.x) + '\u00b0   y = ' + Math.round(VW.y) + '\u00b0', W / 2, Math.min(bot0 - 4, cy + R * 1.08 + 12 * UI)); x.restore(); }
     const tot = G * (G + 1) / 2, sh = cop / tot * 100;
     if (!VON && _introSel) { const rd = _introRad(R, _introSel.M, GZ), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
     let mTxt = '';
@@ -7190,13 +7194,13 @@ function showIntro() {
     /* the sector rays draw themselves outward one after another over the first 6 s of real time (also while the clock is paused) */
     const rp = _introExporting || !_introSeq || !_introRay0 ? 1 : Math.min(1, (performance.now() - _introRay0) / 6000), rayF = k => Math.max(0, Math.min(1, (rp - k * 0.08) / 0.3));
     x.strokeStyle = 'rgba(255,255,255,' + (0.22 + 0.55 * (1 - rp)).toFixed(3) + ')'; x.lineWidth = 0.8 + 1.2 * (1 - rp);   // bright and thick while they draw, settling to the usual faint rays
-    for (let n = 2; n <= 9; n++) { const t = 2 * Math.PI / n, f = VON ? 0 : rayF(n - 2); if (f <= 0) continue; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + R * 1.02 * f * Math.cos(t), cy - R * 1.02 * f * Math.sin(t)); x.stroke(); }
+    for (let n = 2; n <= 9; n++) { const t = 2 * Math.PI / n, f = rayF(n - 2); if (f <= 0) continue; if (VON) { x.beginPath(); let st = false; for (let M = 1; M <= G; M += Math.max(1, Math.floor(G / 120))) { const P = posRM(M / n, M); if (!P) { st = false; continue; } if (st) x.lineTo(P[0], P[1]); else { x.moveTo(P[0], P[1]); st = true; } } x.stroke(); continue; } x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + R * 1.02 * f * Math.cos(t), cy - R * 1.02 * f * Math.sin(t)); x.stroke(); }
     x.globalAlpha *= Math.max(0, Math.min(1, (rp - 0.6) / 0.3));
-    for (let q = 1; q <= 4 && !VON; q++) { const t = Math.PI * (1 / q + 1 / (q + 1)); x.fillText('s=' + q, cx + R * 0.82 * Math.cos(t), cy - R * 0.82 * Math.sin(t) + 3); }
+    for (let q = 1; q <= 4; q++) { const t = Math.PI * (1 / q + 1 / (q + 1)); if (VON) { const M0 = Math.max(2, Math.round(G * 0.8)), P = posRM(M0 * 0.5 * (1 / q + 1 / (q + 1)), M0); if (P) x.fillText('s=' + q, P[0], P[1] + 3); } else x.fillText('s=' + q, cx + R * 0.82 * Math.cos(t), cy - R * 0.82 * Math.sin(t) + 3); }
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
-    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - _introS0) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = (_introGbOn || VON) ? 0 : (_introPAuto ? (T < _introS0 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - _introS0) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < _introS0 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= _introS0 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold, joined to their conjugate 2π − θ), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
@@ -7208,7 +7212,7 @@ function showIntro() {
         x.lineWidth = 1.3;
         for (let M = Math.max(sp, 2); M <= G; M++) {
           const r = mir ? M - sp : sp; if (r < 1) continue;
-          const px = cx + rd(M) * Math.cos(ang(r, M)), py = cy - rd(M) * Math.sin(ang(r, M)), q = Math.floor(M / r);
+          const P = posRM(r, M); if (!P) { prev = null; continue; } const px = P[0], py = P[1], q = Math.floor(M / r);
           if (prev) { const hit = q !== pq; x.beginPath(); x.moveTo(prev[0], prev[1]); x.lineTo(px, py); x.strokeStyle = hit ? 'rgba(255,70,70,1)' : col + '.55)'; x.lineWidth = hit ? 2.4 : 1.1; x.stroke(); if (hit) { x.fillStyle = '#ff4646'; x.fillRect(px - 2, py - 2, 4, 4); } }
           prev = last = [px, py]; pq = q;
         }
@@ -7226,9 +7230,9 @@ function showIntro() {
       _introGbPairs = introGbPairsFor(G); if (_introGbI > _introGbPairs.length - 1) _introGbI = Math.max(0, _introGbPairs.length - 1);
       const es0 = $('intro-e-sl'); if (es0 && +es0.max !== Math.max(0, _introGbPairs.length - 1)) es0.max = Math.max(0, _introGbPairs.length - 1);
     }
-    if (!VON && _introGbOn && _introGbPairs.length) {   // the Strip I dynamic: E = 2(G+1); for a pair g + s = E draw the four lines a, b, c, d and the marker (g, s)
+    if (_introGbOn && _introGbPairs.length) {   // the Strip I dynamic: E = 2(G+1); for a pair g + s = E draw the four lines a, b, c, d and the marker (g, s)
       const E = 2 * (G + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
-      const at = (r, M) => { const rd = _introRad(R, M, GZ), th = _introTh(r, M); return [cx + rd * Math.cos(th), cy - rd * Math.sin(th)]; };
+      const at = (r, M) => posRM(r, M) || [NaN, NaN];
       const ds = [[Math.max(1, g - G), Math.min(G, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - G), Math.min(G, sP - 1), -1, sP, '#e05060'], [1, G - g, 1, g, '#3dc8b8'], [g + 1, G, 1, -g, '#9b7fe8']];
       const dp = Math.max(2, PT * 2.2);
       x.save();
@@ -7415,6 +7419,7 @@ function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
   return [cx + qx, cy - qy];
 }
 function introViewTick(T) {
+  { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { ts.value = Math.min(900, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'); if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
   const V = _introVw, es = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }, sg = (a, b) => es((T - a) / (b - a)), now = performance.now(), dt = Math.min(0.1, (now - (V.last || now)) / 1000); V.last = now;
   if (V.script && !V.man) {
     const L = _introS0 + 33;
@@ -7434,7 +7439,94 @@ function introViewSet(k) {
 }
 function introViewRot() { const V = _introVw; V.script = false; V.man = true; V.mode = 'cay'; V.tm = 1; V.x = 0; V.y = 0; V.rot = performance.now(); ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === 'cay'); }); }
 function introRestart() { try { showIntro(); } catch (e) {} ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); }); }
+/* Math sheet: with the intro paused, one HTML page (print it to PDF) with the Ring, Cayley and Grid pictures at the current G and n, a legend,
+   the definitions, and tables and graphs computed from the same cells. */
+var _introExpView = null, _introExpX = 0, _introExpY = 270;
+function introSheetData(G, n) {
+  const D = lv2D(n), sc = [0, 0, 0, 0, 0, 0], cum = new Array(G + 1).fill(0), phin = new Array(G + 1).fill(0);
+  for (let M = 1; M <= G; M++) {
+    let c = 0;
+    for (let r = 1; r <= M; r++) { if (gcd(r, M) !== 1) continue; if (n > 0 && introKilled(r, M, n)) continue; c++; sc[Math.min(Math.floor(M / r), 5)]++; }
+    phin[M] = c; cum[M] = cum[M - 1] + c;
+  }
+  return { D, sc, cum, phin, tot: G * (G + 1) / 2 };
+}
+async function introMathSheet() {
+  if (!_introPaint) return;
+  const G = Math.max(1, Math.round(_introGcur)), n = _introN || 0, T = _introT, fx = (v, d) => v.toFixed(d == null ? 2 : d);
+  const d = introSheetData(G, n), kept = d.cum[G], ratio = kept / d.tot, err = (ratio / d.D - 1) * 100;
+  // pictures
+  const W = 1600, H = 1000, shots = {}, saveGM = _introGM, saveExp = _introExporting;
+  const names = { ring: 'Ring (unit circle)', cay: 'Cayley (Möbius map on the sphere, x = ' + _introExpX + '°, y = ' + _introExpY + '°)', grid: 'Grid (cell (r, M) at column r, row M)' };
+  for (const v of ['ring', 'cay', 'grid']) {
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+    _introExpView = v; _introGM = G; _introExporting = 'land';
+    try {
+      _introPaint(x, W, H, Math.max(T, 9.5));
+      x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '20px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', W / 2, 36);
+      x.fillStyle = '#e8e3db'; x.font = '64px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', W / 2, 100);
+      x.font = '20px monospace'; x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText(names[v] + '   ·   G = ' + G + (n ? '   ·   n = ' + n : '   ·   n = 0'), W / 2, 140);
+      // legend strip
+      const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190]; x.textAlign = 'left'; x.font = '17px monospace';
+      let lx = 60; const ly = H - 120;
+      x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText('colour = sector s = ⌊M/r⌋ :', lx, ly); lx += 270;
+      for (let s = 1; s <= 8; s++) { x.fillStyle = 'hsl(' + SECHUE[s] + ',62%,55%)'; x.fillRect(lx, ly - 14, 16, 16); x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText(s < 8 ? 's=' + s : 's≥8', lx + 22, ly); lx += 92; }
+      x.fillStyle = 'rgba(232,227,219,.7)'; x.fillText('gcd(r, M) = 1' + (n ? ' and no prime p | r divides any of M…M+' + n : '') + '   ·   kept ' + kept + ' / ' + d.tot + ' = ' + fx(ratio * 100, 2) + '%   ·   target D(' + n + ') = ' + fx(d.D * 100, 2) + '%', 60, ly + 34);
+    } finally { _introExporting = saveExp; _introExpView = null; _introGM = saveGM; }
+    shots[v] = cv.toDataURL('image/png');
+  }
+  // sector table
+  const sNames = ['', 's = 1 : 1/2 < r/M ≤ 1', 's = 2 : 1/3 < r/M ≤ 1/2', 's = 3 : 1/4 < r/M ≤ 1/3', 's = 4 : 1/5 < r/M ≤ 1/4', 's ≥ 5 : r/M ≤ 1/5'], w = [0, 1 / 2, 1 / 6, 1 / 12, 1 / 20, 1 / 5];
+  let secRows = '', secBars = [];
+  for (let s = 1; s <= 5; s++) { const e = d.tot * d.D * w[s], o = d.sc[s], er = e ? (o / e - 1) * 100 : 0; secBars.push(er); secRows += '<tr><td>' + sNames[s] + '</td><td>' + o + '</td><td>' + fx(e, 1) + '</td><td>' + (o - e >= 0 ? '+' : '') + fx(o - e, 1) + '</td><td class="' + (er >= 0 ? 'g' : 'rd') + '">' + (er >= 0 ? '+' : '') + fx(er, 3) + '%</td></tr>'; }
+  // convergence table and curve
+  const gs = []; for (let g = 8; g < G; g *= 2) gs.push(g); gs.push(G);
+  const convRows = gs.map(g => { const t = g * (g + 1) / 2, rr = d.cum[g] / t; return '<tr><td>' + g + '</td><td>' + t + '</td><td>' + d.cum[g] + '</td><td>' + fx(rr * 100, 3) + '%</td><td>' + fx(d.D * 100, 3) + '%</td><td class="' + (rr >= d.D ? 'g' : 'rd') + '">' + (rr >= d.D ? '+' : '') + fx((rr / d.D - 1) * 100, 3) + '%</td></tr>'; }).join('');
+  const curve = []; for (let g = 1; g <= G; g++) curve.push([g, d.cum[g] / (g * (g + 1) / 2)]);
+  // primes
+  const PS = []; for (let p = 2; p <= G && PS.length < 14; p++) { let ok = true; for (let q = 2; q * q <= p; q++) if (p % q === 0) { ok = false; break; } if (ok) PS.push(p); }
+  const primeRows = PS.map(p => { let rings = 0, co = 0; for (let M = p; M <= G; M++) { rings++; if (M % p) co++; } return '<tr><td>' + p + '</td><td>' + rings + '</td><td>' + co + '</td><td>' + fx(rings ? co / rings * 100 : 0, 2) + '%</td><td>' + fx((1 - 1 / p) * 100, 2) + '%</td></tr>'; }).join('');
+  let pi = 0; for (let m = 2; m <= G; m++) { let ok = true; for (let q = 2; q * q <= m; q++) if (m % q === 0) { ok = false; break; } if (ok) pi++; }
+  // births
+  const bM = []; for (let M = 1; M <= 12; M++) bM.push(M); if (G > 12) bM.push(G);
+  const birthRows = bM.map(M => { let ph = 0; for (let r = 1; r <= M; r++) if (gcd(r, M) === 1) ph++; return '<tr><td>' + M + '</td><td>' + ph + '</td><td>' + (M - ph) + '</td><td>' + fx(ph / M * 100, 1) + '%</td></tr>'; }).join('');
+  // Dn table
+  const dnRows = [0, 1, 2, 3, 4, 8, 16, 32].map(k => '<tr><td>' + k + '</td><td>' + fx(lv2D(k), 6) + '</td><td>' + fx(lv2C(k), 6) + '</td></tr>').join('');
+  const gbN = (() => { try { return introGbPairsFor(G).length; } catch (e) { return '–'; } })();
+  // svg charts
+  const svgLine = (pts, tgt, xl, yl, tl) => { const w = 560, h = 240, pl = 52, pb = 34, xs = pts.map(p => p[0]), ys = pts.map(p => p[1]).concat([tgt]), x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys), py = v => 10 + (h - pb - 10) * (1 - (v - y0) / ((y1 - y0) || 1)), px = v => pl + (w - pl - 10) * (v - x0) / ((x1 - x0) || 1); return '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ch"><rect x="0" y="0" width="' + w + '" height="' + h + '" fill="#fff"/><line x1="' + pl + '" y1="' + (h - pb) + '" x2="' + (w - 10) + '" y2="' + (h - pb) + '" stroke="#444"/><line x1="' + pl + '" y1="10" x2="' + pl + '" y2="' + (h - pb) + '" stroke="#444"/><line x1="' + pl + '" y1="' + py(tgt) + '" x2="' + (w - 10) + '" y2="' + py(tgt) + '" stroke="#c0392b" stroke-dasharray="5 4"/><polyline fill="none" stroke="#1f5fa8" stroke-width="1.4" points="' + pts.map(p => px(p[0]).toFixed(1) + ',' + py(p[1]).toFixed(1)).join(' ') + '"/><text x="' + (pl - 4) + '" y="' + (py(y1) + 4) + '" font-size="11" text-anchor="end">' + y1.toFixed(3) + '</text><text x="' + (pl - 4) + '" y="' + (py(y0) + 4) + '" font-size="11" text-anchor="end">' + y0.toFixed(3) + '</text><text x="' + (w / 2) + '" y="' + (h - 8) + '" font-size="12" text-anchor="middle">' + xl + '</text><text x="' + (w - 14) + '" y="' + (py(tgt) - 5) + '" font-size="11" fill="#c0392b" text-anchor="end">' + (tl || 'target D(' + n + ')') + ' = ' + tgt.toFixed(4) + '</text><text x="' + (pl + 4) + '" y="22" font-size="12">' + yl + '</text></svg>'; };
+  const svgBars = vals => { const w = 560, h = 240, pl = 52, pb = 34, mx = Math.max(0.01, Math.max.apply(0, vals.map(Math.abs))) * 1.2, mid = 10 + (h - pb - 10) / 2, bw = 56; let s = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ch"><rect width="' + w + '" height="' + h + '" fill="#fff"/><line x1="' + pl + '" y1="' + mid + '" x2="' + (w - 10) + '" y2="' + mid + '" stroke="#444"/>'; vals.forEach((v, i) => { const hh = (h - pb - 10) / 2 * Math.abs(v) / mx, xx = pl + 24 + i * 92; s += '<rect x="' + xx + '" y="' + (v >= 0 ? mid - hh : mid) + '" width="' + bw + '" height="' + Math.max(1, hh) + '" fill="' + (v >= 0 ? '#2e8b57' : '#c0392b') + '"/><text x="' + (xx + bw / 2) + '" y="' + (h - 16) + '" font-size="12" text-anchor="middle">' + (i < 4 ? 's=' + (i + 1) : 's≥5') + '</text><text x="' + (xx + bw / 2) + '" y="' + (v >= 0 ? mid - hh - 4 : mid + hh + 12) + '" font-size="11" text-anchor="middle">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</text>'; }); return s + '<text x="' + (pl + 4) + '" y="22" font-size="12">sector error (observed / expected − 1), %</text></svg>'; };
+  const pip = []; for (let g = 2, c = 0; g <= G; g++) { let ok = true; for (let q = 2; q * q <= g; q++) if (g % q === 0) { ok = false; break; } if (ok) c++; pip.push([g, c / (g / Math.log(g))]); }
+  const css = 'body{font:14px/1.5 Georgia,serif;max-width:980px;margin:24px auto;padding:0 16px;color:#111}h1{font-size:30px;margin:0}h2{border-bottom:1px solid #999;margin-top:30px;font-size:19px}table{border-collapse:collapse;margin:8px 0;font:13px monospace}td,th{border:1px solid #bbb;padding:3px 9px;text-align:right}th{background:#eee}td:first-child{text-align:left}.g{color:#1a7a3c}.rd{color:#c0392b}img{width:100%;border:1px solid #333;margin:6px 0}.ch{width:100%;max-width:560px;border:1px solid #ccc}.m{font:13px/1.55 monospace;background:#f6f4ee;padding:10px 14px;border-left:3px solid #c8a84a;white-space:pre-wrap}.n{color:#555;font-size:12px}button{font:13px monospace;padding:6px 12px}@media print{button,.np{display:none}h2{break-after:avoid}img,table,svg{break-inside:avoid}}';
+  const html = '<!doctype html><meta charset="utf-8"><title>Strip Arithmetic II · math sheet · G=' + G + ' n=' + n + '</title><style>' + css + '</style>'
+    + '<button class="np" onclick="print()">Print / save as PDF</button><h1>Strip Arithmetic II — math sheet</h1><div class="n">Wessen Getachew · 2026 · snapshot at t = ' + fx(T, 1) + ' s · G = ' + G + ' · n = ' + n + '</div>'
+    + '<h2>1. The three views of the same cells</h2><div class="n">Every dot is a cell (r, M) with 1 ≤ r ≤ M ≤ G that has gcd(r, M) = 1' + (n ? ' and survives the block test at depth n = ' + n : '') + '. The views only change where the cell is drawn.</div>'
+    + ['ring', 'cay', 'grid'].map(v => '<h3>' + names[v] + '</h3><img src="' + shots[v] + '"><a class="np" download="strip-arithmetic-II-' + v + '-G' + G + '.png" href="' + shots[v] + '">download PNG</a>').join('')
+    + '<h2>2. Legend and definitions</h2><div class="m">cell (r, M): ring M, column r, 1 ≤ r ≤ M\ncoprime cell: gcd(r, M) = 1   (φ(M) of them on ring M, so ring M is born with φ(M) new points; the others land on earlier points)\nsector S_s = { 1/(s+1) < r/M ≤ 1/s },  s = ⌊M/r⌋ ;  boundaries at θ = 2π/(s+1) on the ring ;  s ≥ 5 is pooled\nRing: θ(r, M) = 2π·min(r/M, 1) (angle mode "' + _introAng + '"), radius grows with M ; mirror σ(r) = M − r is conjugation θ → 2π − θ\nCayley: z = ρ·e^{iθ}, ρ = ' + OPENER_RHO0 + ' + ' + OPENER_RHOD + '·M/256 ;  w = (z − 1)/(z + 1) ;  then the Riemann sphere is tilted x = ' + _introExpX + '°, y = ' + _introExpY + '° and projected back\nGrid: cell (r, M) drawn at column r, row M (the triangle r ≤ M)\nblock test (n &gt; 0): cell kept iff no prime p | r divides any of M, M+1, …, M+n\ndensity: D(n) = ∏_p (1 − min(n+1, p)/p²) ;  C(n) = ζ(2)·D(n) ;  D(0) = 6/π² = 0.6079…\nexpected sector count = (G(G+1)/2)·D(n)/(s(s+1)),  s ≥ 5 gets 1/5 .  The formula is for fixed n as G grows; it fails when n is comparable to G.</div>'
+    + '<h2>3. State at this moment</h2><table><tr><th>quantity</th><th>value</th></tr><tr><td>G (rings on screen)</td><td>' + G + '</td></tr><tr><td>n</td><td>' + n + '</td></tr><tr><td>cells G(G+1)/2</td><td>' + d.tot + '</td></tr><tr><td>kept cells</td><td>' + kept + '</td></tr><tr><td>kept / cells</td><td>' + fx(ratio * 100, 4) + '%</td></tr><tr><td>D(n)</td><td>' + fx(d.D * 100, 4) + '%</td></tr><tr><td>relative error</td><td class="' + (err >= 0 ? 'g' : 'rd') + '">' + (err >= 0 ? '+' : '') + fx(err, 4) + '%</td></tr><tr><td>π(G)</td><td>' + pi + '  (G / ln G = ' + fx(G / Math.log(Math.max(2, G)), 1) + ', ratio ' + fx(pi / (G / Math.log(Math.max(2, G))), 3) + ')</td></tr><tr><td>Goldbach: E = 2(G+1) = ' + 2 * (G + 1) + '</td><td>' + gbN + ' pairs g + s = E with g ≤ s, both prime</td></tr></table>'
+    + '<h2>4. Sectors</h2><table><tr><th>sector</th><th>observed</th><th>expected</th><th>diff</th><th>error</th></tr>' + secRows + '</table>' + svgBars(secBars)
+    + '<h2>5. Convergence in G (same n)</h2><table><tr><th>G</th><th>cells</th><th>kept</th><th>ratio</th><th>D(n)</th><th>error</th></tr>' + convRows + '</table>' + svgLine(curve, d.D, 'G (rings 1…G)', 'kept / cells')
+    + '<h2>6. Prime columns r = p</h2><div class="n">Column r = p has one cell on every ring M ≥ p; it is coprime exactly when p ∤ M.</div><table><tr><th>p</th><th>rings M ≥ p</th><th>p ∤ M</th><th>fraction</th><th>1 − 1/p</th></tr>' + primeRows + '</table>' + svgLine(pip, 1, 'x (primes ≤ x)', 'π(x) / (x / ln x)', 'limit')
+    + '<h2>7. Births: φ(M) new points per ring</h2><table><tr><th>M</th><th>φ(M) new</th><th>land on earlier points</th><th>φ(M)/M</th></tr>' + birthRows + '</table>'
+    + '<h2>8. D(n) and C(n) = ζ(2)·D(n)</h2><table><tr><th>n</th><th>D(n)</th><th>C(n)</th></tr>' + dnRows + '</table><div class="n">Numerics: observed counts are exact for this G and n; D(n) is the infinite-product value. The sheet states the behaviour for fixed n as G grows; it does not claim a proof for n growing with G.</div>';
+  const blob = new Blob([html], { type: 'text/html' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'strip-arithmetic-II-math-sheet-G' + G + '-n' + n + '.html'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 8000);
+}
+function introScrub(t) {
+  t = Math.max(0, Math.min(90, +t || 0)); const now = performance.now();
+  _introT0 = (_introPaused ? _introPauseAt : now) - t * 1000;
+  _introSeq = true; _introBirth = false; _introGM = null; _introS0 = 44.5; _introRay0 = now - 7000;   // rays already drawn when scrubbing
+  const V = _introVw; V.script = true; V.man = false; V.rot = 0; V.tm = 0;
+  ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); });
+  if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
+}
+function introViewXY(x, y) {
+  const V = _introVw; V.script = false; V.man = true; V.rot = 0; if (V.mode !== 'cay' || V.tm < 1) { V.mode = 'cay'; V.m = V.m > 0.02 && V.mode === 'cay' ? V.m : 0; V.tm = 1; }
+  if (x != null) V.x = +x; if (y != null) V.y = +y;
+  ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === 'cay'); });
+}
 function introPause(force) {
+  { const sb = $('intro-sheet-btn'); if (sb) sb.style.display = (force === undefined ? !_introPaused : !!force) ? '' : 'none'; }
   const el = $('intro-ii'); if (!el) return;
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
   const want = force === undefined ? !_introPaused : !!force; if (want === _introPaused) return;
@@ -7464,7 +7556,7 @@ function introToggleCtl() {
   { const ov1 = $('intro-overlay'); if (ov1) ov1.classList.toggle('ctl-open', open); }
   if (ft) { if (open) { const ov0 = $('intro-overlay'), t0 = Math.round(ft.getBoundingClientRect().top + (ov0 ? ov0.scrollTop : 0)), op = introOpenPin(), t = op != null ? op : t0; ft.style.top = t + 'px'; ft.style.bottom = 'auto'; ft.style.paddingBottom = '40px'; const ov = $('intro-overlay'); if (ov) ov.style.overflowY = 'auto'; } else { ft.style.top = ''; ft.style.bottom = '0'; ft.style.paddingBottom = ''; const ov = $('intro-overlay'); if (ov) { ov.scrollTop = 0; ov.style.overflowY = 'hidden'; } } }
   c.style.display = open ? 'flex' : 'none'; /* open controls collapse the title block to one slim line, so the ring and the controls get the room */ const b = $('intro-ctl-btn'); if (b) b.innerHTML = open ? 'controls &#9662;' : 'controls &#9656;'; }
-function introFull() { _introVw.script = false; if (!_introVw.man) { _introVw.m = 0; _introVw.tm = 0; } if (_introSeq) { _introSeq = false; _introBirth = false; _introS0 = 9.3; _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } introSetHole(0); } if (_introT < 9.5) _introT0 -= (9.5 - _introT) * 1000; }
+function introFull() { if (_introVw.m > 0.02) { _introVw.script = false; _introVw.man = true; _introVw.tm = 1; ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === _introVw.mode); }); } else { _introVw.script = false; if (!_introVw.man) { _introVw.m = 0; _introVw.tm = 0; } } if (_introSeq) { _introSeq = false; _introBirth = false; _introS0 = 9.3; _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } introSetHole(0); } if (_introT < 9.5) _introT0 -= (9.5 - _introT) * 1000; }
 function introSetN(v) {
   if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; const b = $('intro-n-btn'); if (b) b.textContent = '▶ C(n) play'; }
   introFull(); _introN = Math.max(0, Math.min(255, v | 0)); if (_introSel) introShowPop(_introSel.r, _introSel.M);
