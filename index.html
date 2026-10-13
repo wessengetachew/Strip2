@@ -2061,6 +2061,12 @@ walk anyway.</p>
         <div class="gr"><input type="range" id="intro-e-sl" min="0" max="0" value="0" oninput="introSetGb(this.value)" style="flex:1 1 90px;min-width:70px;" title="Goldbach pair g + s = E: the four Strip I lines a, b, c, d for that gap"><span id="intro-e-val" class="gv">g = 3</span></div>
         <div class="gr"><button class="chip" id="intro-gb-btn" onclick="introGbPlay()" title="Additive (+ and −): Goldbach pairs g + s = E, drawn as the four Strip I lines a, b, c, d">▶ + −</button></div>
       </div>
+      <div class="ig"><div class="gl">Strip &nbsp;slope a/b</div>
+        <div class="gr"><button class="chip" id="intro-st-btn" onclick="introStripToggle()" title="Strip: the band of cells with s &le; b&middot;r &minus; a&middot;M &lt; s + w (the opener's strip), drawn in every view.">strip</button><span>a</span><input type="number" id="intro-st-a" value="1" step="1" style="width:46px;" oninput="introStripSet()" title="Slope numerator a"><span>/ b</span><input type="number" id="intro-st-b" value="2" step="1" style="width:46px;" oninput="introStripSet()" title="Slope denominator b"></div>
+        <div class="gr"><span>s</span><input type="range" id="intro-st-s" min="-256" max="256" value="0" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Offset s"><span id="intro-st-sv" class="gv">0</span><span>w</span><input type="range" id="intro-st-w" min="1" max="513" value="1" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Width w"><span id="intro-st-wv" class="gv">1</span></div>
+        <div class="gr"><button class="chip" id="intro-st-grow" onclick="introStripGrow()" title="Grow: width 2k and offset &minus;k, k = 1, 2, 3 &hellip; up to G + 1 and back, so the band widens by one line on each side per step.">&#9654; grow 2w / &minus;1s</button></div>
+        <div class="gr"><button class="chip" id="intro-st-scan" onclick="introStripScan()" title="Scan: the band's slope steps through the Farey fractions a/b (b &le; 12) between the two ends, there and back; the band is 2 cells thick in r, centred on the line r/M = a/b. Between 1/3 and 1/2 is sector s = 2, between 1/3 and 2/3 is s = 1 and 2.">&#9654; scan slope</button> <input id="intro-st-lo" value="1/3" size="4" style="width:3.2em"> &rarr; <input id="intro-st-hi" value="1/2" size="4" style="width:3.2em"></div>
+      </div>
       <div class="ig"><div class="gl">Sieve &nbsp;C(n)</div>
         <div class="gr"><input type="range" id="intro-n-sl" min="0" max="255" value="0" oninput="introSetN(this.value)" style="flex:1 1 90px;min-width:70px;" title="C(n) depth n: cells the block M..M+n kills are removed. Moving it pauses the play."><span id="intro-n-val" class="gv">n = 0</span></div>
         <div class="gr"><button class="chip" id="intro-n-btn" onclick="introNPlay()" title="Play C(n) from n = 0 up to 255 and back: the cells the block kills are removed, so you watch the survivors thin toward C(n)">▶ C(n) play</button><button class="chip" onclick="introSweep(_introSwN)" title="G sweep: how far the observed sector counts sit from the predicted ones as G grows (64 to 1024), for the chosen n">G sweep</button></div>
@@ -7124,6 +7130,7 @@ window.addEventListener('load', () => setTimeout(shareSnapDefaults, 0));
    of cells by gcd. Level 2 is the main page. */
 let _introRaf = 0, _introT0 = 0, _introOn = false;
 function showIntro() {
+  try { _introStrip.on = false; introStripStopGrow(); introStripScanStop(); introStripSync(); } catch (e) {}
   const ov = $('intro-overlay'), cv = $('intro-cv'); if (!ov || !cv) { openWelcomeModal(); return; }
   if (_introRaf) cancelAnimationFrame(_introRaf);
   try { closeWelcomeModal(); } catch (e) {}
@@ -7153,7 +7160,8 @@ function showIntro() {
     const spin = 0;   // no rotation: the ring stays at 0 degrees the whole way
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
-    let cop = 0; const sc = [0, 0, 0, 0, 0, 0];
+    let cop = 0, stN = 0, stC = 0; const sc = [0, 0, 0, 0, 0, 0];
+    const ST = !_introExporting && _introStrip.on ? _introStrip : null;
     const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY, z: _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
     const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GMAX); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
     for (let M = 1; M <= G; M++) {
@@ -7165,6 +7173,7 @@ function showIntro() {
         else { const qq = inW ? Math.floor(M / r) : Math.floor(r / M); x.fillStyle = 'hsla(' + SECHUE[Math.min(8, qq)] + ',' + (qq > 8 ? 12 : 62) + '%,' + ((inW ? 48 : 40) + 14 * M / GMAX) + '%,.9)'; }
         let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th);
         if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GMAX); if (!o) continue; px += (o[0] - px) * VM; py += (o[1] - py) * VM; }
+        if (ST) { const v = ST.b * r - ST.a * M; if (v >= ST.s && v < ST.s + ST.w) { if (inW) { stN++; if (!dead) stC++; } x.fillStyle = 'rgba(61,200,184,1)'; const q = PT * 1.7; x.fillRect(px - q / 2, py - q / 2, q, q); continue; } }
         x.fillRect(px - PT / 2, py - PT / 2, PT, PT);
       }
     }
@@ -7225,6 +7234,14 @@ function showIntro() {
       });
       spTxt += '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan) · mirror σ(r) = M − r (violet)';
     }
+    let stTxt = '';
+    if (ST) {
+      stN = 0; stC = 0; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((ST.s + ST.a * M) / ST.b)), hi = Math.min(M, Math.ceil((ST.s + ST.w + ST.a * M) / ST.b) - 1); for (let r = lo; r <= hi; r++) { stN++; if (gcd(r, M) === 1 && !(_introN > 0 && introKilled(r, M, _introN))) stC++; } }
+      x.save(); x.lineWidth = 1.4 * UI; x.strokeStyle = 'rgba(61,200,184,.95)'; x.setLineDash([5 * UI, 3 * UI]);
+      [ST.s, ST.s + ST.w].forEach(c => { x.beginPath(); let on = false; for (let M = 0; M <= G; M += Math.max(1, Math.floor(G / 160))) { const r = (c + ST.a * M) / ST.b; if (r < 0.5 || r > G + 0.5 || M < 0.5) { on = false; continue; } const P = posRM(r, M); if (!P) { on = false; continue; } if (on) x.lineTo(P[0], P[1]); else { x.moveTo(P[0], P[1]); on = true; } } x.stroke(); });
+      x.restore();
+      if (W >= 600) stTxt = '\nstrip ' + ST.s + ' \u2264 ' + ST.b + 'r \u2212 ' + ST.a + 'M < ' + (ST.s + ST.w) + ' (slope ' + ST.a + '/' + ST.b + ', width ' + ST.w + ') \u00b7 ' + stN + ' cells in band (r \u2264 M), ' + stC + ' coprime = ' + (stN ? (100 * stC / stN).toFixed(1) : '0') + '% (6/\u03c0\u00b2 = 60.8%)';
+    }
     let gbTxt = '';
     if (_introGbOn) {   // Goldbach follows the M slider: E = 2(G+1) for the ring count G on screen, and the pair list is rebuilt for that E
       _introGbPairs = introGbPairsFor(G); if (_introGbI > _introGbPairs.length - 1) _introGbI = Math.max(0, _introGbPairs.length - 1);
@@ -7255,11 +7272,13 @@ function showIntro() {
       const pe = (o, e) => { const v = (o - e) / e * 100; return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(3) + '%'; };   // observed vs expected, signed, 3 decimals
       const blk = (lines, xr, y, up) => { x.font = fs + 'px monospace'; x.textAlign = xr ? 'right' : 'left'; const X = xr ? W - 10 : 10; const n = lines.length; lines.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], X, y + (up ? (i - n + 1) : i) * lh); }); };
          // expected share of kept cells: D(n) = C(n)/zeta(2)
-      blk([[nn ? 'kept, block M…M+' + _introN : 'gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], [(nn ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%', DM], ['err ' + pe(cop, tot * six), sh / 100 >= six ? GR : RD]], false, y0, false);
-      const sec = [['sectors S_s  (err)', DM]];
-      for (let q = 1; q <= 4; q++) { const ex = tot * six / (q * (q + 1)); sec.push(['s=' + q + ': ' + sc[q] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[q], ex), sc[q] >= ex ? GR : RD]); }
-      { const ex = tot * six / 5; sec.push(['s≥5: ' + sc[5] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[5], ex), sc[5] >= ex ? GR : RD]); sec.push(['expected ' + (tot * six).toFixed(0), DM]); }
+      blk([[nn ? 'kept, block M…M+' + _introN : 'gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], [(nn ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%', DM], ['vs cells ' + pe(cop, tot * six), sh / 100 >= six ? GR : RD]], false, y0, false);
+      const sec = [['sector: observed / expected  error', DM]];
+      const tot2 = G * G / 2;   // sector expectation F(s, G) = 3G^2/(pi^2 s(s+1)) x D(n)/D(0): the same leading term as the opener, the main page and the /G/ page
+      for (let q = 1; q <= 4; q++) { const ex = tot2 * six / (q * (q + 1)); sec.push(['s=' + q + ': ' + sc[q] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[q], ex), sc[q] >= ex ? GR : RD]); }
+      { const ex = tot2 * six / 5; sec.push(['s≥5: ' + sc[5] + ' / ' + ex.toFixed(0) + '  ' + pe(sc[5], ex), sc[5] >= ex ? GR : RD]); sec.push(['total: ' + cop + ' obs / ' + (tot2 * six).toFixed(0) + ' exp', DM]); }
       blk(sec, true, y0, false);
+      if (ST) { const TL = 'rgba(61,200,184,1)', sh2 = stN ? stC / stN : 0; blk([['strip ' + ST.a + '/' + ST.b, TL], ['w ' + ST.w + ' · s ' + ST.s, TL], ['cells ' + stN, TL], ['coprime ' + stC, TL], [(sh2 * 100).toFixed(2) + '% of band', TL], [(cop ? (100 * stC / cop).toFixed(1) : '0') + '% of kept', TL], [(six ? (sh2 / six).toFixed(3) : '0') + '× ' + (nn ? 'D(n)/ζ(2)' : '1/ζ(2)'), TL]], false, y0 + 6 * lh, false); }
       let pc = 0; for (let n = 2; n <= G; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) pc++; }
       let colc = 0, colN = 0; if (sp) for (let M = sp; M <= G; M++) { colN++; if (_introN > 0 ? !introKilled(sp, M, _introN) : gcd(sp, M) === 1) colc++; }
       const pexp = sp ? 1 - Math.min(_introN + 1, sp) / sp : 0;
@@ -7268,7 +7287,7 @@ function showIntro() {
       if (roomB) blk([['primes ≤ G', DM], ['π(' + G + ') = ' + pc, '#fff'], ['G/ln G = ' + est.toFixed(1), DM], ['ratio ' + (pc / est).toFixed(3), '#e6c35c']], true, y1, true);
     }
     x.globalAlpha = 1;
-    const c = $('intro-counter'); if (c) { c.style.whiteSpace = 'pre-line'; c.textContent = (W < 600 ? s2 => { const L = s2.split('\n'); return L.length > 2 ? L[0] + '\n' + L[L.length - 1] : s2; } : s2 => s2)('G = ' + G + (_introN > 0 && !_introSat ? '   kept: ' : '   gcd = 1: ') + cop + ' / ' + tot + ' = ' + sh.toFixed(2) + '%   (' + (_introN > 0 ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%)' + (_introN > 0 && !_introSat ? '\nC(n) at n = ' + _introN + ': the block M…M+n removes the cells it kills · kept ' + cop + ' / ' + tot + ' · C(n) = ζ(2)·D(n) = ' + introC(_introN).toFixed(6) : _introSat ? '\ncoloring 16: n = ' + _introN + ' · C(n) = ζ(2)·D(n) = ' + introC(_introN).toFixed(6) + ' · cell coloured by smallest prime p ≤ n+1 dividing r' : '\ncolor = sector s = ⌊M/r⌋ (s=1 gold … s=8 teal, s≥9 grey) · spiral turns red crossing a 1/n boundary' + (W < 600 ? '' : spTxt)) + gbTxt + mTxt); }
+    const c = $('intro-counter'); if (c) { c.style.whiteSpace = 'pre-line'; c.textContent = (W < 600 ? s2 => { const L = s2.split('\n'); return L.length > 2 ? L[0] + '\n' + L[L.length - 1] : s2; } : s2 => s2)('G = ' + G + (_introN > 0 && !_introSat ? '   kept: ' : '   gcd = 1: ') + cop + ' / ' + tot + ' = ' + sh.toFixed(2) + '%   (' + (_introN > 0 ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%)' + (_introN > 0 && !_introSat ? '\nC(n) at n = ' + _introN + ': the block M…M+n removes the cells it kills · kept ' + cop + ' / ' + tot + ' · C(n) = ζ(2)·D(n) = ' + introC(_introN).toFixed(6) : _introSat ? '\ncoloring 16: n = ' + _introN + ' · C(n) = ζ(2)·D(n) = ' + introC(_introN).toFixed(6) + ' · cell coloured by smallest prime p ≤ n+1 dividing r' : '\ncolor = sector s = ⌊M/r⌋ (s=1 gold … s=8 teal, s≥9 grey) · spiral turns red crossing a 1/n boundary' + (W < 600 ? '' : spTxt)) + gbTxt + stTxt + mTxt); }
   };
   const draw = now => {
     if (!_introOn) return;
@@ -7371,6 +7390,47 @@ let _introPOff = 0;
 function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); if (_introPAuto) _introPOff = _introPi - Math.floor(Math.max(0, Math.max(_introT, 9.5) - _introS0) / 0.3);   /* play resumes from the slider's prime, going up */ const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
 function introToggleMirror() { _introMirror = !_introMirror; const b = $('intro-mir-btn'); if (b) b.classList.toggle('on', _introMirror); }
 function introSetGb(i) { introFull(); _introGbI = Math.max(0, Math.min(_introGbPairs.length - 1, i | 0)); _introGbOn = true; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; } }
+/* Strip: the cells with s <= b*r - a*M < s + w (the opener's strip), shown in every view. Grow steps width 2k, offset -k, k = 1 .. G+1 and back. */
+var _introFar = null;
+var _introStrip = { on: false, a: 1, b: 2, s: 0, w: 1, k: 0, dir: 1, timer: 0 };
+function introStripSet() {
+  const S = _introStrip, a = Number($('intro-st-a').value), b = Number($('intro-st-b').value);
+  S.a = isFinite(a) ? a : 1; S.b = isFinite(b) && b !== 0 ? b : 1; S.s = +$('intro-st-s').value; S.w = Math.max(1, +$('intro-st-w').value);
+  if (S.timer) introStripStopGrow(); introStripScanStop(); S.on = true; introStripSync();
+}
+function introStripSync() {
+  const S = _introStrip, bt = $('intro-st-btn'); if (bt) bt.classList.toggle('on', S.on);
+  const sv = $('intro-st-sv'), wv = $('intro-st-wv'); if (sv) sv.textContent = S.s; if (wv) wv.textContent = S.w;
+  const ss = $('intro-st-s'), ws = $('intro-st-w'); if (ss && document.activeElement !== ss) ss.value = Math.max(-256, Math.min(256, S.s)); if (ws && document.activeElement !== ws) ws.value = Math.max(1, Math.min(513, S.w));
+}
+
+function introStripScanStop() { const S = _introStrip; if (S.scanT) { clearInterval(S.scanT); S.scanT = 0; } const b = $('intro-st-scan'); if (b) { b.innerHTML = '&#9654; scan slope'; b.classList.remove('on'); } }
+function introStripScan() {
+  const S = _introStrip; if (S.scanT) { introStripScanStop(); return; }
+  const pf = t => { const m = String(t).trim().match(/^(\d+)\s*\/\s*(\d+)$/); return m && +m[2] > 0 ? [+m[1], +m[2]] : null; };
+  let lo = pf($('intro-st-lo').value), hi = pf($('intro-st-hi').value); if (!lo || !hi) return;
+  if (lo[0] * hi[1] > hi[0] * lo[1]) { const t = lo; lo = hi; hi = t; }
+  const Q = 12, F = []; for (let b = 1; b <= Q; b++) for (let a = 0; a <= b; a++) { if (gcd(a, b) !== 1 || a < 1) continue; if (a * lo[1] >= lo[0] * b && a * hi[1] <= hi[0] * b) F.push([a, b]); }
+  F.sort((u, v) => u[0] * v[1] - v[0] * u[1]); if (!F.length) return;
+  introStripStopGrow(); S.on = true; let i = 0, d = 1;
+  const b = $('intro-st-scan'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); }
+  const step = () => { const f = F[i]; S.a = f[0]; S.b = f[1]; S.w = 2 * f[1]; S.s = -f[1]; const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai) ai.value = S.a; if (bi) bi.value = S.b; introStripSync(); if (F.length > 1) { if (i + d < 0 || i + d >= F.length) d = -d; i += d; } };
+  step(); S.scanT = setInterval(step, 350);
+}
+function introStripToggle() { const S = _introStrip; S.on = !S.on; if (!S.on) { introStripStopGrow(); introStripScanStop(); } introStripSync(); }
+function introStripStopGrow() { const S = _introStrip; if (S.timer) { clearInterval(S.timer); S.timer = 0; } const b = $('intro-st-grow'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
+function introStripGrow() {
+  const S = _introStrip; if (S.timer) { introStripStopGrow(); return; }
+  introStripScanStop(); S.on = true; S.k = S.s < 0 ? -S.s : 0; S.dir = 1;
+  const b = $('intro-st-grow'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); }
+  S.timer = setInterval(() => {
+    const mx = Math.max(2, Math.round(_introGcur) + 1);
+    if (S.k >= mx) S.dir = -1; else if (S.k <= 1) S.dir = 1;
+    S.k = Math.max(1, S.k + S.dir); S.s = -S.k; S.w = 2 * S.k;
+    const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai && document.activeElement !== ai) ai.value = S.a; if (bi && document.activeElement !== bi) bi.value = S.b;
+    introStripSync();
+  }, 160);
+}
 function introGbStop(keepOn) { if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; if (!keepOn) _introGbOn = false; }
 function introGbPlay() {
   if (_introGbTimer) { introGbStop(true); return; }
@@ -7430,6 +7490,12 @@ function introViewTick(T) {
     else if (T >= 37.5 && T < 43.2) { V.mode = 'grid'; V.m = sg(37.5, 39) - sg(41.5, 43); }
     else if (T >= L && T < L + 12.2) { V.mode = 'cay'; V.m = sg(L, L + 1.5) - sg(L + 10.5, L + 12); V.x = 360 * sg(L + 1.5, L + 5.5); V.y = 360 * sg(L + 5.5, L + 9.5); }
     else V.m = 0;
+    { const S = _introStrip, inWin = T >= 28.5 && !S.timer && !S.scanT;   // scripted strip, a fixed function of T so scrubbing works: grow 2w / -1s at 1/2 and back to the first strip, then it scans the Farey slopes (b <= 12) between 1/5 and 1, there and back, until the play ends
+      if (inWin) {
+        if (T < 36.5) { const Gc = Math.max(2, Math.round(_introGcur || 2)), u = Math.max(0, Math.min(1, (T - 28.5) / 7)), k = 1 + Math.round(Gc * (u < 0.5 ? 2 * u : 2 - 2 * u)); S.a = 1; S.b = 2; S.s = -k; S.w = 2 * k; }
+        else { if (!_introFar) { _introFar = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 5 >= q) _introFar.push([p2, q]); _introFar.sort((u, v) => u[0] * v[1] - v[0] * u[1]); } const L = _introFar.length, P = 2 * (L - 1), n = Math.floor((T - 36.5) / 0.35) % P, f = _introFar[n < L ? n : P - n]; S.a = f[0]; S.b = f[1]; S.s = -f[1]; S.w = 2 * f[1]; }
+        S.on = true; S.scr = true;
+      } else if (S.scr && !S.timer && !S.scanT) { S.scr = false; S.on = false; } }
     V.tm = V.m; return;
   }
   if (V.rot) { const t = (now - V.rot) / 1000; V.x = 360 * es(t / 4); V.y = 360 * es((t - 4) / 4); V.z = 360 * es((t - 8) / 4); if (t > 12) { V.rot = 0; V.x = 0; V.y = 0; V.z = 0; } }
@@ -7482,7 +7548,7 @@ async function introMathSheet() {
   // sector table
   const sNames = ['', 's = 1 : 1/2 < r/M ≤ 1', 's = 2 : 1/3 < r/M ≤ 1/2', 's = 3 : 1/4 < r/M ≤ 1/3', 's = 4 : 1/5 < r/M ≤ 1/4', 's ≥ 5 : r/M ≤ 1/5'], w = [0, 1 / 2, 1 / 6, 1 / 12, 1 / 20, 1 / 5];
   let secRows = '', secBars = [];
-  for (let s = 1; s <= 5; s++) { const e = d.tot * d.D * w[s], o = d.sc[s], er = e ? (o / e - 1) * 100 : 0; secBars.push(er); secRows += '<tr><td>' + sNames[s] + '</td><td>' + o + '</td><td>' + fx(e, 1) + '</td><td>' + (o - e >= 0 ? '+' : '') + fx(o - e, 1) + '</td><td class="' + (er >= 0 ? 'g' : 'rd') + '">' + (er >= 0 ? '+' : '') + fx(er, 3) + '%</td></tr>'; }
+  for (let s = 1; s <= 5; s++) { const e = (G * G / 2) * d.D * w[s], o = d.sc[s], er = e ? (o / e - 1) * 100 : 0; secBars.push(er); secRows += '<tr><td>' + sNames[s] + '</td><td>' + o + '</td><td>' + fx(e, 1) + '</td><td>' + (o - e >= 0 ? '+' : '') + fx(o - e, 1) + '</td><td class="' + (er >= 0 ? 'g' : 'rd') + '">' + (er >= 0 ? '+' : '') + fx(er, 3) + '%</td></tr>'; }
   // convergence table and curve
   const gs = []; for (let g = 8; g < G; g *= 2) gs.push(g); gs.push(G);
   const convRows = gs.map(g => { const t = g * (g + 1) / 2, rr = d.cum[g] / t; return '<tr><td>' + g + '</td><td>' + t + '</td><td>' + d.cum[g] + '</td><td>' + fx(rr * 100, 3) + '%</td><td>' + fx(d.D * 100, 3) + '%</td><td class="' + (rr >= d.D ? 'g' : 'rd') + '">' + (rr >= d.D ? '+' : '') + fx((rr / d.D - 1) * 100, 3) + '%</td></tr>'; }).join('');
@@ -7506,7 +7572,7 @@ async function introMathSheet() {
     + '<button class="np" onclick="print()">Print / save as PDF</button><h1>Strip Arithmetic II — math sheet</h1><div class="n">Wessen Getachew · 2026 · snapshot at t = ' + fx(T, 1) + ' s · G = ' + G + ' · n = ' + n + '</div>'
     + '<h2>1. The three views of the same cells</h2><div class="n">Every dot is a cell (r, M) with 1 ≤ r ≤ M ≤ G that has gcd(r, M) = 1' + (n ? ' and survives the block test at depth n = ' + n : '') + '. The views only change where the cell is drawn.</div>'
     + ['ring', 'cay', 'grid'].map(v => '<h3>' + names[v] + '</h3><img src="' + shots[v] + '"><a class="np" download="strip-arithmetic-II-' + v + '-G' + G + '.png" href="' + shots[v] + '">download PNG</a>').join('')
-    + '<h2>2. Legend and definitions</h2><div class="m">cell (r, M): ring M, column r, 1 ≤ r ≤ M\ncoprime cell: gcd(r, M) = 1   (φ(M) of them on ring M, so ring M is born with φ(M) new points; the others land on earlier points)\nsector S_s = { 1/(s+1) < r/M ≤ 1/s },  s = ⌊M/r⌋ ;  boundaries at θ = 2π/(s+1) on the ring ;  s ≥ 5 is pooled\nRing: θ(r, M) = 2π·min(r/M, 1) (angle mode "' + _introAng + '"), radius grows with M ; mirror σ(r) = M − r is conjugation θ → 2π − θ\nCayley: z = ρ·e^{iθ}, ρ = ' + OPENER_RHO0 + ' + ' + OPENER_RHOD + '·M/256 ;  w = (z − 1)/(z + 1) ;  then the Riemann sphere is tilted x = ' + _introExpX + '°, y = ' + _introExpY + '°, then the plane turned z = ' + _introExpZ + '°, and projected back\nGrid: cell (r, M) drawn at x = M (to the right), y = r (up), both positive; the whole G × G square: r ≤ M below the diagonal (slope r/M ≤ 1) is what the Ring holds, r > M above it is its mirror half\nblock test (n &gt; 0): cell kept iff no prime p | r divides any of M, M+1, …, M+n\ndensity: D(n) = ∏_p (1 − min(n+1, p)/p²) ;  C(n) = ζ(2)·D(n) ;  D(0) = 6/π² = 0.6079…\nexpected sector count = (G(G+1)/2)·D(n)/(s(s+1)),  s ≥ 5 gets 1/5 .  Here tot is the exact cell count G(G+1)/2; the opener and main sheets use the leading term 3G²/π² instead, which is smaller by the factor G/(G+1) (0.4% at G = 256), so their error percentages differ from these by about that much. For n = 0 this is the exact density of each sector (area 1/(s(s+1)) of the triangle times 6/π²). For n > 0 it is the page\u2019s working model, checked numerically for fixed n as G grows, not a theorem, and at small G the sectors can sit a few percent off it. It fails when n is comparable to G.</div>'
+    + '<h2>2. Legend and definitions</h2><div class="m">cell (r, M): ring M, column r, 1 ≤ r ≤ M\ncoprime cell: gcd(r, M) = 1   (φ(M) of them on ring M, so ring M is born with φ(M) new points; the others land on earlier points)\nsector S_s = { 1/(s+1) < r/M ≤ 1/s },  s = ⌊M/r⌋ ;  boundaries at θ = 2π/(s+1) on the ring ;  s ≥ 5 is pooled\nRing: θ(r, M) = 2π·min(r/M, 1) (angle mode "' + _introAng + '"), radius grows with M ; mirror σ(r) = M − r is conjugation θ → 2π − θ\nCayley: z = ρ·e^{iθ}, ρ = ' + OPENER_RHO0 + ' + ' + OPENER_RHOD + '·M/256 ;  w = (z − 1)/(z + 1) ;  then the Riemann sphere is tilted x = ' + _introExpX + '°, y = ' + _introExpY + '°, then the plane turned z = ' + _introExpZ + '°, and projected back\nGrid: cell (r, M) drawn at x = M (to the right), y = r (up), both positive; the whole G × G square: r ≤ M below the diagonal (slope r/M ≤ 1) is what the Ring holds, r > M above it is its mirror half\nblock test (n &gt; 0): cell kept iff no prime p | r divides any of M, M+1, …, M+n\ndensity: D(n) = ∏_p (1 − min(n+1, p)/p²) ;  C(n) = ζ(2)·D(n) ;  D(0) = 6/π² = 0.6079…\nexpected sector count F(s, G) = (G²/2)·D(n)/(s(s+1)), which is 3G²/(π² s(s+1)) at n = 0,  s ≥ 5 gets 1/5 .  This is the same leading term as the opener, the main page and the /G/ page, so the percentages agree across them; the kept / cells ratio in section 3 uses the exact cell count G(G+1)/2, so it differs from the sector total by about 1/G. For n = 0 this is the exact density of each sector (area 1/(s(s+1)) of the triangle times 6/π²). For n > 0 it is the page\u2019s working model, checked numerically for fixed n as G grows, not a theorem, and at small G the sectors can sit a few percent off it. It fails when n is comparable to G.</div>'
     + '<h2>3. State at this moment</h2><table><tr><th>quantity</th><th>value</th></tr><tr><td>G (rings on screen)</td><td>' + G + '</td></tr><tr><td>n</td><td>' + n + '</td></tr><tr><td>cells G(G+1)/2</td><td>' + d.tot + '</td></tr><tr><td>kept cells</td><td>' + kept + '</td></tr><tr><td>kept / cells</td><td>' + fx(ratio * 100, 4) + '%</td></tr><tr><td>D(n)</td><td>' + fx(d.D * 100, 4) + '%</td></tr><tr><td>relative error</td><td class="' + (err >= 0 ? 'g' : 'rd') + '">' + (err >= 0 ? '+' : '') + fx(err, 4) + '%</td></tr><tr><td>π(G)</td><td>' + pi + '  (G / ln G = ' + fx(G / Math.log(Math.max(2, G)), 1) + ', ratio ' + fx(pi / (G / Math.log(Math.max(2, G))), 3) + ')</td></tr><tr><td>Goldbach: E = 2(G+1) = ' + 2 * (G + 1) + '</td><td>' + gbN + ' pairs g + s = E with g ≤ s, both prime</td></tr></table>'
     + '<h2>4. Sectors</h2>' + (n ? '<div class="n">n &gt; 0: the expected column is the working model D(n)/(s(s+1)), not a proved density.</div>' : '') + '<table><tr><th>sector</th><th>observed</th><th>expected</th><th>diff</th><th>error</th></tr>' + secRows + '</table>' + svgBars(secBars)
     + '<h2>5. Kept ratio against G (same n), around the target D(n)</h2><div class="n">The ratio does not approach D(n) from one side: it oscillates around it with a shrinking envelope. For n = 0 the limit 6/π² is a classical theorem (error of order log G / G). For n &gt; 0 the shrinking is what these sweeps show up to the G tested; it is not proved here.</div><table><tr><th>G</th><th>cells</th><th>kept</th><th>ratio</th><th>D(n)</th><th>error</th></tr>' + convRows + '</table>' + svgLine(curve, d.D, 'G (rings 1…G)', 'kept / cells')
@@ -16748,7 +16814,7 @@ function msSectorSection(kind, G) {
   const Z = 3 / (Math.PI * Math.PI);
   out.push({ t: 'h', text: 'Sectors' });
   out.push({ t: 'p', text: 'A sector S_s collects the cells (r, M) with r ≤ M whose slope r/M lies between two consecutive unit fractions, 1/(s+1) < r/M ≤ 1/s, which is the same as ⌊M/r⌋ = s. Above the diagonal the Grid mirrors it with ⌊r/M⌋ = s. A window between two slopes, lo ≤ r/M ≤ hi, is the same idea for any pair. ' + (win ? 'On the plate ' + win.desc + ' is kept and every cell outside it is drawn at ' + win.dim + '%.' : 'No cell is dimmed: the sector wedges are drawn as bands only.') });
-  out.push({ t: 'eq', tex: msT`S_s=\{(r,M):\ \lfloor M/r\rfloor=s\}=\{\tfrac{1}{s+1}<\tfrac{r}{M}\le\tfrac{1}{s}\},\qquad F(s,G)=\frac{3}{\pi^{2}}\,\frac{G^{2}}{s(s+1)}`, cap: 'F(s, G) is the expected number of coprime cells of L_G in S_s, using the leading term 3G²/π² (the lattice itself has G(G+1)/2 cells, so observed counts tend to sit about 1/G above F at finite G): the lattice holds 3G²/π² coprime cells in all, and the wedge takes the share 1/s − 1/(s+1) of the area.' });
+  out.push({ t: 'eq', tex: msT`S_s=\{(r,M):\ \lfloor M/r\rfloor=s\}=\{\tfrac{1}{s+1}<\tfrac{r}{M}\le\tfrac{1}{s}\},\qquad F(s,G)=\frac{3}{\pi^{2}}\,\frac{G^{2}}{s(s+1)}`, cap: 'F(s, G) is the expected number of coprime cells of L_G in S_s, using the leading term 3G²/π² (the lattice itself has G(G+1)/2 cells, a factor (G+1)/G more; the observed counts differ from F by an error of order G log G, of either sign): the lattice holds 3G²/π² coprime cells in all, and the wedge takes the share 1/s − 1/(s+1) of the area.' });
   if (G > 1500) { out.push({ t: 'note', text: 'The census is not tabulated past G = 1500.' }); return out; }
   const cnt = new Map(); let total = 0, win_n = 0, win_all = 0;
   const keeps = msSecPred(kind);
