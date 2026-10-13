@@ -7173,6 +7173,9 @@ function showIntro() {
     let lastCs = null;
     const GBd = _introGbOn ? introGbPairsFor(G) : null, GBg = GBd && GBd.length ? GBd[Math.min(_introGbI, GBd.length - 1)] : 0, GBs = GBg ? 2 * (G + 1) - GBg : 0;   // Goldbach: only the four lines a, b, c, d of the current pair stay bright, every other cell dims
     if (GBg) x.globalAlpha = 0.22;
+    const BQ = !_introSat, bufN = new Int32Array(20), bufC = new Array(20), bufX = _introBatch || (_introBatch = Array.from({ length: 20 }, () => new Float32Array(2 * 1100))), tl = [];   // dots of one ring and colour go out as one path: one fill instead of hundreds of fillRects
+    const flushM = () => { for (let i = 0; i < 20; i++) { const n = bufN[i]; if (!n) continue; x.fillStyle = bufC[i]; x.beginPath(); const bx = bufX[i], h = PT / 2; for (let j = 0; j < n; j++) x.rect(bx[2 * j] - h, bx[2 * j + 1] - h, PT, PT); x.fill(); bufN[i] = 0; } lastCs = null;
+      for (let j = 0; j < tl.length; j += 2) { x.fillStyle = 'rgba(61,200,184,1)'; const q = PT * 1.7; if (GBg) x.globalAlpha = 1; x.fillRect(tl[j] - q / 2, tl[j + 1] - q / 2, q, q); if (GBg) x.globalAlpha = 0.22; } tl.length = 0; };
     for (let M = 1; M <= G; M++) {
       const rad = _introRad(R, M, GZ);
       for (let r = 1; r <= (_introAng === 'clamp' && !(VM > 0.3 && VW.mode === 'grid') ? M : G); r++) {   // the Grid shows the whole G x G square: the ring holds r <= M, its mirror r > M fills the other half
@@ -7180,12 +7183,13 @@ function showIntro() {
         if (GBg && (r + M === GBg || r + M === GBs || M - r === GBg || r - M === GBg)) continue;   // the overlay below draws these bright
         const th = _introTh(r, M) + spin;
         if (_introSat) { lastCs = null; const kp = KILL[r]; if (kp) { const c = primeHueRGBA(kp, 235); x.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',.95)'; } else x.fillStyle = 'rgba(90,120,190,.55)'; }
-        else { const qq = inW ? Math.floor(M / r) : Math.floor(r / M), ck = (M << 5) | (inW ? 16 : 0) | Math.min(qq, 9); let cs = _introColC[ck]; if (!cs) cs = _introColC[ck] = 'hsla(' + SECHUE[Math.min(8, qq)] + ',' + (qq > 8 ? 12 : 62) + '%,' + ((inW ? 48 : 40) + 14 * M / GMAX) + '%,.9)'; if (cs !== lastCs) { x.fillStyle = cs; lastCs = cs; } }
+        else { const qq = inW ? Math.floor(M / r) : Math.floor(r / M), ck = (M << 5) | (inW ? 16 : 0) | Math.min(qq, 9); let cs = _introColC[ck]; if (!cs) cs = _introColC[ck] = 'hsla(' + SECHUE[Math.min(8, qq)] + ',' + (qq > 8 ? 12 : 62) + '%,' + ((inW ? 48 : 40) + 14 * M / GMAX) + '%,.9)'; if (BQ) { const bi = Math.min(qq, 9) * 2 + (inW ? 1 : 0); bufC[bi] = cs; var BI = bi; } else if (cs !== lastCs) { x.fillStyle = cs; lastCs = cs; } }
         let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th);
         if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GZ); if (!o) continue; px += (o[0] - px) * VM; py += (o[1] - py) * VM; }
-        if (ST) { const v = ST.b * r - ST.a * M; if (v >= ST.s && v < ST.s + ST.w) { if (inW) { stN++; if (!dead) stC++; } x.fillStyle = 'rgba(61,200,184,1)'; lastCs = null; const q = PT * 1.7; if (GBg) x.globalAlpha = 1; x.fillRect(px - q / 2, py - q / 2, q, q); if (GBg) x.globalAlpha = 0.22; continue; } }
-        x.fillRect(px - PT / 2, py - PT / 2, PT, PT);
+        if (ST) { const v = ST.b * r - ST.a * M; if (v >= ST.s && v < ST.s + ST.w) { if (inW) { stN++; if (!dead) stC++; } if (BQ) { tl.push(px, py); continue; } x.fillStyle = 'rgba(61,200,184,1)'; lastCs = null; const q = PT * 1.7; if (GBg) x.globalAlpha = 1; x.fillRect(px - q / 2, py - q / 2, q, q); if (GBg) x.globalAlpha = 0.22; continue; } }
+        if (BQ) { const n = bufN[BI]++; bufX[BI][2 * n] = px; bufX[BI][2 * n + 1] = py; } else x.fillRect(px - PT / 2, py - PT / 2, PT, PT);
       }
+      if (BQ) flushM();
     }
     x.globalAlpha = 1;
     if (!VON && !_introExporting && _introHole > 0.85) {   // angle labels in units of pi round the unit circle
@@ -7442,7 +7446,7 @@ function introToggleMirror() { _introMirror = !_introMirror; const b = $('intro-
 function introSetGb(i) { introFull(); _introGbI = Math.max(0, Math.min(_introGbPairs.length - 1, i | 0)); _introGbOn = true; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; } }
 /* Strip: the cells with s <= b*r - a*M < s + w (the opener's strip), shown in every view. Grow steps width 2k, offset -k, k = 1 .. G+1 and back. */
 function introGbIdxAt(T, Lg) { const u = Math.max(0, (T - 56) / 49.5), m = u % 2, f = m < 1 ? m : 2 - m; return Math.max(0, Math.min(Lg - 1, Math.floor(Lg * f))); }   // the pair index: one pass up from 56 s to 105.5 s, then back down, up again ... (it loops)
-var _introVUser = false, _introExpFit = 1, _introGbBox = null, _introAbs = false, _introSig = '', _introSigT = 0;
+var _introBatch = null, _introVUser = false, _introExpFit = 1, _introGbBox = null, _introAbs = false, _introSig = '', _introSigT = 0;
 function introAbsToggle() { _introAbs = !_introAbs; const b = $('intro-abs-btn'); if (b) b.classList.toggle('on', _introAbs); }
 var _introGbScr = false, _introFar = null, _introColC = [], _introCop = (() => { const t = new Uint8Array(513 * 513); for (let r = 1; r <= 512; r++) for (let M = 1; M <= 512; M++) t[r * 513 + M] = gcd(r, M) === 1 ? 1 : 0; return t; })();
 var _introStrip = { on: false, a: 1, b: 2, s: 0, w: 1, k: 0, dir: 1, timer: 0 };
