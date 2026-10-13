@@ -2049,8 +2049,8 @@ walk anyway.</p>
       <div class="ig"><div class="gl">Ring</div>
         <div class="gr"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="256" value="1" oninput="introSetM(this.value)" style="flex:1 1 90px;min-width:70px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val" class="gv">M ≤ 1</span></div>
         <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 256 and back">▶ M</button><button class="chip" onclick="introSetM(256)" title="All 256 rings">256</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button></div>
-        <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="_introSeq = false; introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="_introSeq = false; introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: M to the right, r up (r/M is the slope).">Grid</button><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate the Cayley sphere a full 360 degrees about x, then y.">&#9654; rotate x&middot;y</button></div>
-        <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null)" style="flex:1 1 70px;min-width:50px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value)" style="flex:1 1 70px;min-width:50px;" title="Tilt the Cayley sphere about y (degrees)."></div>
+        <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="_introSeq = false; introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="_introSeq = false; introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: M to the right, r up, the whole G × G square.">Grid</button><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate Cayley a full 360 degrees about x, then y, then z.">&#9654; rotate x&middot;y&middot;z</button></div>
+        <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about y (degrees)."><span>z</span><input type="range" id="intro-vz-sl" min="0" max="360" value="0" oninput="introViewXY(null, null, this.value)" style="flex:1 1 60px;min-width:44px;" title="Turn the plane about z (degrees), applied after the x and y tilts."></div>
         <div class="gr"><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="flex:1 1 80px;min-width:60px;" title="Point size"><button class="chip" id="intro-col-btn" onclick="introToggleColor()" title="Switch between sector colours and the opener's coloring 16 (saturation)">color: sector</button></div>
       </div>
       <div class="ig"><div class="gl">Prime spiral &nbsp;× ÷</div>
@@ -7128,7 +7128,7 @@ function showIntro() {
   if (_introRaf) cancelAnimationFrame(_introRaf);
   try { closeWelcomeModal(); } catch (e) {}
   if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; } if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; }
-  introPause(false); _introSeq = true; _introBirth = false; _introS0 = 44.5; _introVw.script = true; _introVw.man = false; _introVw.m = 0; _introVw.tm = 0; _introVw.x = 0; _introVw.y = 0; _introVw.rot = 0; _introRay0 = performance.now(); _introGM = null; _introSel = null; _introGZ = 0; _introPOff = 0; introSetHole(0); _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } _introPAuto = true;
+  introPause(false); _introSeq = true; _introBirth = false; _introS0 = 44.5; _introVw.script = true; _introVw.man = false; _introVw.m = 0; _introVw.tm = 0; _introVw.x = 0; _introVw.y = 0; _introVw.z = 0; _introVw.rot = 0; _introRay0 = performance.now(); _introGM = null; _introSel = null; _introGZ = 0; _introPOff = 0; introSetHole(0); _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } _introPAuto = true;
   _introOn = true; ov.style.display = 'block'; _introT0 = performance.now();
   try { startOpenerMusic(); } catch (e) {}
   /* Opens paused (the title shows a play triangle); plays by itself after 6.079 s (10 x 6/pi^2, the density this page is about), or on a tap. */
@@ -7154,11 +7154,11 @@ function showIntro() {
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0; const sc = [0, 0, 0, 0, 0, 0];
-    const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
+    const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY, z: _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
     const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GMAX); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
     for (let M = 1; M <= G; M++) {
       const rad = _introRad(R, M, GZ);
-      for (let r = 1; r <= (_introAng === 'clamp' ? M : G); r++) {
+      for (let r = 1; r <= (_introAng === 'clamp' && !(VM > 0.3 && VW.mode === 'grid') ? M : G); r++) {   // the Grid shows the whole G x G square: the ring holds r <= M, its mirror r > M fills the other half
         if (gcd(r, M) !== 1) continue; const inW = r <= M, dead = _introN > 0 && introKilled(r, M, _introN); if (dead && !_introSat) continue; if (inW && !dead) { cop++; const q0 = Math.floor(M / r); sc[Math.min(q0, 5)]++; }
         const th = _introTh(r, M) + spin;
         if (_introSat) { const kp = KILL[r]; if (kp) { const c = primeHueRGBA(kp, 235); x.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',.95)'; } else x.fillStyle = 'rgba(90,120,190,.55)'; }
@@ -7185,7 +7185,7 @@ function showIntro() {
     }
     if (!VON && _introHole > 0.02) introDrawHole(x, cx, cy, R * _introHole * 0.97, G, UI);
     if (VON) { x.save(); x.globalAlpha = Math.min(1, (VM - 0.02) / 0.5); x.font = (11 * UI) + 'px monospace'; x.fillStyle = 'rgba(232,227,219,.85)'; x.textAlign = 'center';
-      x.fillText(VW.mode === 'grid' ? 'Grid: M to the right, r up (slope r/M = sector wedge)' : 'Cayley: w = (z\u22121)/(z+1)   x = ' + Math.round(VW.x) + '\u00b0   y = ' + Math.round(VW.y) + '\u00b0', W / 2, Math.min(bot0 - 4, cy + R * 1.08 + 12 * UI)); x.restore(); }
+      { const _t = VW.mode === 'grid' ? 'Grid · M → · r ↑ · whole G × G square' : 'Cayley: w = (z\u22121)/(z+1)  x ' + Math.round(VW.x) + '\u00b0 y ' + Math.round(VW.y) + '\u00b0 z ' + Math.round(VW.z || 0) + '\u00b0'; while (x.measureText(_t).width > W - 16 && parseFloat(x.font) > 8) x.font = (parseFloat(x.font) - 1) + 'px monospace'; x.fillText(_t, W / 2, Math.min(bot0 - 4, cy + R * 1.08 + 12 * UI)); } x.restore(); }
     const tot = G * (G + 1) / 2, sh = cop / tot * 100;
     if (!VON && _introSel) { const rd = _introRad(R, _introSel.M, GZ), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
     let mTxt = '';
@@ -7239,8 +7239,9 @@ function showIntro() {
       ds.forEach(d => { x.fillStyle = d[4]; for (let r = d[0]; r <= d[1]; r++) { const M = d[2] * r + d[3]; if (M < 1 || M > G || lv1G(r, M) !== 1) continue; const q = at(r, M); x.fillRect(q[0] - dp / 2, q[1] - dp / 2, dp, dp); } });
       // trail of every pair's marker (g', E - g') and the current marker
       x.strokeStyle = 'rgba(242,200,96,.35)'; x.lineWidth = 1; x.beginPath(); _introGbPairs.forEach((q, k) => { const m = at(q, E - q); if (k) x.lineTo(m[0], m[1]); else x.moveTo(m[0], m[1]); }); x.stroke();
-      const mk = at(g, sP); x.fillStyle = '#ffd36b'; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke();
-      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')', lw = x.measureText(lt).width; x.fillText(lt, Math.max(6, Math.min(W - lw - 6, mk[0] + 8)), Math.max(top0 + 12 * UI, Math.min(bot0 - 6, mk[1] - 6))); }
+      let mk = at(g, sP); const mkOff = !(mk[0] >= 8 && mk[0] <= W - 8 && mk[1] >= top0 + 8 && mk[1] <= bot0 - 8);   // the marker (g, E - g) has M = E - g > G, so it lies outside the outer ring: pin it to the edge of the plate and mark it hollow
+      if (isFinite(mk[0]) && isFinite(mk[1])) { if (mkOff) mk = [Math.max(8, Math.min(W - 8, mk[0])), Math.max(top0 + 8, Math.min(bot0 - 8, mk[1]))]; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); if (mkOff) { x.strokeStyle = '#ffd36b'; x.lineWidth = 1.6; x.stroke(); } else { x.fillStyle = '#ffd36b'; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke(); } }
+      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')' + (mkOff ? ' off plate' : ''), lw = x.measureText(lt).width; x.fillText(lt, Math.max(6, Math.min(W - lw - 6, mk[0] + 8)), Math.max(top0 + 12 * UI, Math.min(bot0 - 6, mk[1] - 6))); }
       x.restore();
       gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
@@ -7407,20 +7408,21 @@ function introSweep(n) {
 let _introPaused = false, _introPauseAt = 0, _introAutoT = 0;
 /* Views in the intro: Ring (default), Cayley (Mobius map on a tilted sphere) and Grid. A scripted tour plays between the opening and the prime spiral,
    and again as a "look back" after one full spiral scan; the chips drive the same state by hand. */
-var _introVw = { m: 0, tm: 0, mode: 'cay', x: 0, y: 0, rot: 0, script: true, man: false, last: 0 };
+var _introVw = { m: 0, tm: 0, mode: 'cay', x: 0, y: 0, z: 0, rot: 0, script: true, man: false, last: 0 };
 function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
-  if (V.mode === 'grid') { if (r > M && V.m > 0.3) return null; const S = R * 1.9; return [cx + ((M - 0.5) / G - 0.5) * S, cy - ((r - 0.5) / G - 0.5) * S]; }   // M to the right, r up: both positive, and r/M is the visible slope
+  if (V.mode === 'grid') { const S = R * 1.9; return [cx + ((M - 0.5) / G - 0.5) * S, cy - ((r - 0.5) / G - 0.5) * S]; }   // M to the right, r up: both positive, the whole square (r <= M below the diagonal, r > M above); same as the opener and the main page
 
   const rho = OPENER_RHO0 + OPENER_RHOD * M / GMAX, zx = rho * Math.cos(th), zy = rho * Math.sin(th), br = zx + 1, d = br * br + zy * zy;
   if (d < 1e-9) return null;
   let u = ((zx - 1) * br + zy * zy) / d, v = (zy * br - (zx - 1) * zy) / d;
   if (V.x || V.y) { const w = cayleySphereRotate(u, v, V.x * Math.PI / 180, V.y * Math.PI / 180); if (!w) return null; u = w[0]; v = w[1]; }
+  if (V.z) { const c = Math.cos(V.z * Math.PI / 180), sn = Math.sin(V.z * Math.PI / 180), u2 = u * c - v * sn; v = u * sn + v * c; u = u2; }   // z turn: the plane, applied last
   const Rc = R / 1.6, qx = u * Rc, qy = v * Rc;
   if (qx * qx + qy * qy > 2.6 * R * R) return null;
   return [cx + qx, cy - qy];
 }
 function introViewTick(T) {
-  { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { ts.value = Math.min(900, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'); if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
+  { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { ts.value = Math.min(900, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'), vz = $('intro-vz-sl'); if (vz && document.activeElement !== vz) vz.value = Math.round(_introVw.z || 0) % 361; if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
   const V = _introVw, es = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }, sg = (a, b) => es((T - a) / (b - a)), now = performance.now(), dt = Math.min(0.1, (now - (V.last || now)) / 1000); V.last = now;
   if (V.script && !V.man) {
     const L = _introS0 + 33;
@@ -7430,19 +7432,19 @@ function introViewTick(T) {
     else V.m = 0;
     V.tm = V.m; return;
   }
-  if (V.rot) { const t = (now - V.rot) / 1000; V.x = 360 * es(t / 4); V.y = 360 * es((t - 4) / 4); if (t > 8) { V.rot = 0; V.x = 0; V.y = 0; } }
+  if (V.rot) { const t = (now - V.rot) / 1000; V.x = 360 * es(t / 4); V.y = 360 * es((t - 4) / 4); V.z = 360 * es((t - 8) / 4); if (t > 12) { V.rot = 0; V.x = 0; V.y = 0; V.z = 0; } }
   V.m += Math.sign(V.tm - V.m) * Math.min(Math.abs(V.tm - V.m), dt / 1.2);
 }
 function introViewSet(k) {
   const V = _introVw; V.script = false; V.man = true; V.rot = 0;
-  if (k === 'ring') V.tm = 0; else { if (V.mode !== k && V.m > 0.02) V.m = 0; V.mode = k; V.tm = 1; if (k === 'cay') { V.x = 0; V.y = 270; } }
+  if (k === 'ring') V.tm = 0; else { if (V.mode !== k && V.m > 0.02) V.m = 0; V.mode = k; V.tm = 1; if (k === 'cay') { V.x = 0; V.y = 0; V.z = 0; } }
   ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === k); });
 }
-function introViewRot() { const V = _introVw; V.script = false; V.man = true; V.mode = 'cay'; V.tm = 1; V.x = 0; V.y = 0; V.rot = performance.now(); ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === 'cay'); }); }
+function introViewRot() { const V = _introVw; V.script = false; V.man = true; V.mode = 'cay'; V.tm = 1; V.x = 0; V.y = 0; V.z = 0; V.rot = performance.now(); ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === 'cay'); }); }
 function introRestart() { try { showIntro(); } catch (e) {} ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); }); }
 /* Math sheet: with the intro paused, one HTML page (print it to PDF) with the Ring, Cayley and Grid pictures at the current G and n, a legend,
    the definitions, and tables and graphs computed from the same cells. */
-var _introExpView = null, _introExpX = 0, _introExpY = 270;
+var _introExpView = null, _introExpX = 0, _introExpY = 0, _introExpZ = 0;
 function introSheetData(G, n) {
   const D = lv2D(n), sc = [0, 0, 0, 0, 0, 0], cum = new Array(G + 1).fill(0), phin = new Array(G + 1).fill(0);
   for (let M = 1; M <= G; M++) {
@@ -7454,11 +7456,12 @@ function introSheetData(G, n) {
 }
 async function introMathSheet() {
   if (!_introPaint) return;
+  { const V = _introVw, live = V.mode === 'cay' && V.m > 0.02; _introExpX = live ? V.x : 0; _introExpY = live ? V.y : 0; _introExpZ = live ? (V.z || 0) : 0; }
   const G = Math.max(1, Math.round(_introGcur)), n = _introN || 0, T = _introT, fx = (v, d) => v.toFixed(d == null ? 2 : d);
   const d = introSheetData(G, n), kept = d.cum[G], ratio = kept / d.tot, err = (ratio / d.D - 1) * 100;
   // pictures
   const W = 1600, H = 1000, shots = {}, saveGM = _introGM, saveExp = _introExporting;
-  const names = { ring: 'Ring (unit circle)', cay: 'Cayley (Möbius map on the sphere, x = ' + _introExpX + '°, y = ' + _introExpY + '°)', grid: 'Grid (M to the right, r up)' };
+  const names = { ring: 'Ring (unit circle)', cay: 'Cayley (Möbius map on the sphere, x = ' + _introExpX + '°, y = ' + _introExpY + '°, z = ' + _introExpZ + '°)', grid: 'Grid (M to the right, r up, whole G × G square)' };
   for (const v of ['ring', 'cay', 'grid']) {
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
     _introExpView = v; _introGM = G; _introExporting = 'land';
@@ -7503,7 +7506,7 @@ async function introMathSheet() {
     + '<button class="np" onclick="print()">Print / save as PDF</button><h1>Strip Arithmetic II — math sheet</h1><div class="n">Wessen Getachew · 2026 · snapshot at t = ' + fx(T, 1) + ' s · G = ' + G + ' · n = ' + n + '</div>'
     + '<h2>1. The three views of the same cells</h2><div class="n">Every dot is a cell (r, M) with 1 ≤ r ≤ M ≤ G that has gcd(r, M) = 1' + (n ? ' and survives the block test at depth n = ' + n : '') + '. The views only change where the cell is drawn.</div>'
     + ['ring', 'cay', 'grid'].map(v => '<h3>' + names[v] + '</h3><img src="' + shots[v] + '"><a class="np" download="strip-arithmetic-II-' + v + '-G' + G + '.png" href="' + shots[v] + '">download PNG</a>').join('')
-    + '<h2>2. Legend and definitions</h2><div class="m">cell (r, M): ring M, column r, 1 ≤ r ≤ M\ncoprime cell: gcd(r, M) = 1   (φ(M) of them on ring M, so ring M is born with φ(M) new points; the others land on earlier points)\nsector S_s = { 1/(s+1) < r/M ≤ 1/s },  s = ⌊M/r⌋ ;  boundaries at θ = 2π/(s+1) on the ring ;  s ≥ 5 is pooled\nRing: θ(r, M) = 2π·min(r/M, 1) (angle mode "' + _introAng + '"), radius grows with M ; mirror σ(r) = M − r is conjugation θ → 2π − θ\nCayley: z = ρ·e^{iθ}, ρ = ' + OPENER_RHO0 + ' + ' + OPENER_RHOD + '·M/256 ;  w = (z − 1)/(z + 1) ;  then the Riemann sphere is tilted x = ' + _introExpX + '°, y = ' + _introExpY + '° and projected back\nGrid: cell (r, M) drawn at x = M (to the right), y = r (up), both positive, so the slope r/M is the slope you see and each sector S_s is a wedge from the origin (the triangle r ≤ M lies under the diagonal)\nblock test (n &gt; 0): cell kept iff no prime p | r divides any of M, M+1, …, M+n\ndensity: D(n) = ∏_p (1 − min(n+1, p)/p²) ;  C(n) = ζ(2)·D(n) ;  D(0) = 6/π² = 0.6079…\nexpected sector count = (G(G+1)/2)·D(n)/(s(s+1)),  s ≥ 5 gets 1/5 .  Here tot is the exact cell count G(G+1)/2; the opener and main sheets use the leading term 3G²/π² instead, which is smaller by the factor G/(G+1) (0.4% at G = 256), so their error percentages differ from these by about that much. For n = 0 this is the exact density of each sector (area 1/(s(s+1)) of the triangle times 6/π²). For n > 0 it is the page\u2019s working model, checked numerically for fixed n as G grows, not a theorem, and at small G the sectors can sit a few percent off it. It fails when n is comparable to G.</div>'
+    + '<h2>2. Legend and definitions</h2><div class="m">cell (r, M): ring M, column r, 1 ≤ r ≤ M\ncoprime cell: gcd(r, M) = 1   (φ(M) of them on ring M, so ring M is born with φ(M) new points; the others land on earlier points)\nsector S_s = { 1/(s+1) < r/M ≤ 1/s },  s = ⌊M/r⌋ ;  boundaries at θ = 2π/(s+1) on the ring ;  s ≥ 5 is pooled\nRing: θ(r, M) = 2π·min(r/M, 1) (angle mode "' + _introAng + '"), radius grows with M ; mirror σ(r) = M − r is conjugation θ → 2π − θ\nCayley: z = ρ·e^{iθ}, ρ = ' + OPENER_RHO0 + ' + ' + OPENER_RHOD + '·M/256 ;  w = (z − 1)/(z + 1) ;  then the Riemann sphere is tilted x = ' + _introExpX + '°, y = ' + _introExpY + '°, then the plane turned z = ' + _introExpZ + '°, and projected back\nGrid: cell (r, M) drawn at x = M (to the right), y = r (up), both positive; the whole G × G square: r ≤ M below the diagonal (slope r/M ≤ 1) is what the Ring holds, r > M above it is its mirror half\nblock test (n &gt; 0): cell kept iff no prime p | r divides any of M, M+1, …, M+n\ndensity: D(n) = ∏_p (1 − min(n+1, p)/p²) ;  C(n) = ζ(2)·D(n) ;  D(0) = 6/π² = 0.6079…\nexpected sector count = (G(G+1)/2)·D(n)/(s(s+1)),  s ≥ 5 gets 1/5 .  Here tot is the exact cell count G(G+1)/2; the opener and main sheets use the leading term 3G²/π² instead, which is smaller by the factor G/(G+1) (0.4% at G = 256), so their error percentages differ from these by about that much. For n = 0 this is the exact density of each sector (area 1/(s(s+1)) of the triangle times 6/π²). For n > 0 it is the page\u2019s working model, checked numerically for fixed n as G grows, not a theorem, and at small G the sectors can sit a few percent off it. It fails when n is comparable to G.</div>'
     + '<h2>3. State at this moment</h2><table><tr><th>quantity</th><th>value</th></tr><tr><td>G (rings on screen)</td><td>' + G + '</td></tr><tr><td>n</td><td>' + n + '</td></tr><tr><td>cells G(G+1)/2</td><td>' + d.tot + '</td></tr><tr><td>kept cells</td><td>' + kept + '</td></tr><tr><td>kept / cells</td><td>' + fx(ratio * 100, 4) + '%</td></tr><tr><td>D(n)</td><td>' + fx(d.D * 100, 4) + '%</td></tr><tr><td>relative error</td><td class="' + (err >= 0 ? 'g' : 'rd') + '">' + (err >= 0 ? '+' : '') + fx(err, 4) + '%</td></tr><tr><td>π(G)</td><td>' + pi + '  (G / ln G = ' + fx(G / Math.log(Math.max(2, G)), 1) + ', ratio ' + fx(pi / (G / Math.log(Math.max(2, G))), 3) + ')</td></tr><tr><td>Goldbach: E = 2(G+1) = ' + 2 * (G + 1) + '</td><td>' + gbN + ' pairs g + s = E with g ≤ s, both prime</td></tr></table>'
     + '<h2>4. Sectors</h2>' + (n ? '<div class="n">n &gt; 0: the expected column is the working model D(n)/(s(s+1)), not a proved density.</div>' : '') + '<table><tr><th>sector</th><th>observed</th><th>expected</th><th>diff</th><th>error</th></tr>' + secRows + '</table>' + svgBars(secBars)
     + '<h2>5. Kept ratio against G (same n), around the target D(n)</h2><div class="n">The ratio does not approach D(n) from one side: it oscillates around it with a shrinking envelope. For n = 0 the limit 6/π² is a classical theorem (error of order log G / G). For n &gt; 0 the shrinking is what these sweeps show up to the G tested; it is not proved here.</div><table><tr><th>G</th><th>cells</th><th>kept</th><th>ratio</th><th>D(n)</th><th>error</th></tr>' + convRows + '</table>' + svgLine(curve, d.D, 'G (rings 1…G)', 'kept / cells')
@@ -7571,9 +7574,9 @@ function introScrub(t) {
   ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); });
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
 }
-function introViewXY(x, y) {
+function introViewXY(x, y, z) {
   const V = _introVw; V.script = false; V.man = true; V.rot = 0; if (V.mode !== 'cay' || V.tm < 1) { V.mode = 'cay'; V.m = V.m > 0.02 && V.mode === 'cay' ? V.m : 0; V.tm = 1; }
-  if (x != null) V.x = +x; if (y != null) V.y = +y;
+  if (x != null) V.x = +x; if (y != null) V.y = +y; if (z != null) V.z = +z;
   ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === 'cay'); });
 }
 function introPause(force) {
@@ -7641,10 +7644,10 @@ function introCanvasClick(ev) {
   const pop = $('intro-pop'); pop.style.left = Math.max(8, Math.min(b.width - 300, px + 14)) + 'px'; pop.style.top = Math.max(8, Math.min(b.height - 260, py - 40)) + 'px';
 }
 function introZoomAt(px, py, k2) {
-  const gm = _introGeo; if (!gm) return; k2 = Math.max(1, Math.min(14, k2));
+  const gm = _introGeo; if (!gm) return; k2 = Math.max(0.35, Math.min(14, k2));
   const k = _introV.k, cx2 = px - (px - gm.cx) * (k2 / k), cy2 = py - (py - gm.cy) * (k2 / k);
   _introV.k = k2; _introV.fx = (cx2 - gm.W / 2) / gm.W; _introV.fy = (cy2 - gm.cy0) / gm.H;
-  if (k2 === 1) { _introV.fx = 0; _introV.fy = 0; }
+  if (Math.abs(k2 - 1) < 0.02) { _introV.k = 1; _introV.fx = 0; _introV.fy = 0; }
 }
 function introResetView() { _introV = { k: 1, fx: 0, fy: 0 }; }
 function introWireView() {
@@ -17392,7 +17395,7 @@ function msBuildOpenerRaw(noPlates) {
   doc.push({ t: 'h', text: 'The canvas is a formula' });
   doc.push({ t: 'p', text: 'Nothing on the plate is stored as an image. Each tile is a function from cells to pixels, evaluated on the lattice, with S the side of the tile in pixels and c = S/2 its centre.' });
   if (showGrid) {
-    doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right),\qquad \frac SG=\frac{${S}}{${G}}=${msf(S / G, 2)}\ \mathrm{px}`, cap: 'These are pixel coordinates, so y points down: r runs to the right and M runs downward, like a table. For M increasing upward, as on a graph, use y = S − (M − 1/2)·S/G.' });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right),\qquad \frac SG=\frac{${S}}{${G}}=${msf(S / G, 2)}\ \mathrm{px}`, cap: 'Before the plate turn is applied these are pixel coordinates (y points down): r to the right, M downward. The default grid turn of 90° puts M to the right and r up, so r/M is the visible slope.' });
     if (OPENER_ROT.g) doc.push({ t: 'eq', tex: msT`(x,y)\mapsto c+R_{-\alpha}\big((x,y)-c\big),\qquad \alpha=${Math.round(OPENER_ROT.g)}^{\circ}` });
   }
   if (showRing) {
@@ -17546,7 +17549,7 @@ function msBuildMainRaw(views, noPlates) {
   // 3 · canvas
   doc.push({ t: 'h', text: 'The canvas is a formula' });
   doc.push({ t: 'p', text: 'Each exported view is a function from cells to pixels. S is the side of the view in pixels and c = S/2 its centre; the plate is the lattice evaluated through these maps and coloured by the rule in §4.' });
-  if (vs.includes('grid')) doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right)`, cap: 'These are pixel coordinates, so y points down: r runs to the right and M runs downward, like a table. For M increasing upward, as on a graph, use y = S − (M − 1/2)·S/G.' });
+  if (vs.includes('grid')) doc.push({ t: 'eq', tex: msT`\mathrm{Grid}(r,M)=\left(\Big(r-\tfrac12\Big)\frac{S}{G},\ \Big(M-\tfrac12\Big)\frac{S}{G}\right)`, cap: 'Before the plate turn is applied these are pixel coordinates (y points down): r to the right, M downward. The default grid turn of 90° puts M to the right and r up, so r/M is the visible slope.' });
   if (vs.includes('ring')) {
     const thetaTex = thetaMode === 'clamp' ? msT`\theta(r,M)=2\pi\min\!\Big(\frac rM,1\Big)` : thetaMode === 'unit' ? msT`\theta(r,M)=2\pi\,\frac{r}{G}` : msT`\theta(r,M)=2\pi\,\frac{r}{M}`;
     doc.push({ t: 'eq', tex: msT`\rho(M)=R\Big(h+(1-h)\,\frac{M-\frac12}{G}\Big),\qquad R=0.965\cdot\frac S2,\qquad h=${msf(ringHole, 2)}` });
