@@ -830,7 +830,7 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 <h3>The lift overlays</h3>
 <ul>
 <li><b>Mirror</b> $\sigma(r)=M-r$: $\gcd(r,M)=\gcd(M-r,M)$, so coprime cells map to coprime cells ($\varphi(M)$ is even for $M>2$).</li>
-<li><b>Spiral prime $p$</b>: the column $r=p$ is coprime to $M$ unless $p\mid M$; the ring $M=p$ is the dropout ring. <b>All p</b> draws every prime $p\le G$. (It is unrelated to the Ulam spiral.)</li>
+<li><b>Spiral prime $p$</b>: the column $r=p$ is coprime to $M$ unless $p\mid M$; the ring $M=p$ is the dropout ring. <b>All p</b> draws every prime $p\le G$. Classically this is a <b>hyperbolic (reciprocal) spiral</b>: on ring $M>p$ the angle is $2\pi p/M$ and the radius grows with $M$, so $\rho\theta$ is constant. The <b>mirror</b> $r\mapsto M-r$ is complex conjugation $z\mapsto\bar z$ (reflection across the real axis), the Farey symmetry $r/M\mapsto 1-r/M$, and the even/odd split $\chi(-1)=\pm1$ of Dirichlet characters. (It is unrelated to the Ulam spiral.)</li>
 <li><b>$\pm n$ path</b> $r=(M\pm n)/2$: the solutions of $2r\equiv\pm n \pmod M$.</li>
 <li><b>Connect</b> joins the spiral and the path at shared rings. As $n\to n+1$ the lines change only when $n+2$ is prime (the red "about to be cut" set); the sheets list kept / about to be cut / cut for $n-1, n, n+1$.</li>
 </ul>
@@ -1835,8 +1835,9 @@ walk anyway.</p>
       <span class="plabel">Mode</span>
       <button class="chip lift-mode-btn on" data-m="none" onclick="liftSetMode('none')" title="Neither the spiral nor the &plusmn;n path &mdash; just the r&rarr;r mod(M+1) chain lines below, if that's on.">None</button>
       <button class="chip lift-mode-btn" data-m="npath" onclick="liftSetMode('npath')" title="r=(M&plusmn;n)/2 — the lift path at the current block depth.">&plusmn;n path</button>
-      <button class="chip lift-mode-btn" data-m="spiral" onclick="liftSetMode('spiral')" title="r=p across every ring M — the chosen prime's residue spiral.">Spiral</button>
+      <button class="chip lift-mode-btn" data-m="spiral" onclick="liftSetMode('spiral')" title="r=p across every ring M — the chosen prime's residue spiral (classically a hyperbolic spiral, rho*theta = const).">Spiral</button>
       <button class="chip lift-mode-btn" data-m="both" onclick="liftSetMode('both')" title="Spiral and &plusmn;n path together.">Both</button>
+      <button class="chip tl" id="lift-spiral-preset" onclick="liftSpiralPreset()" title="Preset: prime spiral + mirror + dropout ring, then sweep through the primes. A hyperbolic spiral (rho*theta = const) and its complex-conjugate mirror.">&#9654; Prime spiral + mirror</button>
       <button class="chip lift-mode-btn" data-m="connect" onclick="liftSetMode('connect')" title="Spiral and &plusmn;n path together, with thin lines joining the two at every ring M they share.">Connect</button>
     </div>
 
@@ -1944,7 +1945,7 @@ walk anyway.</p>
       <label style="display:inline-flex;align-items:center;gap:4px;color:rgba(200,168,74,.85);cursor:pointer;" title="While ▶ p plays, skip primes already saturated at the current lift depth (p ≤ n+1)."><input type="checkbox" id="lift-psync-chk" checked onchange="liftTogglePSync(this.checked)"> Sync w/ C(n)</label>
     </div>
 
-    <div class="hint" style="padding:4px 0;">Spiral: for prime <b>p</b>, plots r=p across every ring M with gcd(p,M)=1 &mdash; teal above p/M=0.5, coral below, ringed red where it will <i>not</i> also survive one more step to M+1. &plusmn;n path: r=(M&plusmn;n)/2, the same block-coprime depth n the r-chain depth and C(n) use.</div>
+    <div class="hint" style="padding:4px 0;">Spiral (a hyperbolic spiral, &rho;&theta;=const; mirror = complex conjugation): for prime <b>p</b>, plots r=p across every ring M with gcd(p,M)=1 &mdash; teal above p/M=0.5, coral below, ringed red where it will <i>not</i> also survive one more step to M+1. &plusmn;n path: r=(M&plusmn;n)/2, the same block-coprime depth n the r-chain depth and C(n) use.</div>
 
     <div id="lift-table"></div>
 
@@ -2034,7 +2035,7 @@ walk anyway.</p>
     <div style="font-family:var(--mono);font-size:11px;letter-spacing:.38em;color:var(--gold);">WESSEN GETACHEW &middot; 2026</div>
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(30px,7vw,64px);color:var(--cream);margin-top:8px;letter-spacing:.02em;"><span id="intro-rs" onclick="introRestart()" style="pointer-events:auto;cursor:pointer;display:inline-block;color:var(--gold);margin-right:.35em;" title="Restart the animation from 0">&#10226;</span>Strip Arithmetic <span id="intro-ii" onclick="introPause()" style="pointer-events:auto;cursor:pointer;display:inline-block;min-width:.9em;" title="">II</span></div>
     <div style="font-family:var(--mono);font-size:12px;color:var(--cream2);margin-top:6px;">a sieve you can watch &middot; Level 1: G up to 1024 &middot; Level 2: the main page, up to 10,000</div>
-    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:auto;font-family:var(--mono);font-size:11px;color:var(--cream2);"><span id="intro-tt" style="min-width:3.2em;text-align:right;">0.0s</span><input type="range" id="intro-time-sl" min="0" max="1500" value="0" step="1" oninput="introScrub(this.value / 10)" style="width:min(62vw,360px);" title="Animation time: drag to scrub the intro (0 to 150 s; from 107 s the Goldbach pairs loop and the Cayley view eases out)."></div>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:center;pointer-events:auto;font-family:var(--mono);font-size:11px;color:var(--cream2);"><span id="intro-tt" style="min-width:3.2em;text-align:right;">0.0s</span><input type="range" id="intro-time-sl" min="0" max="2560" value="0" step="1" oninput="introTimeInput(this.value)" style="width:min(62vw,360px);" title="Animation time: drag to scrub the intro (0 to 256 s; from 107 s the Goldbach pairs loop and the Cayley view eases out). Once a recording exists or is running, this slider drives the recording instead: drag to rewind, pause, or record over from that point."></div>
   </div>
   <div id="intro-foot" style="position:absolute;z-index:1;left:0;right:0;bottom:0;padding:0 16px max(20px,4vh);text-align:center;">
     <div id="intro-counter" style="font-family:var(--mono);font-size:clamp(11px,2.6vw,14px);color:var(--cream2);min-height:20px;"></div>
@@ -2056,7 +2057,7 @@ walk anyway.</p>
       </div>
       <div class="ig"><div class="gl">Prime spiral &nbsp;× ÷</div>
         <div class="gr"><input type="range" id="intro-p-sl" min="0" max="53" value="0" oninput="introSetP(this.value)" style="flex:1 1 90px;min-width:70px;" title="Prime spiral p (and its mirror): drag to pick the prime"><span id="intro-p-val" class="gv">p = 2</span></div>
-        <div class="gr"><button class="chip" id="intro-p-btn" onclick="introPAutoToggle()" title="Multiplicative (× and ÷): the prime spiral r = p on every ring and its mirror. Click to scan the primes up and back, or pause on the slider's prime. Also hides the Goldbach overlay.">❚❚ × ÷</button><button class="chip on" id="intro-mir-btn" onclick="introToggleMirror()" title="Mirror sigma(r) = M - r">mirror</button></div>
+        <div class="gr"><button class="chip" id="intro-p-btn" onclick="introPAutoToggle()" title="Multiplicative (× and ÷): the prime spiral r = p on every ring (classically a hyperbolic spiral, rho*theta = const) and its mirror r = M - p (complex conjugation). Click to scan the primes up and back, or pause on the slider's prime. Also hides the Goldbach overlay.">❚❚ × ÷</button><button class="chip on" id="intro-mir-btn" onclick="introToggleMirror()" title="Mirror sigma(r) = M - r: complex conjugation, reflection across the real axis">mirror</button></div>
       </div>
       <div class="ig"><div class="gl">Goldbach &nbsp;+ −</div>
         <div class="gr"><input type="range" id="intro-e-sl" min="0" max="0" value="0" oninput="introSetGb(this.value)" style="flex:1 1 90px;min-width:70px;" title="Goldbach pair g + s = E: the four Strip I lines a, b, c, d for that gap"><span id="intro-e-val" class="gv">g = 3</span></div>
@@ -2066,15 +2067,15 @@ walk anyway.</p>
         <div class="gr"><button class="chip" id="intro-st-btn" onclick="introStripToggle()" title="Slope band: the strip of cells off &le; b&middot;r &minus; a&middot;M &lt; off + w around the line r/M = a/b (the opener's strip), drawn in every view.">band</button><span title="rise: r">rise a</span><input type="number" id="intro-st-a" value="1" step="1" style="width:46px;" oninput="introStripSet()" title="Slope numerator a"><span title="run: M">/ run b</span><input type="number" id="intro-st-b" value="2" step="1" style="width:46px;" oninput="introStripSet()" title="Slope denominator b"></div>
         <div class="gr"><span>off</span><input type="range" id="intro-st-s" min="-512" max="512" value="0" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Offset: the band is off &le; b&middot;r &minus; a&middot;M &lt; off + w"><span id="intro-st-sv" class="gv">0</span><span>w</span><input type="range" id="intro-st-w" min="1" max="513" value="1" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Width w"><span id="intro-st-wv" class="gv">1</span></div>
         <div class="gr"><button class="chip" id="intro-st-grow" onclick="introStripGrow()" title="Grow: width 2k and offset &minus;k, k = 1, 2, 3 &hellip; up to G + 1 and back, so the band widens by one line on each side per step.">&#9654; grow 2w / &minus;1s</button></div>
-        <div class="gr"><button class="chip" id="intro-st-scan" onclick="introStripScan()" title="Scan: the band's slope steps through the Farey fractions a/b (b &le; 12) between the two ends, there and back; the band is 2 cells thick in r, centred on the line r/M = a/b. Between 1/3 and 1/2 is sector s = 2, between 1/3 and 2/3 is s = 1 and 2.">&#9654; scan slope</button> <input id="intro-st-lo" value="1/3" size="4" style="width:3.2em"> &rarr; <input id="intro-st-hi" value="1/2" size="4" style="width:3.2em"></div>
+        <div class="gr"><button class="chip" id="intro-st-lock" onclick="introStripLockToggle()" title="Lock the band to the Goldbach pair on screen. For E = 2(G+1) and the pair (g, s) with g + s = E, the marker sits at ring M = s, column r = g, so the band runs along the line r/M = g/s (reduced a/b = g/s over their gcd), 2 cells thick. Step the pairs and the band turns with them; unlock to take the controls back.">&#128274; Goldbach pair</button><button class="chip" id="intro-st-scan" onclick="introStripScan()" title="Scan: the band's slope steps through the Farey fractions a/b (b &le; 12) between the two ends, there and back; the band is 2 cells thick in r, centred on the line r/M = a/b. Between 1/3 and 1/2 is sector s = 2, between 1/3 and 2/3 is s = 1 and 2.">&#9654; scan slope</button> <input id="intro-st-lo" value="1/2" size="4" style="width:3.2em"> &rarr; <input id="intro-st-hi" value="1/1" size="4" style="width:3.2em"></div>
       </div>
       <div class="ig"><div class="gl">Sieve &nbsp;C(n)</div>
         <div class="gr"><input type="range" id="intro-n-sl" min="0" max="255" value="0" oninput="introSetN(this.value)" style="flex:1 1 90px;min-width:70px;" title="C(n) depth n: cells the block M..M+n kills are removed. Moving it pauses the play."><span id="intro-n-val" class="gv">n = 0</span></div>
         <div class="gr"><button class="chip" id="intro-n-btn" onclick="introNPlay()" title="Play C(n) from n = 0 up to 255 and back: the cells the block kills are removed, so you watch the survivors thin toward C(n)">▶ C(n) play</button><button class="chip" onclick="introSweep(_introSwN)" title="G sweep: how far the observed sector counts sit from the predicted ones as G grows (64 to 1024), for the chosen n">G sweep</button></div>
       </div>
-      <div class="ig"><div class="gl">Record &nbsp;1 min</div>
-        <div class="gr"><button class="chip" id="intro-rec-btn" onclick="introRecToggle()" title="Record every parameter change for up to 60 s: time position, view and its x/y/z turns, G, hole, n, strip, Goldbach, prime spiral, zoom and pan. Press again to stop early.">&#9679; rec</button><button class="chip" id="intro-rplay-btn" onclick="introRecPlay()" title="Play the recording back: all the parameters are replayed exactly as you moved them.">&#9654; play</button><span id="intro-rec-info" style="font-size:11px;opacity:.75;">no recording</span></div>
-        <div class="gr"><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
+      <div class="ig"><div class="gl">Record &nbsp;up to 256 s</div>
+        <div class="gr"><button class="chip" id="intro-rec-btn" onclick="introRecToggle()" title="Record every parameter change for up to 256 s (the time slider then drives the recording: drag back to rewind, then press rec to record over from that point): time position, view and its x/y/z turns, G, hole, n, strip, Goldbach, prime spiral, zoom and pan. Press again to stop early.">&#9679; rec</button><button class="chip" id="intro-rpause-btn" onclick="introRecPause()" title="Pause or resume the recording (or its playback, or the intro itself)">&#10074;&#10074;</button><button class="chip" onclick="introRecBack(5)" title="Rewind 5 s: in the recording while recording or playing (recording continues over the rewound part), otherwise in the intro">&#9194; 5s</button><button class="chip" id="intro-rplay-btn" onclick="introRecPlay()" title="Play the recording back: all the parameters are replayed exactly as you moved them.">&#9654; play</button><span id="intro-rec-info" style="font-size:11px;opacity:.75;">no recording</span></div>
+        <div class="gr"><button class="chip" onclick="introRecClear()" title="Delete the recording; the time slider goes back to the intro">clear</button><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
       </div>
       <div class="ig"><div class="gl">View &amp; export</div>
         <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
@@ -7134,8 +7135,28 @@ window.addEventListener('load', () => setTimeout(shareSnapDefaults, 0));
    crossed out when a picked prime divides gcd(r, M). Par is the greedy order, computed exactly from the counts
    of cells by gcd. Level 2 is the main page. */
 let _introRaf = 0, _introT0 = 0, _introOn = false;
+/* While the intro plays, the opener and the main page stand still: any of their play timers or animations still running is stopped (through its own toggle, so the buttons reset), leaving the whole frame budget to the intro. */
+function introQuietOthers() {
+  const T = (v, f) => { try { if (typeof v !== 'undefined' && v) f(); } catch (e) {} };
+  T(typeof _olNTimer !== 'undefined' && _olNTimer, () => olStopNPlay());
+  T(typeof _olCNTimer !== 'undefined' && _olCNTimer, () => olCNPlay());
+  T(typeof _olPTimer !== 'undefined' && _olPTimer, () => olTogglePPlay());
+  T(typeof _olGrowT !== 'undefined' && _olGrowT, () => olToggleGrow());
+  T(typeof _olGbTimer !== 'undefined' && _olGbTimer, () => olToggleGbPlay());
+  T(typeof _olGapTimer !== 'undefined' && _olGapTimer, () => olToggleGapPlay());
+  T(typeof liftNPlayIv !== 'undefined' && liftNPlayIv, () => liftNPlay());
+  T(typeof liftCNPlayIv !== 'undefined' && liftCNPlayIv, () => liftCNPlay());
+  T(typeof liftPPlayIv !== 'undefined' && liftPPlayIv, () => liftPPlay());
+  T(typeof gPlayTimer !== 'undefined' && gPlayTimer, () => toggleGPlay());
+  T(typeof _growT !== 'undefined' && _growT, () => toggleGrow());
+  T(typeof cayRotPlayTimer !== 'undefined' && cayRotPlayTimer, () => toggleCayleyRotPlay());
+  T(typeof partSweepId !== 'undefined' && partSweepId, () => { clearInterval(partSweepId); partSweepId = null; });
+  T(typeof _openerRotTimer !== 'undefined' && _openerRotTimer, () => { clearInterval(_openerRotTimer); _openerRotTimer = 0; });
+  T(typeof _openerAnimHandle !== 'undefined' && _openerAnimHandle, () => { cancelAnimationFrame(_openerAnimHandle); _openerAnimHandle = null; });
+  T(typeof _openerRotRaf !== 'undefined' && _openerRotRaf, () => { cancelAnimationFrame(_openerRotRaf); _openerRotRaf = 0; });
+}
 function showIntro() {
-  _introVUser = false;
+  _introVUser = false; introQuietOthers();
   try { introRecStop(); introRecPlayStop(); } catch (e) {} try { _introStrip.on = false; introStripStopGrow(); introStripScanStop(); introStripSync(); } catch (e) {}
   const ov = $('intro-overlay'), cv = $('intro-cv'); if (!ov || !cv) { openWelcomeModal(); return; }
   if (_introRaf) cancelAnimationFrame(_introRaf);
@@ -7167,6 +7188,7 @@ function showIntro() {
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0, stN = 0, stC = 0; const sc = [0, 0, 0, 0, 0, 0];
+    if (_introStripLock && _introGbOn) { const LP = introGbPairsFor(G); if (LP && LP.length) { const g = LP[Math.min(_introGbI, LP.length - 1)], sP = 2 * (G + 1) - g, d = gcd(g, sP), S0 = _introStrip; S0.on = true; S0.a = g / d; S0.b = sP / d; S0.w = 2 * S0.b; S0.s = -S0.b; { const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai && document.activeElement !== ai) ai.value = S0.a; if (bi && document.activeElement !== bi) bi.value = S0.b; } } }   // locked to the Goldbach pair on screen: the band follows the line r/M = g/(E - g) through the marker (g, E - g)
     const ST = _introStrip.on ? _introStrip : null;
     const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY, z: _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
     const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GZ); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
@@ -7224,9 +7246,9 @@ function showIntro() {
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
-    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - _introS0) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < _introS0 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < 19 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
-    if (_introPAuto && T >= _introS0 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
+    if (_introPAuto && T >= 19 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold, joined to their conjugate 2π − θ), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
     if (sp) {
       const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GZ);
@@ -7247,7 +7269,7 @@ function showIntro() {
           x.fillText(tx, lx, Math.max(top0 + 12 * UI, Math.min(bot0 - 6, last[1] + (mir ? 14 : -6))));
         }
       });
-      spTxt += '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan) · mirror σ(r) = M − r (violet)';
+      spTxt += '\nprime spiral p = ' + sp + ' (r = p on every ring M ≥ p, cyan; hyperbolic spiral, ρθ = const) · mirror σ(r) = M − r (violet; complex conjugation z̄)';
     }
     let stTxt = '';
     if (ST) {
@@ -7441,7 +7463,7 @@ function introNPlay() {
 }
 function introSetP(i) { introGbStop(false); _introPAuto = false; introFull(); _introPi = i | 0; const b = $('intro-p-btn'); if (b) b.textContent = '▶ × ÷'; }
 let _introPOff = 0;
-function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); if (_introPAuto) _introPOff = _introPi - Math.floor(Math.max(0, Math.max(_introT, 9.5) - _introS0) / 0.3);   /* play resumes from the slider's prime, going up */ const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
+function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); if (_introPAuto) _introPOff = _introPi - Math.floor(Math.max(0, _introT - 19) / 0.3);   /* play resumes from the slider's prime, going up */ const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
 function introToggleMirror() { _introMirror = !_introMirror; const b = $('intro-mir-btn'); if (b) b.classList.toggle('on', _introMirror); }
 function introSetGb(i) { introFull(); _introGbI = Math.max(0, Math.min(_introGbPairs.length - 1, i | 0)); _introGbOn = true; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; } }
 /* Strip: the cells with s <= b*r - a*M < s + w (the opener's strip), shown in every view. Grow steps width 2k, offset -k, k = 1 .. G+1 and back. */
@@ -7454,6 +7476,12 @@ function introStripSet() {
   const S = _introStrip, a = Number($('intro-st-a').value), b = Number($('intro-st-b').value);
   S.a = isFinite(a) ? a : 1; S.b = isFinite(b) && b !== 0 ? b : 1; S.s = +$('intro-st-s').value; S.w = Math.max(1, +$('intro-st-w').value);
   if (S.timer) introStripStopGrow(); introStripScanStop(); S.on = true; introStripSync();
+}
+var _introStripLock = false;
+function introStripLockToggle() {   // lock the slope band to the Goldbach pair: slope g/(E-g), 2 cells thick; needs the Goldbach overlay on
+  _introStripLock = !_introStripLock; const b = $('intro-st-lock'); if (b) b.classList.toggle('on', _introStripLock);
+  if (_introStripLock) { try { introStripStopGrow(); introStripScanStop(); } catch (e) {} if (!_introGbOn) { try { introSetGb(10); } catch (e) {} } }
+  try { introStripSync(); } catch (e) {}
 }
 function introStripSync() {
   const S = _introStrip, bt = $('intro-st-btn'); if (bt) bt.classList.toggle('on', S.on);
@@ -7468,30 +7496,51 @@ function introStripScan() {
   let lo = pf($('intro-st-lo').value), hi = pf($('intro-st-hi').value); if (!lo || !hi) return;
   if (lo[0] * hi[1] > hi[0] * lo[1]) { const t = lo; lo = hi; hi = t; }
   const Q = 12, F = []; for (let b = 1; b <= Q; b++) for (let a = 0; a <= b; a++) { if (gcd(a, b) !== 1 || a < 1) continue; if (a * lo[1] >= lo[0] * b && a * hi[1] <= hi[0] * b) F.push([a, b]); }
-  F.sort((u, v) => u[0] * v[1] - v[0] * u[1]); if (!F.length) return;
+  F.sort((u, v) => v[0] * u[1] - u[0] * v[1]); if (!F.length) return;   // starts at the high end (1/1 by default) and walks down
   introStripStopGrow(); S.on = true; let i = 0, d = 1;
   const b = $('intro-st-scan'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); }
   const step = () => { const f = F[i]; S.a = f[0]; S.b = f[1]; S.w = 2 * f[1]; S.s = -f[1]; const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai) ai.value = S.a; if (bi) bi.value = S.b; introStripSync(); if (F.length > 1) { if (i + d < 0 || i + d >= F.length) d = -d; i += d; } };
   step(); S.scanT = setInterval(step, 350);
 }
 /* Parameter recorder: samples every setting 20 times a second for up to 60 s, and replays the samples (numbers eased between them). */
-var _introRec = { f: [], on: false, t0: 0, timer: 0, raf: 0, playing: false };
+var _introRec = { f: [], on: false, t0: 0, timer: 0, raf: 0, playing: false, pz: false, pzAt: 0, p0: 0, pos: 0 };
 function _introRecSnap() {
   const V = _introVw, W = _introV, S = _introStrip, q = v => Math.round(v * 1e4) / 1e4;
   return { T: q(_introT), seq: _introSeq ? 1 : 0, gm: _introGM == null ? -1 : _introGM, s0: _introS0, bi: _introBirth ? 1 : 0, h: q(_introHole), cm: _introCM ? 1 : 0, n: _introN, sat: _introSat ? 1 : 0, pa: _introPAuto ? 1 : 0, pi: _introPi, mi: _introMirror ? 1 : 0, gb: _introGbOn ? 1 : 0, gi: _introGbI, ang: _introAng, pt: _introPtScale,
     k: q(W.k), fx: q(W.fx), fy: q(W.fy), vm: V.mode, m: q(V.m), tm: V.tm, x: q(V.x), y: q(V.y), z: q(V.z), sc: V.script ? 1 : 0, ma: V.man ? 1 : 0, so: S.on ? 1 : 0, sa: S.a, sb: S.b, ss: S.s, sw: S.w };
 }
-function _introRecInfo(t) { const e = $('intro-rec-info'); if (!e) return; const n = _introRec.f.length, end = n ? _introRec.f[n - 1].t : 0; e.textContent = _introRec.on ? '● rec ' + t.toFixed(1) + ' / 60 s' : _introRec.playing ? '▶ ' + t.toFixed(1) + ' / ' + end.toFixed(1) + ' s' : n ? n + ' frames · ' + end.toFixed(1) + ' s' : 'no recording'; }
-function introRecToggle() {
+function _introRecInfo(t) { const e = $('intro-rec-info'); if (!e) return; const n = _introRec.f.length, end = n ? _introRec.f[n - 1].t : 0; e.textContent = _introRec.on ? (_introRec.pz ? '❚❚ rec ' : '● rec ') + t.toFixed(1) + ' / 256 s' : _introRec.playing ? '▶ ' + t.toFixed(1) + ' / ' + end.toFixed(1) + ' s' : n ? n + ' frames · ' + end.toFixed(1) + ' s' : 'no recording'; }
+function introRecMode() { return _introRec.on || _introRec.f.length >= 2; }   // the time slider drives the recording once one exists
+function _introRecSlider(t) { const R = _introRec, ts = $('intro-time-sl'), tt = $('intro-tt'); R.pos = t; if (ts && document.activeElement !== ts) ts.value = Math.min(2560, Math.round(t * 10)); if (tt) tt.textContent = 'rec ' + t.toFixed(1) + 's'; }
+function introTimeInput(v) { if (introRecMode()) introRecSeek(v / 10); else introScrub(v / 10); }
+function _introRecFrameAt(t) { const F = _introRec.f; let i = 0; while (i < F.length - 2 && F[i + 1].t <= t) i++; const a = F[i], c = F[Math.min(F.length - 1, i + 1)]; return [a, c, Math.max(0, Math.min(1, (t - a.t) / Math.max(1e-3, c.t - a.t)))]; }
+function introRecSeek(t) {   // scrub the recording; while recording this rewinds and records over from t; while playing it jumps
+  const R = _introRec, F = R.f, now = performance.now(); if (F.length < 2) return;
+  t = Math.max(0, Math.min(F[F.length - 1].t, t)); const fr = _introRecFrameAt(t);
+  if (R.on) { _introRecApply(fr[0], fr[1], fr[2]); R.f = F.filter(f => f.t <= t); R.t0 = now - t * 1000; if (R.pz) R.pzAt = now; if (R.f.length < 1) R.f.push(_introRecSnap()), R.f[0].t = t; }
+  else if (R.playing) { R.p0 = now - t * 1000; if (R.pz) R.pzAt = now; _introRecApply(fr[0], fr[1], fr[2]); }
+  else { _introRecApply(fr[0], fr[1], fr[2]); introPause(true); }
+  _introRecSlider(t); _introRecInfo(t);
+}
+function introRecBack(d) { const R = _introRec; if (!introRecMode()) { introScrub(Math.max(0, _introT - (d || 5))); return; } const t = R.on ? (R.pz ? R.pzAt - R.t0 : performance.now() - R.t0) / 1000 : R.playing ? ((R.pz ? R.pzAt : performance.now()) - R.p0) / 1000 : R.pos; introRecSeek(Math.max(0, t - (d || 5))); }
+function introRecPause() {   // pause / resume the recording or its playback; with neither, pause the intro itself
+  const R = _introRec, now = performance.now();
+  if (R.on || R.playing) { if (R.pz) { R.pz = false; if (R.on) R.t0 += now - R.pzAt; else R.p0 += now - R.pzAt; introPause(false); } else { R.pz = true; R.pzAt = now; introPause(true); } }
+  else introPause();
+  const b = $('intro-rpause-btn'); if (b) b.classList.toggle('on', R.pz); _introRecInfo(R.pos);
+}
+function introRecClear() { const R = _introRec; introRecStop(); introRecPlayStop(); R.f = []; R.pos = 0; const tt = $('intro-tt'); if (tt) tt.textContent = _introT.toFixed(1) + 's'; _introRecInfo(0); }
+function introRecToggle() {   // rec: a new recording, or, when you have scrubbed to a point in an existing one, record over from there
   const R = _introRec; if (R.on) { introRecStop(); return; }
-  introRecPlayStop(); R.f = []; R.on = true; R.t0 = performance.now();
-  const b = $('intro-rec-btn'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); }
-  const tick = () => { const t = (performance.now() - R.t0) / 1000; const o = _introRecSnap(); o.t = Math.round(t * 1000) / 1000; R.f.push(o); _introRecInfo(t); if (t >= 60) introRecStop(); };
+  introRecPlayStop(); const now = performance.now(), end = R.f.length ? R.f[R.f.length - 1].t : 0, keep = R.f.length >= 2 && R.pos > 0.05 && R.pos < end - 0.05 ? R.pos : 0;
+  R.f = R.f.filter(f => f.t <= keep); if (keep > 0 && R.f.length < 1) { const o = _introRecSnap(); o.t = keep; R.f.push(o); } R.on = true; R.pz = false; R.t0 = now - keep * 1000; if (keep > 0) introPause(false);
+  const b = $('intro-rec-btn'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); } const pb = $('intro-rpause-btn'); if (pb) pb.classList.remove('on');
+  const tick = () => { if (R.pz) return; const t = (performance.now() - R.t0) / 1000; const o = _introRecSnap(); o.t = Math.round(t * 1000) / 1000; R.f.push(o); _introRecSlider(t); _introRecInfo(t); if (t >= 256) introRecStop(); };
   tick(); R.timer = setInterval(tick, 50);
 }
-function introRecStop() { const R = _introRec; if (R.timer) { clearInterval(R.timer); R.timer = 0; } R.on = false; const b = $('intro-rec-btn'); if (b) { b.innerHTML = '&#9679; rec'; b.classList.remove('on'); } _introRecInfo(0); }
+function introRecStop() { const R = _introRec; if (R.timer) { clearInterval(R.timer); R.timer = 0; } if (R.on && R.f.length) _introRecSlider(R.f[R.f.length - 1].t); R.on = false; R.pz = false; const pb = $('intro-rpause-btn'); if (pb) pb.classList.remove('on'); const b = $('intro-rec-btn'); if (b) { b.innerHTML = '&#9679; rec'; b.classList.remove('on'); } _introRecInfo(0); }
 function introRecPlayStop() {
-  const R = _introRec; if (R.raf) cancelAnimationFrame(R.raf); R.raf = 0; R.playing = false; if (R.onEnd) { const f = R.onEnd; R.onEnd = null; f(); } const b = $('intro-rplay-btn'); if (b) { b.innerHTML = '&#9654; play'; b.classList.remove('on'); } _introRecInfo(0);
+  const R = _introRec; if (R.raf) cancelAnimationFrame(R.raf); R.raf = 0; R.playing = false; R.pz = false; { const pb = $('intro-rpause-btn'); if (pb) pb.classList.remove('on'); } if (R.onEnd) { const f = R.onEnd; R.onEnd = null; f(); } const b = $('intro-rplay-btn'); if (b) { b.innerHTML = '&#9654; play'; b.classList.remove('on'); } _introRecInfo(0);
 }
 function _introRecApply(a, c, u) {
   const L = (p, q) => p + (q - p) * u, V = _introVw, W = _introV, S = _introStrip, now = performance.now();
@@ -7505,22 +7554,24 @@ function _introRecApply(a, c, u) {
 }
 function introRecPlay() {
   const R = _introRec; if (R.playing) { introRecPlayStop(); return; } if (R.on) introRecStop(); if (R.f.length < 2) return;
+  if (_introStripLock) introStripLockToggle();
   if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; } if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; }
   try { introStripStopGrow(); introStripScanStop(); } catch (e) {}
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
   R.playing = true; const b = $('intro-rplay-btn'); if (b) { b.innerHTML = '&#9632; stop'; b.classList.add('on'); }
-  const F = R.f, end = F[F.length - 1].t, p0 = performance.now(); let i = 0;
+  const F = R.f, end = F[F.length - 1].t, st = R.pos > 0.05 && R.pos < end - 0.05 ? R.pos : 0; R.p0 = performance.now() - st * 1000; R.pz = false; let i = 0;
   const step = () => {
-    if (!R.playing) return; const t = (performance.now() - p0) / 1000;
-    if (t >= end) { _introRecApply(F[F.length - 1], F[F.length - 1], 0); introRecPlayStop(); return; }
-    while (i < F.length - 2 && F[i + 1].t <= t) i++; const a = F[i], c = F[i + 1], u = Math.max(0, Math.min(1, (t - a.t) / Math.max(1e-3, c.t - a.t)));
-    _introRecApply(a, c, u); _introRecInfo(t); R.raf = requestAnimationFrame(step);
+    if (!R.playing) return; if (R.pz) { R.raf = requestAnimationFrame(step); return; } const t = (performance.now() - R.p0) / 1000;
+    if (t >= end) { _introRecApply(F[F.length - 1], F[F.length - 1], 0); _introRecSlider(end); introRecPlayStop(); return; }
+    i = 0; while (i < F.length - 2 && F[i + 1].t <= t) i++; const a = F[i], c = F[i + 1], u = Math.max(0, Math.min(1, (t - a.t) / Math.max(1e-3, c.t - a.t)));
+    _introRecApply(a, c, u); _introRecSlider(t); _introRecInfo(t); R.raf = requestAnimationFrame(step);
   };
   R.raf = requestAnimationFrame(step);
 }
 function introRecVideo() {
   const R = _introRec, cv = $('intro-cv'), info = $('intro-rec-info');
   if (R.f.length < 2) { if (info) info.textContent = 'record something first'; return; }
+  R.pos = 0;
   if (!cv || !cv.captureStream || !window.MediaRecorder) { if (info) info.textContent = 'this browser cannot record video'; return; }
   const types = ['video/mp4;codecs=avc1.640028', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'], mt = types.find(t => MediaRecorder.isTypeSupported(t)); if (!mt) { if (info) info.textContent = 'no video format available'; return; }
   const ext = mt.indexOf('mp4') >= 0 ? 'mp4' : 'webm', ch = [], st = cv.captureStream(30);
@@ -7531,7 +7582,7 @@ function introRecVideo() {
   mr.start(250); introRecPlay(); if (info) info.textContent = 'recording video…';
 }
 function introRecSave() { const R = _introRec; if (!R.f.length) return; const bl = new Blob([JSON.stringify({ type: 'strip-arithmetic-intro-recording', v: 1, frames: R.f })], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'intro-recording.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
-function introRecLoad(inp) { const f = inp.files && inp.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (o && o.type === 'strip-arithmetic-intro-recording' && Array.isArray(o.frames) && o.frames.length > 1) { _introRec.f = o.frames; _introRecInfo(0); } } catch (e) {} inp.value = ''; }; rd.readAsText(f); }
+function introRecLoad(inp) { const f = inp.files && inp.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (o && o.type === 'strip-arithmetic-intro-recording' && Array.isArray(o.frames) && o.frames.length > 1) { _introRec.f = o.frames; _introRec.pos = 0; _introRecInfo(0); } } catch (e) {} inp.value = ''; }; rd.readAsText(f); }
 function introStripToggle() { const S = _introStrip; S.on = !S.on; if (!S.on) { introStripStopGrow(); introStripScanStop(); } introStripSync(); }
 function introStripStopGrow() { const S = _introStrip; if (S.timer) { clearInterval(S.timer); S.timer = 0; } const b = $('intro-st-grow'); if (b) { b.innerHTML = '&#9654; grow 2w / &minus;1s'; b.classList.remove('on'); } }
 function introStripGrow() {
@@ -7598,19 +7649,23 @@ function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
   return [cx + qx, cy - qy];
 }
 function introViewTick(T) {
-  { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { ts.value = Math.min(1500, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'), vz = $('intro-vz-sl'); if (vz && document.activeElement !== vz) vz.value = Math.round(_introVw.z || 0) % 361; if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
+  { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { if (!introRecMode()) { ts.value = Math.min(2560, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'), vz = $('intro-vz-sl'); if (vz && document.activeElement !== vz) vz.value = Math.round(_introVw.z || 0) % 361; if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
   const V = _introVw, es = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }, sg = (a, b) => es((T - a) / (b - a)), now = performance.now(), dt = Math.min(0.1, (now - (V.last || now)) / 1000); V.last = now;
   if (V.script && !V.man) {
+    /* After the hole closes (26.7 s) the plain ring waits: from 34 s the slope band sweeps in slowly across every lattice point and back (to 44 s); only then does the ring move (Cayley, Grid, ...), which runs as it always did, shifted by DL seconds. */
+    const Tr = T, DL = 16.5; let sweep = false;
+    if (Tr >= 27.5 && Tr < 27.5 + DL) { T = 27.4; sweep = Tr >= 34; } else if (Tr >= 27.5 + DL) T = Tr - DL;
     const L = _introS0 + 33;   // the last 28 s (77.5 s to the 105.5 s end) stay in Cayley: x turn, then y and z together, then it holds
     if (T >= 27.5 && T < 37.2) { V.mode = 'cay'; V.m = sg(27.5, 29) - sg(35.5, 37); V.x = 0; V.z = 0; V.y = 270 * sg(29, 33); }
     else if (T >= 37.5 && T < 43.2) { V.mode = 'grid'; V.m = sg(37.5, 39) - sg(41.5, 43); }
     else if (T >= L) { V.mode = 'cay'; V.m = sg(L, L + 1.5); V.x = 360 * sg(L + 1.5, L + 8.5); V.y = 360 * sg(L + 8.5, L + 22.5); V.z = 360 * sg(L + 8.5, L + 22.5); }
     else V.m = 0;
-    { const S = _introStrip, inWin = T >= 28.5 && !S.timer && !S.scanT;   // scripted strip, a fixed function of T so scrubbing works: grow 2w / -1s at 1/2 and back to the first strip, then it scans the Farey slopes (b <= 12) between 1/5 and 1, there and back, until the play ends
+    { const S = _introStrip, inWin = (sweep || Tr >= 27.5 + DL) && !S.timer && !S.scanT;   // scripted strip, a fixed function of T so scrubbing works: grow 2w / -1s at 1/2 and back to the first strip, then it scans the Farey slopes (b <= 12) between 1/5 and 1, there and back, until the play ends
       if (inWin) {
-        if (T < 36.5) { const Gc = Math.max(2, Math.round(_introGcur || 2)), u = Math.max(0, Math.min(1, (T - 28.5) / 7)), k = 1 + Math.round(Gc * (u < 0.5 ? 2 * u : 2 - 2 * u)); S.a = 1; S.b = 2; S.s = -k; S.w = 2 * k; }
+        if (sweep) { const Gc = Math.max(2, Math.round(_introGcur || 2)), u = Math.max(0, Math.min(1, (Tr - 34) / 10)), k = 1 + Math.round(Gc * (u < 0.55 ? u / 0.55 : (1 - u) / 0.45)); S.a = 1; S.b = 2; S.s = -k; S.w = 2 * k; }
+        else if (T < 36.5) { S.a = 1; S.b = 2; S.s = -1; S.w = 2; }
         else if (T >= 56 && _introGbPairs.length) { const Lg = _introGbPairs.length, g = _introGbPairs[introGbIdxAt(T, Lg)], Ee = 2 * (Math.round(_introGcur || 1) + 1), sP = Ee - g, d = gcd(g, sP); S.a = g / d; S.b = sP / d; S.w = 2 * S.b; S.s = -S.b; }   // Goldbach time: the strip follows the marker (g, E - g), i.e. the line r/M = g/(E - g) through it, 2 cells thick
-        else { if (!_introFar) { _introFar = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 5 >= q) _introFar.push([p2, q]); _introFar.sort((u, v) => u[0] * v[1] - v[0] * u[1]); } const L = _introFar.length, P = 2 * (L - 1), n = Math.floor((T - 36.5) / 0.35) % P, f = _introFar[n < L ? n : P - n]; S.a = f[0]; S.b = f[1]; S.s = -f[1]; S.w = 2 * f[1]; }
+        else { if (!_introFar) { _introFar = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 2 >= q) _introFar.push([p2, q]); _introFar.sort((u, v) => v[0] * u[1] - u[0] * v[1]); } const L = _introFar.length, P = 2 * (L - 1), n = Math.floor((T - 36.5) / 0.35) % P, f = _introFar[n < L ? n : P - n]; S.a = f[0]; S.b = f[1]; S.s = -f[1]; S.w = 2 * f[1]; }
         S.on = true; S.scr = true;
       } else if (S.scr && !S.timer && !S.scanT) { S.scr = false; S.on = false; } }
     { const inGb = T >= 56 && !_introGbTimer;   // scripted Goldbach: from 56 s to the end (it carries on into the final Cayley section), the pair g + s = E steps through every pair once (the prime scan pauses meanwhile)
@@ -7693,9 +7748,9 @@ async function introMathSheet() {
   const svgLine = (pts, tgt, xl, yl, tl) => { const w = 560, h = 240, pl = 52, pb = 34, xs = pts.map(p => p[0]), ys = pts.map(p => p[1]).concat([tgt]), x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys), py = v => 10 + (h - pb - 10) * (1 - (v - y0) / ((y1 - y0) || 1)), px = v => pl + (w - pl - 10) * (v - x0) / ((x1 - x0) || 1); return '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ch"><rect x="0" y="0" width="' + w + '" height="' + h + '" fill="#fff"/><line x1="' + pl + '" y1="' + (h - pb) + '" x2="' + (w - 10) + '" y2="' + (h - pb) + '" stroke="#444"/><line x1="' + pl + '" y1="10" x2="' + pl + '" y2="' + (h - pb) + '" stroke="#444"/><line x1="' + pl + '" y1="' + py(tgt) + '" x2="' + (w - 10) + '" y2="' + py(tgt) + '" stroke="#c0392b" stroke-dasharray="5 4"/><polyline fill="none" stroke="#1f5fa8" stroke-width="1.4" points="' + pts.map(p => px(p[0]).toFixed(1) + ',' + py(p[1]).toFixed(1)).join(' ') + '"/><text x="' + (pl - 4) + '" y="' + (py(y1) + 4) + '" font-size="11" text-anchor="end">' + y1.toFixed(3) + '</text><text x="' + (pl - 4) + '" y="' + (py(y0) + 4) + '" font-size="11" text-anchor="end">' + y0.toFixed(3) + '</text><text x="' + (w / 2) + '" y="' + (h - 8) + '" font-size="12" text-anchor="middle">' + xl + '</text><text x="' + (w - 14) + '" y="' + (py(tgt) - 5) + '" font-size="11" fill="#c0392b" text-anchor="end">' + (tl || 'target D(' + n + ')') + ' = ' + tgt.toFixed(4) + '</text><text x="' + (pl + 4) + '" y="22" font-size="12">' + yl + '</text></svg>'; };
   const svgBars = vals => { const w = 560, h = 240, pl = 52, pb = 34, mx = Math.max(0.01, Math.max.apply(0, vals.map(Math.abs))) * 1.2, mid = 10 + (h - pb - 10) / 2, bw = 56; let s = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="ch"><rect width="' + w + '" height="' + h + '" fill="#fff"/><line x1="' + pl + '" y1="' + mid + '" x2="' + (w - 10) + '" y2="' + mid + '" stroke="#444"/>'; vals.forEach((v, i) => { const hh = (h - pb - 10) / 2 * Math.abs(v) / mx, xx = pl + 24 + i * 92; s += '<rect x="' + xx + '" y="' + (v >= 0 ? mid - hh : mid) + '" width="' + bw + '" height="' + Math.max(1, hh) + '" fill="' + (v >= 0 ? '#2e8b57' : '#c0392b') + '"/><text x="' + (xx + bw / 2) + '" y="' + (h - 16) + '" font-size="12" text-anchor="middle">' + (i < 4 ? 's=' + (i + 1) : 's≥5') + '</text><text x="' + (xx + bw / 2) + '" y="' + (v >= 0 ? mid - hh - 4 : mid + hh + 12) + '" font-size="11" text-anchor="middle">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</text>'; }); return s + '<text x="' + (pl + 4) + '" y="22" font-size="12">sector error (observed / expected − 1), %</text></svg>'; };
   const pip = []; for (let g = 2, c = 0; g <= G; g++) { let ok = true; for (let q = 2; q * q <= g; q++) if (g % q === 0) { ok = false; break; } if (ok) c++; pip.push([g, c / (g / Math.log(g))]); }
-  // 9. the strip: a band of 2 cells in r around the line r/M = a/b, for the Farey slopes the animation scans (b <= 12, 1/5 <= a/b <= 1), counted exactly for this G and n
+  // 9. the strip: a band of 2 cells in r around the line r/M = a/b, for the Farey slopes the animation scans (b <= 12, 1/2 <= a/b <= 1), counted exactly for this G and n
   const stRow = (a2, b2, w2, s2, lab) => { let cells = 0, cop2 = 0; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((s2 + a2 * M) / b2)), hi = Math.min(M, Math.ceil((s2 + w2 + a2 * M) / b2) - 1); for (let r = lo; r <= hi; r++) { cells++; if (gcd(r, M) === 1 && !(n > 0 && introKilled(r, M, n))) cop2++; } } const sh2 = cells ? cop2 / cells : 0; return '<tr><td>' + lab + '</td><td>' + fx(a2 / b2, 4) + '</td><td>' + cells + '</td><td>' + cop2 + '</td><td>' + fx(sh2 * 100, 2) + '%</td><td class="' + (sh2 >= d.D ? 'g' : 'rd') + '">' + fx(d.D ? sh2 / d.D : 0, 3) + '</td></tr>'; };
-  const fr = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 5 >= q) fr.push([p2, q]); fr.sort((u, v) => u[0] * v[1] - v[0] * u[1]);
+  const fr = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 2 >= q) fr.push([p2, q]); fr.sort((u, v) => v[0] * u[1] - u[0] * v[1]);
   const secStrip = '<h2>9. The slope band: r/M = a/b</h2><div class="m">band: off ≤ b·r − a·M &lt; off + w   (cells with r ≤ M), slope a/b = r/M, w = 2b and off = −b give a band 2 cells thick in r\nshare = coprime (kept) cells in the band / cells in the band ;  expected share = D(n) (6/π² for n = 0)</div>'
     + (_introStrip.on ? '<div class="n">band on screen: slope ' + _introStrip.a + '/' + _introStrip.b + ' = ' + fx(_introStrip.a / _introStrip.b, 4) + ', width ' + _introStrip.w + ', offset ' + _introStrip.s + '</div>' : '')
     + '<table><tr><th>slope a/b</th><th>decimal</th><th>cells in band</th><th>kept</th><th>share</th><th>share / D(n)</th></tr>' + (_introStrip.on ? stRow(_introStrip.a, _introStrip.b, _introStrip.w, _introStrip.s, 'on screen ' + _introStrip.a + '/' + _introStrip.b) : '') + fr.map(f => stRow(f[0], f[1], 2 * f[1], -f[1], f[0] + '/' + f[1])).join('') + '</table><div class="n">The three PNGs above show the slope band and the Goldbach overlay as they were on screen when the sheet was made. Near a line of small denominator the band follows cells with a common structure, so the share can sit visibly away from D(n); that is a finite-G observation, not a limit statement.</div>';
@@ -7777,7 +7832,7 @@ function introSheetPreview(ctx) {
 }
 function introScrub(t) {
   _introVUser = false;
-  t = Math.max(0, Math.min(150, +t || 0)); const now = performance.now();
+  t = Math.max(0, Math.min(256, +t || 0)); const now = performance.now();
   _introT0 = (_introPaused ? _introPauseAt : now) - t * 1000;
   _introSeq = true; _introBirth = false; _introGM = null; _introS0 = 44.5; _introRay0 = now - 7000;   // rays already drawn when scrubbing
   const V = _introVw; V.script = true; V.man = false; V.rot = 0; V.tm = 0;
@@ -9657,6 +9712,13 @@ function liftSetSpiralP(v) {
   liftSpiralP = v === 1 ? 1 : (isPrime(v) ? v : nextPrime(Math.max(1, v - 1)));
   const inp = $('lift-p-inp'); if (inp) inp.value = liftSpiralP;
   redraw(false);
+}
+function liftSpiralPreset() {
+  if (typeof liftOn !== 'undefined' && !liftOn) liftToggleOn();
+  liftSetMode('spiral'); liftToggleMirror(true); liftToggleDropout(true);
+  [['lift-mirror-chk'], ['lift-dropout-chk']].forEach(function (a) { const c = $(a[0]); if (c) c.checked = true; });
+  if (liftSpiralP < 2) liftSetSpiralP(2);
+  if (!liftPPlayIv) liftPPlay();
 }
 function liftLockOne() { if (liftPPlayIv) liftPPlay(); liftSetSpiralP(1); }
 function liftToggleMirror(v) { liftMirrorOn = !!v; redraw(false); }
