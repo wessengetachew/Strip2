@@ -7191,6 +7191,7 @@ function showIntro() {
     if (_introStripLock && _introGbOn) { const LP = introGbPairsFor(G); if (LP && LP.length) { const g = LP[Math.min(_introGbI, LP.length - 1)], sP = 2 * (G + 1) - g, d = gcd(g, sP), S0 = _introStrip; S0.on = true; S0.a = g / d; S0.b = sP / d; S0.w = 2 * S0.b; S0.s = -S0.b; { const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai && document.activeElement !== ai) ai.value = S0.a; if (bi && document.activeElement !== bi) bi.value = S0.b; } } }   // locked to the Goldbach pair on screen: the band follows the line r/M = g/(E - g) through the marker (g, E - g)
     const ST = _introStrip.on ? _introStrip : null;
     const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY, z: _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
+    { const tf = _introGbOn ? G / (2 * (G + 1) + 1) : 1; _introGridF = _introExporting ? tf : _introGridF + (tf - _introGridF) * 0.18; if (Math.abs(_introGridF - tf) < 0.002) _introGridF = tf; }   // Grid + Goldbach: ease the square in so the whole pair (r + M = E - g reaches M = E - 3) fits
     const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GZ); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
     let lastCs = null;
     const GBd = _introGbOn ? introGbPairsFor(G) : null, GBg = GBd && GBd.length ? GBd[Math.min(_introGbI, GBd.length - 1)] : 0, GBs = GBg ? 2 * (G + 1) - GBg : 0;   // Goldbach: only the four lines a, b, c, d of the current pair stay bright, every other cell dims
@@ -7477,7 +7478,7 @@ function introStripSet() {
   S.a = isFinite(a) ? a : 1; S.b = isFinite(b) && b !== 0 ? b : 1; S.s = +$('intro-st-s').value; S.w = Math.max(1, +$('intro-st-w').value);
   if (S.timer) introStripStopGrow(); introStripScanStop(); S.on = true; introStripSync();
 }
-var _introStripLock = false;
+var _introStripLock = false, _introGridF = 1;
 function introStripLockToggle() {   // lock the slope band to the Goldbach pair: slope g/(E-g), 2 cells thick; needs the Goldbach overlay on
   _introStripLock = !_introStripLock; const b = $('intro-st-lock'); if (b) b.classList.toggle('on', _introStripLock);
   if (_introStripLock) { try { introStripStopGrow(); introStripScanStop(); } catch (e) {} if (!_introGbOn) { try { introSetGb(10); } catch (e) {} } }
@@ -7636,7 +7637,7 @@ let _introPaused = false, _introPauseAt = 0, _introAutoT = 0;
    and again as a "look back" after one full spiral scan; the chips drive the same state by hand. */
 var _introVw = { m: 0, tm: 0, mode: 'cay', x: 0, y: 0, z: 0, rot: 0, script: true, man: false, last: 0 };
 function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
-  if (V.mode === 'grid') { const S = R * 1.9; return [cx + ((M - 0.5) / G - 0.5) * S, cy - ((r - 0.5) / G - 0.5) * S]; }   // M to the right, r up: both positive, the whole square (r <= M below the diagonal, r > M above); same as the opener and the main page
+  if (V.mode === 'grid') { const f = _introGridF, S = Math.min(R * 1.9 * (1 + 0.9 * (1 - f)), 2 * (cx - 14)); return [cx + ((M - 0.5) / G * f - 0.5) * S, cy - ((r - 0.5) / G * f - f / 2) * S]; }   // with Goldbach on f = G / (E + 1) shrinks the square (about its centre line) so the markers at M up to E - 3 stay on the plate   // M to the right, r up: both positive, the whole square (r <= M below the diagonal, r > M above); same as the opener and the main page
 
   const rho = OPENER_RHO0 + OPENER_RHOD * M / GMAX, zx = rho * Math.cos(th), zy = rho * Math.sin(th), br = zx + 1, d = br * br + zy * zy;
   if (d < 1e-9) return null;
