@@ -2060,7 +2060,7 @@ walk anyway.</p>
       </div>
       <div class="ig"><div class="gl">Prime spiral &nbsp;× ÷</div>
         <div class="gr"><input type="range" id="intro-p-sl" min="0" max="53" value="0" oninput="introSetP(this.value)" style="flex:1 1 90px;min-width:70px;" title="Prime spiral p (and its mirror): drag to pick the prime"><span id="intro-p-val" class="gv">p = 2</span></div>
-        <div class="gr"><button class="chip" id="intro-p-btn" onclick="introPAutoToggle()" title="Multiplicative (× and ÷): the prime spiral r = p on every ring (classically a hyperbolic spiral, rho*theta = const) and its mirror r = M - p (complex conjugation). Click to scan the primes up and back, or pause on the slider's prime. Also hides the Goldbach overlay.">❚❚ × ÷</button><button class="chip on" id="intro-mir-btn" onclick="introToggleMirror()" title="Mirror sigma(r) = M - r: complex conjugation, reflection across the real axis">mirror</button></div>
+        <div class="gr"><button class="chip" id="intro-p-btn" onclick="introPAutoToggle()" title="Multiplicative (× and ÷): the prime spiral r = p on every ring (classically a hyperbolic spiral, rho*theta = const) and its mirror r = M - p (complex conjugation). Click to scan the primes up and back, or pause on the slider's prime. Also hides the Goldbach overlay.">❚❚ × ÷</button><button class="chip" id="intro-plock-btn" onclick="introPLockToggle()" title="Lock the prime spiral to C(n): block depth n = p &minus; 1, the depth at which the prime p is saturated (n + 1 &ge; p). Every column r divisible by p or by a smaller prime is struck out. Move the prime and n follows; move n (slider or play) and the prime follows.">&#128274; C(n)</button><button class="chip on" id="intro-mir-btn" onclick="introToggleMirror()" title="Mirror sigma(r) = M - r: complex conjugation, reflection across the real axis">mirror</button></div>
       </div>
       <div class="ig"><div class="gl">Goldbach &nbsp;+ −</div>
         <div class="gr"><input type="range" id="intro-e-sl" min="0" max="0" value="0" oninput="introSetGb(this.value)" style="flex:1 1 90px;min-width:70px;" title="Goldbach pair g + s = E: the four Strip I lines a, b, c, d for that gap"><span id="intro-e-val" class="gv">g = 3</span></div>
@@ -7251,7 +7251,8 @@ function showIntro() {
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
-    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : (_introPAuto ? (T < 19 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : _introSieveP ? _introSieveP : (_introPAuto ? (T < 19 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    if (_introPLock && sp && sp - 1 <= 255) _introN = sp - 1;   // locked: C(n) depth follows the spiral prime
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= 19 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold, joined to their conjugate 2π − θ), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
@@ -7328,7 +7329,7 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
       if (stA > 0.01) { x.globalAlpha = baseGA * stA; blk(sec, true, y0, false); x.globalAlpha = baseGA; }
       if (_introGbOn && _introGbPairs.length) { const g2 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], GO = '#ffd36b', E2 = 2 * (G + 1), th = introGbTheory(E2), act = _introGbPairs.length, f1 = v => v.toFixed(1), er = v => (v >= act ? '+' : '\u2212') + Math.abs((v - act) / act * 100).toFixed(1) + '%';
         const gl = [['Goldbach E = ' + E2, GO], ['actual ' + act + ' pairs (' + (2 * act) + ' ordered)', '#fff'], ['formula (H–L) ' + f1(th.hl) + '  ' + er(th.hl), th.hl >= act ? GR : RD], ['circle q≤12 ' + f1(th.cm) + '  ' + er(th.cm), th.cm >= act ? GR : RD]]; blk(gl, true, y0 + (sec.length + 1) * lh * stA, false); }
-      if (ST) { const TL = 'rgba(61,200,184,1)', sh2 = stN ? stC / stN : 0; blk([['slope ' + ST.a + '/' + ST.b + ' = ' + (ST.a / ST.b).toFixed(4), TL], ['w ' + ST.w + ' · off ' + String(ST.s).replace('-', '\u2212'), TL], ['cells ' + stN, TL], ['coprime ' + stC, TL], [(sh2 * 100).toFixed(2) + '% of band', TL], [(cop ? (100 * stC / cop).toFixed(1) : '0') + '% of kept', TL], [(six ? (sh2 / six).toFixed(3) : '0') + '× ' + (nn ? 'D(n)/ζ(2)' : '1/ζ(2)'), TL]], false, y0 + 6 * lh * stA, false); }
+      if (ST) { const TL = 'rgba(61,200,184,1)', sh2 = stN ? stC / stN : 0; blk([['slope ' + ST.a + '/' + ST.b + ' = ' + (ST.a / ST.b).toFixed(4), TL], ['w ' + ST.w + ' · off ' + String(ST.s).replace('-', '\u2212'), TL], ['cells ' + stN, TL], ['coprime ' + stC, TL], [(sh2 * 100).toFixed(2) + '% of band', TL], [(cop ? (100 * stC / cop).toFixed(1) : '0') + '% of kept', TL], [(six ? (sh2 / six).toFixed(3) : '0') + '× ' + (nn ? 'D(n)' : '1/ζ(2)'), TL]], false, y0 + 6 * lh * stA, false); }
       let pc = 0; for (let n = 2; n <= G; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) pc++; }
       let colc = 0, colN = 0; if (sp) for (let M = sp; M <= G; M++) { colN++; if (_introN > 0 ? !introKilled(sp, M, _introN) : gcd(sp, M) === 1) colc++; }
       const pexp = sp ? 1 - Math.min(_introN + 1, sp) / sp : 0;
@@ -7463,7 +7464,7 @@ function introNPlay() {
   _introNTimer = setInterval(() => {
     if (_introPaused) return;
     if (_introN >= 255) _introDir = -1; else if (_introN <= 0) _introDir = 1;
-    _introN = Math.max(0, Math.min(255, _introN + _introDir));
+    _introN = Math.max(0, Math.min(255, _introN + _introDir)); if (_introPLock) _introPFromN();
   }, 110);
 }
 function introSetP(i) { introGbStop(false); _introPAuto = false; introFull(); _introPi = i | 0; const b = $('intro-p-btn'); if (b) b.textContent = '▶ × ÷'; }
@@ -7493,7 +7494,13 @@ function introStripReset() {
   ['intro-st-a', 'intro-st-b', 'intro-st-sn', 'intro-st-wn'].forEach((id, i) => { const el = $(id); if (el) el.value = [1, 2, -1, 2][i]; });
   introStripSync();
 }
-var _introStripLock = false, _introGridF = 1, _introVkey = 'ring', _introZ = { ring: { k: 1, fx: 0, fy: 0 }, cay: { k: 1, fx: 0, fy: 0 }, grid: { k: 1, fx: 0, fy: 0 } };
+var _introPLock = false;
+function _introPFromN() { let idx = 0; for (let i = 0; i < _introPr256.length; i++) if (_introPr256[i] <= _introN + 1) idx = i; _introPAuto = false; _introPi = idx; const b = $('intro-p-btn'); if (b) b.textContent = '▶ × ÷'; }
+function introPLockToggle() {   // lock the prime spiral to C(n): block depth n = p - 1, the depth at which the prime p is saturated; moving either one moves the other
+  _introPLock = !_introPLock; const b = $('intro-plock-btn'); if (b) b.classList.toggle('on', _introPLock);
+  if (_introPLock) { if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; const nb = $('intro-n-btn'); if (nb) nb.textContent = '▶ C(n) play'; } introFull(); if (!_introPAuto || true) { /* n follows the prime on the next frame */ } }
+}
+var _introSieveP = 0, _introPr256 = (() => { const a = []; for (let n = 2; n <= 256; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) a.push(n); } return a; })(), _introStripLock = false, _introGridF = 1, _introVkey = 'ring', _introZ = { ring: { k: 1, fx: 0, fy: 0 }, cay: { k: 1, fx: 0, fy: 0 }, grid: { k: 1, fx: 0, fy: 0 } };
 /* Zoom belongs to the view it was made in: Ring, Cayley and Grid each keep their own zoom and pan, so zooming out on the Cayley sphere (more lattice points come into view) leaves the Ring and the Grid alone. */
 function _introVk() { const V = _introVw; return V.m > 0.5 && V.mode === 'cay' ? 'cay' : V.m > 0.5 && V.mode === 'grid' ? 'grid' : 'ring'; }
 function _introZoomSwap() { const vk = _introVk(); if (vk === _introVkey) return; const W = _introV; _introZ[_introVkey] = { k: W.k, fx: W.fx, fy: W.fy }; const n = _introZ[vk] || { k: 1, fx: 0, fy: 0 }; W.k = n.k; W.fx = n.fx; W.fy = n.fy; _introVkey = vk; }
@@ -7574,7 +7581,7 @@ function _introRecApply(a, c, u) {
 }
 function introRecPlay() {
   const R = _introRec; if (R.playing) { introRecPlayStop(); return; } if (R.on) introRecStop(); if (R.f.length < 2) return;
-  if (_introStripLock) introStripLockToggle();
+  if (_introStripLock) introStripLockToggle(); if (_introPLock) introPLockToggle();
   if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; } if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; }
   try { introStripStopGrow(); introStripScanStop(); } catch (e) {}
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
@@ -7708,6 +7715,9 @@ function introViewTick(T) {
   if (V.script && !V.man) {
     /* After the hole closes (26.7 s) the plain ring waits: from 34 s the slope band sweeps in slowly across every lattice point and back (to 44 s); only then does the ring move (Cayley, Grid, ...), which runs as it always did, shifted by DL seconds. */
     const Tr = T, DL = 16.5; let sweep = false;
+    /* The C(n) sieve plays once the ring is open (27 to 34 s), and keeps looping to the end of the play, every loop 1.43x slower than the one before (7 s, 10 s, 14 s, 20 s, 29 s, ...): the prime p climbs through the primes up to 251 and back, block depth n = p - 1, so every column r that p (or any smaller prime) divides is struck out, then the survivors return as n falls back to 0. The prime spiral follows the same p. */
+    if (!_introNTimer && Tr >= 27) { let t0 = 27, d = 7; while (Tr >= t0 + d) { t0 += d; d *= 1.43; } const u = (Tr - t0) / d, f = u < 0.5 ? 2 * u : 2 - 2 * u, pi = Math.max(0, Math.min(_introPr256.length - 1, Math.round(f * (_introPr256.length - 1)))); _introSieveP = _introPr256[pi]; _introN = _introSieveP - 1; }
+    else if (_introSieveP) { _introSieveP = 0; _introN = 0; }
     if (Tr >= 27.5 && Tr < 27.5 + DL) { T = 27.4; sweep = Tr >= 34; } else if (Tr >= 27.5 + DL) T = Tr - DL;
     const L = _introS0 + 33;   // the last 28 s (77.5 s to the 105.5 s end) stay in Cayley: x turn, then y and z together, then it holds
     if (T >= 27.5 && T < 37.2) { V.mode = 'cay'; V.m = sg(27.5, 29) - sg(35.5, 37); V.x = 0; V.z = 0; V.y = 270 * sg(29, 33); }
@@ -7946,7 +7956,7 @@ function introToggleCtl() {
 function introFull() { if (_introVw.m > 0.02) { _introVw.script = false; _introVw.man = true; _introVw.tm = 1; ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === _introVw.mode); }); } else { _introVw.script = false; if (!_introVw.man) { _introVw.m = 0; _introVw.tm = 0; } } if (_introSeq) { _introSeq = false; _introBirth = false; _introS0 = 9.3; _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } introSetHole(0); } if (_introT < 9.5) _introT0 -= (9.5 - _introT) * 1000; }
 function introSetN(v) {
   if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; const b = $('intro-n-btn'); if (b) b.textContent = '▶ C(n) play'; }
-  introFull(); _introN = Math.max(0, Math.min(255, v | 0)); if (_introSel) introShowPop(_introSel.r, _introSel.M);
+  introFull(); _introN = Math.max(0, Math.min(255, v | 0)); if (_introPLock) _introPFromN(); if (_introSel) introShowPop(_introSel.r, _introSel.M);
 }
 function introShowPop(r, M) {
   const n = _introN, pop = $('intro-pop'); if (!pop) return;
