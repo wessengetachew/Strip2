@@ -7229,7 +7229,7 @@ function showIntro() {
       x.save(); x.lineWidth = 1; x.strokeStyle = 'rgba(242,200,96,.35)';
       for (let r = 1; r <= G; r++) {
         const th = _introTh(r, G), px = cx + rd * Math.cos(th), py = cy - rd * Math.sin(th);
-        if (lv1G(r, G) === 1) { nb++; x.fillStyle = '#ffd36b'; x.fillRect(px - 2.6, py - 2.6, 5.2, 5.2); if (py < cy - 1) { x.beginPath(); x.moveTo(px, py); x.lineTo(px, 2 * cy - py); x.stroke(); } }
+        if (lv1G(r, G) === 1) { nb++; x.fillStyle = '#ffd36b'; x.fillRect(px - 2.6, py - 2.6, 5.2, 5.2); }
         else { x.fillStyle = 'rgba(255,107,107,.9)'; x.beginPath(); x.arc(px, py, 2.4, 0, 7); x.fill(); }
       }
       x.restore(); _introBirthN = nb;
@@ -7255,7 +7255,7 @@ function showIntro() {
     if (_introPLock && sp && sp - 1 <= 255) _introN = sp - 1;   // locked: C(n) depth follows the spiral prime
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= 19 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
-    let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold, joined to their conjugate 2π − θ), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
+    let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
     if (sp) {
       const ang = (r, M) => _introTh(r, M) + spin, rd = M => _introRad(R, M, GZ);
       [[0, 'rgba(79,209,197,', '#4fd1c5'], [1, 'rgba(155,127,232,', '#9b7fe8']].forEach(([mir, col, solid]) => {
@@ -7369,8 +7369,8 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
     const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
     _introT = calm ? 99 : ((_introPaused ? _introPauseAt : now) - _introT0) / 1000;
     introViewTick(_introT);
-    if (_introSeq) { const q = introSeqState(_introT); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 27.2) { _introSeq = false; _introBirth = false; } }
-    paint(x, W, H, _introT);
+    if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } }
+    paint(x, W, H, _introT - 10);
     { const sl = $('intro-n-sl'); if (sl && document.activeElement !== sl && +sl.value !== _introN) sl.value = _introN; const nv = $('intro-n-val'); if (nv) nv.textContent = 'n = ' + _introN;
       { const ms = $('intro-m-sl'); if (ms && document.activeElement !== ms && +ms.value !== _introGcur) ms.value = _introGcur; const ml = $('intro-m-val'); if (ml) ml.textContent = 'M ≤ ' + _introGcur; }
       const ps = $('intro-p-sl'); if (ps) { if (document.activeElement !== ps && +ps.value !== _introPi) ps.value = _introPi; const pv = $('intro-p-val'); if (pv) pv.textContent = 'p = ' + (_introPrimes[_introPi] || 2); }
@@ -7415,12 +7415,12 @@ let _introHole = 0, _introCM = false, _introGZ = 0, _introSeq = true, _introSeqG
    Touching any control ends the sequence (the intro's own timeline then takes over). */
 function introSeqState(T) {
   const ez = u => u * u * (3 - 2 * u), lg = u => Math.max(1, Math.min(512, Math.round(Math.pow(512, u))));
+  if (T < 0) { const t = T + 10; return { G: 512, h: t < 4 ? ez(t / 4) : t < 8 ? 1 - ez((t - 4) / 4) : ez((t - 8) / 2), cm: true, b: false }; }   // prelude: the hole slides 0 -> 1 -> 0 -> 1
   if (T < 3) return { G: 512, h: 1, cm: true, b: false };                                                // open on the circle method: the unit circle of every primitive point up to 256, with the Farey arcs and |S(a)| inside it
   if (T < 8.5) return { G: lg(1 - ez((T - 3) / 5.5)), h: 1, cm: true, b: false };                        // collapse: M counts down (the circle method follows N = 2(M+1)), the circle empties into one point (M = 1)
-  if (T < 18.5) return { G: lg(ez((T - 8.5) / 10)), h: 1, cm: false, b: true };                          // rebirth: each M adds phi(M) new points; the rest collide with earlier ones
-  if (T < 20) return { G: 512, h: 1, cm: false, b: false };
-  if (T < 21.5) return { G: 512, h: 1 - 0.5 * ez((T - 20) / 1.5), cm: T > 20.8, b: false };             // the hole opens to 0.5, circle method on again
-  if (T < 25.5) return { G: 512, h: 0.5, cm: true, b: false };                                          // hold the circle method
+  if (T < 13) return { G: lg(ez((T - 8.5) / 4.5)), h: 1, cm: T > 11, b: false };   // plain regrow of M after the collapse, no overlay
+       if (T < 19) return { G: 512, h: 1 - 0.5 * ez((T - 13) / 6), cm: true, b: false };   // hole eases to .5 for the prime spiral at 19 s
+       if (T < 25.5) return { G: 512, h: 0.5, cm: true, b: false };                                          // hold the circle method
   return { G: 512, h: Math.max(0, 0.5 * (1 - (T - 25.5) / 1.2)), cm: false, b: false };                 // hole to 0 and stays: M is now the radius
 }
 function introSetHole(v) { _introHole = Math.max(0, Math.min(1, v)); const sl = $('intro-hole-sl'); if (sl && +sl.value !== Math.round(_introHole * 100)) sl.value = Math.round(_introHole * 100); const b = $('intro-hole-btn'); if (b) b.classList.toggle('on', Math.abs(_introHole - 0.5) < 0.005); }
@@ -7710,13 +7710,14 @@ function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
 }
 function introViewTick(T) {
   { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { if (!introRecMode()) { ts.value = Math.min(2560, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'), vz = $('intro-vz-sl'); if (vz && document.activeElement !== vz) vz.value = Math.round(_introVw.z || 0) % 361; if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
+  T = T - 10;   // the first 10 s are the hole prelude; the scripted timeline starts after it
   _introZoomSwap();
   const V = _introVw, es = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }, sg = (a, b) => es((T - a) / (b - a)), now = performance.now(), dt = Math.min(0.1, (now - (V.last || now)) / 1000); V.last = now;
   if (V.script && !V.man) {
     /* After the hole closes (26.7 s) the plain ring waits: from 34 s the slope band sweeps in slowly across every lattice point and back (to 44 s); only then does the ring move (Cayley, Grid, ...), which runs as it always did, shifted by DL seconds. */
     const Tr = T, DL = 16.5; let sweep = false;
     /* The C(n) sieve plays once the ring is open (27 to 34 s), and keeps looping to the end of the play, every loop 1.43x slower than the one before (7 s, 10 s, 14 s, 20 s, 29 s, ...): the prime p climbs through the primes up to 251 and back, block depth n = p - 1, so every column r that p (or any smaller prime) divides is struck out, then the survivors return as n falls back to 0. The prime spiral follows the same p. */
-    if (!_introNTimer && Tr >= 27) { let t0 = 27, d = 7; while (Tr >= t0 + d) { t0 += d; d *= 1.43; } const u = (Tr - t0) / d, f = u < 0.5 ? 2 * u : 2 - 2 * u, pi = Math.max(0, Math.min(_introPr256.length - 1, Math.round(f * (_introPr256.length - 1)))); _introSieveP = _introPr256[pi]; _introN = _introSieveP - 1; }
+    if (!_introNTimer && Tr >= 27 && Tr < 80) { let t0 = 27, d = 7; while (Tr >= t0 + d) { t0 += d; d *= 1.43; } const u = (Tr - t0) / d, f = u < 0.5 ? 2 * u : 2 - 2 * u, pi = Math.max(0, Math.min(_introPr256.length - 1, Math.round(f * (_introPr256.length - 1)))); _introSieveP = _introPr256[pi]; _introN = _introSieveP - 1; }
     else if (_introSieveP) { _introSieveP = 0; _introN = 0; }
     if (Tr >= 27.5 && Tr < 27.5 + DL) { T = 27.4; sweep = Tr >= 34; } else if (Tr >= 27.5 + DL) T = Tr - DL;
     const L = _introS0 + 33;   // the last 28 s (77.5 s to the 105.5 s end) stay in Cayley: x turn, then y and z together, then it holds
@@ -7768,7 +7769,7 @@ function introSheetData(G, n) {
 async function introMathSheet() {
   if (!_introPaint) return;
   { const V = _introVw, live = V.mode === 'cay' && V.m > 0.02; _introExpX = live ? V.x : 0; _introExpY = live ? V.y : 0; _introExpZ = live ? (V.z || 0) : 0; }
-  const G = Math.max(1, Math.round(_introGcur)), n = _introN || 0, T = _introT, fx = (v, d) => v.toFixed(d == null ? 2 : d);
+  const G = Math.max(1, Math.round(_introGcur)), n = _introN || 0, T = Math.max(0, _introT - 10), fx = (v, d) => v.toFixed(d == null ? 2 : d);
   const d = introSheetData(G, n), kept = d.cum[G], ratio = kept / d.tot, err = (ratio / d.D - 1) * 100;
   // pictures
   const W = 1600, H = 1000, shots = {}, saveGM = _introGM, saveExp = _introExporting;
@@ -7870,7 +7871,7 @@ async function introSheetAll(ctx, st) {
   let pages = null;
   try {
     say('rendering sheet pages…'); pages = await introSheetPages(ctx.html, ctx.dark);
-    for (let i = 0; i < pages.length; i++) { const bl = await new Promise(r => pages[i].toBlob(r, 'image/png')); if (bl) files.push({ name: base + (fmt === 'phone' ? '-1080x1920' : '') + '-sheet-p' + String(i + 1).padStart(2, '0') + 'of' + String(pages.length).padStart(2, '0') + '.png', blob: bl }); }
+    for (let i = 0; i < pages.length; i++) { const bl = await new Promise(r => pages[i].toBlob(r, 'image/png')); if (bl) files.push({ name: base + '-sheet-p' + String(i + 1).padStart(2, '0') + 'of' + String(pages.length).padStart(2, '0') + '.png', blob: bl }); }
     try { const pdf = msPdfBuild(pages.map(cv => ({ cv, wPt: 595.28, hPt: 841.89, q: 0.92 })), 'Strip Arithmetic II'); files.push({ name: base + '-math-sheet.pdf', blob: pdf }); } catch (e) {}
   } catch (e) { say('page images are not available in this browser; the zip has the view PNGs and the sheet page'); await new Promise(r => setTimeout(r, 1200)); }
   say('zipping…'); const z = await msZipBlob(files); introSheetDl(z, base + '-all.zip'); say('saved ' + files.length + ' files in ' + base + '-all.zip' + (pages ? '' : ' (no page images)'));
@@ -7887,20 +7888,21 @@ async function _introPhonePlate(ctx, v) {   // one view plate on a 1080 x 1920 p
 async function introSheetPngs(ctx, st) {   // one zip of every image: the three views and every page of the sheet; A4 pages, or 1080 x 1920 cards and pages when chosen
   const fmt = ($('iss-fmt') || {}).value === 'phone' ? 'phone' : 'a4', files = [], say = t => { if (st) st.textContent = t; }, b64 = u => { const b = atob(u.split(',')[1]), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return new Blob([a], { type: 'image/png' }); }, base = 'strip-arithmetic-II-G' + ctx.G + '-n' + ctx.n;
   say('building…'); if (fmt === 'phone') { for (const v of ['ring', 'cay', 'grid']) files.push({ name: base + '-1080x1920-view-' + v + '.png', blob: await _introPhonePlate(ctx, v) }); } else ['ring', 'cay', 'grid'].forEach(v => files.push({ name: base + '-view-' + v + '.png', blob: b64(ctx.shots[v]) }));
-  try { say('rendering sheet pages…'); const pages = await introSheetPages(ctx.html, ctx.dark, fmt); for (let i = 0; i < pages.length; i++) { const bl = await new Promise(r => pages[i].toBlob(r, 'image/png')); if (bl) files.push({ name: base + (fmt === 'phone' ? '-1080x1920' : '') + '-sheet-p' + String(i + 1).padStart(2, '0') + 'of' + String(pages.length).padStart(2, '0') + '.png', blob: bl }); } } catch (e) { say('page images are not available in this browser; the zip has the three view PNGs'); await new Promise(r => setTimeout(r, 1200)); }
-  say('zipping…'); introSheetDl(await msZipBlob(files), base + '-png.zip'); say('saved ' + files.length + ' PNGs in ' + base + '-png.zip');
+  try { say('rendering sheet pages…'); const pages = await introSheetPages(ctx.html, ctx.dark, fmt); for (let i = 0; i < pages.length; i++) { const bl = await new Promise(r => pages[i].toBlob(r, 'image/png')); if (bl) files.push({ name: base + (fmt === 'phone' ? '-1080x1920' : '') + '-sheet-p' + String(i + 1).padStart(2, '0') + 'of' + String(pages.length).padStart(2, '0') + '.png', blob: bl }); } } catch (e) { say('page images are not available in this browser; the three view PNGs are still saved'); await new Promise(r => setTimeout(r, 1200)); }
+  say('saving ' + files.length + ' PNGs…'); st.textContent = ''; const lst = document.createElement('div'); lst.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:4px'; st.appendChild(document.createTextNode('saved ' + files.length + ' PNGs; if one is missing, click it: ')); st.appendChild(lst);
+  for (const f of files) { const h = URL.createObjectURL(f.blob), a = document.createElement('a'); a.href = h; a.download = f.name; a.textContent = f.name.replace(base + '-', ''); a.style.color = '#4fd1c5'; lst.appendChild(a); a.click(); await new Promise(r => setTimeout(r, 450)); }
 }
 function introSheetPreview(ctx) {
   introSheetClose();
   const m = document.createElement('div'); m.id = 'intro-sheet-modal'; m.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(2,2,8,.82);display:flex;align-items:center;justify-content:center;padding:14px;';
   const bs = 'background:transparent;border:1px solid rgba(255,255,255,.25);color:#e8e3db;border-radius:6px;padding:6px 12px;font:12px monospace;cursor:pointer;';
-  m.innerHTML = '<div style="width:min(1000px,100%);height:min(94vh,100%);display:flex;flex-direction:column;background:#0a0a18;border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.12);"><span style="font:11px monospace;letter-spacing:.08em;color:#c8a84a;flex:1 1 140px;">MATH SHEET · PREVIEW · G = ' + ctx.G + ' · n = ' + ctx.n + '</span><button id="iss-th" style="' + bs + '">☀ light</button><button id="iss-all" style="' + bs + 'background:#3a2f10;border-color:#c8a84a;color:#f2c860;">⬇ download all (.zip)</button><button id="iss-html" style="' + bs + '">sheet .html</button><button id="iss-pdf" style="' + bs + '">save PDF</button><select id="iss-fmt" style="' + bs + '" title="Size of the PNG pages: A4 (the sheet as printed) or 1080 x 1920 (phone, portrait)"><option value="a4">A4 pages</option><option value="phone">1080×1920</option></select><button id="iss-png" style="' + bs + '">all PNGs (.zip)</button><button id="iss-x" style="' + bs + '">close</button></div><div id="iss-st" style="font:11px monospace;color:#b3ad9f;padding:4px 12px;min-height:16px;"></div><iframe id="iss-fr" style="flex:1;border:0;background:#fff;"></iframe></div>';
+  m.innerHTML = '<div style="width:min(1000px,100%);height:min(94vh,100%);display:flex;flex-direction:column;background:#0a0a18;border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.12);"><span style="font:11px monospace;letter-spacing:.08em;color:#c8a84a;flex:1 1 140px;">MATH SHEET · PREVIEW · G = ' + ctx.G + ' · n = ' + ctx.n + '</span><button id="iss-th" style="' + bs + '">☀ light</button><button id="iss-all" style="' + bs + 'background:#3a2f10;border-color:#c8a84a;color:#f2c860;">⬇ download all (.zip)</button><button id="iss-html" style="' + bs + '">sheet .html</button><button id="iss-pdf" style="' + bs + '">save PDF</button><select id="iss-fmt" style="' + bs + '" title="Size of the PNG pages: A4 (the sheet as printed) or 1080 x 1920 (phone, portrait)"><option value="a4">A4 pages</option><option value="phone">1080×1920</option></select><button id="iss-png" style="' + bs + '">all PNGs (separate files)</button><button id="iss-x" style="' + bs + '">close</button></div><div id="iss-st" style="font:11px monospace;color:#b3ad9f;padding:4px 12px;min-height:16px;"></div><iframe id="iss-fr" style="flex:1;border:0;background:#fff;"></iframe></div>';
   (document.fullscreenElement || document.webkitFullscreenElement || document.body).appendChild(m);   // in full screen only the full-screen element is drawn, so the sheet opens inside it
   ctx.base = ctx.html; introSheetTheme(ctx, true); const st = $('iss-st'); $('iss-th').onclick = () => introSheetTheme(ctx, !ctx.dark);
   $('iss-x').onclick = introSheetClose; m.addEventListener('click', e => { if (e.target === m) introSheetClose(); });
   $('iss-html').onclick = () => introSheetDl(new Blob([ctx.html], { type: 'text/html' }), 'strip-arithmetic-II-math-sheet-G' + ctx.G + '-n' + ctx.n + '.html');
   $('iss-pdf').onclick = async function () { this.disabled = true; try { st.textContent = 'building the PDF…'; const pg = await introSheetPages(ctx.html, ctx.dark), pdf = msPdfBuild(pg.map(cv => ({ cv, wPt: 595.28, hPt: 841.89, q: 0.92 })), 'Strip Arithmetic II'); introSheetDl(pdf, 'strip-arithmetic-II-G' + ctx.G + '-n' + ctx.n + '-math-sheet.pdf'); st.textContent = 'saved the PDF (' + pg.length + ' pages)'; } catch (e) { st.textContent = 'the PDF could not be built here, opening the print dialog instead'; try { $('iss-fr').contentWindow.print(); } catch (e2) {} } this.disabled = false; };
-  $('iss-png').onclick = async function () { this.disabled = true; try { await introSheetPngs(ctx, st); } catch (e) { st.textContent = 'could not build the PNG zip: ' + e.message; } this.disabled = false; };
+  $('iss-png').onclick = async function () { this.disabled = true; try { await introSheetPngs(ctx, st); } catch (e) { st.textContent = 'could not build the PNGs: ' + e.message; } this.disabled = false; };
   $('iss-all').onclick = async function () { this.disabled = true; try { await introSheetAll(ctx, st); } catch (e) { st.textContent = 'could not build the zip: ' + e.message; } this.disabled = false; };
 }
 function introScrub(t) {
@@ -8029,7 +8031,7 @@ async function introExport4k(land) {
   const x = cv.getContext('2d'); x.setTransform(2, 0, 0, 2, 0, 0);
   _introExporting = land ? 'land' : true;
   try {
-    introExpFit(W, H, Math.max(_introT, 9.5)); _introPaint(x, W, H, Math.max(_introT, 9.5));
+    introExpFit(W, H, Math.max(_introT - 10, 9.5)); _introPaint(x, W, H, Math.max(_introT - 10, 9.5));
     x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '24px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', hx, land ? 40 : 90);
     x.fillStyle = '#e8e3db'; x.font = (land ? 72 : 104) + 'px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', hx, land ? 112 : 190);
     x.fillStyle = 'rgba(232,227,219,.75)'; x.font = '19px monospace'; x.fillText('a sieve you can watch · Level 1: G up to 1024 · Level 2: main page, up to 10,000', hx, land ? 150 : 228);
