@@ -2053,6 +2053,9 @@ walk anyway.</p>
         <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 512 and back">▶ M</button><button class="chip" onclick="introSetM(512)" title="All 512 rings">512</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button></div>
         <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="_introSeq = false; introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="_introSeq = false; introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: M to the right, r up, the whole G × G square.">Grid</button><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate Cayley a full 360 degrees about x, then y, then z.">&#9654; rotate x&middot;y&middot;z</button></div>
         <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about y (degrees)."><span>z</span><input type="range" id="intro-vz-sl" min="0" max="360" value="0" oninput="introViewXY(null, null, this.value)" style="flex:1 1 60px;min-width:44px;" title="Turn the plane about z (degrees), applied after the x and y tilts."></div>
+        <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">x</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',180)">180</button></div>
+        <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">y</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',180)">180</button></div>
+        <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">z</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',180)">180</button></div>
         <div class="gr"><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="flex:1 1 80px;min-width:60px;" title="Point size"><button class="chip" id="intro-col-btn" onclick="introToggleColor()" title="Switch between sector colours and the opener's coloring 16 (saturation)">color: sector</button></div>
       </div>
       <div class="ig"><div class="gl">Prime spiral &nbsp;× ÷</div>
@@ -2064,8 +2067,9 @@ walk anyway.</p>
         <div class="gr"><button class="chip" id="intro-gb-btn" onclick="introGbPlay()" title="Additive (+ and −): Goldbach pairs g + s = E, drawn as the four Strip I lines a, b, c, d">▶ + −</button></div>
       </div>
       <div class="ig"><div class="gl">Slope band &nbsp;a/b</div>
-        <div class="gr"><button class="chip" id="intro-st-btn" onclick="introStripToggle()" title="Slope band: the strip of cells off &le; b&middot;r &minus; a&middot;M &lt; off + w around the line r/M = a/b (the opener's strip), drawn in every view.">band</button><span title="rise: r">rise a</span><input type="number" id="intro-st-a" value="1" step="1" style="width:46px;" oninput="introStripSet()" title="Slope numerator a"><span title="run: M">/ run b</span><input type="number" id="intro-st-b" value="2" step="1" style="width:46px;" oninput="introStripSet()" title="Slope denominator b"></div>
-        <div class="gr"><span>off</span><input type="range" id="intro-st-s" min="-512" max="512" value="0" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Offset: the band is off &le; b&middot;r &minus; a&middot;M &lt; off + w"><span id="intro-st-sv" class="gv">0</span><span>w</span><input type="range" id="intro-st-w" min="1" max="513" value="1" oninput="introStripSet()" style="flex:1 1 70px;min-width:50px;" title="Width w"><span id="intro-st-wv" class="gv">1</span></div>
+        <div class="gr"><button class="chip" id="intro-st-btn" onclick="introStripToggle()" title="Slope band: the strip of cells off &le; b&middot;r &minus; a&middot;M &lt; off + w around the line r/M = a/b (the opener's strip), drawn in every view.">band</button><span title="rise: r">rise a</span><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-a',-1)" title="down">&#9660;</button><input type="number" id="intro-st-a" value="1" step="1" style="width:52px;" oninput="introStripSet()" title="Slope numerator a (rise): click and type a value"><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-a',1)" title="up">&#9650;</button><span title="run: M">run b</span><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-b',-1)" title="down">&#9660;</button><input type="number" id="intro-st-b" value="2" step="1" style="width:52px;" oninput="introStripSet()" title="Slope denominator b (run): click and type a value"><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-b',1)" title="up">&#9650;</button></div>
+        <div class="gr"><span>off</span><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-sn',-1)" title="down">&#9660;</button><input type="number" id="intro-st-sn" value="-1" step="1" style="width:56px;" oninput="introStripSet()" title="Offset: click and type a value"><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-sn',1)" title="up">&#9650;</button><input type="range" id="intro-st-s" min="-512" max="512" value="-1" oninput="introStripSlide()" style="flex:1 1 60px;min-width:40px;" title="Offset: the band is off &le; b&middot;r &minus; a&middot;M &lt; off + w"></div>
+        <div class="gr"><span>w</span><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-wn',-1)" title="down">&#9660;</button><input type="number" id="intro-st-wn" value="2" step="1" style="width:56px;" oninput="introStripSet()" title="Width w: click and type a value"><button class="chip" style="padding:2px 7px;" onclick="introStripStep('intro-st-wn',1)" title="up">&#9650;</button><input type="range" id="intro-st-w" min="1" max="513" value="2" oninput="introStripSlide()" style="flex:1 1 60px;min-width:40px;" title="Width w"><button class="chip" onclick="introStripReset()" title="Reset the band to its default: slope 1/2, offset &minus;1, width 2 (the first strip of the animation), and the scan range 1/2 &rarr; 1/1. Unlocks the Goldbach pair and stops grow / scan.">&#8634; reset</button></div>
         <div class="gr"><button class="chip" id="intro-st-grow" onclick="introStripGrow()" title="Grow: width 2k and offset &minus;k, k = 1, 2, 3 &hellip; up to G + 1 and back, so the band widens by one line on each side per step.">&#9654; grow 2w / &minus;1s</button></div>
         <div class="gr"><button class="chip" id="intro-st-lock" onclick="introStripLockToggle()" title="Lock the band to the Goldbach pair on screen. For E = 2(G+1) and the pair (g, s) with g + s = E, the marker sits at ring M = s, column r = g, so the band runs along the line r/M = g/s (reduced a/b = g/s over their gcd), 2 cells thick. Step the pairs and the band turns with them; unlock to take the controls back.">&#128274; Goldbach pair</button><button class="chip" id="intro-st-scan" onclick="introStripScan()" title="Scan: the band's slope steps through the Farey fractions a/b (b &le; 12) between the two ends, there and back; the band is 2 cells thick in r, centred on the line r/M = a/b. Between 1/3 and 1/2 is sector s = 2, between 1/3 and 2/3 is s = 1 and 2.">&#9654; scan slope</button> <input id="intro-st-lo" value="1/2" size="4" style="width:3.2em"> &rarr; <input id="intro-st-hi" value="1/1" size="4" style="width:3.2em"></div>
       </div>
@@ -2075,7 +2079,7 @@ walk anyway.</p>
       </div>
       <div class="ig"><div class="gl">Record &nbsp;up to 256 s</div>
         <div class="gr"><button class="chip" id="intro-rec-btn" onclick="introRecToggle()" title="Record every parameter change for up to 256 s (the time slider then drives the recording: drag back to rewind, then press rec to record over from that point): time position, view and its x/y/z turns, G, hole, n, strip, Goldbach, prime spiral, zoom and pan. Press again to stop early.">&#9679; rec</button><button class="chip" id="intro-rpause-btn" onclick="introRecPause()" title="Pause or resume the recording (or its playback, or the intro itself)">&#10074;&#10074;</button><button class="chip" onclick="introRecBack(5)" title="Rewind 5 s: in the recording while recording or playing (recording continues over the rewound part), otherwise in the intro">&#9194; 5s</button><button class="chip" id="intro-rplay-btn" onclick="introRecPlay()" title="Play the recording back: all the parameters are replayed exactly as you moved them.">&#9654; play</button><span id="intro-rec-info" style="font-size:11px;opacity:.75;">no recording</span></div>
-        <div class="gr"><button class="chip" onclick="introRecClear()" title="Delete the recording; the time slider goes back to the intro">clear</button><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
+        <div class="gr"><button class="chip" onclick="introRecClear()" title="Delete the recording; the time slider goes back to the intro">clear</button><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" id="intro-rgif-btn" onclick="introRecGif()" title="Replay the recording and save it as an animated GIF (10 frames a second, up to 480 px wide, 256 colours). Works in every browser; keep this tab in front while it records.">GIF</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
       </div>
       <div class="ig"><div class="gl">View &amp; export</div>
         <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
@@ -7473,12 +7477,26 @@ var _introBatch = null, _introVUser = false, _introExpFit = 1, _introGbBox = nul
 function introAbsToggle() { _introAbs = !_introAbs; const b = $('intro-abs-btn'); if (b) b.classList.toggle('on', _introAbs); }
 var _introGbScr = false, _introFar = null, _introColC = [], _introCop = (() => { const t = new Uint8Array(513 * 513); for (let r = 1; r <= 512; r++) for (let M = 1; M <= 512; M++) t[r * 513 + M] = gcd(r, M) === 1 ? 1 : 0; return t; })();
 var _introStrip = { on: false, a: 1, b: 2, s: 0, w: 1, k: 0, dir: 1, timer: 0 };
-function introStripSet() {
-  const S = _introStrip, a = Number($('intro-st-a').value), b = Number($('intro-st-b').value);
-  S.a = isFinite(a) ? a : 1; S.b = isFinite(b) && b !== 0 ? b : 1; S.s = +$('intro-st-s').value; S.w = Math.max(1, +$('intro-st-w').value);
+function introStripSlide() { const q = $('intro-st-sn'), w = $('intro-st-wn'); if (q) q.value = $('intro-st-s').value; if (w) w.value = $('intro-st-w').value; introStripSet(); }
+function introStripSet() {   // rise >= 0, run >= 1: the band stays in the lattice's quadrant
+  const S = _introStrip, n = id => Number($(id).value), a = Math.round(n('intro-st-a')), b = Math.round(n('intro-st-b')), o = Math.round(n('intro-st-sn')), w = Math.round(n('intro-st-wn'));
+  S.a = isFinite(a) ? Math.max(0, a) : 1; S.b = isFinite(b) ? Math.max(1, b) : 1; S.s = isFinite(o) ? Math.max(-4096, Math.min(4096, o)) : 0; S.w = isFinite(w) ? Math.max(1, Math.min(8192, w)) : 1;
+  if (_introStripLock) { _introStripLock = false; const lb = $('intro-st-lock'); if (lb) lb.classList.remove('on'); }
   if (S.timer) introStripStopGrow(); introStripScanStop(); S.on = true; introStripSync();
 }
-var _introStripLock = false, _introGridF = 1;
+function introStripStep(id, d) { const el = $(id); if (!el) return; let v = Math.round(Number(el.value) || 0) + d; if (id === 'intro-st-b' || id === 'intro-st-wn') v = Math.max(1, v); if (id === 'intro-st-a') v = Math.max(0, v); el.value = v; introStripSet(); }
+function introStripReset() {
+  const S = _introStrip; try { introStripStopGrow(); introStripScanStop(); } catch (e) {}
+  if (_introStripLock) { _introStripLock = false; const lb = $('intro-st-lock'); if (lb) lb.classList.remove('on'); }
+  S.a = 1; S.b = 2; S.s = -1; S.w = 2; S.on = true;
+  const lo = $('intro-st-lo'), hi = $('intro-st-hi'); if (lo) lo.value = '1/2'; if (hi) hi.value = '1/1';
+  ['intro-st-a', 'intro-st-b', 'intro-st-sn', 'intro-st-wn'].forEach((id, i) => { const el = $(id); if (el) el.value = [1, 2, -1, 2][i]; });
+  introStripSync();
+}
+var _introStripLock = false, _introGridF = 1, _introVkey = 'ring', _introZ = { ring: { k: 1, fx: 0, fy: 0 }, cay: { k: 1, fx: 0, fy: 0 }, grid: { k: 1, fx: 0, fy: 0 } };
+/* Zoom belongs to the view it was made in: Ring, Cayley and Grid each keep their own zoom and pan, so zooming out on the Cayley sphere (more lattice points come into view) leaves the Ring and the Grid alone. */
+function _introVk() { const V = _introVw; return V.m > 0.5 && V.mode === 'cay' ? 'cay' : V.m > 0.5 && V.mode === 'grid' ? 'grid' : 'ring'; }
+function _introZoomSwap() { const vk = _introVk(); if (vk === _introVkey) return; const W = _introV; _introZ[_introVkey] = { k: W.k, fx: W.fx, fy: W.fy }; const n = _introZ[vk] || { k: 1, fx: 0, fy: 0 }; W.k = n.k; W.fx = n.fx; W.fy = n.fy; _introVkey = vk; }
 function introStripLockToggle() {   // lock the slope band to the Goldbach pair: slope g/(E-g), 2 cells thick; needs the Goldbach overlay on
   _introStripLock = !_introStripLock; const b = $('intro-st-lock'); if (b) b.classList.toggle('on', _introStripLock);
   if (_introStripLock) { try { introStripStopGrow(); introStripScanStop(); } catch (e) {} if (!_introGbOn) { try { introSetGb(10); } catch (e) {} } }
@@ -7486,7 +7504,7 @@ function introStripLockToggle() {   // lock the slope band to the Goldbach pair:
 }
 function introStripSync() {
   const S = _introStrip, bt = $('intro-st-btn'); if (bt) bt.classList.toggle('on', S.on);
-  const sv = $('intro-st-sv'), wv = $('intro-st-wv'); if (sv) sv.textContent = S.s; if (wv) wv.textContent = S.w;
+  { const f = (id, v) => { const el = $(id); if (el && document.activeElement !== el && +el.value !== v) el.value = v; }; f('intro-st-a', S.a); f('intro-st-b', S.b); f('intro-st-sn', S.s); f('intro-st-wn', S.w); }
   const ss = $('intro-st-s'), ws = $('intro-st-w'); if (ss && document.activeElement !== ss) ss.value = Math.max(-512, Math.min(512, S.s)); if (ws && document.activeElement !== ws) ws.value = Math.max(1, Math.min(513, S.w));
 }
 
@@ -7550,6 +7568,7 @@ function _introRecApply(a, c, u) {
   introSetHole(L(a.h, c.h)); W.k = L(a.k, c.k); W.fx = L(a.fx, c.fx); W.fy = L(a.fy, c.fy);
   V.mode = a.vm; V.script = !!a.sc; V.man = !!a.ma; V.rot = 0; V.tm = a.tm; V.x = L(a.x, c.x); V.y = L(a.y, c.y); V.z = L(a.z, c.z); V.m = L(a.m, c.m);
   S.on = !!a.so; S.a = a.sa; S.b = a.sb; S.s = a.ss; S.w = a.sw; try { introStripSync(); } catch (e) {}
+  _introVkey = _introVk();   // the recorded zoom belongs to the recorded view
   const ns = $('intro-n-sl'); if (ns) ns.value = _introN;
   ['ring', 'cay', 'grid'].forEach(n => { const bt = $('intro-v-' + n); if (bt) bt.classList.toggle('on', !V.script && V.man && (n === 'ring' ? V.tm === 0 : n === (V.mode === 'grid' ? 'grid' : 'cay') && V.tm > 0)); });
 }
@@ -7576,11 +7595,44 @@ function introRecVideo() {
   if (!cv || !cv.captureStream || !window.MediaRecorder) { if (info) info.textContent = 'this browser cannot record video'; return; }
   const types = ['video/mp4;codecs=avc1.640028', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'], mt = types.find(t => MediaRecorder.isTypeSupported(t)); if (!mt) { if (info) info.textContent = 'no video format available'; return; }
   const ext = mt.indexOf('mp4') >= 0 ? 'mp4' : 'webm', ch = [], st = cv.captureStream(30);
-  let mr; try { mr = new MediaRecorder(st, { mimeType: mt, videoBitsPerSecond: 16e6 }); } catch (e) { if (info) info.textContent = 'video recorder failed'; return; }
+  let mr; for (const o of [{ mimeType: mt, videoBitsPerSecond: 16e6 }, { mimeType: mt, videoBitsPerSecond: 6e6 }, { mimeType: mt }, {}]) { try { mr = new MediaRecorder(st, o); break; } catch (e) { mr = null; } } if (!mr) { if (info) info.textContent = 'video recorder failed: this browser cannot record the canvas. Use the GIF button instead.'; return; }
+  mr.onerror = e => { if (info) info.textContent = 'video error: ' + ((e && e.error && e.error.name) || 'recorder') + '. Try the GIF button.'; };
   mr.ondataavailable = e => { if (e.data && e.data.size) ch.push(e.data); };
-  mr.onstop = () => { const bl = new Blob(ch, { type: mt }), a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'intro-animation.' + ext; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); if (info) info.textContent = 'saved intro-animation.' + ext + ' (' + (bl.size / 1048576).toFixed(1) + ' MB)'; };
+  mr.onstop = () => { if (!ch.length) { if (info) info.textContent = 'video came out empty (the browser stopped the recorder). Try the GIF button.'; return; } const bl = new Blob(ch, { type: mt }), a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'intro-animation.' + ext; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); if (info) info.textContent = 'saved intro-animation.' + ext + ' (' + (bl.size / 1048576).toFixed(1) + ' MB)'; };
   R.onEnd = () => setTimeout(() => { try { mr.stop(); } catch (e) {} }, 400);
   mr.start(250); introRecPlay(); if (info) info.textContent = 'recording video…';
+}
+/* GIF export: the recording is replayed and the canvas sampled 10 times a second at up to 480 px wide, mapped to a fixed 256-colour (3-3-2) palette and LZW-compressed frame by frame, so a long recording stays small in memory. Works in any browser, with no video codec. */
+function _gifLZW(px) {
+  const out = [], clear = 256, eoi = 257, dict = new Map(); let bits = 9, next = 258, cur = 0, nb = 0;
+  const emit = c => { cur |= c << nb; nb += bits; while (nb >= 8) { out.push(cur & 255); cur >>>= 8; nb -= 8; } };
+  emit(clear); let pre = px[0];
+  for (let i = 1; i < px.length; i++) {
+    const k = px[i], key = (pre << 8) | k, v = dict.get(key);
+    if (v !== undefined) { pre = v; continue; }
+    emit(pre); dict.set(key, next++); if (next > (1 << bits) && bits < 12) bits++;
+    if (next >= 4095) { emit(clear); dict.clear(); bits = 9; next = 258; }
+    pre = k;
+  }
+  emit(pre); emit(eoi); if (nb > 0) out.push(cur & 255); return out;
+}
+function _gifFrame(px, w, h, delay) {
+  const lz = _gifLZW(px), b = [0x21, 0xF9, 4, 0, delay & 255, delay >> 8, 0, 0, 0x2C, 0, 0, 0, 0, w & 255, w >> 8, h & 255, h >> 8, 0, 8];
+  for (let i = 0; i < lz.length; i += 255) { const n = Math.min(255, lz.length - i); b.push(n); for (let j = 0; j < n; j++) b.push(lz[i + j]); }
+  b.push(0); return new Uint8Array(b);
+}
+function introRecGif() {
+  const R = _introRec, cv = $('intro-cv'), info = $('intro-rec-info');
+  if (R.f.length < 2) { if (info) info.textContent = 'record something first'; return; }
+  if (!cv) return; R.pos = 0;
+  const W = Math.min(480, cv.width), H = Math.max(2, Math.round(cv.height * W / cv.width)), sm = document.createElement('canvas'); sm.width = W; sm.height = H; const sx = sm.getContext('2d', { willReadFrequently: true });
+  const hd = [71, 73, 70, 56, 57, 97, W & 255, W >> 8, H & 255, H >> 8, 0xF7, 0, 0]; for (let i = 0; i < 256; i++) hd.push(Math.round(((i >> 5) & 7) * 255 / 7), Math.round(((i >> 2) & 7) * 255 / 7), Math.round((i & 3) * 255 / 3));
+  hd.push(0x21, 0xFF, 11, 78, 69, 84, 83, 67, 65, 80, 69, 50, 46, 48, 3, 1, 0, 0, 0);   // loop forever
+  const parts = [new Uint8Array(hd)]; let n = 0, last = 0;
+  const grab = () => { sx.drawImage(cv, 0, 0, W, H); const d = sx.getImageData(0, 0, W, H).data, px = new Uint8Array(W * H); for (let i = 0, j = 0; i < d.length; i += 4, j++) px[j] = (d[i] & 0xE0) | ((d[i + 1] & 0xE0) >> 3) | (d[i + 2] >> 6); parts.push(_gifFrame(px, W, H, 10)); n++; if (info) info.textContent = 'gif: ' + n + ' frames…'; };
+  const iv = setInterval(() => { try { grab(); } catch (e) { clearInterval(iv); if (info) info.textContent = 'gif failed: ' + e.message; } }, 100);
+  R.onEnd = () => { clearInterval(iv); try { grab(); } catch (e) {} parts.push(new Uint8Array([0x3B])); const bl = new Blob(parts, { type: 'image/gif' }), a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'intro-animation.gif'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); if (info) info.textContent = 'saved intro-animation.gif (' + n + ' frames, ' + (bl.size / 1048576).toFixed(1) + ' MB)'; };
+  introRecPlay(); if (info) info.textContent = 'gif: recording…';
 }
 function introRecSave() { const R = _introRec; if (!R.f.length) return; const bl = new Blob([JSON.stringify({ type: 'strip-arithmetic-intro-recording', v: 1, frames: R.f })], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'intro-recording.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
 function introRecLoad(inp) { const f = inp.files && inp.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (o && o.type === 'strip-arithmetic-intro-recording' && Array.isArray(o.frames) && o.frames.length > 1) { _introRec.f = o.frames; _introRec.pos = 0; _introRecInfo(0); } } catch (e) {} inp.value = ''; }; rd.readAsText(f); }
@@ -7651,6 +7703,7 @@ function introViewPos(r, M, th, V, cx, cy, R, G, GMAX) {
 }
 function introViewTick(T) {
   { const ts = $('intro-time-sl'); if (ts && document.activeElement !== ts) { if (!introRecMode()) { ts.value = Math.min(2560, Math.round(T * 10)); const tt = $('intro-tt'); if (tt) tt.textContent = T.toFixed(1) + 's'; } } const vx = $('intro-vx-sl'), vy = $('intro-vy-sl'), vz = $('intro-vz-sl'); if (vz && document.activeElement !== vz) vz.value = Math.round(_introVw.z || 0) % 361; if (vx && document.activeElement !== vx) vx.value = Math.round(_introVw.x) % 361; if (vy && document.activeElement !== vy) vy.value = Math.round(_introVw.y) % 361; }
+  _introZoomSwap();
   const V = _introVw, es = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }, sg = (a, b) => es((T - a) / (b - a)), now = performance.now(), dt = Math.min(0.1, (now - (V.last || now)) / 1000); V.last = now;
   if (V.script && !V.man) {
     /* After the hole closes (26.7 s) the plain ring waits: from 34 s the slope band sweeps in slowly across every lattice point and back (to 44 s); only then does the ring move (Cayley, Grid, ...), which runs as it always did, shifted by DL seconds. */
@@ -7673,9 +7726,9 @@ function introViewTick(T) {
       if (inGb) { _introGbOn = true; _introGbScr = true; const Lg = Math.max(1, _introGbPairs.length); _introGbI = introGbIdxAt(T, Lg); }
       else if (_introGbScr) { _introGbScr = false; if (!_introGbTimer) _introGbOn = false; _introV.k = 1; _introV.fx = 0; _introV.fy = 0; introSetHole(0); _introCM = false; const cb0 = $('intro-cm-btn'); if (cb0) cb0.classList.remove('on'); }
       if (_introGbScr && inGb) {   // the marker (g, E - g) has M > G: hole 0.5 pulls the outer rings in (radius 0.5 + 0.5 M/G), the plate zooms out so M up to 2G fits, and the circle method is on
-        const e5 = sg(56, 57.5); introSetHole(0.5 * e5); { const g5 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)] || 5, E5 = 2 * (Math.round(_introGcur || 1) + 1), M5 = E5 - g5, rm = 0.5 + 0.5 * (M5 - 0.5) / Math.max(1, _introGZ || 512), th5 = 2 * Math.PI * Math.min(g5 / M5, 1), Q = _introGeo; let kt = T >= 107 ? 1 - 0.2 * sg(107, 109) : 1;   // Cayley: from 107 s the pairs loop back and the view eases out to 0.8x so both poles stay in view
+        const e5 = sg(56, 57.5); introSetHole(0.5 * e5); { const g5 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)] || 5, E5 = 2 * (Math.round(_introGcur || 1) + 1), M5 = E5 - g5, rm = 0.5 + 0.5 * (M5 - 0.5) / Math.max(1, _introGZ || 512), th5 = 2 * Math.PI * Math.min(g5 / M5, 1), Q = _introGeo; let kt = 1;
           if (T < _introS0 + 33 && Q && Q.R > 0) { const R0 = Q.R / Math.max(0.3, _introV.k), ax = Math.min(Q.cx, Q.W - Q.cx) - 12, ay = Math.min(Q.cy - Q.top0, Q.bot0 - Q.cy) - 16, dx = Math.abs(Math.cos(th5)) * rm * R0, dy = Math.abs(Math.sin(th5)) * rm * R0; kt = Math.max(0.45, Math.min(1, 0.97 * Math.min(dx > 1 ? ax / dx : 9, dy > 1 ? ay / dy : 9))); }
-          if (!_introVUser) _introV.k = 1 - (1 - kt) * e5; }   // zoom out only as far as this pair's marker needs on the real plate: it is on ring M = E - g at radius 0.5 + 0.5 M/G (hole 0.5); none in Cayley
+          if (!_introVUser) _introV.k = _introVkey === 'cay' ? 1 - 0.7 * sg(100, 116) : 1 - (1 - kt) * e5; }   // Cayley: once the turns are done (100 s of the tour) it zooms out slowly, so more and more lattice points come into view   // zoom out only as far as this pair's marker needs on the real plate: it is on ring M = E - g at radius 0.5 + 0.5 M/G (hole 0.5); none in Cayley
          if (!_introVUser) { _introV.fx = 0; _introV.fy = 0; } if (!_introCM) { _introCM = true; const cb1 = $('intro-cm-btn'); if (cb1) cb1.classList.add('on'); }
       } }
     V.tm = V.m; return;
@@ -7823,7 +7876,7 @@ function introSheetPreview(ctx) {
   const m = document.createElement('div'); m.id = 'intro-sheet-modal'; m.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(2,2,8,.82);display:flex;align-items:center;justify-content:center;padding:14px;';
   const bs = 'background:transparent;border:1px solid rgba(255,255,255,.25);color:#e8e3db;border-radius:6px;padding:6px 12px;font:12px monospace;cursor:pointer;';
   m.innerHTML = '<div style="width:min(1000px,100%);height:min(94vh,100%);display:flex;flex-direction:column;background:#0a0a18;border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.12);"><span style="font:11px monospace;letter-spacing:.08em;color:#c8a84a;flex:1 1 140px;">MATH SHEET · PREVIEW · G = ' + ctx.G + ' · n = ' + ctx.n + '</span><button id="iss-th" style="' + bs + '">☀ light</button><button id="iss-all" style="' + bs + 'background:#3a2f10;border-color:#c8a84a;color:#f2c860;">⬇ download all (.zip)</button><button id="iss-html" style="' + bs + '">sheet .html</button><button id="iss-pdf" style="' + bs + '">save PDF</button><button id="iss-png" style="' + bs + '">all PNGs (.zip)</button><button id="iss-x" style="' + bs + '">close</button></div><div id="iss-st" style="font:11px monospace;color:#b3ad9f;padding:4px 12px;min-height:16px;"></div><iframe id="iss-fr" style="flex:1;border:0;background:#fff;"></iframe></div>';
-  document.body.appendChild(m);
+  (document.fullscreenElement || document.webkitFullscreenElement || document.body).appendChild(m);   // in full screen only the full-screen element is drawn, so the sheet opens inside it
   ctx.base = ctx.html; introSheetTheme(ctx, true); const st = $('iss-st'); $('iss-th').onclick = () => introSheetTheme(ctx, !ctx.dark);
   $('iss-x').onclick = introSheetClose; m.addEventListener('click', e => { if (e.target === m) introSheetClose(); });
   $('iss-html').onclick = () => introSheetDl(new Blob([ctx.html], { type: 'text/html' }), 'strip-arithmetic-II-math-sheet-G' + ctx.G + '-n' + ctx.n + '.html');
@@ -7832,13 +7885,18 @@ function introSheetPreview(ctx) {
   $('iss-all').onclick = async function () { this.disabled = true; try { await introSheetAll(ctx, st); } catch (e) { st.textContent = 'could not build the zip: ' + e.message; } this.disabled = false; };
 }
 function introScrub(t) {
-  _introVUser = false;
+  _introVUser = false; for (const k in _introZ) _introZ[k] = { k: 1, fx: 0, fy: 0 }; Object.assign(_introV, { k: 1, fx: 0, fy: 0 });
   t = Math.max(0, Math.min(256, +t || 0)); const now = performance.now();
   _introT0 = (_introPaused ? _introPauseAt : now) - t * 1000;
   _introSeq = true; _introBirth = false; _introGM = null; _introS0 = 44.5; _introRay0 = now - 7000;   // rays already drawn when scrubbing
   const V = _introVw; V.script = true; V.man = false; V.rot = 0; V.tm = 0;
   ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); });
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
+}
+function introViewAxis(ax, d, abs) {   // Cayley x / y / z: set to 0, or turn by d degrees (kept in 0..360, the sliders' range)
+  const V = _introVw, cur = ax === 'x' ? V.x : ax === 'y' ? V.y : V.z, v = abs ? d : ((Math.round(cur || 0) + d) % 360 + 360) % 360;
+  introViewXY(ax === 'x' ? v : null, ax === 'y' ? v : null, ax === 'z' ? v : null);
+  const sl = $('intro-v' + ax + '-sl'); if (sl) sl.value = v;
 }
 function introViewXY(x, y, z) {
   const V = _introVw; V.script = false; V.man = true; V.rot = 0; if (V.mode !== 'cay' || V.tm < 1) { V.mode = 'cay'; V.m = V.m > 0.02 && V.mode === 'cay' ? V.m : 0; V.tm = 1; }
@@ -7911,12 +7969,12 @@ function introCanvasClick(ev) {
 }
 function introZoomAt(px, py, k2) {
   _introVUser = true;   // your own zoom: the scripted Goldbach zoom stops overriding it until you scrub or reset the view
-  const gm = _introGeo; if (!gm) return; k2 = Math.max(0.35, Math.min(14, k2));
+  const gm = _introGeo; if (!gm) return; k2 = Math.max(_introVkey === 'cay' ? 0.2 : 0.35, Math.min(14, k2));
   const k = _introV.k, cx2 = px - (px - gm.cx) * (k2 / k), cy2 = py - (py - gm.cy) * (k2 / k);
   _introV.k = k2; _introV.fx = (cx2 - gm.W / 2) / gm.W; _introV.fy = (cy2 - gm.cy0) / gm.H;
   if (Math.abs(k2 - 1) < 0.02) { _introV.k = 1; _introV.fx = 0; _introV.fy = 0; }
 }
-function introResetView() { _introV = { k: 1, fx: 0, fy: 0 }; _introVUser = false; }
+function introResetView() { Object.assign(_introV, { k: 1, fx: 0, fy: 0 }); for (const k in _introZ) _introZ[k] = { k: 1, fx: 0, fy: 0 }; _introVUser = false; }
 function introWireView() {
   const cv = $('intro-cv'); if (!cv || cv._wired) return; cv._wired = true;
   { const es = $('intro-e-sl'); if (es) es.max = _introGbPairs.length - 1; }
