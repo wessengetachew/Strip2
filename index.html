@@ -1485,6 +1485,21 @@ walk anyway.</p>
     <button class="chip windchip" data-h="1" onclick="setRingWinding(1)" title="Clockwise on screen: screen angle = &minus;2&pi;r/M (default).">&#8635; clockwise</button>
     <button class="chip windchip on" data-h="-1" onclick="setRingWinding(-1)" title="Counter-clockwise on screen: angle = +2&pi;r/M, the way e^{2&pi;ir/M} and the Cayley view wind.">&#8634; counter</button>
     <button class="chip" onclick="setRingRot(0);setRingHole(0)" title="Back to no rotation and no inner hole.">Reset ring</button>
+    <button class="chip" id="pig-btn" onclick="piGridToggle()" title="Advanced: nine kπ rings side by side (3 × 3), gold points labelled with r">advanced ▾</button>
+  </div>
+  <div id="pig-panel" style="display:none;margin:6px 0 10px;padding:10px 12px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.03);">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12px;color:rgba(232,227,219,.85);">
+      <select id="pig-lay" onchange="piGridLayout()" style="background:#0a0a18;color:#e8e3db;border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:2px 4px;"><option value="3x3">3 × 3</option><option value="3x2">3 × 2</option><option value="2x2">2 × 2</option></select><span class="lbl" title="Angle multipliers in units of π: θ = kπ·r/M. Fractions such as 1.5 work.">k in π</span>
+      <span id="pig-ks" style="display:inline-grid;grid-template-columns:repeat(3,58px);gap:4px;"></span>
+      <span class="lbl">M ≤</span><input type="number" id="pig-m" min="2" max="60" value="12" style="width:54px" oninput="piGridDraw()">
+      <label style="cursor:pointer"><input type="checkbox" id="pig-lbl" checked onchange="piGridDraw()"> label gold points with r</label>
+      <button class="chip" onclick="piGridPreset(1,1)" title="1π … 9π">1…9</button>
+      <button class="chip" onclick="piGridPreset(2,2)" title="2π, 4π … 18π">2,4…18</button>
+      <button class="chip" onclick="piGridPreset(0.5,0.5)" title="½π … 4½π">½…4½</button>
+      <button class="chip" onclick="piGridPreset(ANG_K,0)" title="nine copies of the current k">current k</button>
+      <button class="chip on" onclick="piGridSave()" title="Save the 3 × 3 as a PNG">⇩ PNG</button>
+    </div>
+    <canvas id="pig-cv" width="1800" height="1800" style="width:100%;max-width:900px;display:block;margin:8px auto 0;border-radius:6px;background:#04050d"></canvas>
   </div>
 
   <div class="prow vrow" id="row-cay">
@@ -2055,6 +2070,7 @@ walk anyway.</p>
       <div class="ig"><div class="gl">Ring</div>
         <div class="gr"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="512" value="1" oninput="introSetM(this.value)" style="flex:1 1 90px;min-width:70px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val" class="gv">M ≤ 1</span></div>
         <div class="gr"><span class="angk-host"></span></div>
+        <div class="gr"><button class="chip" onclick="introToPiGrid()" title="Open the main page in Ring view with the 3 × 3 kπ grid (gold points labelled with r), starting at the current k and M">&theta; = k&pi;&middot;r/M &rarr; main &pi;-grid</button></div>
         <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 512 and back">▶ M</button><button class="chip" onclick="introSetM(512)" title="All 512 rings">512</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button></div>
         <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="_introSeq = false; introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="_introSeq = false; introSetHole(0.5)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Circle method inside the hole: Farey major arcs (coloured by q), minor arcs (grey) and the prime sum |S(a)|.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: M to the right, r up, the whole G × G square.">Grid</button><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate Cayley a full 360 degrees about x, then y, then z.">&#9654; rotate x&middot;y&middot;z</button></div>
         <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about y (degrees)."><span>z</span><input type="range" id="intro-vz-sl" min="0" max="360" value="0" oninput="introViewXY(null, null, this.value)" style="flex:1 1 60px;min-width:44px;" title="Turn the plane about z (degrees), applied after the x and y tilts."></div>
@@ -7421,6 +7437,38 @@ function introGPlay() {
   _introGTimer = setInterval(() => { if (_introGM >= 512) _introGDir = -1; else if (_introGM <= 1) _introGDir = 1; _introGM = Math.max(1, Math.min(512, _introGM + _introGDir)); }, 40);
 }
 
+
+/* 3 x 3 of nine angle multipliers (Ring advanced): theta = k*pi*r/M for M = 1..Mmax, gold = gcd(r,M) = 1 (labelled with r), coral = gcd > 1 */
+(function(){
+  var KS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  function lay(){ var v = (document.getElementById('pig-lay') || { value: '3x3' }).value; return v === '2x2' ? [2, 2] : v === '3x2' ? [3, 2] : [3, 3]; }
+  window.piGridLayout = function(){ var L = lay(), n = L[0] * L[1], h = document.getElementById('pig-ks'); if (h) { h.style.gridTemplateColumns = 'repeat(' + L[0] + ',58px)'; [].forEach.call(h.children, function(e, i){ e.style.display = i < n ? '' : 'none'; }); } var cv = document.getElementById('pig-cv'); if (cv) { cv.height = Math.round(cv.width * L[1] / L[0]); } piGridDraw(); };
+  function build(){ var h = document.getElementById('pig-ks'); if (!h || h.firstChild) return; for (var i = 0; i < 9; i++) { var e = document.createElement('input'); e.type = 'number'; e.step = '0.5'; e.min = '0.25'; e.max = '60'; e.value = KS[i]; e.style.width = '54px'; e.dataset.i = i; e.oninput = function(){ var v = parseFloat(this.value); if (v > 0) { KS[+this.dataset.i] = v; piGridDraw(); } }; h.appendChild(e); } }
+  window.piGridToggle = function(){ var p = document.getElementById('pig-panel'), b = document.getElementById('pig-btn'); if (!p) return; var on = p.style.display === 'none'; p.style.display = on ? '' : 'none'; if (b) { b.classList.toggle('on', on); b.textContent = on ? 'advanced ▴' : 'advanced ▾'; } if (on) { build(); piGridLayout(); } };
+  window.piGridPreset = function(a, st){ for (var i = 0; i < 9; i++) KS[i] = +(a + st * i).toFixed(2); var h = document.getElementById('pig-ks'); if (h) [].forEach.call(h.children, function(e, i){ e.value = KS[i]; }); piGridDraw(); };
+  window.piGridDraw = function(cv){
+    cv = cv || document.getElementById('pig-cv'); if (!cv) return cv;
+    var MM = Math.max(2, Math.min(60, Math.round(+(document.getElementById('pig-m') || {}).value || 12))), lab = !!(document.getElementById('pig-lbl') || { checked: true }).checked;
+    var LY = lay(), NC = LY[0], NR = LY[1], W = cv.width, H = cv.height, x = cv.getContext('2d'), P = W / NC, ccw = (typeof RING_H !== 'undefined') ? RING_H < 0 : true;
+    x.fillStyle = '#04050d'; x.fillRect(0, 0, W, H);
+    var fs = Math.max(8, Math.min(26, P / (MM * 1.5))), ms = Math.max(2.2, Math.min(9, P * 0.40 / MM * 0.55));
+    for (var i = 0; i < NC * NR; i++) {
+      var k = KS[i], cx = (i % NC) * P + P / 2, cy = Math.floor(i / NC) * P + P / 2 + 8, R = P * 0.40;
+      x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = 1; for (var M = 1; M <= MM; M++) { x.beginPath(); x.arc(cx, cy, R * M / MM, 0, 7); x.stroke(); }
+      for (var pass = 0; pass < 2; pass++) for (M = 1; M <= MM; M++) for (var r = 1; r <= M; r++) {
+        var cop = gcd(r, M) === 1; if ((pass === 0) === cop) continue;
+        var th = k * Math.PI * r / M, rad = R * M / MM, px = cx + rad * Math.cos(th), py = cy + (ccw ? -1 : 1) * rad * Math.sin(th);
+        if (cop) { x.fillStyle = '#f2c860'; x.strokeStyle = '#fff3c0'; x.lineWidth = 0.8; x.beginPath(); x.arc(px, py, ms, 0, 7); x.fill(); x.stroke(); if (lab) { x.fillStyle = '#fff8dc'; x.font = fs + 'px monospace'; x.textAlign = 'center'; x.fillText(String(r), px, py - ms - 2); } }
+        else { x.fillStyle = 'rgba(224,96,90,.6)'; x.beginPath(); x.arc(px, py, ms * 0.5, 0, 7); x.fill(); }
+      }
+      x.fillStyle = '#c8a84a'; x.font = Math.round(P / 22) + 'px monospace'; x.textAlign = 'center'; x.fillText('θ = ' + (+k.toFixed(2)) + 'π · r/M' + (Math.abs(k - 2) < 1e-9 ? '   (the full circle)' : ''), cx, cy - R - P * 0.03);
+    }
+    x.fillStyle = '#e8e3db'; x.font = Math.round(W / 70) + 'px monospace'; x.textAlign = 'center';
+    x.fillText('M = 1 … ' + MM + '  ·  radius = M/' + MM + '  ·  gold: gcd(r, M) = 1' + (lab ? ', labelled with r' : '') + '  ·  coral: gcd(r, M) > 1', W / 2, H - 12);
+    return cv;
+  };
+  window.piGridSave = function(){ var cv = piGridDraw(); if (!cv) return; cv.toBlob(function(b){ if (!b) return; var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'ring-pi-grid-' + KS.slice(0, lay()[0] * lay()[1]).join('_') + '-M' + (document.getElementById('pig-m').value || 12) + '.png'; document.body.appendChild(a); a.click(); a.remove(); }, 'image/png'); };
+})();
 /* Angle multiplier: theta = ANG_K*pi*r/M, shared by intro, opener and main (Ring and Cayley). */
 (function(){
   function html(){ return '<span class="lbl" title="theta = kπ·r/M. k=2 is the full circle; k coprime to M only permutes the points; gcd(k,M)>1 collapses them.">kπ</span>'
@@ -8357,6 +8405,20 @@ function introSend(toMain) {   // carry the intro's current picture over to the 
   try { if (V.mode === 'cay' && V.m > 0.02) { setOpenerRot('x', V.x); setOpenerRot('y', V.y); if (V.z != null) setOpenerRot('z', V.z); } } catch (e) {}
   try { olRedraw(); renderOpenerPreview(true); } catch (e) {}
   if (toMain) { try { sendOpenerToMainAndClose(); } catch (e) {} }
+}
+function introToPiGrid() {   // formula shortcut: straight to the main page's kπ grid
+  const G = Math.max(2, Math.round(_introGM != null ? _introGM : _introGcur)), k = (typeof ANG_K === 'number' && ANG_K > 0) ? ANG_K : 2;
+  introSend(true);
+  setTimeout(function () {
+    try { setView('ring'); } catch (e) {}
+    try {
+      const p = document.getElementById('pig-panel');
+      if (p && p.style.display === 'none') piGridToggle();
+      const m = document.getElementById('pig-m'); if (m) m.value = Math.min(G, 24);
+      piGridPreset(Math.max(1, Math.round(k)), 1);
+      if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' });
+    } catch (e) {}
+  }, 250);
 }
 function introEnter() {
   _introOn = false; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; } if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; } if (_introRaf) cancelAnimationFrame(_introRaf);
