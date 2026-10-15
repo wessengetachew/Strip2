@@ -7198,12 +7198,12 @@ function showIntro() {
     const GZ = _introGZ;
     _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, top0, bot0, cvTop, cy0: cy - _introV.fy * H };
     x.save(); x.beginPath(); x.rect(0, top0, W, bot0 - top0); x.clip();   // the ring never covers the title or the controls
-    const PT = Math.max(0.7, 1.25 * (_introExporting ? 1.6 : 1) * _introPtScale * Math.min(1, Math.sqrt(256 / GZ)) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
+    const PT = Math.max(0.7, 1.25 * (_introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * _introPtScale * Math.min(1, Math.sqrt(256 / GZ)) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
     const spin = 0;   // no rotation: the ring stays at 0 degrees the whole way
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
     let cop = 0, stN = 0, stC = 0; const sc = [0, 0, 0, 0, 0, 0];
-    if (_introStripLock && _introGbOn) { const LP = introGbPairsFor(G); if (LP && LP.length) { const g = LP[Math.min(_introGbI, LP.length - 1)], sP = 2 * (G + 1) - g, d = gcd(g, sP), S0 = _introStrip; S0.on = true; S0.a = g / d; S0.b = sP / d; S0.w = 2 * S0.b; S0.s = -S0.b; { const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai && document.activeElement !== ai) ai.value = S0.a; if (bi && document.activeElement !== bi) bi.value = S0.b; } } }   // locked to the Goldbach pair on screen: the band follows the line r/M = g/(E - g) through the marker (g, E - g)
+    if (_introStripLock && _introGbOn) { const LP = introGbPairsFor(G); if (LP && LP.length) { const g = LP[Math.min(_introGbI, LP.length - 1)], sP = 2 * (G + 1) - g, d = gcd(g, sP), S0 = _introStrip; S0.on = true; S0.a = g / d; S0.b = sP / d; S0.w = 2 * S0.b; S0.s = -S0.b; { const ai = $('intro-st-a'), bi = $('intro-st-b'); if (ai && document.activeElement !== ai) ai.value = S0.a; if (bi && document.activeElement !== bi) bi.value = S0.b; } try { introStripSync(); } catch (e) {} } }   // locked to the Goldbach pair on screen: the band follows the line r/M = g/(E - g) through the marker (g, E - g)
     const ST = _introStrip.on ? _introStrip : null;
     const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : 'cay', x: _introExpX, y: _introExpY, z: _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
     { const tf = _introGbOn ? G / (2 * (G + 1) + 1) : 1; _introGridF = _introExporting ? tf : _introGridF + (tf - _introGridF) * 0.18; if (Math.abs(_introGridF - tf) < 0.002) _introGridF = tf; }   // Grid + Goldbach: ease the square in so the whole pair (r + M = E - g reaches M = E - 3) fits
@@ -7218,6 +7218,7 @@ function showIntro() {
       const rad = _introRad(R, M, GZ);
       for (let r = 1; r <= (_introAng === 'clamp' && !(VM > 0.3 && VW.mode === 'grid') ? M : G); r++) {   // the Grid shows the whole G x G square: the ring holds r <= M, its mirror r > M fills the other half
         if (_introCop[r * 513 + M] !== 1) continue; const inW = r <= M, dead = _introN > 0 && introKilled(r, M, _introN); if (dead && !_introSat) continue; if (inW && !dead) { cop++; const q0 = Math.floor(M / r); sc[Math.min(q0, 5)]++; }
+        if (_introIso) { if (_introIso === 'gb') continue; if (_introIso === 'spiral' && !(r === _introIsoP || r === M - _introIsoP)) continue; if (_introIso === 'sieve' && dead) continue; if (_introIso === 'strip') { if (!ST) continue; const v0 = ST.b * r - ST.a * M; if (!(v0 >= ST.s && v0 < ST.s + ST.w)) continue; } }
         if (GBg && (r + M === GBg || r + M === GBs || M - r === GBg || r - M === GBg)) continue;   // the overlay below draws these bright
         const th = _introTh(r, M) + spin;
         if (_introSat) { lastCs = null; const kp = KILL[r]; if (kp) { const c = primeHueRGBA(kp, 235); x.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',.95)'; } else x.fillStyle = 'rgba(90,120,190,.55)'; }
@@ -7257,9 +7258,9 @@ function showIntro() {
     /* the sector rays draw themselves outward one after another over the first 6 s of real time (also while the clock is paused) */
     const rp = _introExporting || !_introSeq || !_introRay0 ? 1 : Math.min(1, (performance.now() - _introRay0) / 6000), rayF = k => Math.max(0, Math.min(1, (rp - k * 0.08) / 0.3));
     x.strokeStyle = 'rgba(255,255,255,' + (0.22 + 0.55 * (1 - rp)).toFixed(3) + ')'; x.lineWidth = 0.8 + 1.2 * (1 - rp);   // bright and thick while they draw, settling to the usual faint rays
-    for (let n = 2; n <= 9; n++) { const t = 2 * Math.PI / n, f = rayF(n - 2); if (f <= 0) continue; if (VON) { x.beginPath(); let st = false; for (let M = 1; M <= G; M += Math.max(1, Math.floor(G / 120))) { const P = posRM(M / n, M); if (!P) { st = false; continue; } if (st) x.lineTo(P[0], P[1]); else { x.moveTo(P[0], P[1]); st = true; } } x.stroke(); continue; } x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + R * 1.02 * f * Math.cos(t), cy - R * 1.02 * f * Math.sin(t)); x.stroke(); }
+    if (!_introIso) for (let n = 2; n <= 9; n++) { const t = 2 * Math.PI / n, f = rayF(n - 2); if (f <= 0) continue; if (VON) { x.beginPath(); let st = false; for (let M = 1; M <= G; M += Math.max(1, Math.floor(G / 120))) { const P = posRM(M / n, M); if (!P) { st = false; continue; } if (st) x.lineTo(P[0], P[1]); else { x.moveTo(P[0], P[1]); st = true; } } x.stroke(); continue; } x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + R * 1.02 * f * Math.cos(t), cy - R * 1.02 * f * Math.sin(t)); x.stroke(); }
     x.globalAlpha *= Math.max(0, Math.min(1, (rp - 0.6) / 0.3));
-    for (let q = 1; q <= 4; q++) { const t = Math.PI * (1 / q + 1 / (q + 1)); if (VON) { const M0 = Math.max(2, Math.round(G * 0.8)), P = posRM(M0 * 0.5 * (1 / q + 1 / (q + 1)), M0); if (P) x.fillText('s=' + q, P[0], P[1] + 3); } else x.fillText('s=' + q, cx + R * 0.82 * Math.cos(t), cy - R * 0.82 * Math.sin(t) + 3); }
+    if (!_introIso) for (let q = 1; q <= 4; q++) { const t = Math.PI * (1 / q + 1 / (q + 1)); if (VON) { const M0 = Math.max(2, Math.round(G * 0.8)), P = posRM(M0 * 0.5 * (1 / q + 1 / (q + 1)), M0); if (P) x.fillText('s=' + q, P[0], P[1] + 3); } else x.fillText('s=' + q, cx + R * 0.82 * Math.cos(t), cy - R * 0.82 * Math.sin(t) + 3); }
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
@@ -7322,7 +7323,7 @@ function showIntro() {
       gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
     x.restore();
-    x.globalAlpha = _introV.k > 1.3 ? 0.4 : 1;   // the corner stats fade when you zoom in, so they do not sit on the ring
+    x.globalAlpha = _introIso ? 0 : _introV.k > 1.3 ? 0.4 : 1;   // the corner stats fade when you zoom in, so they do not sit on the ring
     const six = 6 / (Math.PI * Math.PI) * introC(_introN), nn = _introN > 0;
     const sigNow = G + ':' + _introN, tNow = performance.now(); if (sigNow !== _introSig) { _introSig = sigNow; _introSigT = tNow; }
     const stA = _introExporting ? 1 : Math.max(0, Math.min(1, 1 - (tNow - _introSigT - 1000) / 500)), baseGA = x.globalAlpha;   // the gcd = 1 and sector tables change only while M (or n) moves: one second after it stops they fade out and the tables below them move up
@@ -7425,29 +7426,32 @@ function introGPlay() {
   function html(){ return '<span class="lbl" title="theta = kπ·r/M. k=2 is the full circle; k coprime to M only permutes the points; gcd(k,M)>1 collapses them.">kπ</span>'
     + [1,2,3,4,5].map(k=>'<button class="chip angk-chip" data-k="'+k+'" onclick="angSet('+k+')">'+k+'π</button>').join('')
     + '<input type="range" class="angk-sl" min="0.25" max="6" step="0.01" value="2" oninput="angSet(+this.value)" style="width:90px">'
-    + '<span class="val angk-v">2.00π</span><button class="chip angk-play" onclick="angPlay()" title="Animate k between 1π and 5π">▶ k</button>'; }
+    + '<span class="val angk-v">2.00π</span><button class="chip angk-play" onclick="angPlay()" title="Animate k from 1π up to the value in the box and back">▶ k</button><span class="lbl">to</span><input type="number" class="angk-max" min="2" max="60" step="1" value="' + (window.ANG_MAX || 5) + '" oninput="angMax(+this.value)" style="width:48px" title="the play sweeps k up to this value (2 to 60)">'; }
   window.angSync = function(){
     document.querySelectorAll('.angk-chip').forEach(b=>b.classList.toggle('on', Math.abs(+b.dataset.k-ANG_K)<0.005));
-    document.querySelectorAll('.angk-sl').forEach(e=>{ if (document.activeElement!==e) e.value = ANG_K; });
+    document.querySelectorAll('.angk-sl').forEach(e=>{ e.max = Math.max(6, window.ANG_MAX || 5, Math.ceil(ANG_K)); if (document.activeElement!==e) e.value = ANG_K; });
+    document.querySelectorAll('.angk-max').forEach(e=>{ if (document.activeElement!==e) e.value = window.ANG_MAX || 5; });
     document.querySelectorAll('.angk-v').forEach(e=>e.textContent = ANG_K.toFixed(2)+'π');
     document.querySelectorAll('.angk-play').forEach(b=>b.classList.toggle('on', !!window._angRaf));
   };
   window.angSet = function(k, keep){
     if (!keep) angStop();
-    ANG_K = Math.max(0.25, Math.min(6, +k || 2));
+    ANG_K = Math.max(0.25, Math.min(60, +k || 2));
     try { ringKey = ''; cayKey = ''; } catch(e){}
     angSync();
     try { redraw(false); } catch(e){}
     try { olRedraw(); } catch(e){}
   };
+  window.ANG_MAX = 5;
+  window.angMax = function(v){ v = Math.round(+v); if (!(v >= 2)) return; window.ANG_MAX = Math.min(60, v); angSync(); };
   window.angStop = function(){ if (window._angRaf) { cancelAnimationFrame(window._angRaf); window._angRaf = 0; angSync(); } };
   window.angPlay = function(){
     if (window._angRaf) { angStop(); return; }
-    let t0 = performance.now(), dir = ANG_K >= 5 ? -1 : 1;
+    let t0 = performance.now(), dir = ANG_K >= (window.ANG_MAX || 5) ? -1 : 1;
     const step = now => {
       const dt = Math.min(0.1, (now - t0) / 1000); t0 = now;
-      let k = ANG_K + dir * 0.5 * dt;
-      if (k >= 5) { k = 5; dir = -1; } else if (k <= 1) { k = 1; dir = 1; }
+      const hi = window.ANG_MAX || 5; let k = ANG_K + dir * Math.max(0.5, (hi - 1) / 12) * dt;
+      if (k >= hi) { k = hi; dir = -1; } else if (k <= 1) { k = 1; dir = 1; }
       angSet(k, true);
       window._angRaf = requestAnimationFrame(step);
     };
@@ -7765,6 +7769,7 @@ function introViewTick(T) {
   if (V.script && !V.man) {
     /* After the hole closes (26.7 s) the plain ring waits: from 34 s the slope band sweeps in slowly across every lattice point and back (to 44 s); only then does the ring move (Cayley, Grid, ...), which runs as it always did, shifted by DL seconds. */
     const Tr = T, DL = 16.5; let sweep = false;
+    if (Tr >= 150) { _introGM = Tr < 158 ? Math.round(512 - 412 * es((Tr - 150) / 8)) : Math.round(100 + 40 * Math.sin(2 * Math.PI * (Tr - 158) / 16)); _introGMscr = true; } else if (_introGMscr) { _introGMscr = false; _introGM = null; }   // from 160 s on the slider: M slides down to 100, then goes in and out (60 to 140); the Goldbach pair is held and the slope stays locked to it
     /* The C(n) sieve plays once the ring is open (27 to 34 s), and keeps looping to the end of the play, every loop 1.43x slower than the one before (7 s, 10 s, 14 s, 20 s, 29 s, ...): the prime p climbs through the primes up to 251 and back, block depth n = p - 1, so every column r that p (or any smaller prime) divides is struck out, then the survivors return as n falls back to 0. The prime spiral follows the same p. */
     if (!_introNTimer && Tr >= 27 && Tr < 80) { let t0 = 27, d = 7; while (Tr >= t0 + d) { t0 += d; d *= 1.43; } const u = (Tr - t0) / d, f = u < 0.5 ? 2 * u : 2 - 2 * u, pi = Math.max(0, Math.min(_introPr256.length - 1, Math.round(f * (_introPr256.length - 1)))); _introSieveP = _introPr256[pi]; _introN = _introSieveP - 1; }
     else if (_introSieveP) { _introSieveP = 0; _introN = 0; }
@@ -7779,12 +7784,12 @@ function introViewTick(T) {
       if (inWin) {
         if (sweep) { const Gc = Math.max(2, Math.round(_introGcur || 2)), u = Math.max(0, Math.min(1, (Tr - 34) / 10)), k = 1 + Math.round(Gc * (u < 0.55 ? u / 0.55 : (1 - u) / 0.45)); S.a = 1; S.b = 2; S.s = -k; S.w = 2 * k; }
         else if (T < 36.5) { S.a = 1; S.b = 2; S.s = -1; S.w = 2; }
-        else if (T >= 56 && _introGbPairs.length) { const Lg = _introGbPairs.length, g = _introGbPairs[introGbIdxAt(T, Lg)], Ee = 2 * (Math.round(_introGcur || 1) + 1), sP = Ee - g, d = gcd(g, sP); S.a = g / d; S.b = sP / d; S.w = 2 * S.b; S.s = -S.b; }   // Goldbach time: the strip follows the marker (g, E - g), i.e. the line r/M = g/(E - g) through it, 2 cells thick
+        else if (T >= 56 && _introGbPairs.length) { const Lg = _introGbPairs.length, g = _introGbPairs[Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg)], Ee = 2 * (Math.round(_introGcur || 1) + 1), sP = Ee - g, d = gcd(g, sP); S.a = g / d; S.b = sP / d; S.w = 2 * S.b; S.s = -S.b; }   // Goldbach time: the strip follows the marker (g, E - g), i.e. the line r/M = g/(E - g) through it, 2 cells thick
         else { if (!_introFar) { _introFar = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 2 >= q) _introFar.push([p2, q]); _introFar.sort((u, v) => v[0] * u[1] - u[0] * v[1]); } const L = _introFar.length, P = 2 * (L - 1), n = Math.floor((T - 36.5) / 0.35) % P, f = _introFar[n < L ? n : P - n]; S.a = f[0]; S.b = f[1]; S.s = -f[1]; S.w = 2 * f[1]; }
-        S.on = true; S.scr = true;
+        S.on = true; S.scr = true; try { introStripSync(); } catch (e) {}
       } else if (S.scr && !S.timer && !S.scanT) { S.scr = false; S.on = false; } }
     { const inGb = T >= 56 && !_introGbTimer;   // scripted Goldbach: from 56 s to the end (it carries on into the final Cayley section), the pair g + s = E steps through every pair once (the prime scan pauses meanwhile)
-      if (inGb) { _introGbOn = true; _introGbScr = true; const Lg = Math.max(1, _introGbPairs.length); _introGbI = introGbIdxAt(T, Lg); }
+      if (inGb) { _introGbOn = true; _introGbScr = true; const Lg = Math.max(1, _introGbPairs.length); _introGbI = Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg); }
       else if (_introGbScr) { _introGbScr = false; if (!_introGbTimer) _introGbOn = false; _introV.k = 1; _introV.fx = 0; _introV.fy = 0; introSetHole(0); _introCM = false; const cb0 = $('intro-cm-btn'); if (cb0) cb0.classList.remove('on'); }
       if (_introGbScr && inGb) {   // the marker (g, E - g) has M > G: hole 0.5 pulls the outer rings in (radius 0.5 + 0.5 M/G), the plate zooms out so M up to 2G fits, and the circle method is on
         const e5 = sg(56, 57.5); introSetHole(0.5 * e5); { const g5 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)] || 5, E5 = 2 * (Math.round(_introGcur || 1) + 1), M5 = E5 - g5, rm = 0.5 + 0.5 * (M5 - 0.5) / Math.max(1, _introGZ || 512), th5 = 2 * Math.PI * Math.min(g5 / M5, 1), Q = _introGeo; let kt = 1;
@@ -7806,6 +7811,7 @@ function introViewRot() { const V = _introVw; V.script = false; V.man = true; V.
 function introRestart() { try { showIntro(); } catch (e) {} ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.remove('on'); }); }
 /* Math sheet: with the intro paused, one HTML page (print it to PDF) with the Ring, Cayley and Grid pictures at the current G and n, a legend,
    the definitions, and tables and graphs computed from the same cells. */
+var _introGMscr = false, _introIso = null, _introIsoP = 0;   // sheet only: draw one layer by itself
 var _introExpView = null, _introExpX = 0, _introExpY = 0, _introExpZ = 0;
 function introSheetData(G, n) {
   const D = lv2D(n), sc = [0, 0, 0, 0, 0, 0], cum = new Array(G + 1).fill(0), phin = new Array(G + 1).fill(0);
@@ -7838,6 +7844,58 @@ function _introChartCv(kind, pts, tgt, title, xl) {   // line (value against x, 
   c.fillStyle = '#e8604c'; c.textAlign = 'right'; c.fillText('target = ' + tgt.toFixed(4), L + pw, Y(tgt) - 12);
   return cv;
 }
+function introLayersDoc(E) {   // every layer on the intro, one section each, with the live values
+  const { G, n } = E, doc = [], isoPlate = (k, cap) => { if (E.cvs && E.cvs['iso_' + k + '_ring']) { doc.push({ t: 'iplate', items: [{ label: 'Grid', cv: E.cvs['iso_' + k + '_grid'], cls: '' }, { label: 'Ring', cv: E.cvs['iso_' + k + '_ring'], cls: '' }] }); doc.push({ t: 'iplate', items: [{ label: 'Cayley', cv: E.cvs['iso_' + k + '_cay'], cls: 'wide' }], cap: cap + '.' }); } }, f = (v, k) => (+v).toFixed(k), L = x => x.toLocaleString();
+  const isP = m => { if (m < 2) return false; for (let q = 2; q * q <= m; q++) if (m % q === 0) return false; return true; };
+  const gc = (a, b) => { while (b) { const t = a % b; a = b; b = t; } return a; };
+  const V = _introVw, cur = V.m > 0.5 ? (V.mode === 'grid' ? 'Grid' : 'Cayley') : 'Ring';
+  const Ee = 2 * (G + 1), pairs = introGbPairsFor(G), gI = Math.min(_introGbI, Math.max(0, pairs.length - 1));
+  const sat = []; for (let q = 2; q <= n + 1; q++) if (isP(q)) sat.push(q);
+  let q1 = n + 2; while (!isP(q1)) q1++;
+  const pSp = _introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2);
+  doc.push({ t: 'h', text: 'Every layer on the picture' });
+  doc.push({ t: 'p', text: 'The picture is a stack of layers. Each one below is stated on its own: whether it is on, the parameters it uses with their live values, and its formula. Layers that are off are listed too, so this page documents the whole intro.' });
+  // 1 angle
+  doc.push({ t: 'h', text: 'Layer 1 · Angle (always on)' });
+  isoPlate('base', 'The angle and the map by themselves: every coprime cell, no overlay');
+  doc.push({ t: 'eq', tex: '\\theta(r,M)=' + angTex() + (_introAng === 'wrap' ? '\\,\\frac rM' : _introAng === 'unit' ? '\\,\\frac rG' : '\\,\\min\\!\\Big(\\frac rM,1\\Big)'), cap: 'mode ' + _introAng + ', k = ' + angTxt() + '. The position is the fraction r/M; k only scales how far round it is placed.' });
+  // 2 ring and cayley
+  doc.push({ t: 'h', text: 'Layer 2 · Ring and Cayley map (on screen: ' + cur + ')' });
+  doc.push({ t: 'eq', tex: '\\rho(M)=R\\Big(h+(1-h)\\frac{M-\\frac12}{G}\\Big),\\qquad h=' + f(_introHole, 2) + (_introCM ? ',\\ \\text{circle method on}' : '') });
+  doc.push({ t: 'eq', tex: 'w=\\frac{z-1}{z+1},\\qquad z=\\rho e^{i\\theta}', cap: 'Cayley tilt x ' + Math.round(V.x) + '°, y ' + Math.round(V.y) + '°, z ' + Math.round(V.z || 0) + '°, zoom ' + f(_introV.k, 2) + '×' + (V.mode === 'cay' ? '' : ' (Cayley is not the view on screen)') });
+  // 3 goldbach
+  doc.push({ t: 'h', text: 'Layer 3 · Goldbach pair (' + (_introGbOn ? 'on' : 'off') + ')' });
+  isoPlate('gb', 'Goldbach by itself: the four lines and the marker');
+  if (pairs.length) {
+    const g = pairs[gI], sP = Ee - g;
+    doc.push({ t: 'eq', tex: 'E=2(G+1)=' + Ee + (_introGbOn ? '=' + g + '+' + sP + ',\\qquad P_g=(g,s)=(' + g + ',' + sP + '),\\quad \\theta=2\\pi\\frac gs=' + f(360 * g / sP, 2) + '^{\\circ}' : ''), cap: _introGbOn ? 'pair ' + (gI + 1) + ' of ' + pairs.length + ' (g ≤ s).' : 'off; the pair would be ' + (gI + 1) + ' of ' + pairs.length + '.' });
+    doc.push({ t: 'p', text: 'The ' + pairs.length + ' pairs of ' + Ee + ': ' + pairs.map((x, i) => (_introGbOn && i === gI ? '[' : '') + x + '+' + (Ee - x) + (_introGbOn && i === gI ? ']' : '')).join(' · ') + '.' });
+  }
+  // 4 strip
+  const S = _introStrip;
+  doc.push({ t: 'h', text: 'Layer 4 · Slope strip (' + (S.on ? 'on' + (_introStripLock ? ', locked to the Goldbach pair' : '') : 'off') + ')' });
+  isoPlate('strip', 'Slope strip by itself: every other point removed');
+  if (S.on && S.b) {
+    doc.push({ t: 'eq', tex: 'v=br-aM=' + S.b + 'r-' + S.a + 'M,\\qquad ' + S.s + '\\le v<' + (S.s + S.w) + ',\\qquad \\text{slope }\\frac ab=\\frac{' + S.a + '}{' + S.b + '}=' + f(S.a / S.b, 4) });
+    let rmax = 0, cells = 0, copc = 0; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((S.s + S.a * M) / S.b)), hi = Math.min(G, Math.ceil((S.s + S.w + S.a * M) / S.b) - 1); for (let r = lo; r <= hi; r++) { cells++; rmax = Math.max(rmax, r); if (gc(r, M) === 1) copc++; } }
+    doc.push({ t: 'table', head: ['strip', 'value', ''], rows: [{ label: 'cells in strip', n: L(cells), pct: '' }, { label: 'coprime, gcd(r, M) = 1', n: L(copc), pct: f(100 * copc / Math.max(1, cells), 2) + '%' }, { label: 'largest r inside G = ' + G, n: String(rmax), pct: '' }] });
+    if (n >= 1) { try { msKeptNote(S.a, S.b, S.s, S.w, n, G).forEach(x => doc.push(x)); } catch (e) {} }
+    if (rmax < q1) doc.push({ t: 'note', text: 'This strip only reaches r ≤ ' + rmax + ' inside G = ' + G + ', below the first unsaturated prime ' + q1 + ', so no prime or composite r can be kept in it: every kept cell is r = 1.' });
+  }
+  // 5 prime spiral and C(n)
+  doc.push({ t: 'h', text: 'Layer 5 · Prime spiral and C(n) block (p = ' + pSp + (_introPLock ? ', locked to n' : '') + ', sieve ' + (_introSat ? 'on' : 'off') + ')' });
+  isoPlate('spiral', 'Prime spiral by itself: the column r = p and its mirror');
+  isoPlate('sieve', 'Sieve by itself: only the cells kept at depth n');
+  doc.push({ t: 'eq', tex: 'n=p-1=' + n + ',\\qquad \\mathrm{good}(r,M)\\iff\\gcd(r,M+j)=1\\ \\ (0\\le j\\le ' + n + '),\\qquad \\text{spiral: }r=p=' + pSp + ',\\ \\sigma(r)=M-r' });
+  if (n >= 1) {
+    let tot = 0, cop = 0, kept = 0, k1 = 0, kp = 0, kc = 0;
+    if (G <= 1024) for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) { tot++; if (gc(r, M) !== 1) continue; cop++; let ok = true; for (let j = 1; j <= n && ok; j++) if (gc(r, M + j) !== 1) ok = false; if (ok) { kept++; if (r === 1) k1++; else if (isP(r)) kp++; else kc++; } }
+    doc.push({ t: 'p', text: 'Saturated primes (p ≤ n + 1 = ' + (n + 1) + '): ' + (sat.length ? sat.join(', ') : 'none') + '. Every multiple of one of them is removed at every M, so a kept r is 1 or a prime until r = ' + q1 + '² = ' + (q1 * q1) + '.' });
+    doc.push({ t: 'table', head: ['whole wedge r ≤ M ≤ G', 'cells', 'share'], rows: [{ label: 'all cells', n: L(tot), pct: '100%' }, { label: 'coprime, gcd(r, M) = 1', n: L(cop), pct: f(100 * cop / Math.max(1, tot), 2) + '%' }, { label: 'kept at depth n = ' + n, n: L(kept), pct: f(100 * kept / Math.max(1, tot), 2) + '%' }, { label: 'kept · r = 1', n: L(k1), pct: '' }, { label: 'kept · r prime', n: L(kp), pct: '' }, { label: 'kept · r composite', n: L(kc), pct: '' }] });
+  }
+  doc.push({ t: 'p', text: 'Mirror σ: r → M − r is ' + (_introMirror ? 'on' : 'off') + '. It pairs each residue with its complement, and it preserves coprimality.' });
+  return doc;
+}
 function introBuildSheetDoc(E) {
   const { G, n, T, d, kept, ratio, err, cvs, pi, gbN } = E, f = (v, k) => (+v).toFixed(k), gcd2 = (a, b) => { while (b) { const t = a % b; a = b; b = t; } return a; }, isP = m => { if (m < 2) return false; for (let q = 2; q * q <= m; q++) if (m % q === 0) return false; return true; };
   const tot = d.tot, D = d.D, doc = [], sgn = v => (v >= 0 ? '+' : '\u2212') + f(Math.abs(v), 1) + '%', ecol = v => (v >= 0 ? 'pos' : 'neg');
@@ -7851,6 +7909,7 @@ function introBuildSheetDoc(E) {
   const stp = _introStrip.on ? ['strip a/b', _introStrip.a + '/' + _introStrip.b] : ['strip', 'off'];
   doc.push({ t: 'h', text: 'Parameters' });
   doc.push({ t: 'params', items: [['G', String(G)], ['on screen', curName], ['cells', 'G(G+1)/2 = ' + tot.toLocaleString()], ['block depth n', String(n)], ['\u03b8 mode', String(_introAng)], ['ring hole h', f(_introHole, 2) + (_introCM ? ' \u00b7 circle method on' : '')], ['Cayley turns', rotTxt], ['Cayley \u03c1\u2080, \u03c1_d', OPENER_RHO0 + ', ' + OPENER_RHOD], ['colouring', 'sector s = \u230aM/r\u230b'], ['spiral p', _introSieveP ? String(_introSieveP) : (PSall[Math.min(PSall.length - 1, _introPi)] + '')], ['mirror \u03c3(r) = M \u2212 r', _introMirror ? 'on' : 'off'], stp, ['Goldbach', _introGbOn ? 'on \u00b7 E = ' + 2 * (G + 1) : 'off']] });
+  try { introLayersDoc(E).forEach(x => doc.push(x)); } catch (e) { console.error(e); }
   // 2 lattice
   doc.push({ t: 'h', text: 'The lattice' });
   doc.push({ t: 'p', text: 'Ring and Cayley plot only the wedge r \u2264 M (in clamp mode a cell with r > M would sit on the r = M spoke, so it is left out), so the set they hold is the triangle below; Grid draws the whole G \u00d7 G square.' });
@@ -7944,6 +8003,7 @@ async function introExportFromPreview() {
     say('Saving the three view PNGs\u2026');
     for (const v of ['ring', 'cay', 'grid']) { const bl = await new Promise(r => c.cvs[v].toBlob(r, 'image/png')); if (bl) introSheetDl(bl, base + '-view-' + v + '.png'); await new Promise(r => setTimeout(r, 400)); }
     if (plateOnly) { say('Saved the three view PNGs only.'); return; }
+    { const ks = Object.keys(c.cvs).filter(k => k.indexOf('iso_') === 0); for (let i = 0; i < ks.length; i++) { say('Saving layer picture ' + (i + 1) + ' of ' + ks.length + '\u2026'); const bl = await new Promise(r => c.cvs[ks[i]].toBlob(r, 'image/png')); if (bl) introSheetDl(bl, base + '-layer-' + ks[i].slice(4).replace('_', '-') + '.png'); await new Promise(r => setTimeout(r, 400)); } }
     say('Typesetting the sheet at ' + MS_RES[MS.res] + '\u2026');
     const pgs = await msRender(c.doc, MS.theme, { pages: true, bySection: true, lazy: true });
     await new Promise(r => setTimeout(r, 350));
@@ -7954,7 +8014,7 @@ async function introExportFromPreview() {
 async function introMathSheet() {
   if (!_introPaint) return;
   { const V = _introVw, live = V.mode === 'cay' && V.m > 0.02; _introExpX = live ? V.x : 0; _introExpY = live ? V.y : 0; _introExpZ = live ? (V.z || 0) : 0; }
-  const G = Math.max(1, Math.round(_introGcur)), n = _introN || 0, T = Math.max(0, _introT - 10), fx = (v, d) => v.toFixed(d == null ? 2 : d);
+  const G = Math.max(1, Math.min(512, Math.round(_introGcur))), n = _introN || 0, T = Math.max(0, _introT - 10), fx = (v, d) => v.toFixed(d == null ? 2 : d);
   const d = introSheetData(G, n), kept = d.cum[G], ratio = kept / d.tot, err = (ratio / d.D - 1) * 100;
   // pictures
   const W = 1600, H = 1000, shots = {}, cvs = {}, saveGM = _introGM, saveExp = _introExporting;
@@ -7976,6 +8036,41 @@ async function introMathSheet() {
     } finally { _introV = _saveV; _introExporting = saveExp; _introExpView = null; _introGM = saveGM; _introExpFit = 1; }
     shots[v] = cv.toDataURL('image/png'); cvs[v] = cv;
   }
+
+  // each layer by itself, in the view on screen: only that layer's points, on the same plate
+  try {
+    const pSp = Math.min(G, Math.max(2, _introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2)));
+    const defs = [['base', 'Angle and map only', 'every coprime cell placed by \u03b8 and \u03c1, nothing else']]; if (_introStrip.on) defs.push(['strip', 'Slope strip only', 'the cells with ' + _introStrip.s + ' ≤ ' + _introStrip.b + 'r − ' + _introStrip.a + 'M < ' + (_introStrip.s + _introStrip.w)]);
+    if (n >= 1) defs.push(['sieve', 'Sieve only', 'the cells kept at block depth n = ' + n]);
+    defs.push(['spiral', 'Prime spiral only', 'the column r = ' + pSp + ' and its mirror r = M − ' + pSp]);
+    if (_introGbOn) defs.push(['gb', 'Goldbach only', 'the four lines and the marker of the current pair']);
+    let wcop = 0, scells = 0, scop = 0; for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) if (gcd(r, M) === 1) wcop++;
+    if (_introStrip.on && _introStrip.b) { const S1 = _introStrip; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((S1.s + S1.a * M) / S1.b)), hi = Math.min(G, Math.ceil((S1.s + S1.w + S1.a * M) / S1.b) - 1); for (let r = lo; r <= hi; r++) { scells++; if (gcd(r, M) === 1) scop++; } } }
+    const Ee1 = 2 * (G + 1), gp1 = introGbPairsFor(G), g1 = gp1[Math.min(_introGbI, Math.max(0, gp1.length - 1))] || 0;
+    const detOf = key => key === 'base' ? ['G = ' + G + '  \u00b7  \u03b8 = ' + angTxt() + '\u00b7r/M (' + _introAng + ')  \u00b7  hole h = ' + (+_introHole).toFixed(2) + (_introCM ? ' + circle method' : ''), 'cells in the wedge ' + (G * (G + 1) / 2) + '  \u00b7  coprime ' + wcop + ' (' + (100 * wcop / (G * (G + 1) / 2)).toFixed(2) + '%)']
+      : key === 'strip' ? ['slope a/b = ' + _introStrip.a + '/' + _introStrip.b + ' = ' + (_introStrip.a / _introStrip.b).toFixed(4) + '  \u00b7  s = ' + _introStrip.s + '  \u00b7  w = ' + _introStrip.w, 'cells in the strip ' + scells + '  \u00b7  coprime ' + scop + ' (' + (100 * scop / Math.max(1, scells)).toFixed(2) + '%)']
+      : key === 'sieve' ? ['block depth n = ' + n + '  \u00b7  saturated primes p \u2264 ' + (n + 1) + '  \u00b7  a kept r is 1 or a prime until r = q\u00b2', 'kept ' + kept + ' of ' + (G * (G + 1) / 2) + ' (' + (100 * ratio).toFixed(2) + '%)  \u00b7  target D(' + n + ') = ' + (100 * d.D).toFixed(2) + '%']
+      : key === 'spiral' ? ['p = ' + pSp + '  \u00b7  column r = p on every ring M \u2265 p (cyan)  \u00b7  mirror \u03c3(r) = M \u2212 r (violet)', 'primes \u2264 G: ' + (() => { let c = 0; for (let m = 2; m <= G; m++) { let ok = true; for (let q = 2; q * q <= m; q++) if (m % q === 0) { ok = false; break; } if (ok) c++; } return c; })() + '  \u00b7  hyperbolic spiral, \u03c1\u03b8 = const']
+      : ['E = 2(G+1) = ' + Ee1 + (g1 ? ' = ' + g1 + ' + ' + (Ee1 - g1) + '  \u00b7  \u03b8 = ' + (360 * g1 / (Ee1 - g1)).toFixed(2) + '\u00b0' : ''), 'pair ' + (Math.min(_introGbI, Math.max(0, gp1.length - 1)) + 1) + ' of ' + gp1.length + '  \u00b7  the four lines r + M = g, r + M = s, M \u2212 r = g, r \u2212 M = g'];
+    const s0 = { sat: _introSat, gb: _introGbOn, st: _introStrip.on, sv: _introSieveP, N: _introN, lk: _introStripLock, pl: _introPLock, V: _introV };
+    for (const [key, ttl, what] of defs) for (const curV of ['grid', 'ring', 'cay']) {
+      const nm = { ring: 'Ring', cay: 'Cayley', grid: 'Grid' }[curV];
+      const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+      _introIso = key; _introIsoP = pSp; _introSat = false; _introGbOn = key === 'gb'; _introStrip.on = key === 'strip'; _introSieveP = key === 'spiral' ? pSp : 0; _introN = key === 'sieve' ? n : 0; _introStripLock = false; _introPLock = false;
+      _introExpView = curV; _introGM = G; _introExporting = 'land'; _introV = curV === 'cay' ? s0.V : { k: 1, fx: 0, fy: 0 };   // Cayley keeps the zoom you set, like the main plates
+      try {
+        introExpFit(W, H, Math.max(T, 9.5)); _introPaint(x, W, H, Math.max(T, 9.5)); x.globalAlpha = 1;
+        x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '20px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', W / 2, 36);
+        x.fillStyle = '#e8e3db'; x.font = '64px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', W / 2, 100);
+        x.font = '20px monospace'; x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText(nm + '   ·   ' + ttl + '   ·   G = ' + G, W / 2, 140);
+        const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190]; x.textAlign = 'left'; x.font = '17px monospace'; let lx = 60; const ly = H - 112;
+        x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText('colour = sector s = \u230aM/r\u230b :', lx, ly); lx += 270;
+        for (let s9 = 1; s9 <= 9; s9++) { x.fillStyle = s9 < 9 ? 'hsl(' + SECHUE[s9] + ',62%,55%)' : 'hsl(0,12%,55%)'; x.fillRect(lx, ly - 14, 16, 16); x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText(s9 < 9 ? 's=' + s9 : 's\u22659', lx + 22, ly); lx += 84; }
+        x.fillStyle = 'rgba(232,227,219,.75)'; const dl = detOf(key); x.fillText(what + '.', 60, ly + 30); x.fillText(dl[0], 60, ly + 54); x.fillText(dl[1], 60, ly + 78);
+      } finally { _introIso = null; _introExporting = saveExp; _introExpView = null; _introGM = saveGM; _introExpFit = 1; _introV = s0.V; _introSat = s0.sat; _introGbOn = s0.gb; _introStrip.on = s0.st; _introSieveP = s0.sv; _introN = s0.N; _introStripLock = s0.lk; _introPLock = s0.pl; }
+      cvs['iso_' + key + '_' + curV] = cv;
+    }
+  } catch (e) { console.error(e); _introIso = null; }
   // sector table
   const sNames = ['', 's = 1 : 1/2 < r/M ≤ 1', 's = 2 : 1/3 < r/M ≤ 1/2', 's = 3 : 1/4 < r/M ≤ 1/3', 's = 4 : 1/5 < r/M ≤ 1/4', 's ≥ 5 : r/M ≤ 1/5'], w = [0, 1 / 2, 1 / 6, 1 / 12, 1 / 20, 1 / 5];
   let secRows = '', secBars = [];
@@ -8232,7 +8327,7 @@ async function introExport4k(land) {
   const W = land ? 1920 : 1080, H = land ? 1080 : 1920, hx = W / 2;
   const cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2;   // layout at 2x, so it stays sharp
   const x = cv.getContext('2d'); x.setTransform(2, 0, 0, 2, 0, 0);
-  const _vw = _introVw, _saveGM = _introGM; _introExpView = _vw.m > 0.5 ? (_vw.mode === 'grid' ? 'grid' : 'cay') : 'ring'; _introExpX = _vw.x; _introExpY = _vw.y; _introExpZ = _vw.z || 0; _introGM = Math.max(1, Math.round(_introGcur || 1));   // export the view that is on screen (Ring, Cayley or Grid) at the current M
+  const _vw = _introVw, _saveGM = _introGM; _introExpView = _vw.m > 0.5 ? (_vw.mode === 'grid' ? 'grid' : 'cay') : 'ring'; _introExpX = _vw.x; _introExpY = _vw.y; _introExpZ = _vw.z || 0; _introGM = Math.max(1, Math.min(512, Math.round(_introGcur || 1)));   // export the view that is on screen (Ring, Cayley or Grid) at the current M
   _introExporting = land ? 'land' : true;
   try {
     introExpFit(W, H, Math.max(_introT - 10, 9.5)); _introPaint(x, W, H, Math.max(_introT - 10, 9.5));
@@ -17925,12 +18020,12 @@ function msKeptNote(a, b, s, w, n, G, off) {   // who survives in a slope strip 
   return [
     { t: 'p', text: 'Who survives at depth n = ' + n + ' (primes p ≤ n + 1 = ' + (n + 1) + ' are saturated). A block of n + 1 consecutive integers contains a multiple of every prime q ≤ n + 1, so any r divisible by such a q is removed at every M. A kept r therefore has all its prime factors above n + 1, so it is 1 or a prime, until r reaches ' + q1 + '² = ' + (q1 * q1) + ', the first composite with no factor ≤ n + 1. The removed cells are the ones that share a factor with a lower prime: the saturated primes (≤ n + 1) that the lock has already passed.' },
     { t: 'table', head: ['coprime cells in the strip (gcd(r, M) = 1)', 'count', 'share'], rows: [
-      ['kept · r = 1', f(k1), (100 * k1 / cop).toFixed(2) + '%'],
-      ['kept · r prime', f(kp), (100 * kp / cop).toFixed(2) + '%'],
-      ['kept · r composite (all factors > ' + (n + 1) + ')', f(kc), (100 * kc / cop).toFixed(2) + '%'],
-      ['removed · r has a prime factor ≤ ' + (n + 1), f(remSat), (100 * remSat / cop).toFixed(2) + '%'],
-      ['removed · r has no such factor (a later column of the block shares one)', f(remOther), (100 * remOther / cop).toFixed(2) + '%'],
-      ['total coprime', f(cop), '100%'] ] },
+      { label: 'kept · r = 1', n: f(k1), pct: (100 * k1 / cop).toFixed(2) + '%' },
+      { label: 'kept · r prime', n: f(kp), pct: (100 * kp / cop).toFixed(2) + '%' },
+      { label: 'kept · r composite (all factors > ' + (n + 1) + ')', n: f(kc), pct: (100 * kc / cop).toFixed(2) + '%' },
+      { label: 'removed \u00b7 r has a prime factor \u2264 ' + (n + 1), n: f(remSat), pct: (100 * remSat / cop).toFixed(2) + '%' },
+      { label: 'removed · r has no such factor (a later column of the block shares one)', n: f(remOther), pct: (100 * remOther / cop).toFixed(2) + '%' },
+      { label: 'total coprime', n: f(cop), pct: '100%' } ] },
     { t: 'note', text: 'Counted over the whole G × G square (G = ' + G + '). Kept composites with r < ' + (q1 * q1) + ': ' + f(kcLow) + ' (the claim above says 0). Kept cells in all: ' + f(kept) + '.' }
   ];
 }
