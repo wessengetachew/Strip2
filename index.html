@@ -1849,12 +1849,12 @@ walk anyway.</p>
 
     <div class="prow">
       <span class="plabel">Mode</span>
-      <button class="chip lift-mode-btn on" data-m="none" onclick="liftSetMode('none')" title="Neither the spiral nor the &plusmn;n path &mdash; just the r&rarr;r mod(M+1) chain lines below, if that's on.">None</button>
-      <button class="chip lift-mode-btn" data-m="npath" onclick="liftSetMode('npath')" title="r=(M&plusmn;n)/2 — the lift path at the current block depth.">&plusmn;n path</button>
-      <button class="chip lift-mode-btn" data-m="spiral" onclick="liftSetMode('spiral')" title="r=p across every ring M — the chosen prime's residue spiral (classically a hyperbolic spiral, rho*theta = const).">Spiral</button>
-      <button class="chip lift-mode-btn" data-m="both" onclick="liftSetMode('both')" title="Spiral and &plusmn;n path together.">Both</button>
+      <button class="chip lift-mode-btn on" data-m="none" onclick="liftModeClick('none')" title="Neither the spiral nor the &plusmn;n path &mdash; just the r&rarr;r mod(M+1) chain lines below, if that's on.">None</button>
+      <button class="chip lift-mode-btn" data-m="npath" onclick="liftModeClick('npath')" title="r=(M&plusmn;n)/2 — the lift path at the current block depth.">&plusmn;n path</button>
+      <button class="chip lift-mode-btn" data-m="spiral" onclick="liftModeClick('spiral')" title="r=p across every ring M — the chosen prime's residue spiral (classically a hyperbolic spiral, rho*theta = const).">Spiral</button>
+      <button class="chip lift-mode-btn" data-m="both" onclick="liftModeClick('both')" title="Spiral and &plusmn;n path together.">Both</button>
       <button class="chip tl" id="lift-spiral-preset" onclick="liftSpiralPreset()" title="Preset: prime spiral + mirror + dropout ring, then sweep through the primes. A hyperbolic spiral (rho*theta = const) and its complex-conjugate mirror.">&#9654; Prime spiral + mirror</button>
-      <button class="chip lift-mode-btn" data-m="connect" onclick="liftSetMode('connect')" title="Spiral and &plusmn;n path together, with thin lines joining the two at every ring M they share.">Connect</button>
+      <button class="chip lift-mode-btn" data-m="connect" onclick="liftModeClick('connect')" title="Spiral and &plusmn;n path together, with thin lines joining the two at every ring M they share.">Connect</button>
     </div>
 
     <div class="prow">
@@ -2042,7 +2042,7 @@ walk anyway.</p>
   </div>
 </div>
 
-<style>#intro-overlay.ctl-open #intro-head{padding-top:8px!important}#intro-overlay.ctl-open #intro-head>div:nth-child(1),#intro-overlay.ctl-open #intro-head>div:nth-child(3){display:none}#intro-overlay.ctl-open #intro-head>div:nth-child(2){font-size:22px!important;margin-top:0!important}.ig{flex:1 1 250px;max-width:330px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 9px 8px;background:rgba(255,255,255,.035)}.ig .gl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}.ig .gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.ig .gv{min-width:4.5em}@media (max-width:600px){.ig{flex:1 1 100%;max-width:none}}@media (max-height:560px){#intro-head{padding-top:8px!important}#intro-head>div:nth-child(2){font-size:clamp(22px,8vh,40px)!important;margin-top:2px!important}#intro-head>div:nth-child(3){display:none}#intro-counter{font-size:11px!important}#intro-foot{padding-bottom:6px!important}#intro-foot>div{margin-top:5px!important}}@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
+<style>@media (max-width:600px){#intro-overlay.ctl-open #intro-head{padding-top:8px!important}#intro-overlay.ctl-open #intro-head>div:nth-child(1),#intro-overlay.ctl-open #intro-head>div:nth-child(3){display:none}#intro-overlay.ctl-open #intro-head>div:nth-child(2){font-size:22px!important;margin-top:0!important}}@media (min-width:601px){#intro-overlay.ctl-open #intro-foot{z-index:5!important}#intro-overlay.ctl-open #intro-ctl{position:fixed;right:10px;bottom:10px;width:348px;max-width:46vw;overflow-y:auto;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start!important;z-index:6;margin:0!important;padding:8px;background:rgba(8,8,20,.95);border:1px solid rgba(255,255,255,.16);border-radius:10px;box-sizing:border-box}#intro-overlay.ctl-open #intro-ctl .ig{flex:0 0 auto;max-width:none}}.ig{flex:1 1 250px;max-width:330px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 9px 8px;background:rgba(255,255,255,.035)}.ig .gl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}.ig .gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.ig .gv{min-width:4.5em}@media (max-width:600px){.ig{flex:1 1 100%;max-width:none}}@media (max-height:560px){#intro-head{padding-top:8px!important}#intro-head>div:nth-child(2){font-size:clamp(22px,8vh,40px)!important;margin-top:2px!important}#intro-head>div:nth-child(3){display:none}#intro-counter{font-size:11px!important}#intro-foot{padding-bottom:6px!important}#intro-foot>div{margin-top:5px!important}}@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
 <div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#04040d;overflow:hidden;">
   <canvas id="intro-cv" style="position:fixed;inset:0;z-index:2;width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;"></canvas>
   <div id="intro-sweep" style="display:none;position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94vw,560px);max-height:88vh;overflow:auto;padding:12px 14px;background:rgba(10,10,24,.97);border:1px solid var(--gold);border-radius:8px;font-family:var(--mono);font-size:11.5px;color:var(--cream);"></div>
@@ -5079,7 +5079,7 @@ function openerOverlaySoon() {
   });
 }
 function olRedraw() { olSyncUI(); openerOverlaySoon(); }
-function olSetMode(m) { OL.mode = m; olRedraw(); }
+function olSetMode(m) { OL.mode = (m === OL.mode && m !== 'none') ? 'none' : m; olRedraw(); }
 function olStepCN(d) {
   olStopCNPlay(); if (OL.lockN) olStopNPlay();
   OL.lockN = false;   // stepping C(n) by hand unlocks it, as on the main page
@@ -7206,7 +7206,8 @@ function showIntro() {
     _introGcur = G;
     const hd = $('intro-head'), ft = $('intro-foot'), cvTop = _introExporting ? 0 : $('intro-cv').getBoundingClientRect().top, top0 = _introExporting ? (LAND ? 175 : 285) : hd ? hd.getBoundingClientRect().bottom + 6 : Math.max(146, H * 0.2), bot0 = _introExporting ? (LAND ? H - 175 : H - 290) : ft ? ft.offsetTop - 4 : H - 152;
     const OPEN = !_introExporting && W < 600 && $('intro-overlay').classList.contains('ctl-open'), Ro = Math.min(W * 0.34, 150);   // controls open on a phone: the ring sits right under the stats and the controls get everything below
-    const cx = W / 2 + _introV.fx * W, cy = OPEN ? top0 + 122 + Ro + _introV.fy * H : (top0 + bot0) / 2 + (W < 600 ? 34 : 0) + _introV.fy * H, R = OPEN ? Ro * _introV.k : Math.max(Math.min(W, H) * 0.13, Math.min(W * (_introExporting ? 0.4 : 0.32), H * (_introExporting ? (LAND ? 0.42 : 0.25) : 0.22), (bot0 - top0) / 2 - (W < 600 ? 118 : 16))) * _introV.k * (_introExporting ? _introExpFit : 1);
+    const DR = (!_introExporting && W >= 900 && $('intro-overlay').classList.contains('ctl-open')) ? 360 : 0, Wa = W - DR;   // desktop: the controls float as a side drawer over the canvas, the plate just centres in the free width and keeps its size
+    const cx = Wa / 2 + _introV.fx * W, cy = OPEN ? top0 + 122 + Ro + _introV.fy * H : (top0 + bot0) / 2 + (W < 600 ? 34 : 0) + _introV.fy * H, R = OPEN ? Ro * _introV.k : Math.max(Math.min(W, H) * 0.13, Math.min(Wa * (_introExporting ? 0.4 : 0.32), H * (_introExporting ? (LAND ? 0.42 : 0.25) : 0.22), (bot0 - top0) / 2 - (W < 600 ? 118 : 16))) * _introV.k * (_introExporting ? _introExpFit : 1);
     /* Auto-fit: once M is driven by the slider, the outer ring G fills the plate (zoomed in at small M, zooming out as M grows).
        The fit eases in log space so the ring never jumps; the intro's own growth and exports keep the fixed GMAX scale. */
     const gT = _introGM != null ? Math.max(12, G) : GMAX;
@@ -7265,7 +7266,7 @@ function showIntro() {
     }
     if (!VON && _introHole > 0.02) { x.save(); if (T < 0) x.globalAlpha *= Math.max(0, Math.min(1, (T + 2.2) / 2.2)); introDrawHole(x, cx, cy, R * _introHole * 0.97, G, UI); x.restore(); }   // opening: the circle method fades in as Cayley settles to the ring
     if (VON) { x.save(); x.globalAlpha = Math.min(1, (VM - 0.02) / 0.5); x.font = (11 * UI) + 'px monospace'; x.fillStyle = 'rgba(232,227,219,.85)'; x.textAlign = 'center';
-      if (!_introAbs) { const _t = VW.mode === 'grid' ? 'Grid · M → · r ↑ · whole G × G square' : 'Cayley: w = (z\u22121)/(z+1)  x ' + Math.round(VW.x) + '\u00b0 y ' + Math.round(VW.y) + '\u00b0 z ' + Math.round(VW.z || 0) + '\u00b0'; while (x.measureText(_t).width > W - 16 && parseFloat(x.font) > 8) x.font = (parseFloat(x.font) - 1) + 'px monospace'; if (!_introExporting) { x.textAlign = 'center'; x.fillText(_t, W / 2, top0 + 10 * UI); } } x.restore(); }
+      if (!_introAbs) { const _t = VW.mode === 'grid' ? 'Grid · M → · r ↑ · whole G × G square' : 'Cayley: w = (z\u22121)/(z+1)  x ' + Math.round(VW.x) + '\u00b0 y ' + Math.round(VW.y) + '\u00b0 z ' + Math.round(VW.z || 0) + '\u00b0'; while (x.measureText(_t).width > W - 16 && parseFloat(x.font) > 8) x.font = (parseFloat(x.font) - 1) + 'px monospace'; if (!_introExporting) { x.textAlign = 'center'; x.globalAlpha *= Math.max(0, Math.min(1, 1 - (performance.now() - _introSigT - 1000) / 500)); x.fillText(_t, W / 2, bot0 - 24 * UI); } } x.restore(); }   // label sits at the bottom of the plate and fades like the corner tables once M (or n) stops moving
     const tot = G * (G + 1) / 2, sh = cop / tot * 100;
     if (!VON && _introSel) { const rd = _introRad(R, _introSel.M, GZ), th = _introTh(_introSel.r, _introSel.M); x.save(); x.strokeStyle = '#fff'; x.lineWidth = 1.6; x.beginPath(); x.arc(cx + rd * Math.cos(th), cy - rd * Math.sin(th), 6, 0, 7); x.stroke(); x.restore(); }
     let mTxt = '';
@@ -7281,7 +7282,7 @@ function showIntro() {
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
     const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff + (_introPaused && T >= 19 ? Math.floor((performance.now() - _introPauseAt) / 300) : 0)) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : _introSieveP ? _introSieveP : (_introPAuto ? (T < 19 || T >= 80 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
-    if (_introPLock && sp && sp - 1 <= 255) _introN = sp - 1;   // locked: C(n) depth follows the spiral prime
+    if (_introPLock && sp && sp - 1 <= 255 && !(_introN === 0 && sp === 2)) _introN = sp - 1;   // locked: C(n) depth follows the spiral prime
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= 19 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
     let spTxt = _introBirth ? '\nbirth of M = ' + G + ': φ(' + G + ') = ' + _introBirthN + ' new points (gold), ' + (G - _introBirthN) + ' land on earlier points (coral)' : _introCM && _introHole >= 0.5 ? '\ncircle method, inside the hole: Farey major arcs (colour = q), minor arcs (grey), prime sum |S(a)| for N = 2(G+1) = ' + 2 * (G + 1) : '';
@@ -7409,6 +7410,7 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
     _introRaf = requestAnimationFrame(draw);
   };
   _introPaint = paint; introWireView();
+  if (cv.clientWidth >= 601) { const ov2 = $('intro-overlay'); if (ov2) ov2.classList.add('ctl-open'); setTimeout(function () { try { introRepin(); } catch (e) {} }, 0); }
   if (cv.clientWidth < 600) { const c = $('intro-ctl'); if (c) c.style.display = 'none'; const b = $('intro-ctl-btn'); if (b) b.innerHTML = 'controls &#9656;'; }
   _introRaf = requestAnimationFrame(draw);
 }
@@ -8282,7 +8284,8 @@ function introOpenPin() {   // phone with controls open: the footer starts just 
   const hd = $('intro-head'); if (!hd || innerWidth >= 600) return null;
   return Math.round(hd.getBoundingClientRect().bottom + 6 + 122 + 2 * Math.min(innerWidth * 0.34, 150) + 30);
 }
-function introRepin() {   // keep the controls' pin at the collapsed footer top after a resize or full-screen change
+function introRepin() {
+  if (innerWidth >= 601) { const c0 = $('intro-ctl'), hd0 = $('intro-head'); if (c0 && c0.style.display !== 'none' && hd0) c0.style.top = Math.round(hd0.getBoundingClientRect().bottom + 6) + 'px'; return; }   // keep the controls' pin at the collapsed footer top after a resize or full-screen change
   const c = $('intro-ctl'), ft = $('intro-foot'); if (!c || !ft || c.style.display === 'none') return;
   const ov = $('intro-overlay'), st = ov ? ov.scrollTop : 0;   // rect.top moves with the scroll, so pin in content coordinates
   c.style.display = 'none'; ft.style.top = ''; ft.style.bottom = '0'; const t = Math.round(ft.getBoundingClientRect().top + (ov ? ov.scrollTop : 0));   // hiding the controls may clamp the scroll, so read it again here
@@ -8299,7 +8302,8 @@ function introToggleCtl() {
   const c = $('intro-ctl'); if (!c) return; const open = c.style.display === 'none', ft = $('intro-foot');
   /* Opening extends the controls DOWN: the footer is pinned at its collapsed top and scrolls, so the ring and stats keep their size. */
   { const ov1 = $('intro-overlay'); if (ov1) ov1.classList.toggle('ctl-open', open); }
-  if (ft) { if (open) { const ov0 = $('intro-overlay'), t0 = Math.round(ft.getBoundingClientRect().top + (ov0 ? ov0.scrollTop : 0)), op = introOpenPin(), t = op != null ? op : t0; ft.style.top = t + 'px'; ft.style.bottom = 'auto'; ft.style.paddingBottom = '40px'; const ov = $('intro-overlay'); if (ov) ov.style.overflowY = 'auto'; } else { ft.style.top = ''; ft.style.bottom = '0'; ft.style.paddingBottom = ''; const ov = $('intro-overlay'); if (ov) { ov.scrollTop = 0; ov.style.overflowY = 'hidden'; } } }
+  if (ft && innerWidth >= 601) { ft.style.top = ''; ft.style.bottom = '0'; ft.style.paddingBottom = ''; const ovd = $('intro-overlay'); if (ovd) { ovd.scrollTop = 0; ovd.style.overflowY = 'hidden'; } if (open) { const hd = $('intro-head'); c.style.top = Math.round((hd ? hd.getBoundingClientRect().bottom : 90) + 6) + 'px'; } }
+  else if (ft) { if (open) { const ov0 = $('intro-overlay'), t0 = Math.round(ft.getBoundingClientRect().top + (ov0 ? ov0.scrollTop : 0)), op = introOpenPin(), t = op != null ? op : t0; ft.style.top = t + 'px'; ft.style.bottom = 'auto'; ft.style.paddingBottom = '40px'; const ov = $('intro-overlay'); if (ov) ov.style.overflowY = 'auto'; } else { ft.style.top = ''; ft.style.bottom = '0'; ft.style.paddingBottom = ''; const ov = $('intro-overlay'); if (ov) { ov.scrollTop = 0; ov.style.overflowY = 'hidden'; } } }
   c.style.display = open ? 'flex' : 'none'; /* open controls collapse the title block to one slim line, so the ring and the controls get the room */ const b = $('intro-ctl-btn'); if (b) b.innerHTML = open ? 'controls &#9662;' : 'controls &#9656;'; }
 function introFull() { if (_introVw.m > 0.02) { _introVw.script = false; _introVw.man = true; _introVw.tm = 1; ['ring', 'cay', 'grid'].forEach(n => { const b = $('intro-v-' + n); if (b) b.classList.toggle('on', n === _introVw.mode); }); } else { _introVw.script = false; if (!_introVw.man) { _introVw.m = 0; _introVw.tm = 0; } } if (_introSeq) { _introSeq = false; _introBirth = false; _introS0 = 9.3; _introCM = false; { const cb = $('intro-cm-btn'); if (cb) cb.classList.remove('on'); } introSetHole(0); } if (_introT < 9.5) _introT0 -= (9.5 - _introT) * 1000; }
 function introSetN(v) {
@@ -10126,6 +10130,7 @@ function liftToggleOn() {
   const dd = $('lift-dd-wrap'); if (dd) dd.style.display = liftOn ? '' : 'none';
   redraw(false);
 }
+function liftModeClick(m) { liftSetMode(m === liftMode && m !== 'none' ? 'none' : m); }   // click the active mode again to switch it (and its connect lines) off
 function liftSetMode(m) {
   liftMode = m;
   document.querySelectorAll('.lift-mode-btn').forEach(function (b) { b.classList.toggle('on', b.dataset.m === m); });
