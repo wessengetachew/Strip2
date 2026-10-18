@@ -1208,6 +1208,12 @@ walk anyway.</p>
   </div>
 
   <div class="prow">
+    <span class="plabel">Which r</span>
+    <button class="chip" id="rc-main-btn" onclick="rcToggle('main')" title="Every r in the strip, kept or removed at the block depth n, by sector. Tap a sector or an r to light it on the plate.">kept / removed by sector &#9662;</button>
+  </div>
+  <div id="rc-main" class="rc" style="display:none;padding:0 0 8px;"></div>
+
+  <div class="prow">
     <span class="plabel">The block</span>
     <button class="chip"    id="ps-blk5"  onclick="preset('blk5')"
             title="Width 6, so n = 5. The C(n) case: a band, not a strip — switch Walk to Band to measure it.">Block n = 5</button>
@@ -2042,7 +2048,7 @@ walk anyway.</p>
   </div>
 </div>
 
-<style>@media (max-width:600px){#intro-overlay.ctl-open #intro-head{padding-top:8px!important}#intro-overlay.ctl-open #intro-head>div:nth-child(1),#intro-overlay.ctl-open #intro-head>div:nth-child(3){display:none}#intro-overlay.ctl-open #intro-head>div:nth-child(2){font-size:22px!important;margin-top:0!important}}@media (min-width:601px){#intro-overlay.ctl-open #intro-foot{z-index:5!important}#intro-overlay.ctl-open #intro-ctl{position:fixed;right:10px;bottom:10px;width:348px;max-width:46vw;overflow-y:auto;flex-direction:column;flex-wrap:nowrap;justify-content:flex-start!important;z-index:6;margin:0!important;padding:8px;background:rgba(8,8,20,.95);border:1px solid rgba(255,255,255,.16);border-radius:10px;box-sizing:border-box}#intro-overlay.ctl-open #intro-ctl .ig{flex:0 0 auto;max-width:none}}.ig{flex:1 1 250px;max-width:330px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 9px 8px;background:rgba(255,255,255,.035)}.ig .gl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}.ig .gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.ig .gv{min-width:4.5em}@media (max-width:600px){.ig{flex:1 1 100%;max-width:none}}@media (max-height:560px){#intro-head{padding-top:8px!important}#intro-head>div:nth-child(2){font-size:clamp(22px,8vh,40px)!important;margin-top:2px!important}#intro-head>div:nth-child(3){display:none}#intro-counter{font-size:11px!important}#intro-foot{padding-bottom:6px!important}#intro-foot>div{margin-top:5px!important}}@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
+<style>.rc{font-family:var(--mono);font-size:11px;color:var(--cream2)}.rc .rr{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:5px 0}.rc .chip{font-size:10.5px;padding:2px 6px}.rc small{opacity:.65;margin-left:3px;font-size:9.5px}.rc .rk{color:#f2c860;margin-right:2px}.rc .rx{color:#ff6b6b;margin-right:2px}.rc .rm{max-height:150px;overflow:auto}.rc .rx2{opacity:.8;color:#ff9a9a}.rc .dim{opacity:.4}@media (max-width:600px){#intro-overlay.ctl-open #intro-head{padding-top:8px!important}#intro-overlay.ctl-open #intro-head>div:nth-child(1),#intro-overlay.ctl-open #intro-head>div:nth-child(3){display:none}#intro-overlay.ctl-open #intro-head>div:nth-child(2){font-size:22px!important;margin-top:0!important}}@media (min-width:601px){#intro-overlay.ctl-open #intro-foot{z-index:5!important}#intro-overlay.ctl-open #intro-ctl{position:fixed;right:10px;bottom:10px;width:348px;max-width:46vw;overflow-y:auto;flex-direction:column!important;flex-wrap:nowrap!important;justify-content:flex-start!important;z-index:6;margin:0!important;padding:8px;background:rgba(8,8,20,.95);border:1px solid rgba(255,255,255,.16);border-radius:10px;box-sizing:border-box}#intro-overlay.ctl-open #intro-ctl .ig{flex:0 0 auto;max-width:none}}.ig{flex:1 1 250px;max-width:330px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 9px 8px;background:rgba(255,255,255,.035)}.ig .gl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}.ig .gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.ig .gv{min-width:4.5em}@media (max-width:600px){.ig{flex:1 1 100%;max-width:none}}@media (max-height:560px){#intro-head{padding-top:8px!important}#intro-head>div:nth-child(2){font-size:clamp(22px,8vh,40px)!important;margin-top:2px!important}#intro-head>div:nth-child(3){display:none}#intro-counter{font-size:11px!important}#intro-foot{padding-bottom:6px!important}#intro-foot>div{margin-top:5px!important}}@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
 <div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#04040d;overflow:hidden;">
   <canvas id="intro-cv" style="position:fixed;inset:0;z-index:2;width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;"></canvas>
   <div id="intro-sweep" style="display:none;position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94vw,560px);max-height:88vh;overflow:auto;padding:12px 14px;background:rgba(10,10,24,.97);border:1px solid var(--gold);border-radius:8px;font-family:var(--mono);font-size:11.5px;color:var(--cream);"></div>
@@ -2094,6 +2100,7 @@ walk anyway.</p>
         <div class="gr"><button class="chip" id="intro-st-grow" onclick="introStripGrow()" title="Grow: width 2k and offset &minus;k, k = 1, 2, 3 &hellip; up to G + 1 and back, so the band widens by one line on each side per step.">&#9654; grow 2w / &minus;1s</button></div>
         <div class="gr"><button class="chip" id="intro-st-lock" onclick="introStripLockToggle()" title="Lock the band to the Goldbach pair on screen. For E = 2(G+1) and the pair (g, s) with g + s = E, the marker sits at ring M = s, column r = g, so the band runs along the line r/M = g/s (reduced a/b = g/s over their gcd), 2 cells thick. Step the pairs and the band turns with them; unlock to take the controls back.">&#128274; Goldbach pair</button><button class="chip" id="intro-st-scan" onclick="introStripScan()" title="Scan: the band's slope steps through the Farey fractions a/b (b &le; 12) between the two ends, there and back; the band is 2 cells thick in r, centred on the line r/M = a/b. Between 1/3 and 1/2 is sector s = 2, between 1/3 and 2/3 is s = 1 and 2.">&#9654; scan slope</button> <input id="intro-st-lo" value="1/2" size="4" style="width:3.2em"> &rarr; <input id="intro-st-hi" value="1/1" size="4" style="width:3.2em"></div>
       </div>
+      <div class="ig"><div class="gl">r census &middot; slope band</div><div id="rc-intro" class="rc"></div></div>
       <div class="ig"><div class="gl">Sieve &nbsp;C(n)</div>
         <div class="gr"><input type="range" id="intro-n-sl" min="0" max="255" value="0" oninput="introSetN(this.value)" style="flex:1 1 90px;min-width:70px;" title="C(n) depth n: cells the block M..M+n kills are removed. Moving it pauses the play."><span id="intro-n-val" class="gv">n = 0</span></div>
         <div class="gr"><button class="chip" id="intro-n-btn" onclick="introNPlay()" title="Play C(n) from n = 0 up to 255 and back: the cells the block kills are removed, so you watch the survivors thin toward C(n)">▶ C(n) play</button><button class="chip" onclick="introSweep(_introSwN)" title="G sweep: how far the observed sector counts sit from the predicted ones as G grows (64 to 1024), for the chosen n">G sweep</button></div>
@@ -2385,8 +2392,10 @@ walk anyway.</p>
         <span class="hint" id="ol-strip-note">&mdash;</span>
         <button class="chip" id="ol-strip-dots-btn" onclick="olToggleStripDots()" title="Draw every lattice point inside the band on the plate: coprime ones bright, misses dim.">show points</button>
         <button class="chip" id="ol-strip-list-btn" onclick="olToggleStripList()" title="List the lattice points in the band. Click one to mark it on the plate.">point list &#9662;</button>
+        <button class="chip" id="rc-ol-btn" onclick="rcToggle('ol')" title="Kept and removed r of the band by sector; tap a sector or an r to light it on the plate.">r census &#9662;</button>
       </div>
       <div id="ol-strip-list" style="display:none;padding:2px 0 8px;"></div>
+      <div id="rc-ol" class="rc" style="display:none;padding:2px 0 8px;"></div>
       <div class="prow">
         <span class="lbl" title="The block each cell is tested against: M, M+1, &hellip;, M+n by default. Step 2 (2n) tests M, M+2, M+4, &hellip;; a custom list like 0,2,6,8 tests exactly those offsets. D(n), C(n), the saturated primes, the r-chain, the colourings and the sheets all follow it.">block</span>
         <select class="blk-sel" onchange="blkPreset(this.value)" style="font-size:11.5px;">
@@ -5051,6 +5060,7 @@ function openerDrawLift(ctx, xy, S, cw, ch, viewKind) {
   // spiral-shaped region there instead of the straight one Grid draws, which
   // is the honest result of the same math under those views' own coordinates.
   if (OL.stripOn) { olStrip(ctx, xy, G, Math.max(1.2, cell * 0.12)); if (OL.stripDots || OL.stripPick) olStripDots(ctx, xy, G, cl(cell * 0.4, 1.2, 2.6)); }
+  if (OL.stripOn && RCH.mode) { try { rcDrawHL(ctx, xy, 'ol', cl(cell * 0.4, 1.2, 2.6)); } catch (e) {} }
   if (pdA > 0) { ctx.globalAlpha = 1; spiralNow(); }
   if (OL.gp.on) gpDraw(ctx, OL.gp, G, xy, olSecOn() ? olSecVis : null, cl(cell * 0.45, 1.2, 3), cl(cell * 0.18, 0.5, 1.2));
   if (OL.gbOn) {
@@ -5424,6 +5434,7 @@ function olPickStripPt(r, M) {
   olRedraw();
 }
 function olSyncLists() {
+  try { rcRender('ol'); } catch (e) {}
   const gl = $('ol-gb-list');
   if (gl) {
     gl.style.display = _olGbListOpen ? '' : 'none';
@@ -7214,8 +7225,9 @@ function showIntro() {
     _introGZ = _introExporting || !_introGZ ? gT : Math.exp(Math.log(_introGZ) + (Math.log(gT) - Math.log(_introGZ)) * 0.2);
     const GZ = _introGZ;
     _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, top0, bot0, cvTop, cy0: cy - _introV.fy * H };
-    x.save(); x.beginPath(); x.rect(0, top0, W, bot0 - top0); x.clip();   // the ring never covers the title or the controls
-    const PT = Math.max(0.7, 1.25 * (_introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * _introPtScale * Math.min(1, Math.sqrt(256 / GZ)) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
+    { const pFs = Math.max(10, Math.min(12, W / 34)) * UI, pLh = pFs + 4, pT = (_introExporting && !LAND) ? top0 + pFs + 2 + (_introStrip.on ? 13 : 8) * pLh : top0, pB = (_introExporting && !LAND) ? bot0 - 5 * pLh : bot0;   // portrait export: a zoomed plate (k > 1) never runs under the corner stats
+    x.save(); x.beginPath(); x.rect(0, pT, W, Math.max(10, pB - pT)); x.clip(); }   // the ring never covers the title or the controls
+    const PT = Math.max(0.7, 1.25 * (_introIso === 'strip' ? 0.75 : _introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * _introPtScale * Math.min(1, Math.sqrt(256 / GZ)) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
     const spin = 0;   // no rotation: the ring stays at 0 degrees the whole way
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
@@ -7281,7 +7293,8 @@ function showIntro() {
     x.restore();
     // prime spiral: the column r = p on every ring M >= p (cyan), its mirror r = M - p (violet); p steps 2,3,5,7,11,13
     const PS = []; for (let n = 2; n <= Math.max(2, G); n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) PS.push(n); }
-    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff + (_introPaused && T >= 19 ? Math.floor((performance.now() - _introPauseAt) / 300) : 0)) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : _introSieveP ? _introSieveP : (_introPAuto ? (T < 19 || T >= 80 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    const per = Math.max(1, 2 * (PS.length - 1)), ph = (((Math.floor(Math.max(0, T - 19) / 0.3) + _introPOff) % per) + per) % per, pi = ph < PS.length ? ph : per - ph, sp = _introGbOn ? 0 : _introSieveP ? _introSieveP : (_introSpForce ? _introSpForce : _introPAuto ? (T < 19 || T >= 80 ? 0 : PS[pi]) : PS[Math.min(PS.length - 1, _introPi)]);
+    if (!_introExporting) _introSpLive = sp;
     if (_introPLock && sp && sp - 1 <= 255 && !(_introN === 0 && sp === 2)) _introN = sp - 1;   // locked: C(n) depth follows the spiral prime
     { const ps0 = $('intro-p-sl'); if (ps0 && +ps0.max !== PS.length - 1) { ps0.max = PS.length - 1; if (!_introPAuto && _introPi > PS.length - 1) _introPi = PS.length - 1; } }  // scans up the primes and back, or follows the slider
     if (_introPAuto && T >= 19 && !_introGbOn) _introPi = pi;   // the prime scan pauses while Goldbach is showing
@@ -7313,6 +7326,7 @@ function showIntro() {
       x.save(); x.lineWidth = 1.4 * UI; x.strokeStyle = 'rgba(61,200,184,.95)'; x.setLineDash([5 * UI, 3 * UI]);
       [ST.s, ST.s + ST.w].forEach(c => { x.beginPath(); let on = false; for (let M = 0; M <= G; M += Math.max(1, Math.floor(G / 160))) { const r = (c + ST.a * M) / ST.b; if (r < 0.5 || r > G + 0.5 || M < 0.5) { on = false; continue; } const P = posRM(r, M); if (!P) { on = false; continue; } if (on) x.lineTo(P[0], P[1]); else { x.moveTo(P[0], P[1]); on = true; } } x.stroke(); });
       x.restore();
+      if (!_introExporting && !_introIso && RCH.mode) { try { rcDrawHL(x, posRM, 'intro', Math.max(2, PT * 1.2)); } catch (e) {} }
       if (W >= 600) stTxt = '\nslope band ' + ST.s + ' \u2264 ' + ST.b + 'r \u2212 ' + ST.a + 'M < ' + (ST.s + ST.w) + ' (slope ' + ST.a + '/' + ST.b + ' = ' + (ST.a / ST.b).toFixed(4) + ', width ' + ST.w + ', off ' + ST.s + ') \u00b7 ' + stN + ' cells in band (r \u2264 M), ' + stC + ' coprime = ' + (stN ? (100 * stC / stN).toFixed(1) : '0') + '% (6/\u03c0\u00b2 = 60.8%)';
     }
     let gbTxt = '';
@@ -7335,7 +7349,7 @@ function showIntro() {
         x.globalCompositeOperation = 'source-over'; }
       let mk = at(g, sP); const mkOff = !(mk[0] >= 8 && mk[0] <= W - 8 && mk[1] >= top0 + 8 && mk[1] <= bot0 - 8);   // the marker (g, E - g) has M = E - g > G, so it lies outside the outer ring: pin it to the edge of the plate and mark it hollow
       if (isFinite(mk[0]) && isFinite(mk[1])) { if (mkOff) mk = [Math.max(8, Math.min(W - 8, mk[0])), Math.max(top0 + 8, Math.min(bot0 - 8, mk[1]))]; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); if (mkOff) { x.strokeStyle = '#ffd36b'; x.lineWidth = 1.6; x.stroke(); } else { x.fillStyle = '#ffd36b'; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke(); } }
-      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')' + (mkOff ? ' off plate' : ''), lw = x.measureText(lt).width; const lw2 = x.measureText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length).width, lx2 = W - 6; x.textAlign = 'right'; const ly2 = Math.max(top0 + 12 * UI, Math.min(bot0 - 6 - 12 * UI, mk[1] - 6)), wl = Math.max(lw, lw2); x.save(); x.setLineDash([2, 3]); x.strokeStyle = 'rgba(255,211,107,.6)'; x.lineWidth = 1; x.beginPath(); x.moveTo(mk[0] + 5, mk[1]); x.lineTo(lx2 - wl - 6, ly2 - 4 * UI); x.stroke(); x.restore(); x.fillText(lt, lx2, ly2); x.fillText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length, lx2, ly2 + 12 * UI); }
+      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')' + (mkOff ? ' off plate' : ''), lw = x.measureText(lt).width; const lw2 = x.measureText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length).width, lx2 = W - 6; x.textAlign = 'right'; const fsL = Math.max(10, Math.min(12, W / 34)) * UI, lhL = fsL + 4, ly2 = Math.max(top0 + 12 * UI, Math.min(bot0 - 6 - 12 * UI, top0 + fsL + 2 + 13 * lhL)), wl = Math.max(lw, lw2); x.save(); x.setLineDash([2, 3]); x.strokeStyle = 'rgba(255,211,107,.6)'; x.lineWidth = 1; x.beginPath(); x.moveTo(mk[0] + 5, mk[1]); x.lineTo(lx2 - wl - 6, ly2 - 4 * UI); x.stroke(); x.restore(); x.fillText(lt, lx2, ly2); x.fillText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length, lx2, ly2 + 12 * UI); }
       x.restore();
       gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
@@ -7571,7 +7585,8 @@ function introNPlay() {
   }, 110);
 }
 function introSetP(i) { introGbStop(false); _introPAuto = false; introFull(); _introPi = i | 0; const b = $('intro-p-btn'); if (b) b.textContent = '▶ × ÷'; }
-let _introPOff = 0;
+let _introPOff = 0, _introSpForce = 0, _introSpLive = 0;
+function introSheetP() { return _introSpLive > 0 ? _introSpLive : 0; }
 function introPAutoToggle() { const wasGb = _introGbOn; introGbStop(false); _introPAuto = wasGb ? true : !_introPAuto; introFull(); if (_introPAuto && _introPLock) _introPi = 0; if (_introPAuto) _introPOff = _introPi - Math.floor(Math.max(0, _introT - 19) / 0.3);   /* play resumes from the slider's prime, going up */ const b = $('intro-p-btn'); if (b) b.textContent = _introPAuto ? '❚❚ × ÷' : '▶ × ÷'; }
 function introToggleMirror() { _introMirror = !_introMirror; const b = $('intro-mir-btn'); if (b) b.classList.toggle('on', _introMirror); }
 function introSetGb(i) { introFull(); _introGbI = Math.max(0, Math.min(_introGbPairs.length - 1, i | 0)); _introGbOn = true; if (_introGbTimer) { clearInterval(_introGbTimer); _introGbTimer = 0; const b = $('intro-gb-btn'); if (b) b.textContent = '▶ + −'; } }
@@ -7902,7 +7917,7 @@ function introLayersDoc(E) {   // every layer on the intro, one section each, wi
   const Ee = 2 * (G + 1), pairs = introGbPairsFor(G), gI = Math.min(_introGbI, Math.max(0, pairs.length - 1));
   const sat = []; for (let q = 2; q <= n + 1; q++) if (isP(q)) sat.push(q);
   let q1 = n + 2; while (!isP(q1)) q1++;
-  const pSp = _introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2);
+  const pSp = introSheetP() || (_introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2));
   doc.push({ t: 'h', text: 'Every layer on the picture' });
   doc.push({ t: 'p', text: 'The picture is a stack of layers. Each one below is stated on its own: whether it is on, the parameters it uses with their live values, and its formula. Layers that are off are listed too, so this page documents the whole intro.' });
   // 1 angle
@@ -7930,6 +7945,7 @@ function introLayersDoc(E) {   // every layer on the intro, one section each, wi
     let rmax = 0, cells = 0, copc = 0; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((S.s + S.a * M) / S.b)), hi = Math.min(G, Math.ceil((S.s + S.w + S.a * M) / S.b) - 1); for (let r = lo; r <= hi; r++) { cells++; rmax = Math.max(rmax, r); if (gc(r, M) === 1) copc++; } }
     doc.push({ t: 'table', head: ['strip', 'value', ''], rows: [{ label: 'cells in strip', n: L(cells), pct: '' }, { label: 'coprime, gcd(r, M) = 1', n: L(copc), pct: f(100 * copc / Math.max(1, cells), 2) + '%' }, { label: 'largest r inside G = ' + G, n: String(rmax), pct: '' }] });
     if (n >= 1) { try { msKeptNote(S.a, S.b, S.s, S.w, n, G).forEach(x => doc.push(x)); } catch (e) {} }
+    try { doc.push({ t: 'h', text: 'The strip, r by r, sector by sector' }); const cz = msCensus('intro'); if (cz.length) cz.forEach(x => doc.push(x)); else doc.pop(); } catch (e) {}
     if (rmax < q1) doc.push({ t: 'note', text: 'This strip only reaches r ≤ ' + rmax + ' inside G = ' + G + ', below the first unsaturated prime ' + q1 + ', so no prime or composite r can be kept in it: every kept cell is r = 1.' });
   }
   // 5 prime spiral and C(n)
@@ -8068,6 +8084,7 @@ async function introMathSheet() {
   const d = introSheetData(G, n), kept = d.cum[G], ratio = kept / d.tot, err = (ratio / d.D - 1) * 100;
   // pictures
   const W = 1600, H = 1000, shots = {}, cvs = {}, saveGM = _introGM, saveExp = _introExporting;
+  _introSpForce = introSheetP();   // every plate in the sheet uses the one prime the screen shows
   const names = { ring: 'Ring (unit circle)', cay: 'Cayley (Möbius map on the sphere, x = ' + _introExpX + '°, y = ' + _introExpY + '°, z = ' + _introExpZ + '°)', grid: 'Grid (M to the right, r up, whole G × G square)' };
   for (const v of ['ring', 'cay', 'grid']) {
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
@@ -8089,7 +8106,7 @@ async function introMathSheet() {
 
   // each layer by itself, in the view on screen: only that layer's points, on the same plate
   try {
-    const pSp = Math.min(G, Math.max(2, _introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2)));
+    const pSp = Math.min(G, Math.max(2, introSheetP() || (_introPLock ? n + 1 : (_introPr256[Math.min(_introPr256.length - 1, _introPi)] || 2))));
     const defs = [['base', 'Angle and map only', 'every coprime cell placed by \u03b8 and \u03c1, nothing else']]; if (_introStrip.on) defs.push(['strip', 'Slope strip only', 'the cells with ' + _introStrip.s + ' ≤ ' + _introStrip.b + 'r − ' + _introStrip.a + 'M < ' + (_introStrip.s + _introStrip.w)]);
     if (n >= 1) defs.push(['sieve', 'Sieve only', 'the cells kept at block depth n = ' + n]);
     defs.push(['spiral', 'Prime spiral only', 'the column r = ' + pSp + ' and its mirror r = M − ' + pSp]);
@@ -8166,6 +8183,7 @@ async function introMathSheet() {
     + '<h2>6. Prime columns r = p</h2><div class="fm">column r = p, ring M ≥ p: coprime ⇔ p ∤ M &nbsp;⇒&nbsp; share (1 − 1/p) &nbsp; (block of n + 1 rings: 1 − min(n+1, p)/p)<small>the prime spiral is these cells with r = p on ring M, angle θ = 2πp/M; its mirror r = M − p is the conjugate</small></div><div class="n">Column r = p has one cell on every ring M ≥ p; it is coprime exactly when p ∤ M.</div><table><tr><th>p</th><th>rings M ≥ p</th><th>p ∤ M</th><th>fraction</th><th>1 − 1/p</th></tr>' + primeRows + '</table>' + svgLine(pip, 1, 'x (primes ≤ x)', 'π(x) / (x / ln x)', 'limit')
     + '<h2>7. Births: φ(M) new points per ring</h2><div class="fm">φ(M) = #{ 1 ≤ r ≤ M : gcd(r, M) = 1 } &nbsp;new points on ring M, &nbsp; the other M − φ(M) land on earlier rings (r/M reduces)<small>Σ_{M ≤ G} φ(M) ≈ 3G²/π²</small></div><table><tr><th>M</th><th>φ(M) new</th><th>land on earlier points</th><th>φ(M)/M</th></tr>' + birthRows + '</table>'
     + '<h2>8. D(n) and C(n) = ζ(2)·D(n)</h2><div class="fm">D(n) = ∏<sub>p</sub> ( 1 − min(n+1, p)/p² ), &nbsp; C(n) = ζ(2) · D(n), &nbsp; D(0) = 6/π²<small>primes up to 200,000 are multiplied exactly; the tail is summed in closed form</small></div><table><tr><th>n</th><th>D(n)</th><th>C(n)</th></tr>' + dnRows + '</table><div class="n">Numerics: observed counts are exact for this G and n; D(n) is the infinite-product value. The sheet states the behaviour for fixed n as G grows; it does not claim a proof for n growing with G.</div>' + secStrip + secGb;
+  _introSpForce = 0;
   try { introSheetOpenDoc({ doc: introBuildSheetDoc({ G, n, T, d, kept, ratio, err, cvs, pi, gbN }), html, shots, cvs, G, n }); } catch (e) { introSheetPreview({ html, shots, G, n }); }
 }
 /* Preview and download-all for the intro math sheet: the sheet is shown in a window first; "download all" saves one .zip with the three view PNGs,
@@ -8268,7 +8286,6 @@ function introPause(force) {
     _introPSnap = { seq: _introSeq, script: _introVw.script, man: _introVw.man, birth: _introBirth, s0: _introS0 }; _introPSnapT = (_introPauseAt - _introT0) / 1000;
   } else {
     const now = performance.now();
-    if (_introPAuto && _introT - 10 >= 19) _introPOff += Math.floor((now - _introPauseAt) / 300);   // the prime spiral kept moving while paused
     const edited = _introPSnap && (_introSeq !== _introPSnap.seq || _introVw.script !== _introPSnap.script || _introVw.man !== _introPSnap.man);
     if (edited) {   // you took over while paused: hand the plate back to the timeline exactly where it stopped
       if (_introNTimer) { clearInterval(_introNTimer); _introNTimer = 0; const b = $('intro-n-btn'); if (b) b.textContent = '▶ C(n) play'; }
@@ -8398,6 +8415,84 @@ async function introExport4k(land) {
   if (!blob) return;
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'strip-arithmetic-II-opener-' + W + 'x' + H + '.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
+
+/* r census: for the slope band, every r with a cell in sector s (s = floor(M/r), r <= M), kept or removed at depth n, and which prime removed it. One model, three hosts (intro, opener, main). Tapping a sector or an r lights those cells on the plate. */
+var RCH = { s: 1, mode: 0, r: 0 }, RC_OPEN = { ol: false, main: false }, _rcCache = {};
+function rcAd(key) {
+  if (key === 'intro') {
+    const S = _introStrip, n = _introN, G = Math.max(1, Math.min(512, Math.round(_introGcur || 1)));
+    return { on: !!S.on, a: S.a, b: S.b, s: S.s, w: Math.max(1, S.w), G: G, n: n, sig: '', fail: function (r, M) { const g = gcd(r, M); if (g > 1) return spfOf(g); if (n > 0) { const f = _introPF[r] || []; for (let i = 0; i < f.length; i++) { const p = f[i]; if ((p - (M % p)) % p <= n) return p; } } return 0; } };
+  }
+  if (key === 'ol') { const cn = openerChainN(), G = OPENER_G; return { on: !!OL.stripOn, a: OL.slopeA, b: OL.slopeB, s: OL.offset, w: Math.max(1, OL.width), G: G, n: cn, sig: blkSig(), fail: function (r, M) { const f = firstFail(r, M, cn, G); return f[0] < 0 ? 0 : f[1]; } }; }
+  const n = blockN(), G = COP_G;
+  return { on: !!showStrip, a: slopeA, b: slopeB, s: offS, w: Math.max(1, widthW), G: G, n: n, sig: blkSig(), fail: function (r, M) { const f = firstFail(r, M, n, G); return f[0] < 0 ? 0 : f[1]; } };
+}
+function rcModel(key, lazyMs) {
+  const ad = rcAd(key), sig = [ad.on, ad.a, ad.b, ad.s, ad.w, ad.G, ad.n, ad.sig].join('|'), now = performance.now(), c = _rcCache[key];
+  if (c && (c.sig === sig || now - c.t < (lazyMs || 0))) return c;
+  const m = { sig: sig, t: now, ad: ad, sec: [], capped: false };
+  for (let i = 0; i <= 9; i++) m.sec.push({ rs: new Map(), cells: [], kept: 0, tot: 0 });
+  if (ad.on && ad.b > 0) {
+    let budget = 90000;
+    outer: for (let M = 1; M <= ad.G; M++) {
+      const lo = Math.max(1, Math.ceil((ad.s + ad.a * M) / ad.b)), hi = Math.min(M, Math.ceil((ad.s + ad.w + ad.a * M) / ad.b) - 1);
+      for (let r = lo; r <= hi; r++) {
+        if (--budget < 0) { m.capped = true; break outer; }
+        const sc = m.sec[Math.min(9, Math.floor(M / r))], f = ad.fail(r, M);
+        let e = sc.rs.get(r); if (!e) { e = { r: r, t: 0, k: 0, p: 0 }; sc.rs.set(r, e); }
+        e.t++; sc.tot++; if (!f) { e.k++; sc.kept++; } else if (!e.p) e.p = f;
+        sc.cells.push(r, M, f ? 0 : 1);
+      }
+    }
+  }
+  return (_rcCache[key] = m);
+}
+function rcRender(key) {
+  const host = document.getElementById('rc-' + key); if (!host) return;
+  if (key !== 'intro' && !RC_OPEN[key]) { host.style.display = 'none'; return; }
+  host.style.display = '';
+  const m = rcModel(key, 0), ad = m.ad; let h;
+  if (!ad.on) h = '<div class="hint">turn the slope band on to list its r</div>';
+  else {
+    let tot = 0, kept = 0; for (let i = 1; i <= 9; i++) { tot += m.sec[i].tot; kept += m.sec[i].kept; }
+    h = '<div class="hint">' + ad.a + '/' + ad.b + ' band, n = ' + ad.n + ': ' + kept + ' of ' + tot + ' cells kept' + (m.capped ? ' (first 90000)' : '') + '</div><div class="rr">';
+    for (let i = 1; i <= 9; i++) {
+      const S = m.sec[i]; let kr = 0; S.rs.forEach(function (e) { if (e.k) kr++; });
+      h += '<button class="chip' + (RCH.s === i ? (RCH.mode === 1 ? ' on' : ' tl') : '') + (S.rs.size ? '' : ' dim') + '" onclick="rcPickS(\'' + key + '\',' + i + ')" title="sector s = ' + (i < 9 ? i : '9 and up') + ': ' + kr + ' of ' + S.rs.size + ' r kept">s' + (i < 9 ? i : '≥9') + '<small>' + kr + '/' + S.rs.size + '</small></button>';
+    }
+    h += '<button class="chip" onclick="rcClear(\'' + key + '\')" title="Clear the highlight">off</button></div>';
+    const S = m.sec[RCH.s], K = [], X = []; S.rs.forEach(function (e) { (e.k ? K : X).push(e); });
+    K.sort(function (a, b) { return a.r - b.r; }); X.sort(function (a, b) { return a.r - b.r; });
+    const CAP = 80, chip = function (e, kept) { const on = RCH.mode === 2 && RCH.r === e.r && RCH.s; return '<button class="chip' + (on ? ' on' : '') + '" onclick="rcPickR(\'' + key + '\',' + e.r + ')" title="' + (kept ? 'r = ' + e.r + ': ' + e.k + ' of ' + e.t + ' cells kept' : 'r = ' + e.r + ': removed by ' + e.p) + '">' + e.r + (kept ? '' : '<small class="rx2">÷' + e.p + '</small>') + '</button>'; };
+    h += '<div class="rm"><div class="rr"><b class="rk">kept r</b> ' + (K.length ? K.slice(0, CAP).map(function (e) { return chip(e, true); }).join('') + (K.length > CAP ? '<small>+' + (K.length - CAP) + ' more</small>' : '') : '<small>none</small>') + '</div>';
+    h += '<div class="rr"><b class="rx">removed r</b> ' + (X.length ? X.slice(0, CAP).map(function (e) { return chip(e, false); }).join('') + (X.length > CAP ? '<small>+' + (X.length - CAP) + ' more</small>' : '') : '<small>none</small>') + '</div></div>';
+  }
+  if (host._h !== h) { host._h = h; host.innerHTML = h; }
+}
+function rcRedrawAll(key) { rcRender(key); if (key === 'ol') olRedraw(); else if (key === 'main') redraw(false); }
+function rcPickS(key, s) { if (RCH.s === s && RCH.mode === 1) RCH.mode = 0; else { RCH.s = s; RCH.mode = 1; } RCH.r = 0; rcRedrawAll(key); }
+function rcPickR(key, r) { if (RCH.mode === 2 && RCH.r === r) { RCH.mode = 1; RCH.r = 0; } else { RCH.mode = 2; RCH.r = r; } rcRedrawAll(key); }
+function rcClear(key) { RCH.mode = 0; RCH.r = 0; rcRedrawAll(key); }
+function rcToggle(key) { RC_OPEN[key] = !RC_OPEN[key]; const b = document.getElementById('rc-' + key + '-btn'); if (b) b.innerHTML = (key === 'ol' ? 'r census ' : 'kept / removed by sector ') + (RC_OPEN[key] ? '&#9652;' : '&#9662;'); rcRender(key); }
+function rcDrawHL(ctx, xy, key, d) {
+  if (!RCH.mode) return;
+  const m = rcModel(key, 150); if (!m.ad.on) return;
+  const S = m.sec[RCH.s]; if (!S) return; const c = S.cells, big = RCH.mode === 2 ? 1.5 : 1; let n = 0;
+  ctx.save();
+  for (let i = 0; i < c.length; i += 3) {
+    if (RCH.mode === 2 && c[i] !== RCH.r) continue;
+    const p = xy(c[i], c[i + 1]); if (!p || !isFinite(p[0]) || !isFinite(p[1])) continue;
+    if (++n > 30000) break;
+    if (c[i + 2]) { const q = d * 1.5 * big; ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.fillRect(p[0] - q, p[1] - q, 2 * q, 2 * q); ctx.fillStyle = '#f2c860'; ctx.fillRect(p[0] - q + 1, p[1] - q + 1, 2 * q - 2, 2 * q - 2); }
+    else { const q = d * 1.1 * big; ctx.fillStyle = 'rgba(255,107,107,.9)'; ctx.fillRect(p[0] - q / 2, p[1] - q / 2, q, q); }
+  }
+  ctx.restore();
+}
+setInterval(function () { try { const ov = document.getElementById('intro-overlay'); if (ov && ov.style.display !== 'none' && document.getElementById('rc-intro') && document.getElementById('intro-ctl').style.display !== 'none') rcRender('intro'); } catch (e) {} }, 350);
+window.addEventListener('load', function () {
+  try { const pv = paintViewInner; paintViewInner = function (ctx, S, cap) { pv(ctx, S, cap); try { if (!MS_ISOM && RCH.mode) rcDrawHL(ctx, function (r, M) { return liftXY(r, M, S); }, 'main', Math.max(1.6, Math.min(5, S / COP_G * 0.5))); } catch (e) {} }; } catch (e) {}
+  try { const rd = redraw; redraw = function (a) { rd(a); try { if (RC_OPEN.main) rcRender('main'); } catch (e) {} }; } catch (e) {}
+});
 function introSend(toMain) {   // carry the intro's current picture over to the opener (and on to the main page)
   const V = _introVw, G = Math.max(1, Math.round(_introGM != null ? _introGM : _introGcur));
   try { introPause(true); } catch (e) {}
@@ -18096,6 +18191,30 @@ function msKeptNote(a, b, s, w, n, G, off) {   // who survives in a slope strip 
     { t: 'note', text: 'Counted over the whole G × G square (G = ' + G + '). Kept composites with r < ' + (q1 * q1) + ': ' + f(kcLow) + ' (the claim above says 0). Kept cells in all: ' + f(kept) + '.' }
   ];
 }
+function msCensus(key) {   // the r census as a sheet section: kept and removed r by sector, from the same model as the live table
+  const m = rcModel(key, 0), ad = m.ad; if (!ad.on || !(ad.b > 0)) return [];
+  const f = x => x.toLocaleString(), rows = []; let tc = 0, tk = 0;
+  for (let i = 1; i <= 9; i++) {
+    const S = m.sec[i]; if (!S.rs.size) continue; let kr = 0; S.rs.forEach(e => { if (e.k) kr++; });
+    tc += S.tot; tk += S.kept;
+    rows.push({ label: 'S_' + (i < 9 ? i : '\u22659'), c: f(S.tot), k: f(S.kept), sh: (100 * S.kept / Math.max(1, S.tot)).toFixed(1) + '%', nr: S.rs.size, kr: kr, xr: S.rs.size - kr });
+  }
+  if (!rows.length) return [];
+  rows.push({ label: 'total', c: f(tc), k: f(tk), sh: (100 * tk / Math.max(1, tc)).toFixed(1) + '%', nr: '', kr: '', xr: '' });
+  const out = [
+    { t: 'p', text: 'The strip seen from the r side. For the band ' + ad.a + '/' + ad.b + ' at depth n = ' + ad.n + ', every r with a cell in the band is listed under the sector s = floor(M/r) that cell falls in. An r is kept if at least one of its cells survives the whole block, and removed otherwise.' },
+    { t: 'table', head: ['sector', 'cells in band', 'kept cells', 'share', 'r in band', 'kept r', 'removed r'], cols: [{ key: 'c', head: 'cells', w: 150 }, { key: 'k', head: 'kept', w: 130 }, { key: 'sh', head: 'share', w: 120 }, { key: 'nr', head: 'r', w: 80 }, { key: 'kr', head: 'kept r', w: 120 }, { key: 'xr', head: 'removed r', w: 150 }], rows: rows },
+    { t: 'note', text: 'Kept cells add up to ' + f(tk) + (m.capped ? ' (first 90000 cells only)' : '') + '. One r can meet several sectors as M grows, so the r counts overlap between rows.' }
+  ];
+  for (let i = 1; i <= 2; i++) {
+    const S = m.sec[i]; if (!S.rs.size) continue; const K = [], X = {};
+    S.rs.forEach(e => { if (e.k) K.push(e.r); else (X[e.p || 0] = X[e.p || 0] || []).push(e.r); });
+    K.sort((a, b) => a - b);
+    const byp = Object.keys(X).map(Number).sort((a, b) => a - b).map(q => '\u00f7' + q + ': ' + X[q].length + ' r').join('   ');
+    out.push({ t: 'p', text: 'Sector ' + i + ' \u00b7 kept r (' + K.length + '): ' + (K.length ? K.slice(0, 60).join(', ') + (K.length > 60 ? ', \u2026' : '') : 'none') + '.  Removed r (' + (S.rs.size - K.length) + ') by the prime that strikes them first: ' + (byp || 'none') + '.' });
+  }
+  return out;
+}
 function msStripLines(a, b, s, w) {
   return [
     { t: 'eq', tex: msT`v=b\,r-a\,M=${b}\,r-(${a})\,M,\qquad s\le v<s+w\ \ \Longrightarrow\ \ ${s}\le v<${s + w}` },
@@ -18238,6 +18357,7 @@ function msBuildOpenerRaw(noPlates) {
       L.push({ t: 'p', text: 'Strip overlay: the band of cells whose v = b·r − a·M falls in [s, s+w), with slope a/b = ' + OL.slopeA + '/' + OL.slopeB + ', offset s = ' + OL.offset + ', width w = ' + Math.max(1, OL.width) + '.' });
       msStripLines(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width)).forEach(b => L.push(b));
       try { msKeptNote(OL.slopeA, OL.slopeB, OL.offset, Math.max(1, OL.width), openerChainN(), OPENER_G).forEach(b => L.push(b)); } catch (e2) {}
+      try { const cz = msCensus('ol'); if (cz.length) { L.push({ t: 'h', text: 'The strip, r by r, sector by sector' }); cz.forEach(b => L.push(b)); } } catch (e2) {}
       try {
         const sp = olStripPoints(G);
         if (!sp.total) L.push({ t: 'p', text: 'This band holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (OL.slopeA === -1 && OL.slopeB === 1 ? ' For slope \u22121/1 the band is the anti-diagonal r + M = ' + OL.offset + (Math.max(1, OL.width) > 1 ? ' \u2026 ' + (OL.offset + Math.max(1, OL.width) - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
@@ -18378,6 +18498,7 @@ function msBuildMainRaw(views, noPlates) {
     try {
       const cnS = liftChainNEff(), st = walkStrip(0, cnS);
       try { msKeptNote(a, b, s, w, cnS, G, blkOff).forEach(x => doc.push(x)); } catch (e2) {}
+      try { const cz = msCensus('main'); if (cz.length) { doc.push({ t: 'h', text: 'The strip, r by r, sector by sector' }); cz.forEach(x => doc.push(x)); } } catch (e2) {}
       if (!st.total) {
         const anti = (a === -1 && b === 1);
         doc.push({ t: 'p', text: 'This window holds no lattice cell, so there is no density to measure: the count is 0 and the ratio is undefined (0/0), not zero.' + (anti ? ' For slope \u22121/1 the window is the anti-diagonal r + M = ' + s + (w > 1 ? ' \u2026 ' + (s + w - 1) : '') + ', and r, M \u2265 1 give r + M \u2265 2, so the first anti-diagonal with cells is s = 2 and the last is s = 2G = ' + (2 * G) + '.' : ' Move the offset s until the band crosses the square.') });
