@@ -1563,6 +1563,14 @@ walk anyway.</p>
     <button class="chip crchip" id="cry-180" onclick="stopCayleyRotPlay();setCayleyRotY(180)">180&deg;</button>
     <button class="chip crchip" id="cry-270" onclick="stopCayleyRotPlay();setCayleyRotY(270)">270&deg;</button>
   </div>
+  <div class="prow vrow" id="row-cay-rz">
+    <span class="lbl">rotate z</span>
+    <button class="chip" onclick="setHelZ(HEL_Z-90)" title="Spin the helix about its own (vertical) axis by 90 degrees, wrapping.">&minus;90&deg;</button>
+    <input type="range" id="hel-rot-z" min="0" max="360" step="1" value="32" oninput="setHelZ(+this.value)">
+    <button class="chip" onclick="setHelZ(HEL_Z+90)" title="Spin the helix about its own axis by +90 degrees, wrapping.">+90&deg;</button>
+    <span class="val" id="hel-rot-z-v">32&deg;</span>
+    <button class="chip tl" onclick="helReset()" title="Back to the starting view: x 62, y 0, z 32.">reset helix</button>
+  </div>
   <div class="prow vrow" id="row-cay-zoom">
     <span class="plabel">Zoom out</span>
     <button class="chip czchip" id="cz-1" onclick="setCayleyZoomOut(1)" title="No shrink. Γ is unbounded, so at ρ near 1 the field can run well off the plate.">1&times;</button>
@@ -2051,6 +2059,7 @@ walk anyway.</p>
 
 <style>.rc{font-family:var(--mono);font-size:11px;color:var(--cream2)}.rc .rr{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:5px 0}.rc .chip{font-size:10.5px;padding:2px 6px}.rc small{opacity:.65;margin-left:3px;font-size:9.5px}.rc .rk{color:#f2c860;margin-right:2px}.rc .rx{color:#ff6b6b;margin-right:2px}.rc .rm{max-height:150px;overflow:auto}.rc .rx2{opacity:.8;color:#ff9a9a}.rc .dim{opacity:.4}@media (max-width:600px){#intro-overlay.ctl-open #intro-head{padding-top:8px!important}#intro-overlay.ctl-open #intro-head>div:nth-child(1),#intro-overlay.ctl-open #intro-head>div:nth-child(3){display:none}#intro-overlay.ctl-open #intro-head>div:nth-child(2){font-size:22px!important;margin-top:0!important}}@media (min-width:601px){#intro-overlay.ctl-open #intro-foot{z-index:5!important}#intro-overlay.ctl-open #intro-ctl{position:fixed;right:10px;bottom:10px;width:348px;max-width:46vw;overflow-y:auto;flex-direction:column!important;flex-wrap:nowrap!important;justify-content:flex-start!important;z-index:6;margin:0!important;padding:8px;background:rgba(8,8,20,.95);border:1px solid rgba(255,255,255,.16);border-radius:10px;box-sizing:border-box}#intro-overlay.ctl-open #intro-ctl .ig{flex:0 0 auto;max-width:none}}.ig{flex:1 1 250px;max-width:330px;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:6px 9px 8px;background:rgba(255,255,255,.035)}.ig .gl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}.ig .gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.ig .gv{min-width:4.5em}@media (max-width:600px){.ig{flex:1 1 100%;max-width:none}}@media (max-height:560px){#intro-head{padding-top:8px!important}#intro-head>div:nth-child(2){font-size:clamp(22px,8vh,40px)!important;margin-top:2px!important}#intro-head>div:nth-child(3){display:none}#intro-counter{font-size:11px!important}#intro-foot{padding-bottom:6px!important}#intro-foot>div{margin-top:5px!important}}@media (max-width:600px){#intro-foot .chip{padding:3px 7px;font-size:10px}#intro-foot input[type=range]{width:84px!important}#intro-foot .btn{font-size:13px!important;padding:7px 18px!important}#intro-foot>div{margin-top:8px!important}}</style>
 <script>(function(){var go=!/[#&]s=/.test(location.hash||'');try{if(localStorage.getItem('stripII_welcome_seen'))go=false}catch(e){}if(!go)return;var st=document.createElement('style');st.id='intro-boot';st.textContent='#intro-overlay{display:block!important}#intro-overlay>*{visibility:hidden}';document.head.appendChild(st);window.introBootOff=function(){var e=document.getElementById('intro-boot');if(e)e.remove()};window.addEventListener('load',function(){setTimeout(function(){if(!window._introOn)window.introBootOff()},400)})})();</script>
+<style>#intro-overlay,#intro-overlay *{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}#intro-overlay input[type=number],#intro-overlay input[type=text],#intro-overlay textarea{-webkit-user-select:text;user-select:text}</style>
 <div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:100000;background:#04040d;overflow:hidden;">
   <canvas id="intro-cv" style="position:fixed;inset:0;z-index:2;width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;"></canvas>
   <div id="intro-sweep" style="display:none;position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94vw,560px);max-height:88vh;overflow:auto;padding:12px 14px;background:rgba(10,10,24,.97);border:1px solid var(--gold);border-radius:8px;font-family:var(--mono);font-size:11.5px;color:var(--cream);"></div>
@@ -2112,7 +2121,7 @@ walk anyway.</p>
         <div class="gr"><button class="chip" onclick="introRecClear()" title="Delete the recording; the time slider goes back to the intro">clear</button><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" id="intro-rgif-btn" onclick="introRecGif()" title="Replay the recording and save it as an animated GIF (10 frames a second, up to 480 px wide, 256 colours). Works in every browser; keep this tab in front while it records.">GIF</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
       </div>
       <div class="ig"><div class="gl">View &amp; export</div>
-        <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
+        <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introResetAngles()" title="Back to the starting angles: Helix x 62, y 0, z 32; Cayley 0, 0, 0.">reset angles</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
       </div>
     </div>
   </div>
@@ -2325,7 +2334,7 @@ walk anyway.</p>
         <div class="prow" id="welcome-colrow"><span class="plabel">Coloring</span>
       <button class="chip" onclick="stepWelcome(-1)" title="Previous coloring (Up arrow)">&#9650;</button>
       <button class="chip" onclick="stepWelcome(1)" title="Next coloring (Down arrow)">&#9660;</button>
-      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="180" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span></span>
+      <span class="wcrot" title="Rotate the Cayley preview, in degrees. Each axis has its own 0 preset and its own play. Preview only."><span class="rw"><label title="Tilt about the x axis, degrees: the picture swings up and down">x<input type="number" id="welcome-crx" value="0" step="1" inputmode="numeric" oninput="openerRotInput('x',this)" onchange="this.value=Math.round(OPENER_ROT.x)%360"></label><button class="chip" onclick="openerRotZero('x')" title="x back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('x',45)" title="Turn x by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-x" onclick="toggleOpenerRotPlay('x')" title="Spin x on loop">&#9654;</button></span><span class="rw"><label title="Tilt about the y axis, degrees: the picture swings left and right">y<input type="number" id="welcome-cry" value="180" step="1" inputmode="numeric" oninput="openerRotInput('y',this)" onchange="this.value=Math.round(OPENER_ROT.y)%360"></label><button class="chip" onclick="openerRotZero('y')" title="y back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('y',45)" title="Turn y by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-y" onclick="toggleOpenerRotPlay('y')" title="Spin y on loop">&#9654;</button></span><span class="rw"><label title="z turn about the pole axis (flat spin), degrees">z<input type="number" id="welcome-crz" value="0" step="1" inputmode="numeric" oninput="openerRotInput('z',this)" onchange="this.value=Math.round(OPENER_ROT.z)%360"></label><button class="chip" onclick="openerRotZero('z')" title="z back to 0&deg;">0</button><button class="chip" onclick="openerRotStep('z',45)" title="Turn z by 45&deg; each click">+45</button><button class="chip tl" id="welcome-crp-z" onclick="toggleOpenerRotPlay('z')" title="Spin z on loop">&#9654;</button></span><button class="chip" id="welcome-helreset" onclick="openerHelReset()" title="Back to the starting view (x 62, y 0, z 32 in Helix; x 0, y 180, z 0 otherwise)">reset</button></span>
     </div>
     <div id="welcome-color-now"></div>
     <div class="subtoggle collapsed" id="ol-dd" onclick="toggleSub(this)" title="Lift dynamics on the three preview canvases: the spiral, the &plusmn;n path, and the r &rarr; r mod(M+1) chain. Preview only.">
@@ -3242,7 +3251,7 @@ let cayGuides = true, cayGuideAlpha = 1;
    laps anything. wrap lets r > M wind round again, which is the honest
    picture of the lattice but reads as noise before you know what you are
    looking at. */
-var HEL_MAIN = false;   // main page: the Cayley view drawn as the unwrapped ring (the Helix view)
+var HEL_MAIN = false, HEL_Z = 32;   // main page: the Cayley view drawn as the unwrapped ring (the Helix view)
 var ANG_K = 2;                      // angle multiplier in units of pi: theta = ANG_K*pi*r/M (2 = the usual full circle)
 let thetaMode = 'clamp';           // 'wrap' | 'clamp' | 'unit' — Strip I's three angular modes
 const TAU = Math.PI * 2;
@@ -5702,6 +5711,7 @@ let OPENER_ROT = { x: 0, y: 180, z: 0, g: 90, r: 0 };   // Ring opens at 0 degre
 let _openerRotOn = { x: false, y: false, z: false }, _openerRotTimer = 0, _openerRotRaf = 0, _openerRotDirty = {};
 function openerNormDeg(v) { v = +v; if (!isFinite(v)) v = 0; return ((v % 360) + 360) % 360; }
 // Redraw only the tile the axis belongs to; the reveal animation, if running, already reads the live angles.
+function openerHelReset() { try { for (const a of OPENER_AXES) if (_openerRotOn[a]) stopOpenerRotPlay(a); } catch (e) {} const t = OL.helix ? { x: 62, y: 0, z: 32 } : { x: 0, y: 180, z: 0 }; setOpenerRot('x', t.x); setOpenerRot('y', t.y); setOpenerRot('z', t.z); }
 function openerRotSoon(axis) {
   _openerRotDirty[axis === 'g' ? 'grid' : axis === 'r' ? 'ring' : 'cay'] = true;
   if (_openerRotRaf) return;
@@ -7237,7 +7247,7 @@ function showIntro() {
     const gT = _introGM != null ? Math.max(12, G) : GMAX;
     _introGZ = _introExporting || !_introGZ ? gT : Math.exp(Math.log(_introGZ) + (Math.log(gT) - Math.log(_introGZ)) * 0.2);
     const GZ = _introGZ;
-    _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, top0, bot0, cvTop, cy0: cy - _introV.fy * H };
+    _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, top0, bot0, cvTop, cy0: cy - _introV.fy * H, cx0: cx - _introV.fx * W };
     { const pFs = Math.max(10, Math.min(12, W / 34)) * UI, pLh = pFs + 4, pT = (_introExporting && !LAND) ? top0 + pFs + 2 + (_introStrip.on ? 13 : 8) * pLh : top0, pB = (_introExporting && !LAND) ? bot0 - 5 * pLh : bot0;   // portrait export: a zoomed plate (k > 1) never runs under the corner stats
     x.save(); x.beginPath(); x.rect(0, pT, W, Math.max(10, pB - pT)); x.clip(); }   // the ring never covers the title or the controls
     const PT = Math.max(0.7, 1.25 * (_introIso === 'strip' ? 0.75 : _introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * _introPtScale * Math.min(1, Math.sqrt(256 / GZ)) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
@@ -7327,7 +7337,7 @@ function showIntro() {
         if (last) {
           x.fillStyle = solid; x.beginPath(); x.arc(last[0], last[1], 3.2, 0, 7); x.fill();
           x.font = (11 * UI) + 'px monospace'; const tx = mir ? 'mirror σ: r = M − ' + sp : 'spiral: r = ' + sp, tw = x.measureText(tx).width, right = last[0] > cx;
-          let lx = right ? last[0] + 8 : last[0] - 8 - tw; lx = Math.max(6, Math.min(W - tw - 6, lx)); x.textAlign = 'left';
+          let lx = right ? last[0] + 8 : last[0] - 8 - tw; lx = Math.max(6, Math.min(Wa - tw - 6, lx)); x.textAlign = 'left';
           x.fillText(tx, lx, Math.max(top0 + 12 * UI, Math.min(bot0 - 6, last[1] + (mir ? 14 : -6))));
         }
       });
@@ -7361,8 +7371,8 @@ function showIntro() {
         _introGbPairs.forEach((q, k) => { const m = at(q, E - q); if (!(m[0] >= 4 && m[0] <= W - 4 && m[1] >= top0 + 4 && m[1] <= bot0 - 4)) return; const on = k <= cur, rr = (k === cur ? 6 + 2 * Math.sin(tn * 6) : on ? 2.6 : 1.8) * UI, gr = x.createRadialGradient(m[0], m[1], 0, m[0], m[1], rr * 2.2); gr.addColorStop(0, k === cur ? 'rgba(255,230,140,.95)' : on ? 'rgba(255,230,140,.5)' : 'rgba(255,230,140,.2)'); gr.addColorStop(1, 'rgba(255,200,80,0)'); x.fillStyle = gr; x.beginPath(); x.arc(m[0], m[1], rr * 2.2, 0, 7); x.fill(); });
         x.globalCompositeOperation = 'source-over'; }
       let mk = at(g, sP); const mkOff = !(mk[0] >= 8 && mk[0] <= W - 8 && mk[1] >= top0 + 8 && mk[1] <= bot0 - 8);   // the marker (g, E - g) has M = E - g > G, so it lies outside the outer ring: pin it to the edge of the plate and mark it hollow
-      if (isFinite(mk[0]) && isFinite(mk[1])) { if (mkOff) mk = [Math.max(8, Math.min(W - 8, mk[0])), Math.max(top0 + 8, Math.min(bot0 - 8, mk[1]))]; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); if (mkOff) { x.strokeStyle = '#ffd36b'; x.lineWidth = 1.6; x.stroke(); } else { x.fillStyle = '#ffd36b'; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke(); } }
-      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')' + (mkOff ? ' off plate' : ''), lw = x.measureText(lt).width; const lw2 = x.measureText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length).width, lx2 = W - 6; x.textAlign = 'right'; const fsL = Math.max(10, Math.min(12, W / 34)) * UI, lhL = fsL + 4, ly2 = Math.max(top0 + 12 * UI, Math.min(bot0 - 6 - 12 * UI, top0 + fsL + 2 + 13 * lhL)), wl = Math.max(lw, lw2); x.save(); x.setLineDash([2, 3]); x.strokeStyle = 'rgba(255,211,107,.6)'; x.lineWidth = 1; x.beginPath(); x.moveTo(mk[0] + 5, mk[1]); x.lineTo(lx2 - wl - 6, ly2 - 4 * UI); x.stroke(); x.restore(); x.fillText(lt, lx2, ly2); x.fillText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length, lx2, ly2 + 12 * UI); }
+      if (isFinite(mk[0]) && isFinite(mk[1])) { if (mkOff) mk = [Math.max(8, Math.min(Wa - 8, mk[0])), Math.max(top0 + 8, Math.min(bot0 - 8, mk[1]))]; x.beginPath(); x.arc(mk[0], mk[1], 4, 0, 7); if (mkOff) { x.strokeStyle = '#ffd36b'; x.lineWidth = 1.6; x.stroke(); } else { x.fillStyle = '#ffd36b'; x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1; x.stroke(); } }
+      x.font = (11 * UI) + 'px monospace'; x.fillStyle = '#ffd36b'; x.textAlign = 'left'; { const lt = '(' + g + ', ' + sP + ')' + (mkOff ? ' off plate' : ''), lw = x.measureText(lt).width; const lw2 = x.measureText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length).width, lx2 = Wa - 6; x.textAlign = 'right'; const fsL = Math.max(10, Math.min(12, W / 34)) * UI, lhL = fsL + 4, ly2 = Math.max(top0 + 12 * UI, Math.min(bot0 - 6 - 12 * UI, top0 + fsL + 2 + 13 * lhL)), wl = Math.max(lw, lw2); x.save(); x.setLineDash([2, 3]); x.strokeStyle = 'rgba(255,211,107,.6)'; x.lineWidth = 1; x.beginPath(); x.moveTo(mk[0] + 5, mk[1]); x.lineTo(lx2 - wl - 6, ly2 - 4 * UI); x.stroke(); x.restore(); x.fillText(lt, lx2, ly2); x.fillText((Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + _introGbPairs.length, lx2, ly2 + 12 * UI); }
       x.restore();
       gbTxt = '\nGoldbach E = 2(G+1) = ' + E + ' (G = ' + G + ') · pair ' + g + ' + ' + sP + ' (' + (_introGbI + 1) + ' of ' + _introGbPairs.length + ') · c: r+M=' + g + ' gold · d: r+M=' + sP + ' coral · a: M−r=' + g + ' teal · b: r−M=' + g + ' violet';
     }
@@ -7377,7 +7387,7 @@ function showIntro() {
       const GR = '#5fd38d', RD = '#ff6b6b', DM = 'rgba(232,227,219,.7)', fs = Math.max(10, Math.min(12, W / 34)) * UI, lh = fs + 4;
       const y0 = top0 + fs + 2, y1 = bot0 - 2, roomB = (y1 - y0) >= 11 * lh && !OPEN && !_introAbs;   // short screens (phone landscape): drop the bottom corner blocks instead of letting them overlap the top ones
       const pe = (o, e) => { const v = (o - e) / e * 100; return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(3) + '%'; };   // observed vs expected, signed, 3 decimals
-      const blk = (lines, xr, y, up) => { x.font = fs + 'px monospace'; x.textAlign = xr ? 'right' : 'left'; const X = xr ? W - 10 : 10; const n = lines.length; lines.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], X, y + (up ? (i - n + 1) : i) * lh); }); };
+      const blk = (lines, xr, y, up) => { x.font = fs + 'px monospace'; x.textAlign = xr ? 'right' : 'left'; const X = xr ? Wa - 10 : 10; const n = lines.length; lines.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], X, y + (up ? (i - n + 1) : i) * lh); }); };
          // expected share of kept cells: D(n) = C(n)/zeta(2)
 if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M…M+' + _introN : 'gcd = 1 cells', DM], [cop + ' / ' + tot, '#fff'], ['ratio ' + sh.toFixed(2) + '%', sh / 100 >= six ? GR : RD], [(nn ? 'D(n) = ' : '6/π² = ') + (six * 100).toFixed(2) + '%', DM], ['vs cells ' + pe(cop, tot * six), sh / 100 >= six ? GR : RD]], false, y0, false); x.globalAlpha = baseGA; }
       const sec = [['sector: observed / expected  error', DM]];
@@ -8308,6 +8318,7 @@ function introScrub(t) {
   if (_introAutoT) { clearTimeout(_introAutoT); _introAutoT = 0; }
   if (_introPaused && _introPSnap) { _introPSnap = { seq: true, script: true, man: false, birth: false, s0: 44.5 }; _introPSnapT = t; }   // scrubbing while paused: the pause now remembers this spot
 }
+function introResetAngles() { const V = _introVw, h = V.mode === 'hel'; introViewXY(h ? 62 : 0, 0, h ? 32 : 0); ['x', 'y', 'z'].forEach((a, i) => { const sl = $('intro-v' + a + '-sl'); if (sl) sl.value = [h ? 62 : 0, 0, h ? 32 : 0][i]; }); }
 function introViewAxis(ax, d, abs) {   // Cayley x / y / z: set to 0, or turn by d degrees (kept in 0..360, the sliders' range)
   const V = _introVw, cur = ax === 'x' ? V.x : ax === 'y' ? V.y : V.z, v = abs ? d : ((Math.round(cur || 0) + d) % 360 + 360) % 360;
   introViewXY(ax === 'x' ? v : null, ax === 'y' ? v : null, ax === 'z' ? v : null);
@@ -8401,7 +8412,7 @@ function introZoomAt(px, py, k2) {
   _introVUser = true;   // your own zoom: the scripted Goldbach zoom stops overriding it until you scrub or reset the view
   const gm = _introGeo; if (!gm) return; k2 = Math.max(_introVkey === 'cay' ? 0.2 : 0.35, Math.min(14, k2));
   const k = _introV.k, cx2 = px - (px - gm.cx) * (k2 / k), cy2 = py - (py - gm.cy) * (k2 / k);
-  _introV.k = k2; _introV.fx = (cx2 - gm.W / 2) / gm.W; _introV.fy = (cy2 - gm.cy0) / gm.H;
+  _introV.k = k2; _introV.fx = (cx2 - (gm.cx0 != null ? gm.cx0 : gm.W / 2)) / gm.W; _introV.fy = (cy2 - gm.cy0) / gm.H;
   if (Math.abs(k2 - 1) < 0.02) { _introV.k = 1; _introV.fx = 0; _introV.fy = 0; }
 }
 function introResetView() { Object.assign(_introV, { k: 1, fx: 0, fy: 0 }); for (const k in _introZ) _introZ[k] = { k: 1, fx: 0, fy: 0 }; _introVUser = false; }
@@ -8415,7 +8426,7 @@ function introWireView() {
   cv.addEventListener('pointermove', e => {
     if (!ptr.has(e.pointerId)) return; const old = ptr.get(e.pointerId), now = pos(e); ptr.set(e.pointerId, now);
     if (ptr.size === 2) { const [a, b] = [...ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pd > 0) introZoomAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, _introV.k * d / pd); pd = d; moved = 99; }
-    else { const dx = now[0] - old[0], dy = now[1] - old[1]; moved += Math.abs(dx) + Math.abs(dy); if (moved > 6 && _introGeo && _introV.k > 1) { _introV.fx += dx / _introGeo.W; _introV.fy += dy / _introGeo.H; } }
+    else { const dx = now[0] - old[0], dy = now[1] - old[1]; moved += Math.abs(dx) + Math.abs(dy); if (moved > 6 && _introGeo) { _introVUser = true; _introV.fx += dx / _introGeo.W; _introV.fy += dy / _introGeo.H; } }
   });
   const up = e => { const was = ptr.size; ptr.delete(e.pointerId); if (was === 1 && moved <= 6 && start) introCanvasClick({ clientX: e.clientX, clientY: e.clientY }); if (ptr.size < 2) pd = 0; };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', e => { ptr.delete(e.pointerId); });
@@ -11957,7 +11968,7 @@ function cayleyXY(r, M, S) {
   const th = thetaOf(r, M);
   if (HEL_MAIN) {   // helix: (rho cos th, rho sin th, th / 2pi), spun 32 deg, tilted by x, turned by y, drawn orthographically
     const Rh = S * 0.42 * Math.max(0.25, cayleyZoomIn), rad = Rh * (M - 0.5) / COP_G, kk = Math.max(0.5, ANG_K / 2), X = rad * Math.cos(th), Y = rad * Math.sin(th), Z = (Math.abs(th) / (2 * Math.PI)) / kk * Rh * 0.9 - Rh * 0.45;
-    const D = Math.PI / 180, cz = Math.cos(32 * D), sz = Math.sin(32 * D), cxr = Math.cos(cayleyRotX * D), sxr = Math.sin(cayleyRotX * D), cyr = Math.cos(cayleyRotY * D), syr = Math.sin(cayleyRotY * D);
+    const D = Math.PI / 180, cz = Math.cos(HEL_Z * D), sz = Math.sin(HEL_Z * D), cxr = Math.cos(cayleyRotX * D), sxr = Math.sin(cayleyRotX * D), cyr = Math.cos(cayleyRotY * D), syr = Math.sin(cayleyRotY * D);
     const X1 = X * cz - Y * sz, Y1 = X * sz + Y * cz, Y2 = Y1 * cxr - Z * sxr, Z2 = Y1 * sxr + Z * cxr, X3 = X1 * cyr + Z2 * syr;
     return [cx + X3, cy - Y2];
   }
@@ -11974,7 +11985,7 @@ function cayleyXY(r, M, S) {
 }
 let cayCv = null, cayKey = '';
 function cayleyBaseKey(S) {
-  return [HEL_MAIN ? 'hel' : 'cay', COP_G, S, cmap, rho0, rhoD, ba, baAng, cayleyRotX, cayleyRotY, cayleyZoomOut, cayleyZoomIn, thetaMode, ANG_K, ptScale, pointShape,
+  return [HEL_MAIN ? 'hel' + HEL_Z : 'cay', COP_G, S, cmap, rho0, rhoD, ba, baAng, cayleyRotX, cayleyRotY, cayleyZoomOut, cayleyZoomIn, thetaMode, ANG_K, ptScale, pointShape,
           survOn, brokenOn,
           (sectorOn && sectorPick > 0 ? 'sec' + sectorPick + 'dim' + sectorDim : '') + hbKeys(), $('cmode').value].join('|');
 }
@@ -12675,7 +12686,7 @@ function onW(v) {
 /* ── view switching ────────────────────────────────────────────────────── */
 function setView(v) {
   const vBtn = v;   // helix = the Cayley view drawn as the unwrapped ring (HEL_MAIN): same plate, zoom, rotation rows, exports and sheet
-  if (v === 'helix') { v = 'cayley'; if (!HEL_MAIN) { HEL_MAIN = true; window._helSave = [cayleyRotX, cayleyRotY]; cayleyRotX = 62; cayleyRotY = 0; try { $('cay-rot-x').value = 62; $('cay-rot-x-v').textContent = '62\u00b0'; $('cay-rot-y').value = 0; $('cay-rot-y-v').textContent = '0\u00b0'; } catch (e) {} cayKey = ''; } }
+  if (v === 'helix') { v = 'cayley'; if (!HEL_MAIN) { HEL_MAIN = true; window._helSave = [cayleyRotX, cayleyRotY]; HEL_Z = 32; try { $('hel-rot-z').value = 32; $('hel-rot-z-v').textContent = '32\u00b0'; } catch (e) {} cayleyRotX = 62; cayleyRotY = 0; try { $('cay-rot-x').value = 62; $('cay-rot-x-v').textContent = '62\u00b0'; $('cay-rot-y').value = 0; $('cay-rot-y-v').textContent = '0\u00b0'; } catch (e) {} cayKey = ''; } }
   else if (HEL_MAIN) { HEL_MAIN = false; const q = window._helSave || [0, 0]; cayleyRotX = q[0]; cayleyRotY = q[1]; try { $('cay-rot-x').value = q[0]; $('cay-rot-x-v').textContent = q[0] + '\u00b0'; $('cay-rot-y').value = q[1]; $('cay-rot-y-v').textContent = q[1] + '\u00b0'; } catch (e) {} cayKey = ''; }
   viewMode = v;
   labelScale = LS[v] !== undefined ? LS[v] : 1;
@@ -12689,7 +12700,7 @@ function setView(v) {
   $('row-cay').classList.toggle('on', v === 'cayley');
   $('row-cay-a').classList.toggle('on', v === 'cayley');
   $('row-cay-b').classList.toggle('on', v === 'cayley');
-  $('row-cay-rx').classList.toggle('on', v === 'cayley');
+  $('row-cay-rx').classList.toggle('on', v === 'cayley'); { const rz = $('row-cay-rz'); if (rz) rz.classList.toggle('on', v === 'cayley' && HEL_MAIN); }
   $('row-cay-ry').classList.toggle('on', v === 'cayley');
   $('row-cay-zoom').classList.toggle('on', v === 'cayley');
   $('row-cay-gzoom').classList.toggle('on', v === 'cayley');
@@ -12808,6 +12819,12 @@ function setCayleyRotX(deg) {
   [0, 90, 180, 270].forEach(k => { const b = $('crx-' + k); if (b) b.classList.toggle('on', k === deg); });
   cayKey = ''; redraw(false);
 }
+function setHelZ(deg) {
+  deg = ((Math.round(deg) % 360) + 360) % 360; HEL_Z = deg;
+  const a = $('hel-rot-z'), b = $('hel-rot-z-v'); if (a) a.value = deg; if (b) b.textContent = deg + '\u00b0';
+  cayKey = ''; redraw(false);
+}
+function helReset() { stopCayleyRotPlay(); HEL_Z = 32; setCayleyRotY(0); setCayleyRotX(62); setHelZ(32); }
 function setCayleyRotY(deg) {
   deg = ((Math.round(deg) % 360) + 360) % 360;
   cayleyRotY = deg;
@@ -18476,7 +18493,7 @@ function msBuildMainRaw(views, noPlates) {
   // 1 · parameters
   const P = [['G', String(G)], ['views', vname], ['walk', walkMode], ['strip a/b', a + '/' + b], ['offset s', String(s)], ['width w', String(w)], ['colouring', label]];
   if (vs.includes('ring')) P.push(['angle k', angTxt()], ['θ mode', thetaMode], ['ring turn θ₀', msDeg(ringRot) + '°'], ['ring hole h', msf(ringHole, 2)], ['ring winding', RING_H > 0 ? 'clockwise' : 'counter-clockwise']);
-  if (vs.includes('cayley') && HEL_MAIN) P.push(['Helix tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']); else if (vs.includes('cayley')) P.push(['Cayley map', cmap + (cmap === 'A' ? '  ρ₀ ' + msf(rho0, 2) + '  ρ_d ' + msf(rhoD, 2) : '  a ' + msf(ba, 2) + '∠' + baAng + '°')], ['Cayley tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']);
+  if (vs.includes('cayley') && HEL_MAIN) P.push(['Helix tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°, z ' + HEL_Z + '°']); else if (vs.includes('cayley')) P.push(['Cayley map', cmap + (cmap === 'A' ? '  ρ₀ ' + msf(rho0, 2) + '  ρ_d ' + msf(rhoD, 2) : '  a ' + msf(ba, 2) + '∠' + baAng + '°')], ['Cayley tilt', 'x ' + cayleyRotX + '°, y ' + cayleyRotY + '°']);
   if (typeof sectorOn !== 'undefined' && sectorOn) msSectorParams('main').forEach(q => P.push(q));
   P.push(['plate turns', vs.map(v => names[v] + ' ' + ((VQ[v] !== undefined ? VQ[v] : viewQuarter) * 90) + '\u00b0').join(', ')]);
   if (liveLift) {
