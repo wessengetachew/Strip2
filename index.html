@@ -745,6 +745,23 @@ tr.bad td{color:var(--coral);}
 .foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--edge);
   font-family:var(--mono);font-size:11px;color:var(--cream3);line-height:1.8;}
 mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+
+/* ---- reading-guide additions ---- */
+#claim,#newbox,#pathbar{max-width:1100px;margin:14px auto;padding:0 4px;}
+.cbox{border:1px solid var(--edge2);background:var(--bg1);border-left:3px solid var(--gold);padding:14px 16px;border-radius:4px;}
+.cbox h3{font-family:var(--disp);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 8px;}
+.cbox p,.cbox li{font-size:14px;line-height:1.6;color:var(--cream2);margin:0 0 8px;}
+.cbox ul{margin:0;padding-left:18px;}
+.cbox .eq{font-family:var(--mono);font-size:12.5px;color:var(--cream);}
+#cl-t{border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:8px 0;min-width:520px;}
+#cl-t th,#cl-t td{border-bottom:1px solid var(--edge);padding:4px 10px;text-align:left;color:var(--cream2);}
+#cl-t th{color:var(--cream3);font-weight:400;}
+.clrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--cream3);margin:6px 0;}
+.clrow input[type=range]{flex:1 1 160px;max-width:300px;}
+#pathbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--cream3);letter-spacing:.08em;text-transform:uppercase;}
+.rolebadge{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:1px 7px;margin-left:10px;border:1px solid currentColor;border-radius:9px;vertical-align:middle;white-space:nowrap;}
+.rb-core{color:var(--gold);}.rb-work{color:var(--cream3);}.rb-ver{color:var(--lime);}
+#st-pill{font-family:var(--mono);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -758,6 +775,7 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
      title="The opener — where this side quest started, and quick presets for coloring &amp; labels.">✦ Opener</button>
   <button class="navbtn fsnavbtn" data-fs-target="cv" onclick="toggleFS('cv')"
      title="Fullscreen: the lattice. Pins the plate to the top of the screen with its controls below.">⛶ Fullscreen</button>
+  <a class="navbtn" id="st-pill" onclick="if(typeof cgo==='function')cgo({panel:'Self test'})" title="Live result of the self-test battery. Click to open the panel.">checks: running&hellip;</a>
   <button class="navbtn" id="share-nav-btn" onclick="shareCopy(this)"
      title="Copy a link that reopens this page with the current settings (the main page, or the opener if it is open).">&#128279; Share link</button>
 </div>
@@ -783,6 +801,32 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
   single geometric setting in which these familiar densities are one computation, and a
   browser that recomputes each of them from scratch.</div>
 </div>
+
+<div id="claim"><div class="cbox">
+<h3>The claim in 30 seconds</h3>
+<p>One residue count, &nu;<sub>p</sub> = the number of distinct residues of a pattern mod p, sets the local factor in both densities. For a block of n+1 consecutive integers it is <span class="eq">min(n+1, p)</span> and gives C(n). For the pair {0, N} it is 1 or 2 depending on whether p | N, and gives the Goldbach factor <span class="eq">&prod;(p&minus;1)/(p&minus;2)</span>. Move the sliders and watch the same column feed both.</p>
+<div class="clrow"><span>block depth n = <b id="cl-nv">3</b></span><input type="range" id="cl-n" min="0" max="12" value="3" oninput="claimRender()">
+<span>even N = <b id="cl-Nv">210</b></span><input type="range" id="cl-N" min="4" max="420" step="2" value="210" oninput="claimRender()"></div>
+<div class="scroll"><table id="cl-t"></table></div>
+<div class="clrow"><button class="chip" onclick="if(typeof cgo==='function')cgo({ctl:'ctl-toggle',walk:'band',preset:'blk29',scroll:'cv'})">see the block side on the lattice</button>
+<button class="chip" onclick="if(typeof cgo==='function')cgo({ctl:'ctl-toggle',preset:'anti',panel:'Live identity',scroll:'cv'})">see the Goldbach side on the lattice</button></div>
+</div></div>
+
+<div id="newbox"><div class="cbox" style="border-left-color:var(--coral);">
+<h3>What is new, and what is not</h3>
+<ul>
+<li><b>Classical:</b> every theorem used here (Euler products, M&ouml;bius and CRT densities, the Hardy&ndash;Littlewood singular series). Nothing is claimed as new.</li>
+<li><b>Offered:</b> one geometric setting (slope, width, offset) in which the C(n) factor and the Goldbach factor are the same residue count.</li>
+<li><b>Method:</b> every stated identity is recomputed in your browser by a second route. The self-tests check that the code has not drifted from the theorems; they check code, not theorems. Live result in the top bar.</li>
+</ul>
+<p style="margin-top:8px;"><a href="#sec4" onclick="openSecGo('sec4wrap');return false;" style="color:var(--coral);">Statement-by-statement register (&sect;4) &rarr;</a></p>
+</div></div>
+
+<div id="pathbar"><span>Read in</span>
+<button class="chip" onclick="readPath('quick')">2 minutes</button>
+<button class="chip" onclick="readPath('mid')">15 minutes</button>
+<button class="chip" onclick="readPath('all')">everything</button>
+<span style="text-transform:none;letter-spacing:0;">Sections are tagged <span class="rolebadge rb-core" style="margin-left:2px">core</span> <span class="rolebadge rb-work" style="margin-left:2px">workbench</span> <span class="rolebadge rb-ver" style="margin-left:2px">verification</span></span></div>
 
 <div id="lv2-panel" style="margin:14px auto 6px;max-width:1100px;padding:0 4px;">
   <div class="subtoggle collapsed" id="lv2-toggle" onclick="toggleSub(this)">
@@ -3138,8 +3182,9 @@ Full attribution is in the credits panel below.
   <p style="font-size:13.5px;margin:0 0 8px;">
   MathJax for typesetting. Typefaces via Google Fonts: Cinzel (Natanael Gama), Spectral
   (Production Type), JetBrains Mono (JetBrains). Everything else &mdash; lattice, sieve,
-  projections, comet, self-tests &mdash; is hand-written vanilla JavaScript and Canvas with no
+  projections, comet, self-tests &mdash; is plain vanilla JavaScript and Canvas with no
   framework or plotting library.</p>
+  <!-- PROVENANCE: add one accurate sentence here on how the code was written (tools, assistance, review). -->
 
   <h3>Same author</h3>
   <p style="font-size:13.5px;margin:0 0 8px;">
@@ -19653,5 +19698,41 @@ async function msExportMain(views, host) {
     <div class="msp-body" id="ms-preview-body"></div>
   </div>
 </div>
+<script>
+(function(){
+  var P=[2,3,5,7,11,13];
+  window.claimRender=function(){
+    var n=+document.getElementById('cl-n').value,N=+document.getElementById('cl-N').value;
+    document.getElementById('cl-nv').textContent=n;document.getElementById('cl-Nv').textContent=N;
+    var h='<tr><th>p</th><th>block: &nu;<sub>p</sub> = min(n+1, p)</th><th>pair {0, N}: &nu;<sub>p</sub></th><th>extra factor when p | N</th></tr>';
+    P.forEach(function(p){var b=Math.min(n+1,p),d=N%p===0;
+      h+='<tr><td>'+p+'</td><td>'+b+(b===p?' &middot; saturated':'')+'</td><td>'+(d?1:2)+'</td><td>'+(d&&p>2?'(p&minus;1)/(p&minus;2) = '+((p-1)/(p-2)).toFixed(4):'&mdash;')+'</td></tr>';});
+    document.getElementById('cl-t').innerHTML=h;
+  };
+  claimRender();
+  function setSec(id,open){var el=document.getElementById(id);if(!el)return;
+    el.classList.toggle('collapsed',!open);if(open&&typeof secRefit==='function')secRefit(el);}
+  window.openSecGo=function(id){setSec(id,true);var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});};
+  window.readPath=function(k){
+    var core=['sec1','sec3wrap'],rest=['sec0','sec4wrap'];
+    if(k==='quick'){core.concat(rest).forEach(function(i){setSec(i,false);});var c=document.getElementById('claim');if(c)c.scrollIntoView({behavior:'smooth'});}
+    else if(k==='mid'){rest.forEach(function(i){setSec(i,false);});core.forEach(function(i){setSec(i,true);});openSecGo('sec1');}
+    else{core.concat(rest).forEach(function(i){setSec(i,true);});}
+  };
+  function badge(host,cls,txt){if(!host)return;var b=document.createElement('span');b.className='rolebadge '+cls;b.textContent=txt;host.appendChild(b);}
+  var q=function(s){return document.querySelector(s);};
+  badge(q('#sec0 .dsec-h .num'),'rb-core','core');badge(q('#sec1 .dsec-h .num'),'rb-core','core');
+  badge(q('#sec2 .num'),'rb-work','workbench');badge(q('#sec3 .num'),'rb-core','core');
+  badge(q('#sec4 .num'),'rb-ver','verification');
+  var pt=document.querySelectorAll('.ptitle>span:first-child');
+  pt.forEach(function(e){if(/^Self test/.test(e.textContent))badge(e,'rb-ver','verification');});
+  var pill=document.getElementById('st-pill'),sum=document.getElementById('st-summary');
+  function upd(){if(!pill||!sum)return;var m=/(\d+) passed, (\d+) failed/.exec(sum.textContent);if(!m)return;
+    var ok=+m[2]===0;pill.textContent=ok?'\u2713 '+m[1]+'/'+(+m[1]+ +m[2])+' checks pass':'\u2717 '+m[2]+' check(s) failing';
+    pill.style.color=ok?'var(--lime)':'var(--coral)';}
+  if(sum)new MutationObserver(upd).observe(sum,{childList:true,subtree:true,characterData:true});
+  upd();
+})();
+</script>
 </body>
 </html>
