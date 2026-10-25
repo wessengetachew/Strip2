@@ -2124,7 +2124,7 @@ walk anyway.</p>
       <button class="chip" onclick="introSend(false)" title="Send this picture (G, n, view, angle, hole, tilt) to the opener">&rarr; opener</button>
       <button class="chip" onclick="introSend(true)" title="Send this picture to the opener and on to the main page">&rarr; main</button>
       <button class="chip" onclick="introExport4k(false)" title="Save the view you are looking at as a 1080 x 1920 PNG">1080&times;1920</button>
-      <button class="chip" onclick="introResetView()" title="Reset zoom and pan (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introFitTail()" title="Fit the whole helix (the tail in wrap and unit angle modes) in the plate: sets zoom and pan so every point is in view, keeping the x, y, z turn you have. Works on the Helix and the Ring.">fit tail</button>
+      <button class="chip" onclick="introResetView()" title="Reset zoom and pan (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introFitTail()" title="Fit the whole helix (the tail in wrap and unit angle modes) in the plate: sets zoom and pan so every point is in view, keeping the x, y, z turn you have. Works on the Helix and the Ring.">fit tail</button><button class="chip" id="intro-tw-btn" onclick="introTailWalk()" title="Tail walk: pauses, zooms in on the lowest point of the picture (the bottom of the helix tail) and lets you climb it: drag up/down, scroll, or use the slider">&#8597; tail walk</button><input type="range" class="intro-tw-ctl" id="intro-tw-sl" min="0" max="1000" value="0" style="display:none;width:110px;vertical-align:middle;" oninput="introTailWalkSet(this.value / 1000)" title="Position along the tail: 0 = bottom, 1000 = top"><button class="chip intro-tw-ctl" style="display:none" onclick="introTailWalkZoom()" title="Tail-walk zoom, relative to the view you started from">×3</button><button class="chip" id="intro-lens-btn" onclick="introLensToggle()" title="Magnifier: drag or tap on the picture to move it; works paused or playing, in every view">&#128269; lens</button><button class="chip intro-lens-ctl" style="display:none" onclick="introLensMode()" title="What the lens labels: r, r/M, the angle θ in π, M, the sector s, or whether C(n) keeps the cell">lens: r</button><button class="chip intro-lens-ctl" style="display:none" onclick="introLensZoom()" title="Lens magnification">×4</button>
       <button class="chip" id="intro-fs-btn" onclick="introFS()" title="Full screen">&#9974; full</button>
     </div>
     <div id="intro-ctl" style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;text-align:left;font-family:var(--mono);font-size:11px;color:var(--cream2);">
@@ -2167,7 +2167,7 @@ walk anyway.</p>
         <div class="gr"><button class="chip" onclick="introRecClear()" title="Delete the recording; the time slider goes back to the intro">clear</button><button class="chip" id="intro-rvid-btn" onclick="introRecVideo()" title="Replay the recording and save it as a video (MP4 where the browser can, otherwise WebM), 30 fps, high bitrate. Keep this tab in front while it records.">&#127902; video</button><button class="chip" id="intro-rgif-btn" onclick="introRecGif()" title="Replay the recording and save it as an animated GIF (10 frames a second, up to 480 px wide, 256 colours). Works in every browser; keep this tab in front while it records.">GIF</button><button class="chip" onclick="introRecSave()" title="Download the recording as a small .json file">&#11015; save</button><button class="chip" onclick="$('intro-rec-file').click()" title="Load a saved recording">&#11014; load</button><input type="file" id="intro-rec-file" accept=".json,application/json" style="display:none" onchange="introRecLoad(this)"></div>
       </div>
       <div class="ig"><div class="gl">View &amp; export</div>
-        <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introFitTail()" title="Fit the whole helix (the tail in wrap and unit angle modes) in the plate: sets zoom and pan so every point is in view, keeping the x, y, z turn you have. Works on the Helix and the Ring.">fit tail</button><button class="chip" onclick="introResetAngles()" title="Back to the starting angles: Helix x 62, y 0, z 32; Cayley 0, 0, 0.">reset angles</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
+        <div class="gr"><button class="chip" onclick="introResetView()" title="Reset zoom (wheel / pinch to zoom, drag to pan, double-click to reset)">reset view</button><button class="chip" onclick="introFitTail()" title="Fit the whole helix (the tail in wrap and unit angle modes) in the plate: sets zoom and pan so every point is in view, keeping the x, y, z turn you have. Works on the Helix and the Ring.">fit tail</button><button class="chip" id="intro-tw-btn" onclick="introTailWalk()" title="Tail walk: pauses, zooms in on the lowest point of the picture (the bottom of the helix tail) and lets you climb it: drag up/down, scroll, or use the slider">&#8597; tail walk</button><input type="range" class="intro-tw-ctl" id="intro-tw-sl" min="0" max="1000" value="0" style="display:none;width:110px;vertical-align:middle;" oninput="introTailWalkSet(this.value / 1000)" title="Position along the tail: 0 = bottom, 1000 = top"><button class="chip intro-tw-ctl" style="display:none" onclick="introTailWalkZoom()" title="Tail-walk zoom, relative to the view you started from">×3</button><button class="chip" id="intro-lens-btn" onclick="introLensToggle()" title="Magnifier: drag or tap on the picture to move it; works paused or playing, in every view">&#128269; lens</button><button class="chip intro-lens-ctl" style="display:none" onclick="introLensMode()" title="What the lens labels: r, r/M, the angle θ in π, M, the sector s, or whether C(n) keeps the cell">lens: r</button><button class="chip intro-lens-ctl" style="display:none" onclick="introLensZoom()" title="Lens magnification">×4</button><button class="chip" onclick="introResetAngles()" title="Back to the starting angles: Helix x 62, y 0, z 32; Cayley 0, 0, 0.">reset angles</button><button class="chip" onclick="introExport4k(false)" title="Save the current frame as a portrait 1080 x 1920 PNG (phone), rendered at 2x so it stays sharp">1080×1920 PNG</button><button class="chip" onclick="introExport4k(true)" title="Save the current frame as a landscape 1920 x 1080 PNG (desktop), rendered at 2x so it stays sharp">1920×1080 PNG</button></div>
       </div>
     </div>
   </div>
@@ -7313,6 +7313,7 @@ function showIntro() {
     const VW = _introExporting && _introExpView ? { m: 1, mode: _introExpView === 'grid' ? 'grid' : _introExpView === 'hel' ? 'hel' : 'cay', x: _introExpView === 'hel' ? _introHX[0] : _introExpX, y: _introExpView === 'hel' ? _introHX[1] : _introExpY, z: _introExpView === 'hel' ? _introHX[2] : _introExpZ } : _introVw, VM = _introExporting ? (_introExpView && _introExpView !== 'ring' ? 1 : 0) : VW.m, VON = VM > 0.02;
     { const tf = _introGbOn ? G / (2 * (G + 1) + 1) : 1; _introGridF = _introExporting ? tf : _introGridF + (tf - _introGridF) * 0.18; if (Math.abs(_introGridF - tf) < 0.002) _introGridF = tf; }   // Grid + Goldbach: ease the square in so the whole pair (r + M = E - g reaches M = E - 3) fits
     const posRM = (r, M) => { const th = _introTh(r, M), rad = _introRad(R, M, GZ); let px = cx + rad * Math.cos(th), py = cy - rad * Math.sin(th); if (VM > 0.002) { const o = introViewPos(r, M, th, VW, cx, cy, R, G, GZ); if (!o) return null; px += (o[0] - px) * VM; py += (o[1] - py) * VM; } return [px, py]; };   // where cell (r, M) is drawn in the current view; every overlay uses it
+    if (!_introExporting) { _introPosRM = posRM; _introPosG = G; }
     let lastCs = null;
     const GBd = _introGbOn ? introGbPairsFor(G) : null, GBg = GBd && GBd.length ? GBd[Math.min(_introGbI, GBd.length - 1)] : 0, GBs = GBg ? 2 * (G + 1) - GBg : 0;   // Goldbach: only the four lines a, b, c, d of the current pair stay bright, every other cell dims
     if (GBg) x.globalAlpha = 0.22;
@@ -7337,17 +7338,19 @@ function showIntro() {
     }
     x.globalAlpha = 1;
     if (_introZL > 0.02 && !_introExporting && _introStopNow) {   // zoom stop: every visible cell labelled with its r
-      const o = INTRO_STOPS[_introStopNow.i], Mt = Math.min(G, Math.round(_introStopM || o.M)), sp = VW.mode === 'cay' && VM > 0.3 ? G : Math.ceil(G * 2.8 / _introStopZ) + 6, fsz = Math.round(9 * UI);
+      const o = INTRO_STOPS[_introStopNow.i], Mt = Math.min(G, Math.round(_introStopM || o.M)), sp = VW.mode === 'cay' && VM > 0.3 ? G : Math.ceil(G * 2.8 / _introStopZ) + 6, fsz = Math.round(8 * UI);
       x.save(); x.globalAlpha = _introZL; x.font = fsz + 'px monospace'; x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = 'rgba(255,248,220,.95)'; x.shadowColor = 'rgba(0,0,0,.9)'; x.shadowBlur = 3;
-      let cnt = 0; const occ = new Map(), zx = Wa / 2, zy = (top0 + bot0) / 2, zr = Math.max(60, Math.min(Wa, bot0 - top0) * 0.2), zr2 = zr * zr;   // only the cells inside the zoom circle get labels
+      let cnt = 0; const isCay = VW.mode === 'cay' && VM > 0.5, occ = new Map(), zx = Wa / 2, zy = (top0 + bot0) / 2, zr = Math.max(60, Math.min(Wa, bot0 - top0) * 0.2), zr2 = zr * zr;   // only the cells inside the zoom circle get labels
       x.save(); x.strokeStyle = 'rgba(212,175,55,.55)'; x.lineWidth = 1.2 * UI; x.setLineDash([4 * UI, 4 * UI]); x.beginPath(); x.arc(zx, zy, zr, 0, 7); x.stroke(); x.restore();
       for (let M = Math.max(1, Mt - sp); M <= Math.min(G, Mt + sp) && cnt < 900; M++) for (let r = 1; r <= (_introAng === 'clamp' ? M : G) && cnt < 900; r++) {
-        if (_introCop[r * 513 + M] !== 1 || (_introN > 0 && introKilled(r, M, _introN))) continue; const P = posRM(r, M); if (!P || (P[0] - zx) * (P[0] - zx) + (P[1] - zy) * (P[1] - zy) > zr2) continue;
-        const lx = P[0] + PT * 0.7 + 2, ly = P[1] - PT * 0.7 - 1, lw = x.measureText(String(r)).width + 2, lh = fsz + 1, gx = Math.floor(lx / 40), gy = Math.floor(ly / 20);   // skip a label whose box would touch one already placed
+        if (_introCop[r * 513 + M] !== 1 || (_introN > 0 && introKilled(r, M, _introN))) continue;
+        if (((_introStopLM === 'r' || _introStopLM === 'pi') && M !== Math.round(_introStopM)) || (_introStopLM === 'rm' && r !== Math.round(_introStopR))) continue;   /* a sweep labels only the ring or ray it travels */
+        const P = posRM(r, M); if (!P || (P[0] - zx) * (P[0] - zx) + (P[1] - zy) * (P[1] - zy) > zr2) continue;
+        const lt = (_introStopLM === 'rm' || _introStopLM === 'all' || (isCay && !_introStopLM)) ? r + '/' + M : _introStopLM === 'pi' ? (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })() : String(r), lx = P[0] + PT * 0.7 + 2, ly = P[1] - PT * 0.7 - 1, lw = x.measureText(lt).width + 2, lh = fsz + 1, gx = Math.floor(lx / 40), gy = Math.floor(ly / 20);   // skip a label whose box would touch one already placed
         let hit = false; for (let ix = gx - 1; ix <= gx + 1 && !hit; ix++) for (let iy = gy - 1; iy <= gy + 1 && !hit; iy++) { const B = occ.get(ix * 4096 + iy); if (B) for (const b of B) if (lx < b[0] + b[2] && b[0] < lx + lw && ly - lh < b[1] && b[1] - b[3] < ly) { hit = true; break; } }
         if (hit) continue; { const key = gx * 4096 + gy; if (!occ.has(key)) occ.set(key, []); occ.get(key).push([lx, ly, lw, lh]); }
-        x.fillText(String(r), lx, ly); cnt++; }
-      if (_introStopTxt) { x.font = 'italic ' + Math.round(14 * UI) + 'px Georgia, serif'; x.textAlign = 'center'; x.fillStyle = '#d4af37'; x.fillText(_introStopTxt + '  ·  labels: r', Wa / 2, Math.min(bot0 - 8, zy + zr + 22 * UI)); }
+        x.fillText(lt, lx, ly); cnt++; }
+      if (_introStopTxt) { x.font = 'italic ' + Math.round(14 * UI) + 'px Georgia, serif'; x.textAlign = 'center'; x.fillStyle = '#d4af37'; x.fillText(_introStopCap || (_introStopTxt + '  ·  labels: ' + (isCay ? 'r/M' : 'r')), Wa / 2, Math.min(bot0 - 8, zy + zr + 22 * UI)); }
       x.restore();
     }
     if (OPENM && G <= 7) {   // small M while k unwinds: every point is labelled with its r
@@ -7550,22 +7553,26 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
     { const wv = calm ? [99, -1, 0] : introWarp(((_introPaused ? _introPauseAt : now) - _introT0) / 1000); _introT = wv[0]; _introStopNow = (wv[1] >= 0 && !_introExporting) ? { i: wv[1], ph: wv[2] } : null; }
     introViewTick(_introT); introKAnim(_introT - 10);
     if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } introKAnim(_introT - 10); } else if (_introKOn) { _introKOn = false; }
+    _introStopLM = ''; _introStopCap = '';
     { const st = _introStopNow, gm = _introGeo;   // zoom stop: camera in to (r, M), hold with the r labels, back out
       if (st && gm && !_introVUser) {
-        const o0 = INTRO_STOPS[st.i], ez = v => { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }, t0 = st.ph * o0.d, nT = o0.tour ? o0.tour.length : 1, sg = o0.d / nT, jT = Math.min(nT - 1, Math.floor(t0 / sg));
-        let o = o0.tour ? Object.assign({ d: sg, am: 0, aq: 0 }, o0.tour[jT]) : o0, t = t0 - jT * sg, w = ez(t / 1.5) * (1 - ez((t - (o.d - 1.5)) / 1.5)); o = Object.assign({}, o, { Z: o.Z * INTRO_STOP_ZX }); _introStopZ = o.Z;   // a tour: zoom in, hold, out, then the next cluster
+        const o0 = INTRO_STOPS[st.i], ez = v => { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }, t0 = st.ph * o0.d; let nT = o0.tour ? o0.tour.length : 1; const sg = o0.d / nT; let jT = Math.min(nT - 1, Math.floor(t0 / sg));
+        let o = o0.tour ? Object.assign({ d: sg, am: 0, aq: 0 }, o0.tour[jT]) : o0, t = t0 - jT * sg, w = ez(t / 1.5) * (1 - ez((t - (o.d - 1.5)) / 1.5)); if (o0.sweep) {   // a sweep: zoom in once, glide from cluster to cluster at zoom (holding on each), zoom out once
+          const L = o0.sweep, n = L.length, tt = Math.max(0, Math.min(o0.d - 3, t0 - 1.5)), seg = (o0.d - 3) / n, i0 = Math.min(n - 1, Math.floor(tt / seg)), a = L[i0], b = L[Math.min(n - 1, i0 + 1)], hd = a.hold != null ? a.hold : 0.55, fr = (tt - i0 * seg) / seg, u = hd >= 1 ? 0 : hd <= 0 ? Math.max(0, Math.min(1, fr)) : ez((fr - hd) / (1 - hd)); _introStopLM = a.lm || ''; _introStopCap = a.cap || '';   // hold 0: a steady glide (r or M moves linearly)
+          o = { d: o0.d, am: 0, aq: 0, r: a.r + (b.r - a.r) * u, M: a.M + (b.M - a.M) * u, Z: Math.exp(Math.log(a.Z) + (Math.log(b.Z) - Math.log(a.Z)) * u) }; t = t0; w = ez(t0 / 1.5) * (1 - ez((t0 - (o0.d - 1.5)) / 1.5)); jT = i0; nT = n; }
+        o = Object.assign({}, o, { Z: o.Z * INTRO_STOP_ZX }); _introStopZ = o.Z;   // a tour: zoom in, hold, out, then the next cluster
         if (!_introStopBase || _introStopBase.i !== st.i) _introStopBase = { i: st.i, k: _introV.k, fx: _introV.fx, fy: _introV.fy };
         const B = _introStopBase, M0 = Math.max(1, Math.min(gm.G, o.M)), r0 = Math.max(1, Math.min(M0, o.r)), V = _introVw;
         /* while held, the camera walks a loop through the lattice itself (in M and r/M), so it never drifts onto empty plate */
         const hu = ez((t - 1.5) / (o.d - 3)), Rp = Math.max(50, Math.min(gm.W, gm.bot0 - gm.top0) * 0.18), R0 = gm.R / Math.max(1e-6, _introKPaint || _introV.k) * B.k, GZ = gm.GZ || gm.G;
         const AM = Math.min(o.am != null ? o.am : gm.G * 0.3, Rp * GZ / Math.max(1, R0 * o.Z)), sM = M0 + AM > gm.G ? -1 : 1, q0 = r0 / M0, Aq = Math.min(o.aq != null ? o.aq : 0.3, Rp / Math.max(1, 2 * Math.PI * R0 * o.Z * M0 / GZ)), sq = q0 > 0.5 ? -1 : 1;
-        const M = Math.max(1, Math.min(gm.G, M0 + sM * AM * Math.sin(Math.PI * hu))), r = Math.max(1, Math.min(M, M * Math.max(1 / M, Math.min(1, q0 + sq * Aq * 0.5 * (1 - Math.cos(2 * Math.PI * hu))))));
-        const th = _introTh(r, M), rad = _introRad(gm.R, M, gm.GZ); _introStopM = M;
+        const M = Math.max(1, Math.min(gm.G, M0 + sM * AM * Math.sin(Math.PI * hu))), r = o.fixr ? r0 : Math.max(1, Math.min(M, M * Math.max(1 / M, Math.min(1, q0 + sq * Aq * 0.5 * (1 - Math.cos(2 * Math.PI * hu))))));
+        const th = _introTh(r, M), rad = _introRad(gm.R, M, gm.GZ); _introStopM = M; _introStopR = r;
         let px = gm.cx + rad * Math.cos(th), py = gm.cy - rad * Math.sin(th);
         if (V.m > 0.002) { const q = introViewPos(r, M, th, V, gm.cx, gm.cy, gm.R, gm.G, gm.GZ); if (q) { px += (q[0] - px) * V.m; py += (q[1] - py) * V.m; } }
         const kt = B.k * Math.pow(o.Z, w), sc = kt / Math.max(1e-6, _introKPaint || _introV.k), dx = (px - gm.cx) * sc, dy = (py - gm.cy) * sc;
         _introV.k = kt; _introV.fx = B.fx * (1 - w) - w * dx / gm.W; _introV.fy = B.fy * (1 - w) - w * (dy - ((gm.top0 + gm.bot0) / 2 - gm.cy0)) / gm.H;
-        _introZL = ez((w - 0.55) / 0.35); _introStopTxt = 'zoom ×' + Math.round(o.Z) + ' around (r, M) ≈ (' + Math.round(r) + ', ' + Math.round(M) + ')' + (_introN > 0 ? '  ·  C(n), n = ' + _introN + ': r = 1 or prime > ' + (_introN + 1) : '') + (o0.tour ? '  ·  ' + (jT + 1) + ' / ' + nT : '');
+        _introZL = ez((w - 0.55) / 0.35); _introStopTxt = 'zoom ×' + Math.round(o.Z) + ' around (r, M) ≈ (' + Math.round(r) + ', ' + Math.round(M) + ')' + (_introN > 0 ? '  ·  C(n), n = ' + _introN + ': r = 1 or prime > ' + (_introN + 1) : '') + (o0.tour || o0.sweep ? '  ·  ' + (jT + 1) + ' / ' + nT : '');
       } else { if (_introStopBase) { Object.assign(_introV, { k: _introStopBase.k, fx: _introStopBase.fx, fy: _introStopBase.fy }); _introStopBase = null; } _introZL = 0; } }
     _introKPaint = _introV.k;   // the zoom the plate geometry (_introGeo) is drawn with this frame
     paint(x, W, H, _introT - 10);
@@ -7589,7 +7596,7 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
     }
     { const sT = _introT, gm = _introGeo;   // act 1: the placement formula over the sector as it draws, fading out before the spiral
       if (_introSeq && gm && sT < -40) {
-        const fa = Math.max(0, Math.min(1, (sT + INTRO_PRE) / 1.5, (-41 - sT) / 3));   // fades in from the first frame
+        const fa = Math.max(0, Math.min(1, (sT + INTRO_PRE) / 1.5, (-44.2 - sT) / 2.5));   // fades in from the first frame
         if (fa > 0.01) {
           const fs = Math.max(13, Math.min(22, W / 48)), lx = 14, y = W < 600 ? gm.cy + fs * 1.6 : (gm.top0 + gm.bot0) / 2 - fs * 2.2,   /* narrow screens: below the π ray */ rx = 2 * (gm.cx0 != null ? gm.cx0 : W / 2) - 14;   // mid-height, below the stat blocks: placement on the left, sector on the right
           x.save(); x.globalAlpha = fa; x.textAlign = 'left'; x.textBaseline = 'middle'; x.shadowColor = 'rgba(0,0,0,.85)'; x.shadowBlur = 6;
@@ -7611,6 +7618,29 @@ if (stA > 0.01) { x.globalAlpha = baseGA * stA;       blk([[nn ? 'kept, block M�
         if ((sT >= 16 && sT < 36) || (sT >= -24 && sT < -18) || (sT >= -50 && sT < -34)) introAutoFit(1);
         else if ((sT >= 36 && sT < 44) || (sT >= -18 && sT < -8) || (sT >= -34 && sT < -30)) { _introV.k += (1 - _introV.k) * 0.15; _introV.fx *= 0.85; _introV.fy *= 0.85; }
       } }
+    if (_introLens.on && _introPosRM && !_introExporting) {   // magnifier: the canvas under it, scaled up, with labels placed from the true cell positions
+      const L = _introLens, Z = L.z, lr = Math.max(70, Math.min(W, H) * 0.17), sr = lr / Z, lx = L.x, ly = L.y;
+      const pw = Math.ceil(2 * sr * dpr); if (!_introLensOC) _introLensOC = document.createElement('canvas'); const oc = _introLensOC; if (oc.width !== pw) { oc.width = pw; oc.height = pw; }
+      const oq = oc.getContext('2d'); oq.setTransform(1, 0, 0, 1, 0, 0); oq.clearRect(0, 0, pw, pw); oq.drawImage(cv, (lx - sr) * dpr, (ly - sr) * dpr, pw, pw, 0, 0, pw, pw);
+      x.save(); x.beginPath(); x.arc(lx, ly, lr, 0, 7); x.fillStyle = '#05050c'; x.fill(); x.clip(); x.imageSmoothingEnabled = true; x.drawImage(oc, 0, 0, pw, pw, lx - lr, ly - lr, 2 * lr, 2 * lr);
+      const md = INTRO_LENS_MODES[L.m], G2 = _introPosG, n = _introN, occ = new Map(), fs = 9; x.font = fs + 'px monospace'; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.shadowColor = 'rgba(0,0,0,.95)'; x.shadowBlur = 3;
+      let best = null, bd = 1e9, cnt = 0;
+      for (let M = 1; M <= G2; M++) for (let r = 1; r <= (_introAng === 'clamp' ? M : G2); r++) {
+        if (_introCop[r * 513 + M] !== 1) continue; const P = _introPosRM(r, M); if (!P) continue; const dx = P[0] - lx, dy = P[1] - ly, d2 = dx * dx + dy * dy; if (d2 > sr * sr) continue;
+        const kl = n > 0 && introKilled(r, M, n); if (d2 < bd) { bd = d2; best = [r, M, kl]; } if (kl && md !== 'kept') continue; if (cnt > 400) continue;
+        const qx = lx + dx * Z, qy = ly + dy * Z, tx = md === 'r' ? String(r) : md === 'r/M' ? r + '/' + M : md === 'M' ? String(M) : md === 's' ? 's' + Math.floor(M / r) : md === 'kept' ? (kl ? '×' + ((_introPF[r] || []).find(p => (p - (M % p)) % p <= n) || '') : '✓') : (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })();
+        const tw = x.measureText(tx).width + 2, ax = qx + 3, ay = qy - 2, gx = Math.floor(ax / 40), gy = Math.floor(ay / 14); let hit = false;
+        for (let ix = gx - 1; ix <= gx + 1 && !hit; ix++) for (let iy = gy - 1; iy <= gy + 1 && !hit; iy++) { const B = occ.get(ix * 4096 + iy); if (B) for (const b of B) if (ax < b[0] + b[2] && b[0] < ax + tw && ay - fs < b[1] && b[1] - fs < ay) { hit = true; break; } }
+        if (hit) continue; { const k = gx * 4096 + gy; if (!occ.has(k)) occ.set(k, []); occ.get(k).push([ax, ay, tw]); }
+        x.fillStyle = md === 'kept' ? (kl ? '#ff6b6b' : '#5fd38d') : 'rgba(255,248,220,.95)'; x.fillText(tx, ax, ay); cnt++;
+      }
+      x.restore();
+      x.save(); x.strokeStyle = 'rgba(212,175,55,.9)'; x.lineWidth = 1.5; x.beginPath(); x.arc(lx, ly, lr, 0, 7); x.stroke(); x.strokeStyle = 'rgba(212,175,55,.5)'; x.lineWidth = 1; x.beginPath(); x.moveTo(lx - 5, ly); x.lineTo(lx + 5, ly); x.moveTo(lx, ly - 5); x.lineTo(lx, ly + 5); x.stroke();
+      if (best) { const [r, M, kl] = best, a = 2 * r, g = gcd(a, M), th = (a / g === 1 ? '' : a / g) + 'π' + (M / g === 1 ? '' : '/' + M / g); const t = '(r, M) = (' + r + ', ' + M + ')  ·  r/M = ' + r + '/' + M + '  ·  θ = ' + th + '  ·  s = ' + Math.floor(M / r) + (n > 0 ? '  ·  ' + (kl ? 'removed by C(' + n + ')' : 'kept by C(' + n + ')') : '');
+        x.font = '11px monospace'; x.textAlign = 'center'; x.textBaseline = 'top'; const tw = x.measureText(t).width, ty = ly + lr + 6 + 18 > H ? ly - lr - 22 : ly + lr + 6, txc = Math.max(tw / 2 + 4, Math.min(W - tw / 2 - 4, lx));
+        x.fillStyle = 'rgba(5,5,12,.85)'; x.fillRect(txc - tw / 2 - 4, ty - 2, tw + 8, 16); x.fillStyle = '#d4af37'; x.fillText(t, txc, ty); }
+      x.restore();
+    }
     { const sl = $('intro-n-sl'); if (sl && document.activeElement !== sl && +sl.value !== _introN) sl.value = _introN; const nv = $('intro-n-val'); if (nv) nv.textContent = 'n = ' + _introN;
       { const ms = $('intro-m-sl'); if (ms && document.activeElement !== ms && +ms.value !== _introGcur) ms.value = _introGcur; const ml = $('intro-m-val'); if (ml) ml.textContent = 'M ≤ ' + _introGcur; }
       const ps = $('intro-p-sl'); if (ps) { if (document.activeElement !== ps && +ps.value !== _introPi) ps.value = _introPi; const pv = $('intro-p-val'); if (pv) pv.textContent = (_introPrimes[_introPi] || 2) === 1 ? 's = 1 (gcd 1)' : 'p = ' + (_introPrimes[_introPi] || 2); }
@@ -7728,14 +7758,26 @@ let _introHole = 0, _introCM = false, _introGZ = 0, _introSeq = true, _introSeqG
    Touching any control ends the sequence (the intro's own timeline then takes over). */
 /* Zoom stops: at slider time s the play holds for d seconds while the camera eases in to cell (r, M) (zoom Z), shows every r, then eases back out and the play carries on. The slider shows play time, so it rests at s during a stop. */
 var INTRO_STOPS = [
-  { s: -44, r: 5, M: 18, Z: 12 },     // the build: the first rings, up close
+  { s: -44, d: 42, sweep: [                                       // the build, up close: round a ring by r, out along a ray by M, back round by angle (prime rings, so every residue is a point)
+      { r: 1, M: 41, Z: 3, hold: 0, lm: 'r', cap: 'round the ring M = 41 by r: each label is r, the residue r mod 41' },
+      { r: 40, M: 41, Z: 3, hold: 0.3, lm: 'r', cap: 'round the ring M = 41 by r: each label is r, the residue r mod 41' },
+      { r: 5, M: 6, Z: 6, hold: 0, lm: 'rm', cap: 'out along r = 5 by M: each label is r/M; the ray crosses sector s = ⌊M/5⌋ after sector' },
+      { r: 5, M: 60, Z: 6, hold: 0.3, lm: 'rm', cap: 'out along r = 5 by M: each label is r/M; the ray crosses sector s = ⌊M/5⌋ after sector' },
+      { r: 58, M: 59, Z: 3, hold: 0, lm: 'pi', cap: 'back round the ring M = 59 by angle: each label is θ = 2π·r/M in multiples of π' },
+      { r: 1, M: 59, Z: 3, hold: 1, lm: 'pi', cap: 'back round the ring M = 59 by angle: each label is θ = 2π·r/M in multiples of π' }] },
   { s: -38, r: 10, M: 27, Z: 8, am: 6, aq: 0.03 },    // Helix with the gcd-1 spiral: where sectors 1, 2, 3 meet (r/M = 1/2 and 1/3)
   { s: -27, r: 8, M: 24, Z: 30 },     // Grid, the free spiral pass
   { s: -21, r: 30, M: 90, Z: 20 },    // Helix, tilted
-  { s: -15, r: 1, M: 2, Z: 10 },      // Cayley, C(n) locked to the spiral
-  { s: -10.4, d: 22, tour: [                                     // C(n) at n = 78 (spiral p = 79): what survives has r = 1 or r prime > 79; visit each sector's cluster in turn
-      { r: 251, M: 300, Z: 7 }, { r: 101, M: 212, Z: 9 }, { r: 89, M: 270, Z: 10 }, { r: 83, M: 334, Z: 10 }] },   // s = 1, 2, 3, 4
-  { s: 0, r: 171, M: 512, Z: 40 },    // hole .5, the outer ring next to the circle method
+  { s: -15, r: 1, M: 2, Z: 10, am: 40, fixr: true },      // Cayley, C(n) locked: walks along r = 1, which C(n) never removes
+  { s: -10.4, d: 30, sweep: [                                    // C(n) at n = 78 (spiral p = 79): survivors have r = 1 or r prime > 79; glide through every sector's cluster, s = 1 to 6
+      { r: 401, M: 480, Z: 8 }, { r: 251, M: 300, Z: 8 }, { r: 127, M: 150, Z: 9 }, { r: 101, M: 212, Z: 9 }, { r: 89, M: 270, Z: 10 }, { r: 83, M: 334, Z: 10 }, { r: 89, M: 450, Z: 10 }, { r: 83, M: 500, Z: 10 }] },
+  { s: 0, d: 40, sweep: [                                          // hole .5 with the circle method inside: follow the fractions out from the major arcs a/q on the hole's edge
+      { r: 1, M: 2, Z: 5, hold: 0.5, lm: 'all', cap: 'the hole’s edge at r/M = 1/2: the major arc a/q = 1/2 sits just inside; labels r/M' },
+      { r: 128, M: 257, Z: 5, hold: 0.25, lm: 'all', cap: 'out along r/M ≈ 1/2 to the rim: every ring has its fractions near 1/2; labels r/M' },
+      { r: 1, M: 3, Z: 5, hold: 0.5, lm: 'all', cap: 'the hole’s edge at r/M = 1/3, the next major arc; labels r/M' },
+      { r: 170, M: 511, Z: 5, hold: 0.25, lm: 'all', cap: 'out along r/M ≈ 1/3 to the rim; labels r/M' },
+      { r: 2, M: 5, Z: 5, hold: 0.5, lm: 'all', cap: 'r/M = 2/5: a smaller arc (q = 5); labels r/M' },
+      { r: 1, M: 2, Z: 5, hold: 1, lm: 'all', cap: 'back to 1/2; labels r/M' }] },    // hole .5, the outer ring next to the circle method
   { s: 12.5, r: 5, M: 12, Z: 6 },    // hole 1: every ring on the unit circle, equal fractions on one point
   { s: 25, r: 50, M: 200, Z: 20 },    // Helix act, k winding up
   { s: 50, r: 64, M: 255, Z: 30 },    // the slope band sweeping
@@ -7744,7 +7786,31 @@ var INTRO_STOPS = [
 ].map(o => Object.assign({ d: 8 }, o)), _introStopNow = null, _introStopBase = null, _introZL = 0;
 function introWarp(tr) { let acc = 0; for (let i = 0; i < INTRO_STOPS.length; i++) { const o = INTRO_STOPS[i], a = o.s + acc; if (tr < a) break; if (tr < a + o.d) return [o.s, i, (tr - a) / o.d]; acc += o.d; } return [tr - acc, -1, 0]; }   // real clock -> play time (+ the stop being held)
 function introUnwarp(t) { let acc = 0; for (const o of INTRO_STOPS) if (o.s < t) acc += o.d; return t + acc; }   // play time -> real clock (lands just after a stop at t)
-var INTRO_STOP_ZX = 1.6, _introStopM = 0, _introStopZ = 1, _introStopTxt = '', _introKPaint = 0, _introKOn = false, _introHX = [62, 0, 32], INTRO_PRE = 60.79;   // the play opens at -60.79 s (6/π² = 60.79%)
+var _introLens = { on: false, x: -1, y: -1, z: 4, m: 0 }, _introPosRM = null, _introPosG = 1, _introLensOC = null, INTRO_LENS_MODES = ['r', 'r/M', 'θ', 'M', 's', 'kept'];
+function introLensSync() { document.querySelectorAll('.intro-lens-ctl').forEach((b, i) => { b.style.display = _introLens.on ? '' : 'none'; if (i % 2 === 0) b.textContent = 'lens: ' + INTRO_LENS_MODES[_introLens.m]; else b.textContent = '×' + _introLens.z; }); document.querySelectorAll('#intro-lens-btn').forEach(b => b.classList.toggle('on', _introLens.on)); }
+function introLensToggle() { _introLens.on = !_introLens.on; if (_introLens.on && _introGeo && _introLens.x < 0) { _introLens.x = _introGeo.cx0 != null ? _introGeo.cx0 : _introGeo.W / 2; _introLens.y = (_introGeo.top0 + _introGeo.bot0) / 2; } introLensSync(); }
+function introLensMode() { _introLens.m = (_introLens.m + 1) % INTRO_LENS_MODES.length; introLensSync(); }
+function introLensZoom() { const zs = [2, 4, 8, 16]; _introLens.z = zs[(zs.indexOf(_introLens.z) + 1) % zs.length]; introLensSync(); }
+var _introTW = null, _introTWv = 0, _introTWz = 3;
+function introTWStep(px) { return _introTW ? px / 4000 : 0; }   // a scroll notch or a drag of 100 px moves 2.5% of the way through the points
+function introTailWalkUI() { document.querySelectorAll('.intro-tw-ctl').forEach(b => { b.style.display = _introTW ? '' : 'none'; if (b.tagName === 'BUTTON') b.textContent = '×' + _introTWz; if (b.tagName === 'INPUT' && document.activeElement !== b) b.value = Math.round(_introTWv * 1000); }); document.querySelectorAll('#intro-tw-btn').forEach(b => b.classList.toggle('on', !!_introTW)); }
+function introTailWalk() {   // on: pause, measure every drawn cell, and bin them by height so the camera can follow the tail from its bottom up
+  if (_introTW) { _introTW = null; introResetView(); introTailWalkUI(); return; }
+  const gm = _introGeo; if (!gm || !_introPosRM) return; try { introPause(true); } catch (e) {}
+  const pts = []; for (let M = 1; M <= _introPosG; M++) for (let r = 1; r <= (_introAng === 'clamp' ? M : _introPosG); r++) { if (_introCop[r * 513 + M] !== 1) continue; const P = _introPosRM(r, M); if (P) pts.push(P[0] - gm.cx, P[1] - gm.cy); }
+  if (pts.length < 4) return; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (let i = 0; i < pts.length; i += 2) { x0 = Math.min(x0, pts[i]); x1 = Math.max(x1, pts[i]); y0 = Math.min(y0, pts[i + 1]); y1 = Math.max(y1, pts[i + 1]); }
+  const N = pts.length / 2, ord = Array.from({ length: N }, (_, k) => k).sort((a, b) => pts[2 * b + 1] - pts[2 * a + 1]);   // every drawn cell, lowest first: the walk goes point by point, so it always sits on real points
+  const NB = 600, hw = Math.max(1, Math.round(N / 1200)), bins = []; for (let b = 0; b < NB; b++) { const c = Math.round(b / (NB - 1) * (N - 1)); let sx = 0, sy = 0, cn = 0; for (let q = Math.max(0, c - hw); q <= Math.min(N - 1, c + hw); q++) { sx += pts[2 * ord[q]]; sy += pts[2 * ord[q] + 1]; cn++; } bins.push([sx / cn, sy / cn]); }
+  const Wa = 2 * (gm.cx0 != null ? gm.cx0 : gm.W / 2), f0 = Math.min((Wa - 36) / Math.max(1, x1 - x0), (gm.bot0 - gm.top0 - 28) / Math.max(1, y1 - y0));
+  _introVUser = true; _introTW = { bins, kRef: _introKPaint || _introV.k, f0, hgt: Math.max(1, y1 - y0) }; _introTWv = 0; introTailWalkSet(0); introTailWalkUI();
+}
+function introTailWalkSet(v) {   // centre the camera on the tail at height v (0 bottom, 1 top), zoomed _introTWz past the whole-tail fit
+  const T = _introTW, gm = _introGeo; if (!T || !gm) return; _introTWv = Math.max(0, Math.min(1, v));
+  const f = _introTWv * (T.bins.length - 1), i = Math.floor(f), u = f - i, a = T.bins[i], b = T.bins[Math.min(T.bins.length - 1, i + 1)], bx = a[0] + (b[0] - a[0]) * u, by = a[1] + (b[1] - a[1]) * u;
+  const sc = _introTWz, k3 = T.kRef * sc;   /* zoom is relative to the view the walk started from */ _introV.k = k3; _introV.fx = -bx * sc / gm.W; _introV.fy = ((gm.top0 + gm.bot0) / 2 - by * sc - gm.cy0) / gm.H; introTailWalkUI();
+}
+function introTailWalkZoom() { const zs = [2, 3, 6, 12]; _introTWz = zs[(zs.indexOf(_introTWz) + 1) % zs.length]; introTailWalkSet(_introTWv); }
+var _introStopR = 0, _introStopLM = '', _introStopCap = '', INTRO_STOP_ZX = 1.6, _introStopM = 0, _introStopZ = 1, _introStopTxt = '', _introKPaint = 0, _introKOn = false, _introHX = [62, 0, 32], INTRO_PRE = 60.79;   // the play opens at -60.79 s (6/π² = 60.79%)
 var _introSecN = 16;   // sectors drawn (rays, labels) and counted one by one in the intro: 4 (the original), 8, 16, or 0 = all (every s = floor(M/r) up to G); the rest are pooled
 function introSecCycle() { const o = [4, 8, 16, 0], i = o.indexOf(_introSecN); _introSecN = o[(i + 1) % o.length]; _introColC = []; const b = $('intro-sec-btn'); if (b) b.textContent = 'sectors: ' + (_introSecN || 'all'); }
 var INTRO_CORNER_MAX = 6;
@@ -8742,20 +8808,22 @@ function introFitTail() {   // zoom and pan so every drawn cell of the Helix (or
   const ox = ((x0 + x1) / 2 - gm.cx) * f, oy = ((y0 + y1) / 2 - gm.cy) * f, tx = Wa / 2, ty = (gm.top0 + gm.bot0) / 2;
   _introV.k = k2; _introV.fx = (tx - ox - (gm.cx0 != null ? gm.cx0 : gm.W / 2)) / gm.W; _introV.fy = (ty - oy - gm.cy0) / gm.H;
 }
-function introResetView() { Object.assign(_introV, { k: 1, fx: 0, fy: 0 }); for (const k in _introZ) _introZ[k] = { k: 1, fx: 0, fy: 0 }; _introVUser = false; }
+function introResetView() { if (_introTW) { _introTW = null; try { introTailWalkUI(); } catch (e) {} } Object.assign(_introV, { k: 1, fx: 0, fy: 0 }); for (const k in _introZ) _introZ[k] = { k: 1, fx: 0, fy: 0 }; _introVUser = false; }
 function introWireView() {
   const cv = $('intro-cv'); if (!cv || cv._wired) return; cv._wired = true;
   { const es = $('intro-e-sl'); if (es) es.max = _introGbPairs.length - 1; }
   const ptr = new Map(); let moved = 0, pd = 0, start = null;
   const pos = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
-  cv.addEventListener('wheel', e => { e.preventDefault(); const [px, py] = pos(e); introZoomAt(px, py, _introV.k * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
-  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, pos(e)); moved = 0; start = pos(e); if (ptr.size === 2) { const [a, b] = [...ptr.values()]; pd = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
+  cv.addEventListener('wheel', e => { e.preventDefault(); if (_introTW) { introTailWalkSet(_introTWv + introTWStep(-e.deltaY)); return; } const [px, py] = pos(e); introZoomAt(px, py, _introV.k * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr.set(e.pointerId, pos(e)); if (_introLens.on && ptr.size === 1) { const q = pos(e); _introLens.x = q[0]; _introLens.y = q[1]; } moved = 0; start = pos(e); if (ptr.size === 2) { const [a, b] = [...ptr.values()]; pd = Math.hypot(a[0] - b[0], a[1] - b[1]); } });
   cv.addEventListener('pointermove', e => {
     if (!ptr.has(e.pointerId)) return; const old = ptr.get(e.pointerId), now = pos(e); ptr.set(e.pointerId, now);
     if (ptr.size === 2) { const [a, b] = [...ptr.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pd > 0) introZoomAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, _introV.k * d / pd); pd = d; moved = 99; }
+    else if (_introLens.on) { _introLens.x = now[0]; _introLens.y = now[1]; moved = 99; }
+    else if (_introTW) { introTailWalkSet(_introTWv + introTWStep(now[1] - old[1])); moved = 99; }   // drag down = climb up the tail
     else { const dx = now[0] - old[0], dy = now[1] - old[1]; moved += Math.abs(dx) + Math.abs(dy); if (moved > 6 && _introGeo) { _introVUser = true; _introV.fx += dx / _introGeo.W; _introV.fy += dy / _introGeo.H; } }
   });
-  const up = e => { const was = ptr.size; ptr.delete(e.pointerId); if (was === 1 && moved <= 6 && start) introCanvasClick({ clientX: e.clientX, clientY: e.clientY }); if (ptr.size < 2) pd = 0; };
+  const up = e => { const was = ptr.size; ptr.delete(e.pointerId); if (was === 1 && moved <= 6 && start && !_introLens.on) introCanvasClick({ clientX: e.clientX, clientY: e.clientY }); if (ptr.size < 2) pd = 0; };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', e => { ptr.delete(e.pointerId); });
   cv.addEventListener('dblclick', () => introResetView());
 }
