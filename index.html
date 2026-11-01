@@ -1500,7 +1500,7 @@ walk anyway.</p>
     <button class="chip viewchip" data-view="cayley" onclick="setView('cayley')" title="The ring point run through a Möbius map. Conformal, so angles survive and the strip stays a curve — but the measurement is unchanged, only where points sit.">Cayley &mdash; residues mod m</button>
     <button class="chip viewchip" data-view="helix" onclick="setView('helix')" title="The ring with height θ/2π: the angle is not wrapped, so each ring is a helix turn (the Riemann surface of log). The Cayley x and y turns tilt and spin it.">Helix &mdash; unwrapped ring</button>
     <span class="lbl" id="view-lbl"></span>
-    <span class="lbl">classical</span><button class="chip" onclick="clsStep('main', -1)" title="Previous classical view">&#9660;</button><select id="main-cls-sel" onchange="clsSet('main', this.value)" style="background:#0c0e1a;color:var(--cream);border:1px solid rgba(255,255,255,.18);border-radius:4px;font:inherit;font-size:11px;padding:2px 4px;max-width:230px" title="A classical picture of the same lattice at this G, drawn under the plate; exports and the math sheet include it."><option value="">off</option></select><button class="chip" onclick="clsStep('main', 1)" title="Next classical view">&#9650;</button>
+    <span class="lbl">classical</span><button class="chip" onclick="clsStep('main', -1)" title="Previous classical view">&#9660;</button><select id="main-cls-sel" onchange="clsSet('main', this.value)" style="background:#0c0e1a;color:var(--cream);border:1px solid rgba(255,255,255,.18);border-radius:4px;font:inherit;font-size:11px;padding:2px 4px;max-width:230px" title="A classical picture of the same lattice at this G, drawn under the plate; exports and the math sheet include it."><option value="">off</option></select><button class="chip" onclick="clsStep('main', 1)" title="Next classical view">&#9650;</button><button class="chip" onclick="clsPreset('main')" title="Set G to the value this classical view reads best at (picks the first view if none is on). Each view's credit row has the same preset.">preset G</button>
   </div>
 
   <div class="prow">
@@ -3193,6 +3193,42 @@ Full attribution is in the credits panel below.
   all. Nothing here is a new theorem.<div class="cnone">opener and sheet controls &mdash; not reachable from this page&rsquo;s chips</div></td></tr>
   </table></div>
 
+  <h3>The classical views &mdash; ten pictures of the same lattice</h3>
+  <p style="font-size:13px;margin:0 0 8px;color:var(--cream3);">Each is a standard picture from the literature, redrawn at this page's $G$. The chips open that view under the plate at a preset $G$ (the <i>preset G</i> button beside the classical selector does the same). Nothing in these views is a new result.</p>
+  <div class="scroll"><table>
+  <tr><th>Whose</th><th>The view</th></tr>
+
+  <tr><td><b>Euclid</b> (<i>Elements</i> VII, the gcd); <b>Carl Johannes Thomae</b> (1875)</td>
+  <td>Euclid's orchard: a lattice point $(r,M)$ is visible from the origin exactly when $\gcd(r,M)=1$, so the coprime cells of the plate are the trees you can see. Thomae's function $T(r/M)=1/M$ is the same picture seen side-on. The share $\to 6/\pi^2$ is the Mertens&ndash;Ces&agrave;ro row above. The &ldquo;orchard&rdquo; name is later folklore, not Euclid's.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'orchard',cG:48})">G = 48</button><button class="chip" onclick="cgo({cls:'orchard',cG:512})">G = 512</button></div></td></tr>
+
+  <tr><td><b>Lester R. Ford</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">&ldquo;Fractions&rdquo;, Amer. Math. Monthly 45 (1938)</span></td>
+  <td>Ford circles: one circle of radius $1/(2M^2)$ on each reduced $r/M$; two are tangent exactly when $|ad-bc|=1$ and otherwise disjoint. A chart, not a lattice overlay, so it is a view here and in the classical tour but not an intro starting plate.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'ford',cG:24})">G = 24</button><button class="chip" onclick="cgo({cls:'ford',cG:64})">G = 64</button></div></td></tr>
+
+  <tr><td><b>John Farey</b> (1816), <b>Charles Haros</b> (1802), <b>Augustin Cauchy</b> (proof, 1816)</td>
+  <td>The Farey tessellation: join $a/b$ and $c/d$ when $|ad-bc|=1$. Drawn in the disk it is the tiling of the hyperbolic plane by ideal triangles (the Farey graph); the mediant is the next vertex between two neighbours. The disk drawing is standard modern presentation, not Farey's own.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'farey',cG:32})">G = 32</button><button class="chip" onclick="cgo({cls:'farey',cG:128})">G = 128</button></div></td></tr>
+
+  <tr><td><b>Moritz Stern</b> (1858); <b>Achille Brocot</b> (1861)</td>
+  <td>The Stern&ndash;Brocot tree: every positive reduced fraction appears exactly once, generated from $0/1,1/0$ by mediants; $bc-ad=1$ is preserved, which is why each mediant is already reduced. Stern found it in number theory, Brocot in clockmaking gear ratios.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'sb',cG:64})">G = 64</button><button class="chip" onclick="cgo({cls:'sb',cG:256})">G = 256</button></div></td></tr>
+
+  <tr><td><b>P. G. L. Dirichlet</b> (1837); <b>de la Vall&eacute;e Poussin</b> (1896, equidistribution)</td>
+  <td>Primes in progressions: for $\gcd(r,M)=1$ the column $r \bmod M$ holds infinitely many primes, and asymptotically each such class gets the share $1/\varphi(M)$; a class with $\gcd>1$ holds at most one. The view counts primes per residue class. It illustrates the theorem; it does not prove it.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'dirichlet',cG:210})">G = 210</button><button class="chip" onclick="cgo({cls:'dirichlet',cG:1024})">G = 1024</button></div></td></tr>
+
+  <tr><td><b>P. L. Chebyshev</b> (1853 letter); <b>M. Rubinstein</b> &amp; <b>P. Sarnak</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">Experimental Math. 3 (1994)</span></td>
+  <td>Chebyshev's bias: $\pi(x;4,3)$ is ahead of $\pi(x;4,1)$ for most $x$. Littlewood (1914) proved the lead changes sign infinitely often; Rubinstein&ndash;Sarnak computed the logarithmic density $\approx 0.9959$, conditional on GRH and a linear-independence hypothesis. A chart that only moves as $M$ grows, so it plays in the classical tour, not as a starting plate.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'chebyshev',cG:1024})">G = 1024</button><button class="chip" onclick="cgo({cls:'chebyshev',cG:256})">G = 256</button></div></td></tr>
+
+  <tr><td><b>D. H. Lehmer</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">&ldquo;On Euler's totient function&rdquo;, Bull. AMS 38 (1932)</span></td>
+  <td>Lehmer's totient problem: is there a composite $M$ with $\varphi(M)\mid M-1$? None is known; Lehmer showed such an $M$ would have to be odd, squarefree and have at least seven prime factors, and later work raised that bound much further. Open. The view marks which rows satisfy the divisibility, which so far is exactly the primes.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'lehmer',cG:512})">G = 512</button><button class="chip" onclick="cgo({cls:'lehmer',cG:1024})">G = 1024</button></div></td></tr>
+
+  <tr><td><b>A. F. M&ouml;bius</b> (1832); <b>Franz Mertens</b> (1897)</td>
+  <td>$\mu$ and the Mertens walk $M(x)=\sum_{n\le x}\mu(n)$. The identity $[\gcd(r,M)=1]=\sum_{d\mid\gcd}\mu(d)$ is the inversion row above; the walk is drawn for context. Mertens conjectured $|M(x)|<\sqrt x$; Odlyzko and te Riele disproved it (1985). $M(x)=O(x^{1/2+\varepsilon})$ is equivalent to RH.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'mobius',cG:1024})">G = 1024</button><button class="chip" onclick="cgo({cls:'mobius',cG:128})">G = 128</button></div></td></tr>
+
+  <tr><td><b>Srinivasa Ramanujan</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">Trans. Cambridge Phil. Soc. 22 (1918)</span></td>
+  <td>$c_M(r)$, the sum of $e^{2\pi i k r/M}$ over the coprime $k$ in row $M$. Its closed form $\mu(M/g)\varphi(M)/\varphi(M/g)$ with $g=\gcd(r,M)$ (von Sterneck, H&ouml;lder) is what the view colours by. Same object as the void arrow in the Ramanujan row above.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'ramanujan',cG:30})">G = 30</button><button class="chip" onclick="cgo({cls:'ramanujan',cG:210})">G = 210</button></div></td></tr>
+
+  <tr><td><b>C. F. Gauss</b>, <i>Disquisitiones Arithmeticae</i> (1801); <b>Emil Artin</b> (1927)</td>
+  <td>Primitive roots: $(\mathbb Z/M\mathbb Z)^\times$ is cyclic exactly for $M=1,2,4,p^k,2p^k$, and then has $\varphi(\varphi(M))$ generators. Artin's conjecture, that a fixed non-square $a\ne -1$ is a primitive root for infinitely many primes, is open (Hooley proved it under GRH, 1967).<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'primroot',cG:128})">G = 128</button><button class="chip" onclick="cgo({cls:'primroot',cG:512})">G = 512</button></div></td></tr>
+  </table></div>
+
   <h3>Music</h3>
   <p style="font-size:13.5px;margin:0 0 8px;">
   The opener's soundtrack is <b>&ldquo;Riemann Zeta Function&rdquo;</b> by <b>Vince Rubinetti</b>, the
@@ -3709,6 +3745,13 @@ function clsStep(where, d) {   // ▼ / ▲ beside the dropdown: previous / next
   const L = [''].concat(CLS_VIEWS.map(v => v.id)), i = Math.max(0, L.indexOf(CLS[where] || ''));
   if (where === 'intro' && _introClsTour) { introFull(); introClsTourEnd(); }   // stepping during the tour takes over from the script, from the view on screen
   clsSet(where, L[(i + d + L.length) % L.length]);
+}
+/* One preset per classical view: the G at which its picture reads best on the main page
+   (small enough to see single cells where that is the point, large enough for a law to show). */
+const CLS_PRE = { orchard: 48, ford: 24, farey: 32, sb: 64, dirichlet: 210, chebyshev: 1024, lehmer: 512, mobius: 1024, ramanujan: 30, primroot: 128 };
+function clsPreset(where) {
+  let id = CLS[where]; if (!id) { clsSet(where, CLS_VIEWS[0].id); id = CLS[where]; }
+  const g = CLS_PRE[id]; if (where === 'main' && g) { onG(g); clsSet('main', id); }
 }
 function clsSet(where, id) {
   CLS[where] = clsView(id) ? id : ''; clsLblSync();
@@ -8945,7 +8988,7 @@ function introSurvivors(G, N) {   // cells r < M ≤ G with gcd(r, M) = 1 kept a
   const cols = new Map(), perM = [], secN = new Map(); let total = 0;
   for (let M = 2; M <= G; M++) { const row = []; for (let r = 1; r < M; r++) { if (gcd(r, M) !== 1 || introKilled(r, M, N)) continue; total++; row.push(r); let c = cols.get(r); if (!c) { c = { r, n: 0, kind: r === 1 ? 'one' : isP(r) ? 'prime' : 'comp' }; cols.set(r, c); } c.n++; const sv = Math.floor(M / r), k = sv > 6 ? 0 : sv; let e = secN.get(k); if (!e) { e = { s: k, n: 0, set: new Set() }; secN.set(k, e); } e.n++; e.set.add(r); } perM.push({ M, rs: row }); }
   let q = N + 2; while (!isP(q)) q++;
-  const sec = [1, 2, 3, 4, 5, 6, 0].filter(k => secN.has(k)).map(k => { const e = secN.get(k), L = [...e.set].sort((a, b) => a - b); return { s: k, n: e.n, cols: L.length <= 8 ? L.join(', ') : L.slice(0, 7).join(', ') + ' … (' + L.length + ')' }; });
+  const sec = [1, 2, 3, 4, 5, 6, 0].filter(k => secN.has(k)).map(k => { const e = secN.get(k), L = [...e.set].sort((a, b) => a - b); return { s: k, n: e.n, cols: L.length <= 8 ? L.join(', ') : L.slice(0, 7).join(', ') + ' … (' + L.length + ')', colsShort: (L.length <= 10 ? L.join(', ') : L.slice(0, 10).join(', ') + ' …'), nCols: L.length }; });
   return { cols: [...cols.values()].sort((a, b) => a.r - b.r), perM, total, sec, q2: q * q };
 }
 function introSurvivorCv(G, N, S) {   // chips for the surviving columns, then the surviving cells per ring, stacked by sector
@@ -9048,7 +9091,7 @@ function introBuildSheetDoc(E) {
       doc.push({ t: 'h', text: 'Who survives at depth n = ' + N });
       doc.push({ t: 'p', text: 'At depth n every prime p ≤ n + 1 divides one of the n + 1 consecutive rings M, …, M+n, whatever M is, so it removes every column r it divides. The survivors are therefore the columns r with no prime factor ≤ ' + (N + 1) + ': r = 1, the primes above ' + (N + 1) + ', and composites only from (next prime)² = ' + S.q2 + ' on. Here G = ' + G + (S.q2 > G ? ', below that square, so every surviving column is 1 or a prime: at this depth the block sieve is the prime sieve.' : ', so composites can survive too (red).') + ' A surviving column still loses a ring when one of its primes divides some M + j, so each column lists how many rings it survives on.' });
       doc.push({ t: 'iplate', items: [{ label: 'survivors at depth n = ' + N, cv: introSurvivorCv(G, N, S), cls: 'wide' }], cap: S.cols.length + ' surviving columns (gold r = 1, teal primes, red composites' + (comp.length ? ': ' + comp.map(c => c.r).join(', ') : ', none here') + '), ' + S.total + ' surviving cells in all; below, the surviving cells on each ring M, stacked by sector s = ⌊M/r⌋.' });
-      doc.push({ t: 'table', head: ['sector s = ⌊M/r⌋', 'surviving cells', 'share of survivors', 'columns'], rows: S.sec.map(o => ({ label: o.s === 0 ? 's > 6' : 's = ' + o.s, n: String(o.n), pct: (100 * o.n / Math.max(1, S.total)).toFixed(1) + '%', err: o.cols })) });
+      doc.push({ t: 'table', head: ['sector s = ⌊M/r⌋  ·  its columns r', 'cells', 'share', 'columns'], rows: S.sec.map(o => ({ label: (o.s === 0 ? 's > 6' : 's = ' + o.s) + '   ' + o.colsShort, n: String(o.n), pct: (100 * o.n / Math.max(1, S.total)).toFixed(1) + '%', err: String(o.nCols) })) });   // the column list sits in the wide label cell, so nothing in the narrow right-hand cells can overrun
     } } catch (e) {}
   // convergence in G
   doc.push({ t: 'h', text: 'Kept ratio against G' });
@@ -17940,6 +17983,7 @@ function cgo(o) {
   if (o.comet)         _cTry(() => setComet(o.comet));
   if (o.sector)        _cTry(() => { if (!sectorOn) toggleSector(); if (o.sector.all) secAllRays(); else if (o.sector.pick != null) setSectorPick(o.sector.pick); if (o.sector.rays) setSectorRays(o.sector.rays); });
   if (o.lift)          _cTry(() => { if (typeof liftOn !== 'undefined' && !liftOn) liftToggleOn(); if (o.lift.mode) liftSetMode(o.lift.mode); if (o.lift.mirror != null) { liftToggleMirror(o.lift.mirror); const c = $('lift-mirror-chk'); if (c) c.checked = o.lift.mirror; } if (o.lift.n != null) liftSetChainN(o.lift.n); });
+  if (o.cls != null)    _cTry(() => { if (o.cG) onG(o.cG); clsSet('main', o.cls); if (!o.scroll) target = $('main-cls-wrap'); });
   if (o.pf)            _cTry(() => pfFind(o.pf));
   if (o.gp)            _cTry(() => gpmSet(o.gp));
   if (o.blk != null)   _cTry(() => blkSet(o.blk));
