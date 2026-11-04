@@ -864,7 +864,7 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 </div>
 
 <h3>The three views</h3>
-<p><b>Grid</b> plots $(r, M)$ as a square lattice. <b>Ring</b> places ring $M$ at a radius and cell $r$ at angle $2\pi r/M$, so ring $M$ holds the fractions $r/M$ (the Farey structure). <b>Cayley</b> maps the ring plane with $\Gamma(z)=(z-1)/(z+1)$, a M&ouml;bius transformation, with radius $\rho=\rho_0+\rho_D M/G$. The views are presentation only; no count depends on which one is shown. Colouring, labels (r, M, gcd, residue, degrees, and so on) and the G slider are shared by all three.</p>
+<p><b>Grid</b> plots $(r, M)$ as a square lattice. <b>Ring</b> places ring $M$ at a radius and cell $r$ at angle $2\pi r/M$, so ring $M$ holds the fractions $r/M$ (the Farey structure). <b>Cayley</b> maps the ring plane with $\Gamma(z)=(z-1)/(z+1)$, a M&ouml;bius transformation, with radius $\rho=\rho_0+\rho_D M/G$. The views are presentation only; no count depends on which one is shown. <b>Helix</b> is the ring with its angle unwrapped into height. Colouring, labels (r, M, gcd, residue, degrees, and so on) and the G slider are shared by all four.</p>
 
 <h3>The sieve, step by step (what C(n) does)</h3>
 <p>A cell survives to depth $n$ when $r$ is coprime to every one of $M, M+1, \dots, M+n$.</p>
@@ -924,9 +924,9 @@ mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 <div class="dsec-b">
 
 <div class="lead">
-<p>A block $\{M, M+1, \dots, M+n\}$ is $n+1$ adjacent diagonals of the coprimality lattice.
+<p>A block $\{M, M+1, \dots, M+n\}$ is $n+1$ adjacent lines of the coprimality lattice, read with an AND across them.
 Read that way, the gap diagonal identity is the width-1 case, block-coprime density $C(n)$
-is the general width case, and turning the slope from $+1$ to $-1$ gives the configuration
+is the width-$(n{+}1)$ AND case (not a diagonal-strip average; see below), and turning the slope from $+1$ to $-1$ gives the configuration
 Hardy and Littlewood treat for Goldbach. Each of the three is a standard piece of
 elementary or classical analytic number theory. What the lattice adds is that they are
 visibly the same local computation, run at different slopes and widths.</p>
@@ -2777,7 +2777,7 @@ walk anyway.</p>
 <p>The Goldbach comet plots $r(N)$, the number of ordered prime pairs summing to $N$, against
 $N$. It does not form a single curve: it separates into distinct bands. That the bands are
 indexed by $\mathfrak{S}(N)$, and that dividing by $\mathfrak{S}(N)$ merges them, is the
-standard reading of the comet and dates to the same 1923 paper. The panels below reproduce
+standard reading of the comet; it follows from the singular series of the same 1923 paper (the comet plot itself came later). The panels below reproduce
 that normalisation on data computed in the browser. They illustrate a classical prediction;
 they are not an argument for it, and &sect;4 keeps the two apart.</p>
 
@@ -2799,7 +2799,7 @@ is checked against a 400,000-step reference at two points.</p>
 density is $\frac{1}{\log a \log (N-a)}$, giving $\int_2^N \frac{dt}{\log t \,\log(N-t)}$. The
 single-log form used here is the standard stand-in and agrees with it asymptotically, but the
 two differ at relative order $1/\log N$. That is the most likely reason the <b>with $\mathfrak{S}$</b>
-column sits near $0.95$&ndash;$0.97$ rather than $1.00$ &mdash; a systematic, size-dependent
+column sits a few percent below $1.00$ &mdash; a systematic, size-dependent
 deficit, not a failure of $\mathfrak{S}$. The column to read for whether $\mathfrak{S}$ works is
 the <i>spread</i> across neighbouring $N$, not the distance of any single row from $1$.</p>
 </div>
@@ -3221,7 +3221,7 @@ Full attribution is in the credits panel below.
   <td>Chebyshev's bias: $\pi(x;4,3)$ is ahead of $\pi(x;4,1)$ for most $x$. Littlewood (1914) proved the lead changes sign infinitely often; Rubinstein&ndash;Sarnak computed the logarithmic density $\approx 0.9959$, conditional on GRH and a linear-independence hypothesis. A chart that only moves as $M$ grows, so it plays in the classical tour, not as a starting plate.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'chebyshev',cG:1024})">G = 1024</button><button class="chip" onclick="cgo({cls:'chebyshev',cG:256})">G = 256</button></div></td></tr>
 
   <tr><td><b>D. H. Lehmer</b><br><span style="font-family:var(--mono);font-size:10.5px;color:var(--cream3);">&ldquo;On Euler's totient function&rdquo;, Bull. AMS 38 (1932)</span></td>
-  <td>Lehmer's totient problem: is there a composite $M$ with $\varphi(M)\mid M-1$? None is known; Lehmer showed such an $M$ would have to be odd, squarefree and have at least seven prime factors, and later work raised that bound much further. Open. The view marks which rows satisfy the divisibility, which so far is exactly the primes.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'lehmer',cG:512})">G = 512</button><button class="chip" onclick="cgo({cls:'lehmer',cG:1024})">G = 1024</button></div></td></tr>
+  <td>Lehmer's totient problem: is there a composite $M$ with $\varphi(M)\mid M-1$? None is known; Lehmer showed such an $M$ would have to be odd, squarefree and have at least seven prime factors, and Cohen and Hagis (1980) raised it to fourteen, and computations put any solution above $10^{28}$ (Pinch). Claimed proofs, including a January 2026 preprint, have been withdrawn. Open. The view marks which rows satisfy the divisibility, which so far is exactly the primes.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'lehmer',cG:512})">G = 512</button><button class="chip" onclick="cgo({cls:'lehmer',cG:1024})">G = 1024</button></div></td></tr>
 
   <tr><td><b>A. F. M&ouml;bius</b> (1832); <b>Franz Mertens</b> (1897)</td>
   <td>$\mu$ and the Mertens walk $M(x)=\sum_{n\le x}\mu(n)$. The identity $[\gcd(r,M)=1]=\sum_{d\mid\gcd}\mu(d)$ is the inversion row above; the walk is drawn for context. Mertens conjectured $|M(x)|<\sqrt x$; Odlyzko and te Riele disproved it (1985). $M(x)=O(x^{1/2+\varepsilon})$ is equivalent to RH.<div class="cgo" style="display:flex"><button class="chip" onclick="cgo({cls:'mobius',cG:1024})">G = 1024</button><button class="chip" onclick="cgo({cls:'mobius',cG:128})">G = 128</button></div></td></tr>
@@ -3487,7 +3487,8 @@ function clsPrimFactors(n) { const f = []; for (let p = 2; p * p <= n; p++) if (
    them, so the hole, kπ, rotation, Ring / Cayley / Grid / Helix, zoom and point size all carry over; rings are drawn through the same
    map. Without it, a plain ring layout in the box. o.kill(r, M) hides cells the C(n) sieve removes at the current depth. */
 const _clsPC = new Map();
-function clsPrimeClasses(M, P) { let a = _clsPC.get(M); if (!a) { a = new Int32Array(M); for (const p of P) a[p % M]++; _clsPC.set(M, a); } return a; }   // primes < 50000 by residue mod M (kept)
+const clsDirX = M => Math.max(M * M, 10000);   // Dirichlet bound for ring M: x = M², floor 10,000
+function clsPrimeClasses(M, P) { let a = _clsPC.get(M); if (!a) { const X = clsDirX(M); a = new Int32Array(M); let n = 0, c = 0; for (const p of P) { if (p >= X) break; a[p % M]++; n++; if (M % p) c++; } a.n = n; a.cop = c; a.X = X; _clsPC.set(M, a); } return a; }   // primes < x = M² by residue mod M (kept per ring)
 function clsGeo(o, x, y, w, h, G) {
   if (o && o.proj) { const P = o.proj; return { P, kill: o.kill, k: o.ptk || Math.max(1.5, Math.min(w, h) / 2 / Math.max(1, G)), ring(ctx, M, col, lw) { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); let f = true, n = 0; for (let r = 1; r <= M; r++) { const q = P(r, M); if (!q) { f = true; continue; } if (f) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]); f = false; n++; } if (n > 2 && o.closed !== false) ctx.closePath(); ctx.stroke(); } }; }
   const R = Math.min(w, h) / 2 * 0.96, cx = x + w / 2, cy = y + h / 2, k = R / Math.max(1, G);
@@ -3501,7 +3502,7 @@ const CLS_DIRC = ['hsla(215,70%,58%,.9)','hsla(200,65%,56%,.9)','hsla(170,55%,52
 const CLS_VIEWS = [
   { id: 'orchard', f: 'gcd(r, M) = 1  ⇔  (r, M) visible from (0, 0)  ·  T(r/M) = 1/M  ·  #{gcd = 1} / #{r ≤ M ≤ G} → 6/π²', name: "Euclid's orchard · Thomae's function",
     law: 'gcd(r, M) = 1 ⇔ (r, M) is visible from the origin · heights 1/M over r/M are Thomae’s function · share → 6/π²',
-    thm: 'A lattice point (r, M) is visible from the origin, with no other lattice point on the segment to it, exactly when gcd(r, M) = 1: a common divisor d > 1 puts (r/d, M/d) in the way. So the gold cells are the trees one sees standing at the origin of Euclid’s orchard. Read as heights 1/M over the positions r/M, they are Thomae’s (popcorn) function, which is continuous at every irrational and discontinuous at every rational. The share of visible points tends to 6/π² (Dirichlet, Cesàro).',
+    thm: 'A lattice point (r, M) is visible from the origin, with no other lattice point on the segment to it, exactly when gcd(r, M) = 1: a common divisor d > 1 puts (r/d, M/d) in the way. So the gold cells are the trees one sees standing at the origin of Euclid’s orchard. Read as heights 1/M over the positions r/M, they are Thomae’s (popcorn) function, which is continuous at every irrational and discontinuous at every rational. The share of visible points tends to 6/π² (Dirichlet 1849, Mertens 1874).',
     tex: String.raw`\gcd(r,M)=1\iff (r,M)\ \text{visible from }(0,0),\qquad T\!\left(\tfrac rM\right)=\tfrac1M,\qquad \frac{\#\{r\le M\le G:\gcd=1\}}{G(G+1)/2}\to\frac6{\pi^2}`,
     over(ctx, G, o) {   // sightlines on the lattice: from each visible (reduced) point out through its multiples, which it hides
       const P = o.proj, Gc = Math.min(G, CLS_MAXG), k = o.ptk || 2; let vis = 0, cells = 0;
@@ -3542,7 +3543,7 @@ const CLS_VIEWS = [
     } },
   { id: 'farey', f: 'a/b ~ c/d  ⇔  |ad − bc| = 1  ·  the mediant (a + c)/(b + d) is the next vertex between them', name: 'Farey tessellation',
     law: 'Farey neighbours |ad − bc| = 1 joined by hyperbolic geodesics tile the disk by ideal triangles (the modular group) · r/M at the ring angle 2πr/M',
-    thm: 'Join every pair of fractions a/b, c/d with |ad − bc| = 1 (Farey neighbours) by a hyperbolic geodesic. The arcs never cross, and they cut the hyperbolic plane into ideal triangles: the Farey tessellation, on which the modular group SL(2, Z) acts. Every edge appears in the Stern–Brocot recursion (a node and its mediant). Here the boundary point of r/M is put at the ring angle 2πr/M, so the arcs connect the same points the Ring view draws; the connections are exact, the placement is the Ring’s rather than the standard upper-half-plane picture.',
+    thm: 'Join every pair of fractions a/b, c/d with |ad − bc| = 1 (Farey neighbours) by a hyperbolic geodesic. The arcs never cross, and they cut the hyperbolic plane into ideal triangles: the Farey tessellation, on which the modular group PSL(2, Z) acts. Every edge appears in the Stern–Brocot recursion (a node and its mediant). Here the boundary point of r/M is put at the ring angle 2πr/M, so the arcs connect the same points the Ring view draws; the connections are exact, the placement is the Ring’s rather than the standard upper-half-plane picture.',
     tex: String.raw`\frac ab\sim\frac cd\iff |ad-bc|=1,\qquad \frac{a+c}{b+d}\ \text{(mediant)} \text{ is the next vertex between them}`,
     over(ctx, G, o) {   // Farey neighbours joined between the points where they sit (geodesics of the limit disk when the page passes one)
       const Gc = Math.min(G, 72), E = clsSB(Gc); E.sort((u, v) => Math.max(v[0][1], v[1][1]) - Math.max(u[0][1], u[1][1]));
@@ -3557,7 +3558,7 @@ const CLS_VIEWS = [
     } },
   { id: 'sb', f: 'a/b, c/d  ↦  (a + c)/(b + d)  ·  bc − ad = 1  ⇒  gcd(a + c, b + d) = 1', name: 'Stern–Brocot tree',
     law: 'every reduced fraction in (0, 1] appears exactly once · a node is the mediant (a + c)/(b + d) of its two nearest ancestors',
-    thm: 'Start from 0/1 and 1/1 and insert between neighbours a/b and c/d their mediant (a + c)/(b + d). Every positive reduced fraction appears exactly once, already in lowest terms, and the left / right path to it spells its continued fraction (Stern 1858, Brocot 1861). Restricted to denominators ≤ G the tree holds exactly the gold cells r ≤ M ≤ G.',
+    thm: 'Start from 0/1 and 1/1 and insert between neighbours a/b and c/d their mediant (a + c)/(b + d). Every reduced fraction in (0, 1) appears exactly once (seeded with 1/0 instead of 1/1, the full tree gives every positive fraction), already in lowest terms, and the left / right path to it spells its continued fraction (Stern 1858, Brocot 1861). Restricted to denominators ≤ G the tree holds exactly the gold cells r ≤ M ≤ G.',
     tex: String.raw`\frac ab,\ \frac cd\ \longmapsto\ \frac{a+c}{b+d},\qquad bc-ad=1\ \Rightarrow\ \gcd(a+c,\,b+d)=1`,
     over(ctx, G, o) {   // the Stern–Brocot tree drawn on the lattice: each fraction joined to its parent (the mediant step)
       const Gc = Math.min(G, CLS_MAXG), E = []; const rec = (lo, hi, par) => { const m = [lo[0] + hi[0], lo[1] + hi[1]]; if (m[1] > Gc) return; if (par) E.push([par, m]); rec(lo, m, m); rec(m, hi, m); }; rec([0, 1], [1, 1], [1, 1]);
@@ -3580,16 +3581,16 @@ const CLS_VIEWS = [
 
   { id: 'dirichlet', f: 'π(x; M, r) ~ π(x)/φ(M)  for gcd(r, M) = 1  ·  π(x; M, r) ≤ 1  for gcd(r, M) > 1', ring: true, name: 'Dirichlet · primes in progressions',
     law: 'Dirichlet (1837): primes fall evenly into the φ(M) classes r with gcd(r, M) = 1, and never into the others (except p | M)',
-    thm: 'For gcd(r, M) = 1 there are infinitely many primes p ≡ r (mod M), and by the prime number theorem for progressions each such class receives asymptotically 1/φ(M) of all primes. A class with gcd(r, M) > 1 holds at most one prime (a divisor of M). On ring M the dot area is the count of primes below the bound in the class of r, scaled to the fair share π(x)/φ(M); the points keep their sector colours. A red cross marks a class with gcd(r, M) > 1 that still holds its one prime: that prime p divides M and r = p, so r/M = 1/(M/p) and every cross sits on a sector boundary 1/n. These are the same cells where the prime spiral r = p turns red: a prime p shares a factor with M only when p | M, and then p/M reduces to 1/(M/p), never to any other a/b. On the 1/2 line they are 2/4, 3/6, 5/10, 7/14, … (r = p, M = 2p); on 1/n they are p/(np). Dirichlet’s theorem is the other half, which no single column shows: the primes larger than M, wrapped to p mod M, fill every coprime class of ring M, and in equal shares.',
+    thm: 'For gcd(r, M) = 1 there are infinitely many primes p ≡ r (mod M), and by the prime number theorem for progressions each such class receives asymptotically 1/φ(M) of all primes. A class with gcd(r, M) > 1 holds at most one prime (a divisor of M). Each ring M is counted with its own bound x = M² (at least 10,000), so the bound grows with the grid: the dot area on ring M is the number of primes p < x with p ≡ r (mod M), divided by the fair share π(x)/φ(M) (primes dividing M excluded), so a dot of area 1 is exactly fair; the points keep their sector colours. On ring 512, for example, x = 262,144 holds 23,000 primes, about 90 per class, and the classes range 0.83–1.22 × fair. That scatter is ordinary sampling noise of order 1/√(fair share); the theorem says only that every ratio tends to 1 as x → ∞, and with x = M² the scatter stays roughly the same at every G instead of growing as the rings multiply. A red cross marks a class with gcd(r, M) > 1 that still holds its one prime: that prime p divides M and r = p, so r/M = 1/(M/p) and every cross sits on a sector boundary 1/n. These are the same cells where the prime spiral r = p turns red: a prime p shares a factor with M only when p | M, and then p/M reduces to 1/(M/p), never to any other a/b. On the 1/2 line they are 2/4, 3/6, 5/10, 7/14, … (r = p, M = 2p); on 1/n they are p/(np). Dirichlet’s theorem is the other half, which no single column shows: the primes larger than M, wrapped to p mod M, fill every coprime class of ring M, and in equal shares.',
     tex: String.raw`\pi(x;M,r)\sim\frac{\pi(x)}{\varphi(M)}\quad(\gcd(r,M)=1),\qquad \pi(x;M,r)\le 1\quad(\gcd(r,M)>1)`,
     draw(ctx, x, y, w, h, G, fs, o) {
-      const Gc = Math.min(G, CLS_MAXG), X = 50000, N = clsNT(X), P = N.primes.filter(p => p < X), g = clsGeo(o, x, y, w, h, Gc), cnt = new Map(); let lo = Infinity, hi = 0;
+      const Gc = Math.min(G, CLS_MAXG), X = clsDirX(Gc), N = clsNT(X), P = N.primes, g = clsGeo(o, x, y, w, h, Gc), cnt = new Map(); let lo = Infinity, hi = 0;
       if (!(o && o.overlay)) for (let M = 1; M <= Gc; M++) g.ring(ctx, M, 'rgba(255,255,255,.06)', 0.6);
-      for (let M = 2; M <= Gc; M++) { const m = clsPrimeClasses(M, P); const ex = P.length / N.phi[M];
+      for (let M = 2; M <= Gc; M++) { const m = clsPrimeClasses(M, P); const ex = m.cop / N.phi[M];
         for (let r = 1; r <= M; r++) { const q = g.P(r, M); if (!q) continue; const n = m[r % M];
           if (clsIsCop(r, M)) { if (g.kill && g.kill(r, M)) continue; const v = n / ex; if (M === Gc) { lo = Math.min(lo, v); hi = Math.max(hi, v); } clsDot(ctx, q[0], q[1], Math.max(1, Math.min(g.k * 1.6, g.k * 0.9 * Math.sqrt(v))), clsCol(r, M, .9)); }
           else if (n) { const z = Math.max(2, g.k * 0.4); clsLine(ctx, q[0] - z, q[1] - z, q[0] + z, q[1] + z, '#ff6b6b', 1); clsLine(ctx, q[0] - z, q[1] + z, q[0] + z, q[1] - z, '#ff6b6b', 1); } } }
-      return P.length + ' primes < ' + X + '  ·  ring M = ' + Gc + ': each class holds ' + (isFinite(lo) ? lo.toFixed(2) + '–' + hi.toFixed(2) : '—') + ' × its fair share π(x)/φ(M) (dot size)  ·  × = the one prime p | M, on the 1/n boundaries' + (Gc < G ? '  ·  rings ≤ ' + Gc : '');
+      { const m = clsPrimeClasses(Gc, P), ex = m.cop / N.phi[Gc]; return 'ring M = ' + Gc + ': ' + m.n.toLocaleString('en-US') + ' primes < x = ' + (Gc * Gc >= 10000 ? 'M² = ' + X.toLocaleString('en-US') : '10,000 (floor, since M² < 10,000)') + '  ·  fair share π(x)/φ(M) = ' + ex.toFixed(1) + ' per class; classes hold ' + (isFinite(lo) ? lo.toFixed(2) + '–' + hi.toFixed(2) : '—') + ' × it (dot area), scatter ~1/√' + ex.toFixed(0) + '  ·  × = a prime p | M, on the 1/n boundaries' + (Gc < G ? '  ·  rings ≤ ' + Gc : ''); }
     } },
   { id: 'chebyshev', sec: false, f: 'Δ(x) = π(x; 4, 3) − π(x; 4, 1)  ·  Δ(x) > 0 for most x  ·  log-density ≈ 0.9959 (Rubinstein–Sarnak)', name: "Chebyshev's bias · the prime race",
     law: 'Chebyshev (1853): primes ≡ 3 (mod 4) lead primes ≡ 1 (mod 4) for most x · the lead still changes hands infinitely often (Littlewood 1914)',
@@ -3611,8 +3612,8 @@ const CLS_VIEWS = [
       return 'x = ' + X + ': π(x;4,3) − π(x;4,1) = ' + R4[R4.length - 1][1] + '  ·  3 mod 4 ahead after ' + (100 * ahead / R4.length).toFixed(1) + '% of the primes';
     } },
   { id: 'lehmer', sec: false, f: 'φ(M) | M − 1  ⇒?  M prime  ·  (p² − 1)/φ(p²) = (p + 1)/p', ring: true, name: "Lehmer's totient problem",
-    law: 'open since 1932: is there a composite M with φ(M) | M − 1? any one is a Carmichael number, odd, squarefree, > 10²², with ≥ 14 prime factors',
-    thm: 'Ring M carries φ(M) gold points, and for a prime M that is M − 1, so (M − 1)/φ(M) = 1. Lehmer (1932) asked whether a composite M can have φ(M) dividing M − 1. None is known. Any such M must be a Carmichael number, odd and squarefree, with at least 7 prime factors (Lehmer); the bounds now stand at 14 prime factors and M > 10²² (Cohen–Hagis 1980, Pinch). The closest composites on the plate are prime squares p², where (M − 1)/φ(M) = (p + 1)/p, just above 1 and never whole.',
+    law: 'open since 1932: is there a composite M with φ(M) | M − 1? any one is a Carmichael number, odd, squarefree, > 10²⁸, with ≥ 15 prime factors (Pinch)',
+    thm: 'Ring M carries φ(M) gold points, and for a prime M that is M − 1, so (M − 1)/φ(M) = 1. Lehmer (1932) asked whether a composite M can have φ(M) dividing M − 1. None is known. Any such M must be a Carmichael number, odd and squarefree, with at least 7 prime factors (Lehmer); Cohen and Hagis (1980) raised that to 14 prime factors and M > 10²⁰, and Pinch to 15 prime factors and M > 10²⁸. The closest composites on the plate are prime squares p², where (M − 1)/φ(M) = (p + 1)/p, just above 1 and never whole.',
     tex: String.raw`\varphi(M)\mid M-1\ \overset{?}{\Longrightarrow}\ M\ \text{prime},\qquad \frac{p^2-1}{\varphi(p^2)}=\frac{p+1}{p}`,
     draw(ctx, x, y, w, h, G, fs, o) {
       const N = clsNT(G + 1), ov = o && o.overlay, Gc = Math.min(G, CLS_MAXG), lw = ov ? w : Math.min(w * 0.55, h), g = clsGeo(o, x, y + (h - lw) / 2, lw, (o && o.proj) ? h : lw, Gc);
@@ -3628,7 +3629,7 @@ const CLS_VIEWS = [
     } },
   { id: 'mobius', sec: false, f: '[gcd(r, M) = 1] = Σ_{d | gcd(r, M)} μ(d)  ·  Σ μ(n)/n² = 1/ζ(2) = 6/π²', ring: true, name: 'Möbius μ · the Mertens walk',
     law: 'Σ μ(n)/n² = 1/ζ(2) = 6/π², the gold density · M(x) = Σ μ(n) stays within ±√x as far as computed, yet not forever (Odlyzko–te Riele 1985)',
-    thm: 'μ(n) is (−1)^k for a product of k distinct primes and 0 when a square divides n. Möbius inversion turns the gcd = 1 condition into Σ_{d | gcd} μ(d), which gives the density Σ μ(d)/d² = 1/ζ(2) = 6/π² of the gold cells. The Mertens function M(x) = Σ_{n ≤ x} μ(n) wanders like a random walk; |M(x)| < √x holds for every x ever computed, but Odlyzko and te Riele (1985) proved it fails somewhere. M(x) = O(x^{1/2 + ε}) for every ε > 0 is equivalent to the Riemann hypothesis.',
+    thm: 'μ(n) is (−1)^k for a product of k distinct primes and 0 when a square divides n. Möbius inversion turns the gcd = 1 condition into Σ_{d | gcd} μ(d), which gives the density Σ μ(d)/d² = 1/ζ(2) = 6/π² of the gold cells. The Mertens function M(x) = Σ_{n ≤ x} μ(n) wanders like a random walk; |M(x)| < √x holds for every x > 1 ever computed, but Odlyzko and te Riele (1985) proved it fails somewhere. M(x) = O(x^{1/2 + ε}) for every ε > 0 is equivalent to the Riemann hypothesis.',
     tex: String.raw`[\gcd(r,M)=1]=\sum_{d\mid\gcd(r,M)}\mu(d),\qquad \sum_{n\ge1}\frac{\mu(n)}{n^2}=\frac1{\zeta(2)}=\frac6{\pi^2}`,
     draw(ctx, x, y, w, h, G, fs, o) {
       const N = clsNT(G), ov = o && o.overlay, Gc = Math.min(G, CLS_MAXG), lw = ov ? w : Math.min(w * 0.55, h), g = clsGeo(o, x, y + (h - lw) / 2, lw, (o && o.proj) ? h : lw, Gc);
@@ -3803,12 +3804,11 @@ function clsPlate(ctx, id, P, G, o) {
 function clsOpenerDraw() { try { clsBoxDraw('ol-cls-wrap', 'welcome-cv-cls', clsIsLayer(CLS.opener) ? '' : CLS.opener, OPENER_G, clsOpenerOpt()); } catch (e) {} try { openerRedrawSoon(); } catch (e) {} }   // layers go on the opener's own plates; only the two plots keep the panel
 function clsMainDraw() { try { if (typeof COP_G !== 'undefined' && COP_G) clsBoxDraw('main-cls-wrap', 'main-cls-cv', clsIsLayer(CLS.main) ? '' : CLS.main, COP_G, clsMainOpt()); } catch (e) {} }
 function clsMainPlate(ctx, S) { if (!clsIsLayer(CLS.main)) return; const o = clsMainOpt(); clsPlate(ctx, CLS.main, (r, M) => sectorXY(r, M, S), COP_G, { kill: o.kill, closed: o.closed, ptk: Math.max(1.1, S / Math.min(COP_G, CLS_MAXG) * 0.5) }); }
-function msClsPush(doc, id, G, opt) {   // math-sheet section for a classical view: the theorem, its formula and the picture at this G
+function msClsPush(doc, id, G, opt, plateOnly) {   // math-sheet section for a layer: the theorem, its formula and the picture at this G (plateOnly: the text is already on the sheet)
   const V = clsView(id); if (!V) return;
   const cv = document.createElement('canvas'); cv.width = 1600; cv.height = 1000; clsDraw(id, cv.getContext('2d'), 0, 0, 1600, 1000, G, Object.assign({ k: 1.25 }, opt || {}));
-  doc.push({ t: 'h', text: 'Classical view · ' + V.name });
-  doc.push({ t: 'p', text: V.thm });
-  if (V.tex) doc.push({ t: 'eq', tex: V.tex });
+  doc.push({ t: 'h', text: 'Layer · ' + V.name + (plateOnly ? ' · the plate' : '') });
+  if (!plateOnly) { doc.push({ t: 'p', text: V.thm }); if (V.tex) doc.push({ t: 'eq', tex: V.tex }); }
   doc.push({ t: 'plate', items: [{ label: V.name + ' at M ≤ ' + G, cv: cv, cls: 'wide' }] });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { try { clsFillSelects(); } catch (e) {} }); else setTimeout(() => { try { clsFillSelects(); } catch (e) {} }, 0);
@@ -4529,7 +4529,7 @@ function openerClass(mode, r, M) {
     case 'sat': {
       const lim = blockN() + 1;
       for (let q = 2; q <= lim; q++) if (r % q === 0 && spfOf(q) === q && blkSat(q, blockN())) return C('prime ' + q + ' | r  \u00b7 killed', q);
-      return cop ? C('no saturated prime \u00b7 gcd = 1', 1000) : C('no saturated prime \u00b7 gcd > 1', 1001);
+      return lim <= 1 ? (cop ? C('coprime \u00b7 gcd = 1 (n = 0: no prime is saturated yet)', 1000) : C('not coprime \u00b7 gcd > 1', 1001)) : cop ? C('no saturated prime \u00b7 gcd = 1', 1000) : C('no saturated prime \u00b7 gcd > 1', 1001);
     }
     case 'failp': {
       const f = firstFail(r, M, blockN(), COP_G);
@@ -8060,8 +8060,8 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
         secCols = []; for (let i = 0; i < L.length; i += rowsCol) secCols.push(L.slice(i, i + rowsCol)); secRows = Math.min(L.length, rowsCol);
       }
       if (stA > 0.01 && !SECH) { x.globalAlpha = baseGA * stA; if (secCols) { x.font = fs + 'px monospace'; x.textAlign = 'right'; secCols.forEach((col, ci) => col.forEach((l, i) => { x.fillStyle = l[1]; x.fillText(l[0], Wa - 10 - ci * secColW, y0 + i * lh); })); } else blk(sec, true, y0, false); x.globalAlpha = baseGA; }
-      if (_introGbOn && _introGbPairs.length) { const g2 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], GO = '#ffd36b', E2 = 2 * (G + 1), th = introGbTheory(E2), act = _introGbPairs.length, f1 = v => v.toFixed(1), er = v => (v >= act ? '+' : '\u2212') + Math.abs((v - act) / act * 100).toFixed(1) + '%';
-        const gl = [['Goldbach E = ' + E2, GO], ['actual ' + act + ' pairs (' + (2 * act) + ' ordered)', '#fff'], ['formula (H–L) ' + f1(th.hl) + '  ' + er(th.hl), th.hl >= act ? GR : RD], ['circle q≤12 ' + f1(th.cm) + '  ' + er(th.cm), th.cm >= act ? GR : RD]]; if (_introExporting) gl.push(['marker (' + g2 + ', ' + (E2 - g2) + ') \u00b7 pair ' + (Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + act, GO]); const gy0 = y0 + ((secRows || sec.length) + 1) * lh * stA; if (!(_introSeq && !_introExporting && _introT < -54.5)) { blk(gl, true, gy0, false);
+      if (_introGbOn && _introGbPairs.length) { const g2 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], GO = '#ffd36b', E2 = 2 * (G + 1), th = introGbTheory(E2), act = _introGbPairs.length, f1 = v => v.toFixed(1), er = v => (act >= v ? '+' : '\u2212') + Math.abs((act - v) / v * 100).toFixed(1) + '%';
+        const gl = [['Goldbach E = ' + E2, GO], ['actual ' + act + ' pairs (' + (2 * act) + ' ordered)', '#fff'], ['formula (H–L) ' + f1(th.hl) + '  ' + er(th.hl), th.hl <= act ? GR : RD], ['circle q≤12 ' + f1(th.cm) + '  ' + er(th.cm), th.cm <= act ? GR : RD]]; if (_introExporting) gl.push(['marker (' + g2 + ', ' + (E2 - g2) + ') \u00b7 pair ' + (Math.min(_introGbI, _introGbPairs.length - 1) + 1) + ' of ' + act, GO]); const gy0 = y0 + ((secRows || sec.length) + 1) * lh * stA; if (!(_introSeq && !_introExporting && _introT < -54.5)) { blk(gl, true, gy0, false);
           if (_introExporting && _introMk) { const ly = gy0 + (gl.length - 1) * lh, tw = x.measureText(gl[gl.length - 1][0]).width; x.save(); x.setLineDash([2 * UI, 3 * UI]); x.strokeStyle = 'rgba(255,211,107,.65)'; x.lineWidth = 1.2 * UI; x.beginPath(); x.moveTo(_introMk[0] + 5 * UI, _introMk[1]); x.lineTo(Wa - 10 - tw - 6, ly - fs * 0.35); x.stroke(); x.restore(); } } }   // exports: a dotted leader from the marker to its line in the corner
       if (ST) { const TL = 'rgba(61,200,184,1)', sh2 = stN ? stC / stN : 0; blk([['slope ' + ST.a + '/' + ST.b + ' = ' + (ST.a / ST.b).toFixed(4), TL], ['w ' + ST.w + ' · off ' + String(ST.s).replace('-', '\u2212'), TL], ['cells ' + stN, TL], ['coprime ' + stC, TL], [(sh2 * 100).toFixed(2) + '% of band', TL], [(cop ? (100 * stC / cop).toFixed(1) : '0') + '% of kept', TL], [(six ? (sh2 / six).toFixed(3) : '0') + '× ' + (nn ? 'D(n)' : '1/ζ(2)'), TL]], false, y0 + 6 * lh * stA, false); }
       let pc = 0; for (let n = 2; n <= G; n++) { let ok = true; for (let d = 2; d * d <= n; d++) if (n % d === 0) { ok = false; break; } if (ok) pc++; }
@@ -8383,6 +8383,21 @@ var INTRO_STOPS = [
 ].map(o => Object.assign({ d: 8 }, o)), _introStopNow = null, _introStopBase = null, _introZL = 0;
 function introWarp(tr) { let acc = 0; for (let i = 0; i < INTRO_STOPS.length; i++) { const o = INTRO_STOPS[i], a = o.s + acc; if (tr < a) break; if (tr < a + o.d) return [o.s, i, (tr - a) / o.d]; acc += o.d; } return [tr - acc, -1, 0]; }   // real clock -> play time (+ the stop being held)
 var _introActU = null, _introCapFn = null;
+/* The closing loop: a cycle of charts, each at its own M = G; M slides to it, then every Goldbach pair of E = 2(G + 1) is visited once
+   with the strip locked and the camera on the marker, then on to the next chart. Ring sits between the others so each change is a
+   single blend. Durations follow the pair counts, so the cycle is fixed and scrubbing lands on the same frame. */
+const INTRO_LOOP = [['cay', 60], ['ring', 90], ['grid', 120], ['ring', 150], ['hel', 100], ['ring', 74]], INTRO_LOOP_MV = 3, INTRO_LOOP_PAIR = 1.2, INTRO_LOOP_HOLD = 1;
+let _introLoopS = null;
+function introLoopSched() {
+  if (_introLoopS) return _introLoopS; const isP = n => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; };
+  let t = 0; const L = INTRO_LOOP.map(([v, G]) => { const E = 2 * (G + 1); let n = 0; for (let p = 2; p <= E / 2; p++) if (isP(p) && isP(E - p)) n++; const d = INTRO_LOOP_MV + n * INTRO_LOOP_PAIR + INTRO_LOOP_HOLD, o = { v, G, n, t0: t, d }; t += d; return o; });
+  return _introLoopS = { L, P: t };
+}
+function introLoopAt(t) {   // t = seconds into the loop -> { seg, prev, u (seconds into the segment), G, pair index }
+  const S = introLoopSched(), tt = ((t % S.P) + S.P) % S.P; let i = 0; while (i < S.L.length - 1 && tt >= S.L[i + 1].t0) i++;
+  const o = S.L[i], pv = S.L[(i + S.L.length - 1) % S.L.length], u = tt - o.t0, e = Math.max(0, Math.min(1, u / INTRO_LOOP_MV)), ez = e * e * (3 - 2 * e);
+  return { o, pv, u, G: Math.round(pv.G + (o.G - pv.G) * ez), gi: u < INTRO_LOOP_MV ? 0 : Math.min(o.n - 1, Math.floor((u - INTRO_LOOP_MV) / INTRO_LOOP_PAIR)), mv: ez };
+}
 function _introIsP(n) { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }   // seconds into the opening acts, or null
 function introDispT(T) { if (_introActU != null) return -44 + _introActU; if (T > -44 || _introStopNow) return T + INTRO_ACTS; return T; }   // the clock shown: the script's time with the acts' INTRO_ACTS s inserted at -44
 function introDispUnwarp(D) { if (D < -44) return introUnwarp(D); if (D < -44 + INTRO_ACTS) return introUnwarp(-44) + (D + 44); const T = D - INTRO_ACTS; return T <= -44 ? introUnwarp(-44) + INTRO_ACTS : introUnwarp(T); }   // the clock shown -> real clock
@@ -8989,7 +9004,7 @@ function introViewTick(T) {
        back to the plain ring while the ten classical views take turns on the lattice (INTRO_CLS_SEG s each, M growing under each);
        everything after it runs as before, shifted by the tour's length. */
     const Tr0 = T, DL = 16.5, CT = Tr0 >= 150 && Tr0 < 150 + INTRO_CLS_T ? Tr0 - 150 : -1, Tr = Tr0 >= 150 + INTRO_CLS_T ? Tr0 - INTRO_CLS_T : CT >= 0 ? 149.99 : Tr0; let sweep = false;
-    if (Tr >= 150) { _introGM = Tr < 158 ? Math.round(512 - 412 * es((Tr - 150) / 8)) : Math.round(100 + 40 * Math.sin(2 * Math.PI * (Tr - 158) / 64)); _introGMscr = true; } else if (_introGMscr) { _introGMscr = false; _introGM = null; }   // from 160 s on the slider: M slides down to 100, then goes in and out (60 to 140); the Goldbach pair is held and the slope stays locked to it
+    if (Tr >= 150) { _introGM = Tr < 158 ? Math.round(512 - 412 * es((Tr - 150) / 8)) : introLoopAt(Tr - 158).G; _introGMscr = true; } else if (_introGMscr) { _introGMscr = false; _introGM = null; }   // from 160 s on the slider: M slides down to 100, then goes in and out (60 to 140); the Goldbach pair is held and the slope stays locked to it
     /* The C(n) sieve plays once the ring is open (27 to 34 s), and keeps looping to the end of the play, every loop 1.43x slower than the one before (7 s, 10 s, 14 s, 20 s, 29 s, ...): the prime p climbs through the primes up to 251 and back, block depth n = p - 1, so every column r that p (or any smaller prime) divides is struck out, then the survivors return as n falls back to 0. The prime spiral follows the same p. */
     if (false) { let t0 = 27, d = 7; while (Tr >= t0 + d) { t0 += d; d *= 1.43; } const u = (Tr - t0) / d, f = u < 0.5 ? 2 * u : 2 - 2 * u, pi = Math.max(0, Math.min(_introPr256.length - 1, Math.round(f * (_introPr256.length - 1)))); _introSieveP = _introPr256[pi]; _introN = _introSieveP - 1; }
     else if (_introSieveP) { _introSieveP = 0; _introN = 0; }
@@ -9014,12 +9029,12 @@ function introViewTick(T) {
       else if (inWin) {
         if (sweep) { const Gc = Math.max(2, Math.round(_introGcur || 2)), u = Math.max(0, Math.min(1, (Tr - 34) / 10)), k = 1 + Math.round(Gc * (u < 0.55 ? u / 0.55 : (1 - u) / 0.45)); S.a = 1; S.b = 2; S.s = -k; S.w = 2 * k; }
         else if (T < 36.5) { S.a = 1; S.b = 2; S.s = -1; S.w = 2; }
-        else if (T >= 56 && _introGbPairs.length) { const Lg = _introGbPairs.length, g = _introGbPairs[Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg)], Ee = 2 * (Math.round(_introGcur || 1) + 1), sP = Ee - g, d = gcd(g, sP); S.a = g / d; S.b = sP / d; S.w = 2 * S.b; S.s = -S.b; }   // Goldbach time: the strip follows the marker (g, E - g), i.e. the line r/M = g/(E - g) through it, 2 cells thick
+        else if (T >= 56 && _introGbPairs.length) { const Lg = _introGbPairs.length, g = _introGbPairs[Tr >= 158 ? Math.min(Lg - 1, introLoopAt(Tr - 158).gi) : Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg)], Ee = 2 * (Math.round(_introGcur || 1) + 1), sP = Ee - g, d = gcd(g, sP); S.a = g / d; S.b = sP / d; S.w = 2 * S.b; S.s = -S.b; }   // Goldbach time: the strip follows the marker (g, E - g), i.e. the line r/M = g/(E - g) through it, 2 cells thick
         else { if (!_introFar) { _introFar = []; for (let q = 1; q <= 12; q++) for (let p2 = 1; p2 <= q; p2++) if (gcd(p2, q) === 1 && p2 * 2 >= q) _introFar.push([p2, q]); _introFar.sort((u, v) => v[0] * u[1] - u[0] * v[1]); } const L = _introFar.length, P = 2 * (L - 1), n = Math.floor((T - 36.5) / 0.35) % P, f = _introFar[n < L ? n : P - n]; S.a = f[0]; S.b = f[1]; S.s = -f[1]; S.w = 2 * f[1]; }
         S.on = true; S.scr = true; try { introStripSync(); } catch (e) {}
       } else if (S.scr && !S.timer && !S.scanT) { S.scr = false; S.on = false; } }
     { const inGb = T >= 56 && !_introGbTimer;   // scripted Goldbach: from 56 s to the end (it carries on into the final Cayley section), the pair g + s = E steps through every pair once (the prime scan pauses meanwhile)
-      if (inGb) { _introGbOn = true; _introGbScr = true; const Lg = Math.max(1, _introGbPairs.length); _introGbI = Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg); }
+      if (inGb) { _introGbOn = true; _introGbScr = true; const Lg = Math.max(1, _introGbPairs.length); _introGbI = Tr >= 158 ? Math.min(Lg - 1, introLoopAt(Tr - 158).gi) : Tr >= 150 ? Math.min(2, Lg - 1) : introGbIdxAt(T, Lg); }
       else if (_introGbScr) { _introGbScr = false; if (!_introGbTimer) _introGbOn = false; _introV.k = 1; _introV.fx = 0; _introV.fy = 0; introSetHole(0); _introCM = false; const cb0 = $('intro-cm-btn'); if (cb0) cb0.classList.remove('on'); }
       if (_introGbScr && inGb) {   // the marker (g, E - g) has M > G: hole 0.5 pulls the outer rings in (radius 0.5 + 0.5 M/G), the plate zooms out so M up to 2G fits, and the circle method is on
         const e5 = sg(56, 57.5); introSetHole(0.5 * e5); { const g5 = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)] || 5, E5 = 2 * (Math.round(_introGcur || 1) + 1), M5 = E5 - g5, rm = 0.5 + 0.5 * (M5 - 0.5) / Math.max(1, _introGZ || 512), th5 = 2 * Math.PI * Math.min(g5 / M5, 1), Q = _introGeo; let kt = 1;
@@ -9027,12 +9042,17 @@ function introViewTick(T) {
           if (!_introVUser && Tr < 160) _introV.k = _introVkey === 'cay' ? 1 - 0.4 * sg(100, 116) : 1 - (1 - kt) * e5; }   // from 160 the closing loop's camera follows the marker instead   // Cayley: once the turns are done (100 s of the tour) it zooms out slowly, so more and more lattice points come into view   // zoom out only as far as this pair's marker needs on the real plate: it is on ring M = E - g at radius 0.5 + 0.5 M/G (hole 0.5); none in Cayley
          if (!_introVUser && Tr < 160) { _introV.fx = 0; _introV.fy = 0; } if (!_introCM) { _introCM = true; const cb1 = $('intro-cm-btn'); if (cb1) cb1.classList.add('on'); }
       } }
-    if (Tr >= 160 && _introGbOn && _introGbPairs.length && !_introVUser && _introGeo) {   // the closing loop: the camera rides on the locked Goldbach marker (g, E - g) while M breathes slowly
-      const gm = _introGeo, Lg = _introGbPairs.length, g = _introGbPairs[Math.min(_introGbI, Lg - 1)], Mk = 2 * (Math.round(_introGcur || 1) + 1) - g, k0 = Math.max(1e-6, _introKPaint || _introV.k);
-      const th = _introTh(g, Mk), rad = _introRad(gm.R, Mk, gm.GZ); let px = gm.cx + rad * Math.cos(th), py = gm.cy - rad * Math.sin(th);
-      if (V.m > 0.002) { const q = introViewPos(g, Mk, th, V, gm.cx, gm.cy, gm.R, gm.G, gm.GZ); if (q) { px += (q[0] - px) * V.m; py += (q[1] - py) * V.m; } }
-      const w = es((Tr - 160) / 3), kt = 1 + 1.6 * w, sc = kt / k0, dx = (px - gm.cx) * sc, dy = (py - gm.cy) * sc, fx = -w * dx / gm.W, fy = -w * (dy - ((gm.top0 + gm.bot0) / 2 - gm.cy0)) / gm.H, q2 = 0.08;
-      _introV.k += (kt - _introV.k) * q2; _introV.fx += (fx - _introV.fx) * q2; _introV.fy += (fy - _introV.fy) * q2; }
+    if (Tr >= 158) {   // the loop's chart: Ring between the others, each change a single blend over the M slide
+      const A = introLoopAt(Tr - 158), cur = A.o.v, pv = A.pv.v, set = (mode, m) => { V.mode = mode; V.m = m; if (mode === 'cay') { V.x = 25; V.y = 0; V.z = 0; } else if (mode === 'hel') { V.x = 62; V.y = 0; V.z = 32; } else { V.x = 0; V.y = 0; V.z = 0; } };
+      if (cur === 'ring') { if (pv !== 'ring') set(pv, 1 - A.mv); else V.m = 0; } else set(cur, Tr < 161 ? Math.max(V.m, A.mv) : A.mv); }
+    if (Tr >= 160 && _introGbOn && _introGbPairs.length && !_introVUser && _introGeo) {   // the closing loop: the camera fits the whole chart and every pair marker of this E on screen, nothing cut off
+      const gm = _introGeo, k0 = Math.max(1e-6, _introKPaint || _introV.k), G0 = Math.max(2, Math.round(_introGcur || 2)), E = 2 * (G0 + 1);
+      const pr = (r, M) => { const th = _introTh(r, M), rad = _introRad(gm.R, M, gm.GZ); let px = gm.cx + rad * Math.cos(th), py = gm.cy - rad * Math.sin(th); if (V.m > 0.002) { const q = introViewPos(r, M, th, V, gm.cx, gm.cy, gm.R, gm.G, gm.GZ); if (!q) return null; px += (q[0] - px) * V.m; py += (q[1] - py) * V.m; } return [(px - gm.cx) / k0, (py - gm.cy) / k0]; };
+      let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; const add = q => { if (!q || !isFinite(q[0]) || !isFinite(q[1])) return; x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); };
+      const st = Math.max(1, Math.floor(G0 / 64)); for (let r = 1; r <= G0; r += st) { add(pr(r, G0)); add(pr(Math.max(1, Math.round(r / 2)), Math.max(1, Math.round(G0 / 2)))); } add(pr(G0, G0)); add(pr(1, 1)); add(pr(1, G0));
+      for (const g of _introGbPairs) add(pr(g, E - g));
+      if (x1 > x0 && y1 > y0) { const aw = gm.W * 0.94, ah = (gm.bot0 - gm.top0) * 0.92, kt = Math.max(0.25, Math.min(2, aw / (x1 - x0), ah / (y1 - y0))), cxm = (x0 + x1) / 2 * kt, cym = (y0 + y1) / 2 * kt;
+        const fx = -cxm / gm.W, fy = -(cym - ((gm.top0 + gm.bot0) / 2 - gm.cy0)) / gm.H, q2 = 0.08; _introV.k += (kt - _introV.k) * q2; _introV.fx += (fx - _introV.fx) * q2; _introV.fy += (fy - _introV.fy) * q2; } }
     if (CT >= 0) {   // the tour: blend w eases in over 2 s and out over the last 2 s
       const IDS = INTRO_CLS_TOUR; let i = 0; while (i < IDS.length - 1 && CT >= INTRO_CLS_AT[i + 1]) i++; const seg = INTRO_CLS_AT[i + 1] - INTRO_CLS_AT[i], u = CT - INTRO_CLS_AT[i], w = Math.min(es(CT / 2), es((INTRO_CLS_T - CT) / 2));
       if (!_introClsTour) _introClsTour = { prev: CLS.intro };
@@ -9159,9 +9179,9 @@ function introLayersDoc(E) {   // every layer on the intro, one section each, wi
     doc.push({ t: 'table', head: ['whole wedge r ≤ M ≤ G', 'cells', 'share'], rows: [{ label: 'all cells', n: L(tot), pct: '100%' }, { label: 'coprime, gcd(r, M) = 1', n: L(cop), pct: f(100 * cop / Math.max(1, tot), 2) + '%' }, { label: 'kept at depth n = ' + n, n: L(kept), pct: f(100 * kept / Math.max(1, tot), 2) + '%' }, { label: 'kept · r = 1', n: L(k1), pct: '' }, { label: 'kept · r prime', n: L(kp), pct: '' }, { label: 'kept · r composite', n: L(kc), pct: '' }] });
   }
   doc.push({ t: 'p', text: 'Mirror σ: r → M − r is ' + (_introMirror ? 'on' : 'off') + '. It pairs each residue with its complement, and it preserves coprimality.' });
-  { const V = clsView(CLS.intro); doc.push({ t: 'h', text: 'Layer · Classical view (' + (V ? 'on: ' + V.name : 'off') + ')' });
+  { const V = clsView(CLS.intro); doc.push({ t: 'h', text: 'Layer (' + (V ? 'on: ' + V.name : 'off') + ')' });
     if (V) { doc.push({ t: 'p', text: V.thm }); if (V.tex) doc.push({ t: 'eq', tex: V.tex }); doc.push({ t: 'p', text: 'Formula: ' + V.f + '.  Live: ' + (CLS_STAT[V.id] || '') + '.' }); isoPlate('cls', V.name + ' by itself on the lattice, in each view'); }
-    else doc.push({ t: 'p', text: 'Off. Ten classical views (Euclid’s orchard, Ford circles, Farey, Stern–Brocot, Dirichlet, Chebyshev, Lehmer, Möbius, Ramanujan sums, primitive roots) can be drawn on the lattice from the Classical view control; the sheet then states the theorem and isolates it.' }); }
+    else doc.push({ t: 'p', text: 'Off. Ten classical views (Euclid’s orchard, Ford circles, Farey, Stern–Brocot, Dirichlet, Chebyshev, Lehmer, Möbius, Ramanujan sums, primitive roots) can be drawn on the lattice from the Layer control; the sheet then states the theorem and isolates it.' }); }
   return doc;
 }
 function introSurvivors(G, N) {   // cells r < M ≤ G with gcd(r, M) = 1 kept across the block M … M+N
@@ -9211,7 +9231,7 @@ function introBuildSheetDoc(E) {
   // 1 parameters
   const stp = _introStrip.on ? ['strip a/b', _introStrip.a + '/' + _introStrip.b + ' \u00b7 w ' + _introStrip.w + ' \u00b7 offset ' + _introStrip.s + (_introStripLock ? ' \u00b7 locked to the Goldbach pair' : '')] : ['strip', 'off'];
   doc.push({ t: 'h', text: 'Parameters' });
-  doc.push({ t: 'params', items: [['G', String(G)], ['on screen', curName], ['cells', 'G(G+1)/2 = ' + tot.toLocaleString()], ['block depth n', String(n)], ['angle factor k\u03c0', angTxt()], ['\u03b8 mode', String(_introAng)], ['ring hole h', f(_introHole, 2) + (_introCM ? ' \u00b7 circle method on' : '')], [cur === 'hel' ? 'Helix turns' : cur === 'cay' ? 'Cayley turns' : 'view turns', rotTxt], ['zoom \u00b7 pan (' + curName + ')', f(zv.k, 2) + '\u00d7 \u00b7 x ' + f(zv.fx * 100, 1) + '%, y ' + f(zv.fy * 100, 1) + '%'], ['Cayley \u03c1\u2080, \u03c1_d', OPENER_RHO0 + ', ' + OPENER_RHOD], ['colouring', colTxtW], ['sectors drawn', secTxt], ['point size', f(_introPtScale, 2) + '\u00d7'], ['spiral', (() => { const q = introSheetP(); return q > 1 ? 'r = p = ' + q : q === 1 ? 'r = 1 (gcd 1)' : 'not drawn'; })()], ['mirror \u03c3(r) = M \u2212 r', _introMirror ? 'on' : 'off'], stp, ['Goldbach', _introGbOn ? 'on \u00b7 E = ' + 2 * (G + 1) + ' \u00b7 pair ' + gpN : 'off'], ['C(n) lock to the spiral prime', _introPLock ? 'on' : 'off']] });
+  doc.push({ t: 'params', items: [['G', String(G)], ['on screen', curName], ['cells', 'G(G+1)/2 = ' + tot.toLocaleString()], ['block depth n', String(n)], ['angle factor k\u03c0', angTxt()], ['\u03b8 mode', String(_introAng)], ['ring hole h', f(_introHole, 2) + (_introCM ? ' \u00b7 circle method on' : '')], [cur === 'hel' ? 'Helix turns' : cur === 'cay' ? 'Cayley turns' : 'view turns', rotTxt], ['zoom \u00b7 pan (' + curName + ')', f(zv.k, 2) + '\u00d7 \u00b7 x ' + f(zv.fx * 100, 1) + '%, y ' + f(zv.fy * 100, 1) + '%'], ['Cayley \u03c1\u2080, \u03c1_d', OPENER_RHO0 + ', ' + OPENER_RHOD], ['colouring', colTxtW], ['sectors drawn', secTxt], ['point size', f(_introPtScale, 2) + '\u00d7'], ['spiral', (() => { const q = introSheetP(); return q > 1 ? 'r = p = ' + q : q === 1 ? 'r = 1 (gcd 1)' : 'not drawn'; })()], ['mirror \u03c3(r) = M \u2212 r', _introMirror ? 'on' : 'off'], stp, ['Goldbach', _introGbOn ? 'on \u00b7 E = ' + 2 * (G + 1) + ' \u00b7 pair ' + gpN : 'off'], ['C(n) lock to p', _introPLock ? 'on' : 'off']] });
   try { introLayersDoc(E).forEach(x => doc.push(x)); } catch (e) { console.error(e); }
   // 2 lattice
   doc.push({ t: 'h', text: 'The lattice' });
@@ -9233,9 +9253,9 @@ function introBuildSheetDoc(E) {
   // 5 what the picture counts
   doc.push({ t: 'h', text: 'What the picture counts' });
   doc.push({ t: 'p', text: 'Over L_' + G + ' the plate holds ' + kept + ' kept cells out of ' + tot + '.' });
-  doc.push({ t: 'eq', tex: '\\#\\{\\gcd(r,M)=1\\}_{M\\le ' + G + '}=\\sum_{M=1}^{' + G + '}\\varphi(M)=' + d.cum[G] + (n ? '\\ \\ (n=0\\ \\text{count; the block test then keeps } ' + kept + ')' : '') });
-  doc.push({ t: 'eq', tex: '\\frac{\\Phi(G)}{G(G+1)/2}=\\frac{' + kept + '}{' + tot + '}=' + f(ratio * 100, 4) + '\\%,\\qquad D(' + n + ')=' + f(D * 100, 4) + '\\%,\\qquad \\Delta=' + (err >= 0 ? '+' : '-') + f(Math.abs(err), 4) + '\\%' });
-  doc.push({ t: 'eq', tex: '\\lim_{G\\to\\infty}\\frac{\\#\\{(r,M)\\in\\mathcal L_G:\\ \\gcd(r,M)=1\\}}{|\\mathcal L_G|}=\\frac{6}{\\pi^{2}}', cap: 'For n = 0 this is the classical density of coprime pairs, with error of order log G / G. For n > 0 the same argument (Möbius inversion over squarefree d) gives the limit D(n) below, with error O((log G)^{n+1} / G) for each fixed n.' });
+  doc.push({ t: 'eq', tex: '\\#\\{\\gcd(r,M)=1\\}_{M\\le ' + G + '}=\\sum_{M=1}^{' + G + '}\\varphi(M)=' + (() => { let c = 0; for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) if (gcd(r, M) === 1) c++; return c; })() + (n ? '\\ \\ (n=0;\\ \\text{at depth } n=' + n + '\\text{ the block test keeps } ' + kept + ')' : '') });
+  doc.push({ t: 'eq', tex: (n ? '\\frac{\\mathrm{kept}(G,' + n + ')}{G(G+1)/2}' : '\\frac{\\Phi(G)}{G(G+1)/2}') + '=\\frac{' + kept + '}{' + tot + '}=' + f(ratio * 100, 4) + '\\%,\\qquad D(' + n + ')=' + f(D * 100, 4) + '\\%,\\qquad \\Delta=' + (err >= 0 ? '+' : '-') + f(Math.abs(err), 4) + '\\%' });
+  doc.push({ t: 'eq', tex: '\\lim_{G\\to\\infty}\\frac{\\#\\{(r,M)\\in\\mathcal L_G:\\ \\gcd(r,M)=1\\}}{|\\mathcal L_G|}=\\frac{6}{\\pi^{2}}', cap: 'For n = 0 this is the classical density of coprime pairs, with error of order log G / G. For n > 0 the same argument (Möbius inversion over squarefree d, with CRT across primes) gives the limit D(n) below, with error O((log G)^{n+1}/G) for each fixed n (derived on the main page, §1).' });
   // 6 sectors (census of the first 12)
   doc.push({ t: 'h', text: 'Sectors' });
   doc.push({ t: 'p', text: 'A sector S_s collects the cells (r, M) with r \u2264 M whose slope r/M lies between two consecutive unit fractions, 1/(s+1) < r/M \u2264 1/s, which is the same as \u230aM/r\u230b = s. Its area is 1/(s(s+1)) of the triangle, so the expected count is F(s, G).' });
@@ -9263,20 +9283,20 @@ function introBuildSheetDoc(E) {
   const dn = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40], coPr = d.cum[G] - (G >= 1 ? 0 : 0), drows = [], dpts = [];
   let co0 = 0; for (let M = 1; M <= G; M++) for (let r = 1; r < M; r++) if (gcd2(r, M) === 1) co0++;
   dn.forEach(k => { let kp = 0; for (let M = 1; M <= G; M++) for (let r = 1; r < M; r++) { if (gcd2(r, M) !== 1) continue; if (k > 0 && introKilled(r, M, k)) continue; kp++; } const C = lv2C(k), sh = co0 ? kp / co0 : 0, er = C ? (sh / C - 1) * 100 : 0; dpts.push([String(k), er]); drows.push({ label: 'n = ' + k + (k === n ? ' \u25c4 frame' : '') + ' \u00b7 C(n) = ' + f(C, 8), raw: f(lv2D(k), 8), n: kp + ' / ' + co0, pct: f(sh * 100, 2) + '%', err: sgn(er), ec: ecol(er) }); });
-  doc.push({ t: 'p', text: 'Each row is the plate\u2019s own count of coprime cells (of ' + co0 + ', r < M) that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it and the raw density D(n) = C(n)/\u03b6(2) in its own column. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply. The error is not monotone in n: at moderate G it is first positive and growing, peaks, crosses zero, then goes strongly negative once n is a sizeable fraction of G. That pattern is observed on the plate, not derived here. Red: the plate falls below the limit; green: above.' });
+  doc.push({ t: 'p', text: 'Each row is the plate\u2019s own count of coprime cells (of ' + co0 + ', r < M; the r \u2264 M count elsewhere on the sheet is one more, the cell r = M = 1) that stay coprime across a block of n + 1 columns, with the limiting C(n) beside it and the raw density D(n) = C(n)/\u03b6(2) in its own column. C(n) is a limit for fixed n as G grows: once n is a sizeable fraction of G the lattice has too few r beyond n + 1 for it to apply. The error is not monotone in n: at moderate G it is first positive and growing, peaks, crosses zero, then goes strongly negative once n is a sizeable fraction of G. That pattern is observed on the plate, not derived here. Red: the plate falls below the limit; green: above.' });
   doc.push({ t: 'table', head: ['depth n \u00b7 limiting C(n)', 'kept / coprime cells', 'share', 'vs C(n)', 'raw D(n)'], rows: drows });
   doc.push({ t: 'iplate', items: [{ label: 'error against depth', cv: _introChartCv('bars', dpts, 0, 'error of the kept share against C(n), by depth n, %'), cls: 'wide' }], cap: 'Signed error (share \u2212 C(n)) / C(n) at each depth. The rows are nested, so the measured ratio only falls as n rises, and C(n) falls with it as each new prime p \u2264 n + 1 saturates. The signed error itself rises, peaks, then falls through zero at larger n.' });
   // who survives at the deepest row: the columns, coloured prime / composite, and the count per ring and per sector
-  try { const Ns = dn.filter(k => k >= 2 && k < G - 1), N = Ns.length ? Ns[Ns.length - 1] : 0;
+  try { const Ns = dn.filter(k => k >= 2 && k < G - 1), N = n >= 2 && n < G - 1 ? n : Ns.length ? Ns[Ns.length - 1] : 0;   // the frame's own depth when it has one, so this section matches the plate
     if (N >= 2) { const S = introSurvivors(G, N), comp = S.cols.filter(c => c.kind === 'comp');
-      doc.push({ t: 'h', text: 'Who survives at depth n = ' + N });
+      doc.push({ t: 'h', text: 'Who survives at depth n = ' + N + (N === n ? ' (this frame)' : ' (the frame is at n = ' + n + ')') });
       doc.push({ t: 'p', text: 'At depth n every prime p ≤ n + 1 divides one of the n + 1 consecutive rings M, …, M+n, whatever M is, so it removes every column r it divides. The survivors are therefore the columns r with no prime factor ≤ ' + (N + 1) + ': r = 1, the primes above ' + (N + 1) + ', and composites only from (next prime)² = ' + S.q2 + ' on. Here G = ' + G + (S.q2 > G ? ', below that square, so every surviving column is 1 or a prime: at this depth the block sieve is the prime sieve.' : ', so composites can survive too (red).') + ' A surviving column still loses a ring when one of its primes divides some M + j, so each column lists how many rings it survives on.' });
       doc.push({ t: 'iplate', items: [{ label: 'survivors at depth n = ' + N, cv: introSurvivorCv(G, N, S), cls: 'wide' }], cap: S.cols.length + ' surviving columns (gold r = 1, teal primes, red composites' + (comp.length ? ': ' + comp.map(c => c.r).join(', ') : ', none here') + '), ' + S.total + ' surviving cells in all; below, the surviving cells on each ring M, stacked by sector s = ⌊M/r⌋.' });
       doc.push({ t: 'table', head: ['sector s = ⌊M/r⌋  ·  its columns r', 'cells', 'share', 'columns'], rows: S.sec.map(o => ({ label: (o.s === 0 ? 's > 6' : 's = ' + o.s) + '   ' + o.colsShort, n: String(o.n), pct: (100 * o.n / Math.max(1, S.total)).toFixed(1) + '%', err: String(o.nCols) })) });   // the column list sits in the wide label cell, so nothing in the narrow right-hand cells can overrun
     } } catch (e) {}
   // convergence in G
   doc.push({ t: 'h', text: 'Kept ratio against G' });
-  doc.push({ t: 'p', text: 'The ratio does not approach D(n) from one side: it oscillates around it with a shrinking envelope. For n = 0 the limit 6/\u03c0\u00b2 is a classical theorem. For n > 0 the limit is also a theorem for fixed n; the sign pattern and the exact speed of the shrinking seen here are observations.' });
+  doc.push({ t: 'p', text: 'At small G the kept ratio can sit far from D(n), above or below, and the table shows how it moves as G grows. For n = 0 the limit 6/\u03c0\u00b2 is a classical theorem. For n > 0 the limit D(n) is also a theorem for fixed n; the path toward it and its speed seen here are observations at this size, not a statement about the sign of the error.' });
   const gs = []; for (let g = 8; g < G; g *= 2) gs.push(g); gs.push(G);
   doc.push({ t: 'table', head: ['G \u00b7 cells', 'kept', 'ratio', 'error'], rows: gs.map(g => { const t = g * (g + 1) / 2, rr = d.cum[g] / t, e2 = (rr / D - 1) * 100; return { label: g + ' \u00b7 ' + t, n: String(d.cum[g]), pct: f(rr * 100, 3) + '%', err: (e2 >= 0 ? '+' : '\u2212') + f(Math.abs(e2), 3) + '%', ec: ecol(e2) }; }) });
   const curve = []; for (let g = 1; g <= G; g++) curve.push([g, d.cum[g] / (g * (g + 1) / 2)]);
@@ -9299,12 +9319,12 @@ function introBuildSheetDoc(E) {
   doc.push({ t: 'eq', tex: 'r(E)\\sim\\tfrac12\\,\\mathfrak S(E)\\int_{2}^{E-2}\\frac{dt}{\\ln t\\,\\ln(E-t)}:\\qquad r(' + Ee + ')=' + full + ',\\qquad \\text{formula}=' + f(th.hl, 1) + ',\\qquad \\text{ratio}=' + f(full / th.hl, 3), cap: 'r(E) counts the pairs g + s = E with g \u2264 s both prime. The circle method keeps only the major arcs with q \u2264 12 and gives ' + f(th.cm, 1) + '. This asymptotic is the Hardy\u2013Littlewood conjecture and is unproved; even granted, it describes large E and is only a rough guide at this size.' });
   const prow = []; run = 2 * 0.6601618158468696 * 1; { let rr = 2 * 0.6601618158468696; oddP.forEach(p => { const dv = Ee % p === 0, fac = dv ? (p - 1) / (p - 2) : 1; rr *= fac; prow.push({ label: 'p = ' + p + ' \u00b7 \u03bd_p = ' + (dv ? 1 : 2) + (dv ? ' (p | E)' : '') + ' \u00b7 ' + (dv ? 'extra factor (p\u22121)/(p\u22122) = ' + f(fac, 5) : 'no extra factor (its 1 \u2212 1/(p\u22121)\u00b2 is already in C\u2082)'), n: f(rr, 5), pct: '', err: '', ec: 'pos' }); }); }
   doc.push({ t: 'table', head: ['prime \u00b7 \u03bd_p \u00b7 factor on top of 2C\u2082', 'running S(E)', '', ''], rows: prow });
-  const gbRows = [G, 64, 128, 256, 512].filter((v, i, a) => a.indexOf(v) === i).sort((u, v) => u - v).map(G2 => { const E2 = 2 * (G2 + 1), act = introGbPairsFor(G2).length, t2 = introGbTheory(E2), er = v => (v >= act ? '+' : '\u2212') + f(Math.abs((v - act) / act * 100), 1) + '%'; return { label: 'G = ' + G2 + ' \u00b7 E = ' + E2, n: String(act), pct: f(t2.hl, 1), err: er(t2.hl), ec: t2.hl >= act ? 'pos' : 'neg' }; });
+  const gbRows = [G, 64, 128, 256, 512].filter((v, i, a) => a.indexOf(v) === i).sort((u, v) => u - v).map(G2 => { const E2 = 2 * (G2 + 1), act = introGbPairsFor(G2).length, t2 = introGbTheory(E2), er = v => (act >= v ? '+' : '\u2212') + f(Math.abs((act - v) / v * 100), 1) + '%'; return { label: 'G = ' + G2 + ' \u00b7 E = ' + E2, n: String(act), pct: f(t2.hl, 1), err: er(t2.hl), ec: act >= t2.hl ? 'pos' : 'neg' }; });
   doc.push({ t: 'table', head: ['G \u00b7 E', 'actual r(E)', 'formula', 'error'], rows: gbRows });
-  const near = []; for (let e2 = Ee - 12; e2 <= Ee + 12; e2 += 2) { const G2 = e2 / 2 - 1; if (G2 < 3) continue; const ac = introGbPairsFor(G2).length, t2 = introGbTheory(e2); near.push({ label: 'E = ' + e2 + (e2 === Ee ? ' \u25c4 this frame' : '') + ' \u00b7 r(E) = ' + ac, n: String(ac), pct: f(t2.hl, 1), err: ((t2.hl >= ac ? '+' : '\u2212') + f(Math.abs((t2.hl - ac) / ac * 100), 1) + '%'), ec: t2.hl >= ac ? 'pos' : 'neg' }); }
-  doc.push({ t: 'p', text: 'S(E) is large when E has many small odd prime factors and small when it has few, which is what makes the Goldbach count r(E) rise and fall from one even E to the next. The table compares the actual count with the Hardy\u2013Littlewood value for the even numbers either side of E.' });
+  const near = []; for (let e2 = Ee - 12; e2 <= Ee + 12; e2 += 2) { const G2 = e2 / 2 - 1; if (G2 < 3) continue; const ac = introGbPairsFor(G2).length, t2 = introGbTheory(e2); near.push({ label: 'E = ' + e2 + (e2 === Ee ? ' \u25c4 this frame' : '') + ' \u00b7 r(E) = ' + ac, n: String(ac), pct: f(t2.hl, 1), err: ((ac >= t2.hl ? '+' : '\u2212') + f(Math.abs((ac - t2.hl) / t2.hl * 100), 1) + '%'), ec: ac >= t2.hl ? 'pos' : 'neg' }); }
+  doc.push({ t: 'p', text: 'S(E) is large when E has many small odd prime factors and small when it has few, which is what makes the Goldbach count r(E) rise and fall from one even E to the next. The table compares the actual count with the Hardy\u2013Littlewood value for the even numbers either side of E; error = (actual \u2212 formula)/formula, as in the C(n) table: green above, red below.' });
   doc.push({ t: 'table', head: ['even E \u00b7 r(E)', 'actual', 'formula', 'error'], rows: near });
-  if (CLS.intro) { try { msClsPush(doc, CLS.intro, Math.max(2, Math.round(_introGcur))); } catch (e) {} }   // the classical view on screen, at the same M
+  if (CLS.intro) { try { msClsPush(doc, CLS.intro, Math.max(2, Math.round(_introGcur)), null, true); } catch (e) {} }   // the layer's plate at the same M; its theorem is already stated in its own section
   return doc;
 }
 function introSheetOpenDoc(c) {   // the opener's preview window, over the intro
@@ -9373,13 +9393,13 @@ async function introMathSheet() {
     if (n >= 1) defs.push(['sieve', 'Sieve only', 'the cells kept at block depth n = ' + n]);
     if (pSp > 0) defs.push(['spiral', pSp > 1 ? 'Prime spiral only' : 'gcd-1 spiral only', 'the column r = ' + pSp + ' and its mirror r = M − ' + pSp]);
     if (_introGbOn) defs.push(['gb', 'Goldbach only', 'the four lines and the marker of the current pair']);
-    if (clsView(CLS.intro)) defs.push(['cls', clsView(CLS.intro).name + ' only', 'the classical view by itself on the lattice']);
+    if (clsView(CLS.intro)) defs.push(['cls', clsView(CLS.intro).name + ' only', 'the layer by itself on the lattice']);
     let wcop = 0, scells = 0, scop = 0; for (let M = 1; M <= G; M++) for (let r = 1; r <= M; r++) if (!(_introWheel && r % 6 !== 1 && r % 6 !== 5) && gcd(r, M) === 1) wcop++;
     if (_introStrip.on && _introStrip.b) { const S1 = _introStrip; for (let M = 1; M <= G; M++) { const lo = Math.max(1, Math.ceil((S1.s + S1.a * M) / S1.b)), hi = Math.min(G, Math.ceil((S1.s + S1.w + S1.a * M) / S1.b) - 1); for (let r = lo; r <= hi; r++) { scells++; if (gcd(r, M) === 1) scop++; } } }
     const Ee1 = 2 * (G + 1), gp1 = introGbPairsFor(G), g1 = gp1[Math.min(_introGbI, Math.max(0, gp1.length - 1))] || 0;
     const detOf = key => key === 'base' ? ['G = ' + G + '  \u00b7  \u03b8 = ' + angTxt() + '\u00b7r/M (' + _introAng + ')  \u00b7  hole h = ' + (+_introHole).toFixed(2) + (_introCM ? ' + circle method' : ''), 'cells in the wedge ' + (G * (G + 1) / 2) + '  \u00b7  coprime ' + wcop + ' (' + (100 * wcop / (G * (G + 1) / 2)).toFixed(2) + '%)']
       : key === 'strip' ? ['slope a/b = ' + _introStrip.a + '/' + _introStrip.b + ' = ' + (_introStrip.a / _introStrip.b).toFixed(4) + '  \u00b7  s = ' + _introStrip.s + '  \u00b7  w = ' + _introStrip.w, 'cells in the strip ' + scells + '  \u00b7  coprime ' + scop + ' (' + (100 * scop / Math.max(1, scells)).toFixed(2) + '%)']
-      : key === 'sieve' ? ['block depth n = ' + n + '  \u00b7  saturated primes p \u2264 ' + (n + 1) + '  \u00b7  a kept r is 1 or a prime until r = q\u00b2', 'kept ' + kept + ' of ' + (G * (G + 1) / 2) + ' (' + (100 * ratio).toFixed(2) + '%)  \u00b7  target D(' + n + ') = ' + (100 * d.D).toFixed(2) + '%']
+      : key === 'sieve' ? ['block depth n = ' + n + '  \u00b7  saturated primes p \u2264 ' + (n + 1) + '  \u00b7  a kept r is 1 or a prime until r = ' + (() => { let q = n + 2; const ip = m => { for (let d2 = 2; d2 * d2 <= m; d2++) if (m % d2 === 0) return false; return m > 1; }; while (!ip(q)) q++; return q + '\u00b2 = ' + q * q; })(), 'kept ' + kept + ' of ' + (G * (G + 1) / 2) + ' (' + (100 * ratio).toFixed(2) + '%)  \u00b7  target D(' + n + ') = ' + (100 * d.D).toFixed(2) + '%']
       : key === 'cls' ? [(clsView(CLS.intro) || {}).f || '', CLS_STAT[CLS.intro] || '']
       : key === 'spiral' ? ['p = ' + pSp + '  \u00b7  column r = p on every ring M \u2265 p (cyan)  \u00b7  mirror \u03c3(r) = M \u2212 r (violet)', 'primes \u2264 G: ' + (() => { let c = 0; for (let m = 2; m <= G; m++) { let ok = true; for (let q = 2; q * q <= m; q++) if (m % q === 0) { ok = false; break; } if (ok) c++; } return c; })() + '  \u00b7  hyperbolic spiral: \u03c1\u03b8 \u2192 const as M grows (hole 0)']
       : ['E = 2(G+1) = ' + Ee1 + (g1 ? ' = ' + g1 + ' + ' + (Ee1 - g1) + '  \u00b7  \u03b8 = ' + (360 * g1 / (Ee1 - g1)).toFixed(2) + '\u00b0' : ''), 'pair ' + (Math.min(_introGbI, Math.max(0, gp1.length - 1)) + 1) + ' of ' + gp1.length + '  \u00b7  the four lines r + M = g, r + M = s, M \u2212 r = g, r \u2212 M = g'];
@@ -9405,16 +9425,16 @@ async function introMathSheet() {
         const S1 = _introStrip, sh = scells ? scop / scells : 0;
         X.f = 'v = b\u00b7r \u2212 a\u00b7M = ' + S1.b + 'r \u2212 ' + S1.a + 'M,    ' + S1.s + ' \u2264 v < ' + (S1.s + S1.w) + ',    slope a/b = ' + S1.a + '/' + S1.b + ' = ' + (S1.a / S1.b).toFixed(4);
         X.L = [['slope ' + S1.a + '/' + S1.b + ' = ' + (S1.a / S1.b).toFixed(4), '#3dc8b8'], ['w ' + S1.w + ' \u00b7 off ' + String(S1.s).replace('-', '\u2212'), '#3dc8b8'], ['cells ' + scells, '#3dc8b8'], ['coprime ' + scop, '#3dc8b8'], [(100 * sh).toFixed(2) + '% of band', '#3dc8b8'], [(wcop ? (100 * scop / wcop).toFixed(1) : '0') + '% of all gcd = 1 cells', '#3dc8b8'], [(sh / six).toFixed(3) + '\u00d7 1/\u03b6(2)', '#3dc8b8']];
-      } else if (key === 'cls') { const V = clsView(CLS.intro); X.f = V ? V.f : ''; X.L = [[V ? V.name : '', DM], [CLS_STAT[CLS.intro] || '', WH]];
+      } else if (key === 'cls') { const V = clsView(CLS.intro); X.f = V ? V.f : ''; X.L = [[V ? V.name : '', DM]].concat(String(CLS_STAT[CLS.intro] || '').split(/\s+\u00b7\s+/).map(t => [t, WH]));
       } else if (key === 'spiral') {
         let rings = 0, co = 0; for (let M = pSp; M <= G; M++) { rings++; if (gcd(pSp, M) === 1) co++; } let pc = 0; for (let m = 2; m <= G; m++) { let ok = true; for (let q = 2; q * q <= m; q++) if (m % q === 0) { ok = false; break; } if (ok) pc++; } const est = G / Math.log(Math.max(2, G));
         X.f = 'cell (r, M) with r = p = ' + pSp + ' on every ring M \u2265 p, and its mirror \u03c3(r) = M \u2212 p;      \u03b8 = ' + angTxt() + '\u00b7p/M';
         X.L = [['sieve: prime p = ' + pSp, '#4fd1c5'], ['column r = p: ' + rings + ' rings', DM], ['gcd = 1: ' + co + ' (' + (100 * co / Math.max(1, rings)).toFixed(1) + '%)', WH], ['1 \u2212 1/p = ' + (100 * (1 - 1 / pSp)).toFixed(1) + '%', DM], ['mirror r = M \u2212 p: same count', DM]];
         X.R = [['primes \u2264 G', DM], ['\u03c0(' + G + ') = ' + pc, WH], ['G/ln G = ' + est.toFixed(1), DM], ['ratio ' + (pc / est).toFixed(3), '#e6c35c']];
       } else if (key === 'gb' && g1 && gp1.length) {
-        const th = introGbTheory(Ee1), act = gp1.length, er = v => (v >= act ? '+' : '\u2212') + Math.abs((v - act) / act * 100).toFixed(1) + '%';
+        const th = introGbTheory(Ee1), act = gp1.length, er = v => (act >= v ? '+' : '\u2212') + Math.abs((act - v) / v * 100).toFixed(1) + '%';
         X.f = 'E = 2(G+1) = g + s     lines: r+M = g, r+M = s, M\u2212r = g, r\u2212M = g     r(E) \u2248 \u00bd\u00b7S(E)\u00b7\u222b dt / (ln t\u00b7ln(E\u2212t))';
-        X.L = [['Goldbach E = ' + Ee1, '#ffd36b'], ['actual ' + act + ' pairs (' + (2 * act) + ' ordered)', WH], ['formula (H\u2013L) ' + th.hl.toFixed(1) + '  ' + er(th.hl), th.hl >= act ? GR : RD], ['circle q\u226412 ' + th.cm.toFixed(1) + '  ' + er(th.cm), th.cm >= act ? GR : RD], ['marker (' + g1 + ', ' + (Ee1 - g1) + ') \u00b7 pair ' + (Math.min(_introGbI, Math.max(0, gp1.length - 1)) + 1) + ' of ' + act, '#ffd36b']];
+        X.L = [['Goldbach E = ' + Ee1, '#ffd36b'], ['actual ' + act + ' pairs (' + (2 * act) + ' ordered)', WH], ['formula (H\u2013L) ' + th.hl.toFixed(1) + '  ' + er(th.hl), th.hl <= act ? GR : RD], ['circle q\u226412 ' + th.cm.toFixed(1) + '  ' + er(th.cm), th.cm <= act ? GR : RD], ['marker (' + g1 + ', ' + (Ee1 - g1) + ') \u00b7 pair ' + (Math.min(_introGbI, Math.max(0, gp1.length - 1)) + 1) + ' of ' + act, '#ffd36b']];
       }
       if (!X.sec) X.sec = secSpec(six, 0);   // every isolated plate carries the sector table, set by the same 4 / 8 / 16 / all switch as the live view
       return (isoCache[key] = X);
@@ -9477,7 +9497,7 @@ async function introMathSheet() {
         } else {
         x.fillStyle = 'rgba(232,227,219,.85)'; x.fillText('colour = sector s = \u230aM/r\u230b :', lx, ly); lx += 270;
         lx = introSecLegend(x, lx, ly, G); }
-        x.fillStyle = 'rgba(232,227,219,.75)'; const dl = detOf(key); x.fillText(what + '.', 60, ly + 30); x.fillText(dl[0], 60, ly + 54); x.fillText(dl[1], 60, ly + 78); isoDraw(x, key, H - 175 + 14, ly - 14 - 10);
+        x.fillStyle = 'rgba(232,227,219,.75)'; const dl = detOf(key), mw = W - 120, wr = t => { const P = String(t || '').split(/\s+\u00b7\s+/), L = []; let c = ''; P.forEach(q => { const t2 = c ? c + '  \u00b7  ' + q : q; if (c && x.measureText(t2).width > mw) { L.push(c); c = q; } else c = t2; }); if (c) L.push(c); return L; }, DL = wr(dl[0]).concat(wr(dl[1])).slice(0, 3); x.fillText(what + '.', 60, ly + 30); DL.forEach((t, i) => x.fillText(t, 60, ly + 54 + 20 * i)); isoDraw(x, key, H - 175 + 14, ly - 14 - 10);
       } finally { _introExpBotX = 0; _introIso = null; _introExporting = saveExp; _introExpView = null; _introGM = saveGM; _introExpFit = 1; _introV = s0.V; _introSat = s0.sat; _introGbOn = s0.gb; _introStrip.on = s0.st; _introSieveP = s0.sv; _introN = s0.N; _introStripLock = s0.lk; _introPLock = s0.pl; }
       cvs['iso_' + key + '_' + curV] = cv;
     }
@@ -9511,7 +9531,7 @@ async function introMathSheet() {
     + (_introStrip.on ? '<div class="n">band on screen: slope ' + _introStrip.a + '/' + _introStrip.b + ' = ' + fx(_introStrip.a / _introStrip.b, 4) + ', width ' + _introStrip.w + ', offset ' + _introStrip.s + '</div>' : '')
     + '<table><tr><th>slope a/b</th><th>decimal</th><th>cells in band</th><th>kept</th><th>share</th><th>share / D(n)</th></tr>' + (_introStrip.on ? stRow(_introStrip.a, _introStrip.b, _introStrip.w, _introStrip.s, 'on screen ' + _introStrip.a + '/' + _introStrip.b) : '') + fr.map(f => stRow(f[0], f[1], 2 * f[1], -f[1], f[0] + '/' + f[1])).join('') + '</table><div class="n">The three PNGs above show the slope band and the Goldbach overlay as they were on screen when the sheet was made. Near a line of small denominator the band follows cells with a common structure, so the share can sit visibly away from D(n); that is a finite-G observation, not a limit statement.</div>';
   // 10. Goldbach: E = 2(G+1), the number of prime pairs g + s = E (g <= s): actual, Hardy-Littlewood product, circle method (major arcs q <= 12)
-  const gbRow = G2 => { const E2 = 2 * (G2 + 1), act = introGbPairsFor(G2).length, th = introGbTheory(E2), er = v => '<td class="' + (v >= act ? 'g' : 'rd') + '">' + (v >= act ? '+' : '−') + fx(Math.abs((v - act) / act * 100), 1) + '%</td>'; return '<tr><td>' + G2 + '</td><td>' + E2 + '</td><td>' + act + '</td><td>' + fx(th.hl, 1) + '</td>' + er(th.hl) + '<td>' + fx(th.cm, 1) + '</td>' + er(th.cm) + '</tr>'; };
+  const gbRow = G2 => { const E2 = 2 * (G2 + 1), act = introGbPairsFor(G2).length, th = introGbTheory(E2), er = v => '<td class="' + (act >= v ? 'g' : 'rd') + '">' + (act >= v ? '+' : '−') + fx(Math.abs((act - v) / v * 100), 1) + '%</td>'; return '<tr><td>' + G2 + '</td><td>' + E2 + '</td><td>' + act + '</td><td>' + fx(th.hl, 1) + '</td>' + er(th.hl) + '<td>' + fx(th.cm, 1) + '</td>' + er(th.cm) + '</tr>'; };
   const secGb = '<h2>10. Goldbach: E, formula, circle method, actual</h2><div class="m">actual: pairs (g, s), g ≤ s, g + s = E, both prime\nformula (Hardy–Littlewood, conjectured): ½ · S(E) · ∫ dt / (ln t · ln(E − t)),  S(E) = 2C₂ · ∏_{p | E, p &gt; 2} (p − 1)/(p − 2),  C₂ = 0.66016…\ncircle method: the same integral with the major arcs a/q, q ≤ 12:  S₁₂(E) = Σ_{q ≤ 12, q squarefree} c_q(E) / φ(q)²   (c_q = Ramanujan sum)\nE = 2(G + 1) is the sum on the ring count G shown; the marker (g, E − g) lies on ring M = E − g &gt; G, outside the outer ring</div>'
     + '<table><tr><th>G</th><th>E</th><th>actual</th><th>formula</th><th>error</th><th>circle q ≤ 12</th><th>error</th></tr>' + [G, 64, 128, 256, 512].filter((v, i, arr) => arr.indexOf(v) === i).sort((u, v) => u - v).map(gbRow).join('') + '</table><div class="n">The circle-method column keeps only the major arcs with q ≤ 12, so it differs from the full singular series (the formula column) by the arcs left out; neither is a proof for a given E. Both are conjectural asymptotics (Hardy\u2013Littlewood, unproved) and are loose for small E.</div>';
   const css = ':root{--bg:#fbf9f4;--ink:#16140f;--mut:#6b6558;--gold:#8a6a10;--line:#d9d3c3;--card:#f3efe4;--head:#ece6d6;--g:#1a7a3c;--rd:#c0392b}html,body{background:var(--bg)}a{color:var(--gold)}body{font:15px/1.6 "Cormorant Garamond",Georgia,serif;max-width:980px;margin:0 auto;padding:36px 20px 48px;color:var(--ink)}.eb{font:11px monospace;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:6px}h1{font-size:42px;font-weight:400;letter-spacing:.01em;margin:6px 0 0;text-align:center;line-height:1.15}.sub{font-style:italic;text-align:center;color:var(--mut);font-size:17px;margin-top:6px}.by{text-align:center;margin-top:6px;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:22px}.abs{border:1px solid var(--line);border-radius:6px;background:var(--card);padding:16px 22px;font-style:italic;font-size:17px;line-height:1.6;margin-bottom:8px;color:var(--ink)}.abs .al{font:11px monospace;font-style:normal;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:8px}.n{color:var(--mut);font:12px monospace;margin-top:8px}h2{margin:34px 0 10px;font-size:23px;font-weight:600;border:0;padding:0 0 6px 12px;border-left:3px solid var(--gold);border-bottom:1px solid var(--line);line-height:1.25}h3{font:11px monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:20px 0 6px}table{border-collapse:collapse;margin:10px 0;font:12.5px monospace;width:100%}td,th{border:0;border-bottom:1px solid var(--line);padding:5px 10px;text-align:right}th{background:var(--head);font-weight:600;letter-spacing:.06em;font-size:11px;text-transform:uppercase;color:var(--gold)}tr:nth-child(even) td{background:rgba(128,118,90,.07)}td:first-child,th:first-child{text-align:left}.g{color:var(--g)}.rd{color:var(--rd)}img{width:100%;border:1px solid var(--line);border-radius:6px;margin:8px 0}.ch{width:100%;max-width:560px;border:1px solid var(--line);border-radius:6px}.m{font:13px/1.6 monospace;background:var(--card);padding:12px 16px;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:4px;white-space:pre-wrap}p{margin:8px 0}.fm{font:italic 19px/1.45 "Cormorant Garamond",Georgia,serif;text-align:center;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:9px 14px;margin:8px 0}.fm small{display:block;font:11px monospace;font-style:normal;letter-spacing:.04em;color:var(--mut);margin-top:3px}.n,.n *{font-family:monospace}button{font:12px monospace;letter-spacing:.06em;padding:7px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:3px;cursor:pointer}@media print{button,.np{display:none}h2{break-after:avoid}img,table,svg{break-inside:avoid}}';
@@ -17381,8 +17401,8 @@ function _selfTestRaw() {
   {
     const sa = slopeA, sb = slopeB, so = offS, sw = widthW;
     let agree = 0, total = 0; const shown = [];
-    for (const N of [60, 100, 210, 256, 330]) {
-      if (N > COP_G) continue;
+    const Ns6 = [60, 100, 210, 256, 330].filter(N => N <= COP_G), NsUse = Ns6.length ? Ns6 : [COP_G, COP_G - 1, COP_G - 2].filter(N => N >= 3);   // never a vacuous 0 / 0 pass at small G
+    for (const N of NsUse) {
       slopeA = -1; slopeB = 1; offS = N; widthW = 1;
       const got = walkStrip(0).cop;
       total++; if (got === PHI[N]) agree++;
@@ -19058,7 +19078,7 @@ function msSectorSection(kind, G) {
   const win = msSecWindow(kind), picked = kind === 'main' ? sectorPick : (OL.sec.mode === 'sector' ? OL.sec.pick : 0);
   const Z = 3 / (Math.PI * Math.PI);
   out.push({ t: 'h', text: 'Sectors' });
-  out.push({ t: 'p', text: 'A sector S_s collects the cells (r, M) with r ≤ M whose slope r/M lies between two consecutive unit fractions, 1/(s+1) < r/M ≤ 1/s, which is the same as ⌊M/r⌋ = s. Above the diagonal the Grid mirrors it with ⌊r/M⌋ = s. A window between two slopes, lo ≤ r/M ≤ hi, is the same idea for any pair. ' + (win ? 'On the plate ' + win.desc + ' is kept and every cell outside it is drawn at ' + win.dim + '%.' : 'No cell is dimmed: the sector wedges are drawn as bands only.') });
+  out.push({ t: 'p', text: 'A sector S_s collects the cells (r, M) with r ≤ M whose slope r/M lies between two consecutive unit fractions, 1/(s+1) < r/M ≤ 1/s, which is the same as ⌊M/r⌋ = s. Above the diagonal the Grid mirrors it with ⌊r/M⌋ = s. A window between two slopes, lo ≤ r/M ≤ hi, is the same idea for any pair. ' + (win ? (/^all,/.test(win.desc) ? 'On the plate every sector S_1 \u2026 S_' + win.desc.replace(/^all, S_1 \u2026 S_(\d+).*$/, '$1') + ' is kept; cells past the last one are drawn at ' + win.dim + '%.' : 'On the plate ' + win.desc + ' is kept and every cell outside it is drawn at ' + win.dim + '%.') : 'No cell is dimmed: the sector wedges are drawn as bands only.') });
   out.push({ t: 'eq', tex: msT`S_s=\{(r,M):\ \lfloor M/r\rfloor=s\}=\{\tfrac{1}{s+1}<\tfrac{r}{M}\le\tfrac{1}{s}\},\qquad F(s,G)=\frac{3}{\pi^{2}}\,\frac{G^{2}}{s(s+1)}`, cap: 'F(s, G) is the expected number of coprime cells of L_G in S_s, using the leading term 3G²/π² (the lattice itself has G(G+1)/2 cells, a factor (G+1)/G more; the observed counts differ from F by an error of order G log G, of either sign): the lattice holds 3G²/π² coprime cells in all, and the wedge takes the share 1/s − 1/(s+1) of the area.' });
   if (G > 1500) { out.push({ t: 'note', text: 'The census is not tabulated past G = 1500.' }); return out; }
   const cnt = new Map(); let total = 0, win_n = 0, win_all = 0;
@@ -19767,7 +19787,7 @@ function msBuildOpenerRaw(noPlates) {
   if (showRing) {
     const R = (0.92 * S / 2), h = OPENER_RING_HOLE;
     doc.push({ t: 'eq', tex: msT`\rho(M)=R\Big(h+(1-h)\,\frac{M-\frac12}{G}\Big),\qquad R=0.92\cdot\frac S2=${msf(R, 1)},\qquad h=${msf(h, 2)}` });
-    doc.push({ t: 'eq', tex: msT`\theta(r,M)=${OL.ringCCW ? '-' : ''}${OL.thetaMode === 'wrap' ? angTex() + '\\,\\frac rM' : OL.thetaMode === 'unit' ? angTex() + '\\,\\frac rG' : angTex() + '\\,\\min\\!\\Big(\\frac rM,\\,1\\Big)'},\qquad \mathrm{Ring}(r,M)=\big(c+\rho\cos\theta,\ \ c+\rho\sin\theta\big)`, cap: OL.ringCCW ? 'The minus sign turns \\u03b8 counter-clockwise on screen; drop it for the clockwise sweep.' : undefined });
+    doc.push({ t: 'eq', tex: msT`\theta(r,M)=${OL.ringCCW ? '-' : ''}${OL.thetaMode === 'wrap' ? angTex() + '\\,\\frac rM' : OL.thetaMode === 'unit' ? angTex() + '\\,\\frac rG' : angTex() + '\\,\\min\\!\\Big(\\frac rM,\\,1\\Big)'},\qquad \mathrm{Ring}(r,M)=\big(c+\rho\cos\theta,\ \ c+\rho\sin\theta\big)`, cap: OL.ringCCW ? 'The minus sign turns \u03b8 counter-clockwise on screen; drop it for the clockwise sweep.' : undefined });
     doc.push({ t: 'p', text: 'Angle factor k\u03c0 = ' + angTxt() + ' (\u03b8 = k\u03c0\u00b7r/M; the default k = 2 is the full circle 2\u03c0). The cell is still the fraction r/M; k only changes where it is drawn. Write k = 2m. In wrap and clamp modes the cells r = 1 \u2026 M of ring M sit at \u03b8 = 2\u03c0\u00b7m\u00b7r/M: if m is an integer coprime to M they are the M-th roots of unity in a new order; if m is an integer with g = gcd(m, M) > 1 they fall on M/g positions, g cells on each; if k is odd (m a half-integer) they sit on 2M-th roots of unity. No count on this sheet depends on k.' });
     if (OPENER_ROT.r) doc.push({ t: 'eq', tex: msT`(x,y)\mapsto c+R_{-\beta}\big((x,y)-c\big),\qquad \beta=${Math.round(OPENER_ROT.r)}^{\circ}` });
     if (OPENER_CIRCLE_METHOD && h > 0) {
@@ -19778,7 +19798,7 @@ function msBuildOpenerRaw(noPlates) {
   const helEqs = () => {
     const Rc = 0.44 * S * OPENER_CZ;
     doc.push({ t: 'eq', tex: msT`(x,\,y,\,h)=\Big(\rho\cos\theta,\ \rho\sin\theta,\ \frac{\theta}{2\pi}\Big),\qquad \rho(M)=\frac MG,\qquad \theta=${angTex()}\,\frac rM` });
-    doc.push({ t: 'eq', tex: msT`\mathrm{Hel}(r,M)=\big(c+R_c\,x',\ c-R_c\,y'\big),\qquad R_c=0.44\,S\,\kappa=${msf(Rc, 1)}\ \mathrm{px}`, cap: 'The ring with the angle left unwrapped: the height is the number of turns, so the picture is the Riemann surface of log. The primes (x\u2032, y\u2032) are the point after the turns below, drawn orthographically; the measurement is unchanged, only where the points sit.' });
+    doc.push({ t: 'eq', tex: msT`\mathrm{Hel}(r,M)=\big(c+R_c\,x',\ c-R_c\,y'\big),\qquad R_c=0.44\,S\,\kappa=${msf(Rc, 1)}\ \mathrm{px}`, cap: 'The ring with the angle left unwrapped: the height is the number of turns, so the picture is the Riemann surface of log. Here (x\u2032, y\u2032) is the point after the turns below, drawn orthographically; the measurement is unchanged, only where the points sit.' });
     doc.push({ t: 'eq', tex: msT`z\text{-turn }${Math.round(OPENER_ROT.z)}^{\circ},\ \ x\text{-tilt }${Math.round(OPENER_ROT.x)}^{\circ},\ \ y\text{-turn }${Math.round(OPENER_ROT.y)}^{\circ}` });
   };
   if (showCay && OL.helix && !all4) helEqs();
@@ -20858,7 +20878,7 @@ function msPlateCommon(kind) {   // live parameters shared by every card of this
     tr(() => P.push(['slope band', _introStrip.on ? _introStrip.a + '/' + _introStrip.b + ', s = ' + _introStrip.s + ', w = ' + _introStrip.w : 'off']));
     tr(() => P.push(['Goldbach', _introGbOn ? 'E = ' + 2 * (G + 1) + ', pair ' + ((_introGbPairs || [])[_introGbI] || '') : 'off']));
     tr(() => P.push(['colour', _introColM || 'sector'])); tr(() => P.push(['6k ± 1 wheel', _introWheel ? 'on' : 'off'])); tr(() => P.push(['point size', f(_introPtScale) + '×']));
-    tr(() => P.push(['classical view', clsView(CLS.intro) ? clsView(CLS.intro).name : 'off']));
+    tr(() => P.push(['layer on screen', clsView(CLS.intro) ? clsView(CLS.intro).name : 'off']));
     return { G, P };
   }
   if (kind === 'opener') {
@@ -20867,7 +20887,7 @@ function msPlateCommon(kind) {   // live parameters shared by every card of this
     tr(() => P.push(['Cayley ρ', f(OPENER_RHO0) + ' + ' + f(OPENER_RHOD) + '·M/G'])); tr(() => P.push(['turns x, y, z', Math.round(OPENER_ROT.x) + '°, ' + Math.round(OPENER_ROT.y) + '°, ' + Math.round(OPENER_ROT.z) + '°']));
     tr(() => P.push(['prime spiral', (OL.p || 0) > 1 ? 'p = ' + OL.p + (OL.mirror ? ', mirror on' : '') : 'r = 1' + (OL.mirror ? ', mirror on' : '')])); tr(() => P.push(['Goldbach', OL.gbOn ? 'on' : 'off']));
     tr(() => P.push(['colour', ($('cmode') || {}).value || ''])); tr(() => P.push(['labels', OPENER_LABEL_MODE])); tr(() => P.push(['6k ± 1 wheel', _introWheel ? 'on' : 'off']));
-    tr(() => P.push(['classical view', clsView(CLS.opener) ? clsView(CLS.opener).name : 'off']));
+    tr(() => P.push(['layer on screen', clsView(CLS.opener) ? clsView(CLS.opener).name : 'off']));
     return { G, P };
   }
   const G = COP_G; P.push(['G (rings)', G]);
@@ -20875,7 +20895,7 @@ function msPlateCommon(kind) {   // live parameters shared by every card of this
   tr(() => P.push(['Cayley map', cmap + (cmap === 'A' ? ', ρ ' + f(rho0) + ' + ' + f(rhoD) + '·M/G' : ', a ' + f(ba) + '∠' + baAng + '°')])); tr(() => P.push(['zoom', cayleyZoomOut + '× out, ' + (+cayleyZoomIn).toFixed(1) + '× in']));
   tr(() => P.push([walkMode === 'band' ? 'block band' : 'strip', walkMode === 'band' ? 'w = ' + widthW : slopeA + '/' + slopeB + ', s = ' + offS + ', w = ' + widthW]));
   tr(() => P.push(['C(n) lift', (typeof liftOn !== 'undefined' && liftOn) ? 'n = ' + liftChainNEff() : 'off'])); tr(() => P.push(['6k ± 1 wheel', _introWheel ? 'on' : 'off']));
-  tr(() => P.push(['classical view', clsView(CLS.main) ? clsView(CLS.main).name : 'off']));
+  tr(() => P.push(['layer on screen', clsView(CLS.main) ? clsView(CLS.main).name : 'off']));
   return { G, P };
 }
 function msPlateImg(kind, v) {   // the plate alone for one base view
@@ -20900,9 +20920,14 @@ function msPlateCards(kind) {   // lazy cards: each is drawn only when it is sav
   const cards = [];
   ['grid', 'ring', 'cayley', 'helix'].forEach((v, i) => cards.push({ lazy: true, build: () => { const t = MS_VIEW_TXT[v]; return msCard({ title: 'The ' + t.name + ' View', sub: page + '  ·  plate ' + (i + 1) + ' of 14  ·  G = ' + G, img: msPlateImg(kind, v), detail: t.detail, params: C.P, formulas: t.f.concat([dens]), foot: page + ' · ' + t.name + ' view' }); } }));
   CLS_VIEWS.forEach((V, i) => cards.push({ lazy: true, build: () => {
-    const cv = document.createElement('canvas'); cv.width = 1600; cv.height = 1000; const opt = Object.assign({ noHead: true, k: 1.25 }, kind === 'opener' ? clsOpenerOpt() : kind === 'main' ? clsMainOpt() : {});
-    clsDraw(V.id, cv.getContext('2d'), 0, 0, 1600, 1000, G, opt);
-    return msCard({ title: V.name, sub: page + '  ·  plate ' + (i + 5) + ' of 14  ·  classical view  ·  M ≤ ' + G, img: cv, detail: V.thm, params: C.P, formulas: [V.f, CLS_STAT[V.id] || '', V.law], foot: page + ' · ' + V.name }); } }));
+    let cv;
+    if (clsIsLayer(V.id)) {   // a lattice layer: the page's own plate in the chart on screen, with every dynamic it shows (C(n), spiral, mirror, Goldbach, strip, circle method), and the layer drawn on it
+      const ch = kind === 'intro' ? ({ cay: 'cayley', hel: 'helix', grid: 'grid' }[_introVw.m > 0.5 ? _introVw.mode : ''] || 'ring') : kind === 'opener' ? (OPENER_VIEW === 'cayley' ? (OL.helix ? 'helix' : 'cayley') : OPENER_VIEW === 'grid' ? 'grid' : 'ring') : (viewMode === 'cayley' ? (HEL_MAIN ? 'helix' : 'cayley') : viewMode === 'grid' ? 'grid' : 'ring');
+      const sv = CLS[kind]; CLS[kind] = V.id; try { cv = msPlateImg(kind, ch); } finally { CLS[kind] = sv; }
+    } else {   // Ford circles, Chebyshev's bias: plots, not layers, so they keep their own panel
+      cv = document.createElement('canvas'); cv.width = 1600; cv.height = 1000; const opt = Object.assign({ noHead: true, k: 1.25 }, kind === 'opener' ? clsOpenerOpt() : kind === 'main' ? clsMainOpt() : {});
+      clsDraw(V.id, cv.getContext('2d'), 0, 0, 1600, 1000, G, opt); }
+    return msCard({ title: V.name, sub: page + '  ·  plate ' + (i + 5) + ' of 14  ·  layer  ·  M ≤ ' + G, img: cv, detail: V.thm, params: C.P.map(q => q[0] === 'layer on screen' ? ['this plate', V.name] : q), formulas: [V.f, CLS_STAT[V.id] || '', V.law], foot: page + ' · ' + V.name }); } }));
   return cards;
 }
 async function msPlatesSave(kind, st, host) {
