@@ -2157,7 +2157,7 @@ walk anyway.</p>
         <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">y</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('y',180)">180</button></div>
         <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">z</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('z',180)">180</button></div>
         <div class="gr" style="gap:4px;"><span style="min-width:2.4em;" title="Cayley radius at the start of the sweep: rho = rho0 + rhoD * M/G">&rho;&#8320;</span><input type="range" id="intro-rho0-sl" min="0" max="4" step="0.05" value="0" oninput="setOpenerRho0(+this.value)" style="flex:1 1 60px;min-width:44px;"><input type="number" id="intro-rho0-n" min="0" max="4" step="any" value="0" style="width:52px;font-size:11px;" onchange="setOpenerRho0(+this.value)"></div>
-        <div class="gr" style="gap:4px;"><span style="min-width:2.4em;" title="Cayley radius growth: rho = rho0 + rhoD * M/G">&rho;<sub>D</sub></span><input type="range" id="intro-rhod-sl" min="0" max="16" step="0.05" value="2" oninput="setOpenerRhoD(+this.value)" style="flex:1 1 60px;min-width:44px;"><input type="number" id="intro-rhod-n" min="0" max="16" step="any" value="2" style="width:52px;font-size:11px;" onchange="setOpenerRhoD(+this.value)"><button class="chip" style="padding:2px 8px;" onclick="setIntroRhoPair(0,2)" title="Default: rho runs 0 to 2, from the origin: the poles">0&middot;2</button><button class="chip" style="padding:2px 8px;" onclick="setIntroRhoPair(0.4,1.8)" title="rho runs 0.4 to 2.2">0.4&middot;1.8</button></div>
+        <div class="gr" style="gap:4px;"><span style="min-width:2.4em;" title="Cayley radius growth: rho = rho0 + rhoD * M/G">&rho;<sub>D</sub></span><input type="range" id="intro-rhod-sl" min="0" max="16" step="0.05" value="2" oninput="setOpenerRhoD(+this.value)" style="flex:1 1 60px;min-width:44px;"><input type="number" id="intro-rhod-n" min="0" max="16" step="any" value="2" style="width:52px;font-size:11px;" onchange="setOpenerRhoD(+this.value)"><button class="chip" style="padding:2px 8px;" onclick="setIntroRhoPair(0,2)" title="Default: rho runs 0 to 2, from the origin: the poles">0&middot;2</button><button class="chip" style="padding:2px 8px;" onclick="setIntroRhoPair(0.4,1.8)" title="rho runs 0.4 to 2.2">0.4&middot;1.8</button><button class="chip" style="padding:2px 8px;" onclick="setIntroRhoPair(0.4,0.6)" title="rho runs 0.4 to 1.0, inside the unit circle">0.4&middot;0.6</button></div>
         <div class="gr"><span>size</span><input type="range" id="intro-sz-sl" min="30" max="200" value="75" oninput="_introPtScale = this.value / 100" style="flex:1 1 80px;min-width:60px;" title="Point size"><button class="chip" id="intro-col-btn" onclick="introToggleColor()" title="Cycle the colouring: sector s = ⌊M/r⌋ · φ(M) progression (hue by the rank of r among the residues coprime to M, as on the opener) · Ethiopian (green r/M ≥ 2/3, yellow 1/3 ≤ r/M < 2/3, red r/M < 1/3) · r/M hue (the fraction behind the angle) · coloring 16 (the smallest saturated prime dividing r)">color: sector</button><button class="chip" id="intro-sec-btn" onclick="introSecCycle()" title="How many sectors are drawn (rays, labels) and counted one by one in the corner table: 4, 8, 16, all, or off (no rays, names or table; the colours stay). Classical views that are not about sectors (Ford, Chebyshev, Dirichlet, Lehmer, Möbius, Ramanujan, primitive roots) hide them by themselves while they show. Choices: 4, 8, 16, or all (every s = floor(M/r) up to G). Sectors beyond the listed ones are pooled in one exact row.">sectors: all</button></div>
       </div>
       <div class="ig"><div class="gl">Layer</div><div class="gr"><button class="chip" onclick="clsStep('intro', -1)" title="Previous layer">&#9660;</button><select id="intro-cls-sel" onchange="clsSet('intro', this.value)" style="background:#0c0e1a;color:var(--cream);border:1px solid rgba(255,255,255,.18);border-radius:4px;font:inherit;font-size:11px;padding:2px 4px;max-width:230px" title="Draw one of ten classical pictures of the lattice over the plate, at the current M (slider and timeline drive it)."><option value="">off</option></select><button class="chip" onclick="clsStep('intro', 1)" title="Next layer">&#9650;</button></div></div>
@@ -4630,7 +4630,7 @@ let OPENER_G = 13;        // preview lattice size, 2..256, set by the slider
 const OPENER_CZ_DEFAULT = 0.33;
 /* Cayley map A's rho = rho0 + rhoD*M/G for the preview only: same defaults and
    ranges as the Cayley panel on the page, but its own sliders. */
-let OPENER_RHO0 = 0, OPENER_RHOD = 2;
+let OPENER_RHO0 = 0.4, OPENER_RHOD = 1.8;
 let OPENER_RING_HOLE = 0;   // Ring preview's inner radius, 0..1 &mdash; the page's own "hole" control, mirrored here
 let OPENER_CIRCLE_METHOD = false;   // "circle method" fill in the ring's hole, opt-in, strength follows OPENER_RING_HOLE
 let OPENER_CZ = OPENER_CZ_DEFAULT;   // Cayley preview zoom; below 1 zooms out
@@ -7777,14 +7777,14 @@ function showIntro() {
     /* Auto-fit: once M is driven by the slider, the outer ring G fills the plate (zoomed in at small M, zooming out as M grows).
        The fit eases in log space so the ring never jumps; the intro's own growth and exports keep the fixed GMAX scale. */
     const OPENM = _introSeq && !_introExporting && T < -50;   // the opening 10 s: M grows 1 -> 512, so the plate fits the rings that exist and the few points are drawn larger and labelled
-    const gT = _introGM != null || OPENM ? Math.max(12, G) : GMAX;
+    const gT = OPENM ? Math.max(2, G) : _introGM != null ? Math.max(12, G) : GMAX;
     _introGZ = _introExporting || !_introGZ ? gT : (_introVUser && _introV.k > 1.05 && !_introExporting) ? _introGZ : Math.exp(Math.log(_introGZ) + (Math.log(gT) - Math.log(_introGZ)) * 0.2);   // zoomed in by hand: the ring scale holds still while M plays, so the zoomed spot does not slide; at the normal zoom the plate keeps refitting to M
     const GZ = _introGZ;
     _introGeo = { cx, cy, R, W, H, GMAX, GZ, G, top0, bot0, cvTop, cy0: cy - _introV.fy * H, cx0: cx - _introV.fx * W };
     { const pFs = Math.max(10, Math.min(12, W / 34)) * UI, pLh = pFs + 4, pT = (_introExporting && !LAND) ? top0 + pFs + 2 + (_introStrip.on ? 13 : 8) * pLh : top0, pB = (_introExporting && !LAND) ? bot0 - 5 * pLh : bot0;   // portrait export: a zoomed plate (k > 1) never runs under the corner stats
     x.save(); x.beginPath(); x.rect(0, pT, W, Math.max(10, pB - pT)); x.clip(); }   // the ring never covers the title or the controls
-    const PT0 = Math.max(0.7, 1.25 * introPtG(G) * (_introIso === 'strip' ? 0.75 : _introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * _introPtScale * (_introExporting ? Math.min(1, Math.sqrt(256 / GZ)) : 1) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
-    const PT = _introExporting ? PT0 : Math.min(PT0, Math.max(0.6, 0.9 * R / Math.max(1, GZ || G)));   // never wider than the gap between neighbouring rings (R/G), so dense plates do not merge into a solid fill
+    const PT0 = Math.max(0.7, 1.25 * introPtG(G) * (_introIso === 'strip' ? 0.75 : _introIso ? 2.2 : 1) * (_introExporting ? 1.6 : 1) * 0.75 * (_introExporting ? Math.min(1, Math.sqrt(256 / GZ)) : 1) * Math.max(1, Math.min(3.2, _introV.k)));   // points shrink as the plate fills: area per cell ~ 1/G^2, so size ~ 1/G beyond G = 256 (sqrt-eased)
+    const PT = Math.max(0.25, (_introExporting ? PT0 : Math.min(PT0, Math.max(0.6, 0.9 * R / Math.max(1, GZ || G)))) * (_introPtScale / 0.75));   // the size slider scales the final size, after the dense-plate cap, so it works on every plate   // never wider than the gap between neighbouring rings (R/G), so dense plates do not merge into a solid fill
     const spin = 0;   // no rotation: the ring stays at 0 degrees the whole way
     const SECHUE = [0, 50, 170, 215, 275, 320, 25, 110, 190];   // by sector s = floor(M / r); s >= 8 shares the last hue, desaturated
     const KILL = _introSat ? introKiller(_introN) : null;
@@ -7829,7 +7829,7 @@ function showIntro() {
     }
     x.globalAlpha = 1;
     const bdFade = _introStopLM.startsWith('bd') ? Math.max(0, Math.min(1, (_introStopZ / (40 * INTRO_STOP_ZX) - 0.75) / 0.2)) : 1;   // boundary scan: labels only once the camera is (nearly) all the way in; they fade as it starts to zoom out, and no labels are computed in between
-    if (_introZL > 0.02 && !_introExporting && _introStopNow && _introStopLM !== 'none' && bdFade > 0.02) {   // zoom stop: every visible cell labelled with its r
+    if (_introZL > 0.02 && (!_introExporting || _introExpLbl) && _introStopNow && _introStopLM !== 'none' && bdFade > 0.02) {   // zoom stop: every visible cell labelled with its r
       const o = INTRO_STOPS[_introStopNow.i], Mt = Math.min(G, Math.round(_introStopM || o.M)), sp = VW.mode === 'cay' && VM > 0.3 ? G : Math.ceil(G * 2.8 / _introStopZ) + 6, fsz = Math.round((_introStopLM.startsWith('bd') ? 14 : 11) * UI);
       x.save(); x.globalAlpha = _introZL * bdFade; x.font = 'bold ' + fsz + 'px monospace'; x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = 'rgba(255,248,220,.95)'; x.shadowColor = 'rgba(0,0,0,.9)'; x.shadowBlur = 3;
       let cnt = 0; const LZ = _introLens.on ? (() => { const lr = Math.max(70, Math.min(W, H) * 0.17); return { x: Math.max(lr + 4, Math.min(W - lr - 4, _introLens.x)), y: Math.max(lr + 4, Math.min(H - lr - 4, _introLens.y)), r: lr / _introLens.z + 40 }; })() : null;   // the lens re-labels its own patch, so the stop labels stay out of it
@@ -7840,7 +7840,7 @@ function showIntro() {
         if (_introCop[r * 513 + M] !== 1 || (_introWheel && r % 6 !== 1 && r % 6 !== 5)) continue; const kd = !bdN && _introN > 0 && introKilled(r, M, _introN); if (kd && _introStopLM !== 'sieve') continue;
         if (((_introStopLM === 'r' || _introStopLM === 'pi') && M !== Math.round(_introStopM)) || (_introStopLM === 'rm' && r !== Math.round(_introStopR))) continue;   /* a sweep labels only the ring or ray it travels */
         const P = posRM(r, M); if (!P || (P[0] - zx) * (P[0] - zx) + (P[1] - zy) * (P[1] - zy) > zr2) continue; if (LZ && (P[0] - LZ.x) * (P[0] - LZ.x) + (P[1] - LZ.y) * (P[1] - LZ.y) < LZ.r * LZ.r) continue;
-        const lt = bdN ? String(r) : (_introStopLM === 'rm' || _introStopLM === 'all' || (isCay && !_introStopLM)) ? r + '/' + M : _introStopLM === 'pi' ? (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })() : String(r), _fz = bdN && !bdX ? Math.round(fsz * 0.72) : fsz, _ff = (x.font = 'bold ' + _fz + 'px monospace'), lx = P[0] + PT * (bdX ? 1.2 : 0.7) + (bdX ? 5 : 2), ly = bdX ? P[1] + _fz * 0.38 : P[1] - PT * 0.7 - 1, lw = x.measureText(lt).width + 2,   /* a boundary scan writes the integer on the × itself */ lh = fsz + 1, gx = Math.floor(lx / 40), gy = Math.floor(ly / 20);   // skip a label whose box would touch one already placed
+        const lt = bdN ? String(r) : (_introStopLM === 'rm' || _introStopLM === 'all') ? r + '/' + M : _introStopLM === 'pi' ? (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })() : String(r), _fz = bdN && !bdX ? Math.round(fsz * 0.72) : fsz, _ff = (x.font = 'bold ' + _fz + 'px monospace'), lx = P[0] + PT * (bdX ? 1.2 : 0.7) + (bdX ? 5 : 2), ly = bdX ? P[1] + _fz * 0.38 : P[1] - PT * 0.7 - 1, lw = x.measureText(lt).width + 2,   /* a boundary scan writes the integer on the × itself */ lh = fsz + 1, gx = Math.floor(lx / 40), gy = Math.floor(ly / 20);   // skip a label whose box would touch one already placed
         if (bdX) { RED.push([lt, lx, ly, lw, _fz]); continue; }   // the line's primes are drawn last, over everything
         let hit = false; for (let ix = gx - 1; ix <= gx + 1 && !hit; ix++) for (let iy = gy - 1; iy <= gy + 1 && !hit; iy++) { const B = occ.get(ix * 4096 + iy); if (B) for (const b of B) if (lx < b[0] + b[2] && b[0] < lx + lw && ly - lh < b[1] && b[1] - b[3] < ly) { hit = true; break; } }
         if (hit) continue; { const key = gx * 4096 + gy; if (!occ.has(key)) occ.set(key, []); occ.get(key).push([lx, ly, lw, lh]); }
@@ -7851,7 +7851,7 @@ function showIntro() {
         const fz = Math.round(Math.max(11, Math.min(14, Wa / 40)) * UI), mw = Math.max(140, Math.min(Wa - 24, 620 * UI)), txt = (_introStopCap || '').split('{M}').join(String(Math.round(_introStopM))) || (_introStopTxt + '  ·  labels: ' + (isCay ? 'r/M' : 'r'));
         x.font = 'italic ' + fz + 'px Georgia, serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.shadowBlur = 0;
         const ln = []; let cur = ''; txt.split(' ').forEach(w => { const t2 = cur ? cur + ' ' + w : w; if (x.measureText(t2).width > mw && cur) { ln.push(cur); cur = w; } else cur = t2; }); if (cur) ln.push(cur);
-        const lh2 = fz * 1.35, bw = Math.min(mw, Math.max(...ln.map(l => x.measureText(l).width))) + 20, bh = ln.length * lh2 + 12, by = Math.min(bot0 - bh - 6, zy + zr + 10 * UI), bx = Wa / 2 - bw / 2;
+        const lh2 = fz * 1.35, bw = Math.min(mw, Math.max(...ln.map(l => x.measureText(l).width))) + 20, bh = ln.length * lh2 + 12, by = Math.min(bot0 - bh - 6, _introExpLbl && _introExpCapB ? _introExpCapB - bh : Infinity, zy + zr + 10 * UI), bx = Wa / 2 - bw / 2;
         x.globalAlpha = 1; x.fillStyle = '#06060f'; x.strokeStyle = 'rgba(232,227,219,.25)'; x.lineWidth = 1; x.beginPath(); if (x.roundRect) x.roundRect(bx, by, bw, bh, 6); else x.rect(bx, by, bw, bh); x.fill(); x.stroke();
         x.fillStyle = '#ece6d6'; ln.forEach((l, i) => x.fillText(l, Wa / 2, by + 6 + lh2 * (i + 0.5))); x.restore(); };
       x.restore();
@@ -7975,7 +7975,7 @@ function showIntro() {
       if (_introMirror && sp >= 2 && _introN === sp - 1 && !_introSat) {
         let k = 0, kp = 0, kc = 0, first = 0, lastQ = 0;
         x.save(); x.strokeStyle = 'rgba(255,236,170,.95)'; x.lineWidth = 1.4;
-        const SV = [], rr0 = Math.max(3, PT * 1.6);
+        const SV = [], rr0 = Math.max(3 * Math.min(1, _introPtScale / 0.75), PT * 1.6);
         for (let M = sp + 1; M <= G; M++) { const r = M - sp; if (gcd(r, M) !== 1 || introKilled(r, M, _introN)) continue; k++; let kind = 'one'; if (r > 1) { let pr = true; for (let d = 2; d * d <= r; d++) if (r % d === 0) { pr = false; break; } if (pr) { kp++; kind = 'prime'; if (!first) first = r; lastQ = r; } else { kc++; kind = 'comp'; } }
           const P = posRM(r, M); if (!P) continue; x.beginPath(); x.arc(P[0], P[1], rr0, 0, 7); x.stroke(); SV.push({ r, M, P, kind }); }
         /* label every surviving mirror cell with its r: set perpendicular to the mirror line, on the side away from the spiral, with a dark
@@ -8015,7 +8015,7 @@ function showIntro() {
       const E = 2 * (G + 1), g = _introGbPairs[Math.min(_introGbI, _introGbPairs.length - 1)], sP = E - g;
       const at = (r, M) => posRM(r, M) || [NaN, NaN];
       const ds = [[Math.max(1, g - G), Math.min(G, g - 1), -1, g, '#c8a84a'], [Math.max(1, sP - G), Math.min(G, sP - 1), -1, sP, '#e05060'], [1, G - g, 1, g, '#3dc8b8'], [g + 1, G, 1, -g, '#9b7fe8']];
-      const dp = Math.max(2, PT * 2.2);
+      const dp = Math.max(2 * Math.min(1, _introPtScale / 0.75), PT * 2.2);
       x.save();
       ds.forEach(d => { x.fillStyle = d[4]; for (let r = d[0]; r <= d[1]; r++) { const M = d[2] * r + d[3]; if (M < 1 || M > G || lv1G(r, M) !== 1) continue; const q = at(r, M); x.fillRect(q[0] - dp / 2, q[1] - dp / 2, dp, dp); } });
       // trail of every pair's marker (g', E - g') and the current marker
@@ -8123,14 +8123,16 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
     if (!_introExporting && (_introSeq || (_introVw.script && !_introVw.man))) { const want = _introT > -43.99; if (want !== _introAbsWant) { _introAbsWant = want; if (_introAbs !== want) introAbsToggle(); } }   // formula mode comes on once the first zoom (-44 s) is over, for the rest of the play; scrubbing back before it turns it off; your own toggle holds until the play crosses -44 again
     introViewTick(_introT); introKAnim(_introT - 10);
     introViewTitleTick();
-    if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } introKAnim(_introT - 10); } else if (_introKOn) { _introKOn = false; }
+    if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } introKAnim(_introT - 10);
+      if (_introT < -43.9 && !_introVUser && _introActU == null && !_introStopNow) { const kt = _introVw.mode === 'cay' && _introVw.m > 0.5 ? 0.45 : 1; _introV.k += (kt - _introV.k) * 0.08; } }   // opening on Cayley: zoomed out so both poles (0 mod 1 and 0 mod 2) show as M grows else if (_introKOn) { _introKOn = false; }
     _introStopLM = ''; _introStopCap = ''; _introStopSv = 0;
     { const st = _introStopNow, gm = _introGeo;   // zoom stop: camera in to (r, M), hold with the r labels, back out
       if (st && gm && !_introVUser) {
         const o0 = INTRO_STOPS[st.i], ez = v => { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }, t0 = st.ph * o0.d; let nT = o0.tour ? o0.tour.length : 1; const sg = o0.d / nT; let jT = Math.min(nT - 1, Math.floor(t0 / sg));
         let o = o0.tour ? Object.assign({ d: sg, am: 0, aq: 0 }, o0.tour[jT]) : o0, t = t0 - jT * sg, w = ez(t / 1.5) * (1 - ez((t - (o.d - 1.5)) / 1.5)); if (o0.sweep) {   // a sweep: zoom in once, glide from cluster to cluster at zoom (holding on each), zoom out once
           const L = o0.sweep, n = L.length, tt = Math.max(0, Math.min(o0.d - 3, t0 - 1.5)), Wt = L.reduce((q, o) => q + (o.w || 1), 0), unit = (o0.d - 3) / Wt; let i0 = 0, acc0 = 0; while (i0 < n - 1 && tt >= acc0 + (L[i0].w || 1) * unit) { acc0 += (L[i0].w || 1) * unit; i0++; } const seg = (L[i0].w || 1) * unit, a = L[i0], b = L[Math.min(n - 1, i0 + 1)], hd = a.hold != null ? a.hold : 0.55, fr = Math.min(1, (tt - acc0) / seg), u = hd >= 1 ? 0 : hd <= 0 ? Math.max(0, Math.min(1, fr)) : ez((fr - hd) / (1 - hd)); _introStopLM = a.lm || ''; _introStopCap = a.cap || '';   // hold 0: a steady glide (r or M moves linearly)
-          o = { d: o0.d, am: 0, aq: 0, r: a.r + (b.r - a.r) * u, M: a.M + (b.M - a.M) * u, Z: Math.exp(Math.log(a.Z) + (Math.log(b.Z) - Math.log(a.Z)) * u) }; t = t0; w = ez(t0 / 1.5) * (1 - ez((t0 - (o0.d - 1.5)) / 1.5)); jT = i0; nT = n; }
+          const Gx = gm.G, fit = e => { let r = e.r, M = e.M; if (M > Gx) { r = Math.max(1, Math.round(r * Gx / M)); M = Gx; } return Object.assign({}, e, { r: r, M: M }); },   /* the 1/2 line runs through the Cayley pole (rho = 1, theta = pi): it stops short of it */ a2 = fit(a), b2 = fit(b), bk = _introStopBase && _introStopBase.i === st.i ? _introStopBase.k : _introV.k, zf = e => e.Z <= 1 ? bk / INTRO_STOP_ZX : e.Z;   /* a zoom-out (Z = 1) returns to the camera the scan started from (both poles in view), not to a fixed zoom; the scan was written for M = 512: on a smaller plate each line ends at the last M that exists, keeping r/M */
+          o = { d: o0.d, am: 0, aq: 0, r: a2.r + (b2.r - a2.r) * u, M: a2.M + (b2.M - a2.M) * u, Z: Math.exp(Math.log(zf(a)) + (Math.log(zf(b)) - Math.log(zf(a))) * u) }; t = t0; w = ez(t0 / 1.5) * (1 - ez((t0 - (o0.d - 1.5)) / 1.5)); jT = i0; nT = n; }
         if (o0.sieve) { const L = o0.sieve, k = Math.max(0, Math.min(L.length - 1, Math.floor((t0 - 1.5) / ((o0.d - 3) / L.length)))); _introStopSv = L[k]; _introStopCap = 'C(n) locked to the prime spiral: p = ' + L[k] + ', n = p − 1 = ' + (L[k] - 1) + ' · every prime ≤ ' + L[k] + ' now removes all of its multiples r · removed r in red'; }
         if (o0.spiral) { const L = o0.spiral, k = Math.max(0, Math.min(L.length - 1, Math.floor(t0 / o0.d * L.length))); _introStopSv = L[k]; _introStopLk = !!o0.lock; }   // the prime spiral plays while the camera moves (C(n) left at 0)
         else if (o0.sieve) _introStopLk = true;
@@ -8151,7 +8153,7 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
         const th = _introTh(r, M), rad = _introRad(gm.R, M, gm.GZ); _introStopM = M; _introStopR = r;
         let px = gm.cx + rad * Math.cos(th), py = gm.cy - rad * Math.sin(th);
         if (V.m > 0.002) { const q = introViewPos(r, M, th, V, gm.cx, gm.cy, gm.R, gm.G, gm.GZ); if (q) { px += (q[0] - px) * V.m; py += (q[1] - py) * V.m; } }
-        const kt = B.k * Math.pow(o.Z, w), sc = kt / Math.max(1e-6, _introKPaint || _introV.k), dx = (px - gm.cx) * sc, dy = (py - gm.cy) * sc;
+        const kt = o0.sweep ? Math.pow(B.k, 1 - w) * Math.pow(o.Z, w) : B.k * Math.pow(o.Z, w), sc = kt / Math.max(1e-6, _introKPaint || _introV.k), dx = (px - gm.cx) * sc, dy = (py - gm.cy) * sc;
         _introV.k = kt; _introV.fx = B.fx * (1 - w) - w * dx / gm.W; _introV.fy = B.fy * (1 - w) - w * (dy - ((gm.top0 + gm.bot0) / 2 - gm.cy0)) / gm.H;
         _introZL = ez((w - 0.55) / 0.35); _introStopTxt = 'zoom ×' + Math.round(o.Z) + ' around (r, M) ≈ (' + Math.round(r) + ', ' + Math.round(M) + ')' + (o0.spiral ? '  ·  prime spiral r = ' + _introStopSv + (_introStopSv === 1 ? ' (gcd 1)' : '') + (o0.lock ? ', C(n) locked: n = ' + Math.max(0, _introStopSv - 1) + (_introStopSv > 1 ? ' · removed r in red' : '') : ', C(n) at n = 0') : '') + (_introN > 0 && !o0.spiral ? '  ·  C(n), n = ' + _introN + ': kept r have no prime factor ≤ ' + (_introN + 1) + ((() => { let q = _introN + 2; while (_introPF[q] && _introPF[q].length && !(_introPF[q].length === 1 && _introPF[q][0] === q)) q++; return q * q > _introGcur; })() ? ', so r = 1 or a prime > ' + (_introN + 1) : '') : '') + (o0.tour || o0.sweep ? '  ·  ' + (jT + 1) + ' / ' + nT : '');
       } else { if (_introStopBase) { Object.assign(_introV, { k: _introStopBase.k, fx: _introStopBase.fx, fy: _introStopBase.fy }); _introStopBase = null; } _introZL = 0; } }
@@ -8197,7 +8199,7 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
         } } }
     { const sT = _introT;   // opening: from slider -36 to -2 keep every lattice point in view (zoom out only); then ease back to k = 1
       if (_introSeq && !_introVUser && !_introExporting && !_introStopNow) {
-        if (_introActU == null && ((sT >= 16 && sT < 36) || (sT >= -24 && sT < -18) || (sT >= -50 && sT < -34))) introAutoFit(1);
+        if (_introActU == null && ((sT >= 16 && sT < 36) || (sT >= -24 && sT < -18) || (sT >= -50 && sT < -34 && !(sT < -43.9 && _introVw.mode === 'cay' && _introVw.m > 0.5)))) introAutoFit(1);   // not while the opening Cayley plate is up: the fit ignores the circle-method arcs and cut them
         else if ((sT >= 36 && sT < 44) || (sT >= -18 && sT < -8) || (sT >= -34 && sT < -30)) { _introV.k += (1 - _introV.k) * 0.15; _introV.fx *= 0.85; _introV.fy *= 0.85; }
       } }
     if (_introLens.on && _introPosRM && !_introExporting) {   // magnifier: the canvas under it, scaled up, with labels placed from the true cell positions
@@ -8209,12 +8211,13 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
       let best = null, bd = 1e9, cnt = 0;
       for (let M = 1; M <= G2; M++) for (let r = 1; r <= (_introAng === 'clamp' ? M : G2); r++) {
         if (_introCop[r * 513 + M] !== 1 || (_introWheel && r % 6 !== 1 && r % 6 !== 5)) continue; const P = _introPosRM(r, M); if (!P) continue; const dx = P[0] - lx, dy = P[1] - ly, d2 = dx * dx + dy * dy; if (d2 > sr * sr) continue;
-        const kl = n > 0 && introKilled(r, M, n); if (d2 < bd) { bd = d2; best = [r, M, kl]; } if (kl && md !== 'kept') continue; if (cnt > 400) continue;
-        const qx = lx + dx * Z, qy = ly + dy * Z, tx = md === 'r' ? String(r) : md === 'r/M' ? r + '/' + M : md === 'M' ? String(M) : md === 's' ? 's' + Math.floor(M / r) : md === 'kept' ? (kl ? '×' + ((_introPF[r] || []).find(p => (p - (M % p)) % p <= n) || '') : '✓') : (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })();
+        const kl = n > 0 && introKilled(r, M, n); if (d2 < bd) { bd = d2; best = [r, M, kl]; } if (kl && md !== 'kept' && !_introSat) continue; if (cnt > 400) continue;
+        const qx = lx + dx * Z, qy = ly + dy * Z; let tx = md === 'r' ? String(r) : md === 'r/M' ? r + '/' + M : md === 'M' ? String(M) : md === 's' ? 's' + Math.floor(M / r) : md === 'kept' ? (kl ? '×' + ((_introPF[r] || []).find(p => (p - (M % p)) % p <= n) || '') : '✓') : (() => { const a = 2 * r, g = gcd(a, M), nu = a / g, de = M / g; return (nu === 1 ? '' : nu) + 'π' + (de === 1 ? '' : '/' + de); })();
+        if (kl && md !== 'kept') tx = '×' + ((_introPF[r] || []).find(p => (p - (M % p)) % p <= n) || '') + ' ' + tx;
         const tw = x.measureText(tx).width + 2, ax = qx + 3, ay = qy - 2, gx = Math.floor(ax / 40), gy = Math.floor(ay / 14); let hit = false;
         for (let ix = gx - 1; ix <= gx + 1 && !hit; ix++) for (let iy = gy - 1; iy <= gy + 1 && !hit; iy++) { const B = occ.get(ix * 4096 + iy); if (B) for (const b of B) if (ax < b[0] + b[2] && b[0] < ax + tw && ay - fs < b[1] && b[1] - fs < ay) { hit = true; break; } }
         if (hit) continue; { const k = gx * 4096 + gy; if (!occ.has(k)) occ.set(k, []); occ.get(k).push([ax, ay, tw]); }
-        x.fillStyle = md === 'kept' ? (kl ? '#ff6b6b' : '#5fd38d') : 'rgba(255,248,220,.95)'; x.fillText(tx, ax, ay); cnt++;
+        x.fillStyle = md === 'kept' ? (kl ? '#ff6b6b' : '#5fd38d') : kl ? '#ff6b6b' : 'rgba(255,248,220,.95)'; x.fillText(tx, ax, ay); cnt++;
       }
       x.restore();
       x.save(); x.strokeStyle = 'rgba(212,175,55,.9)'; x.lineWidth = 1.5; x.beginPath(); x.arc(lx, ly, lr, 0, 7); x.stroke(); x.strokeStyle = 'rgba(212,175,55,.5)'; x.lineWidth = 1; x.beginPath(); x.moveTo(lx - 5, ly); x.lineTo(lx + 5, ly); x.moveTo(lx, ly - 5); x.lineTo(lx, ly + 5); x.stroke();
@@ -8347,7 +8350,6 @@ let _introHole = 0, _introCM = false, _introGZ = 0, _introSeq = true, _introSeqG
    Touching any control ends the sequence (the intro's own timeline then takes over). */
 /* Zoom stops: at slider time s the play holds for d seconds while the camera eases in to cell (r, M) (zoom Z), shows every r, then eases back out and the play carries on. The slider shows play time, so it rests at s during a stop. */
 var INTRO_STOPS = [
-  { s: -44, d: 60, act: true },   // the opening acts (Farey, then k 0 -> 128 ...): the script waits at -44 while they play; the clock shown keeps running
   { s: -44, d: 112, cls: 'dirichlet', sweep: [   // the boundary scan, Dirichlet on: zoom in at the start of the 1/1 line, slide out along it reading the × marks, zoom out; then 1/2, 1/3, 1/4
       { r: 2, M: 2, Z: 40, w: 2, hold: 0.35, lm: 'bd1', cap: 'the 1/1 line r = M (0 mod 1): × at M = p prime, where the class 0 mod p holds the one prime p · each × labelled p' },
       { r: 97, M: 97, Z: 40, hold: 0.3, lm: 'bd1', cap: 'the 1/1 line r = M (0 mod 1): × at M = p prime, where the class 0 mod p holds the one prime p · each × labelled p' },
@@ -8361,6 +8363,7 @@ var INTRO_STOPS = [
       { r: 2, M: 8, Z: 40, w: 2, hold: 0.35, lm: 'bd4', cap: 'the 1/4 line r = M/4: × at (p, 4p): 2/8, 3/12, 5/20, 7/28, … · each × labelled p' },
       { r: 97, M: 388, Z: 40, hold: 0.3, lm: 'bd4', cap: 'the 1/4 line r = M/4: × at (p, 4p): 2/8, 3/12, 5/20, 7/28, … · each × labelled p' },
       { r: 1, M: 1, Z: 1, hold: 1, lm: 'none', cap: '' }] },
+  { s: -44, d: 60, act: true },   // the opening acts (now AFTER the boundary scan) (Farey, then k 0 -> 128 ...): the script waits at -44 while they play; the clock shown keeps running
   { s: -38, d: 20, lock: true, lm: 'sieve', spiral: [1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 19, 17, 13, 11, 7, 5, 3, 2, 1], sweep: [                                       // Helix with the gcd-1 spiral: a loop round the corner where sectors 1, 2, 3 meet (r/M = 1/2 and 1/3)
       { r: 10, M: 27, Z: 5, hold: 0.35 }, { r: 16, M: 28, Z: 5, hold: 0.35 }, { r: 22, M: 46, Z: 5, hold: 0.35 }, { r: 14, M: 45, Z: 5, hold: 0.35 }, { r: 9, M: 34, Z: 5, hold: 0.35 }, { r: 10, M: 27, Z: 5, hold: 1 }] },    // Helix with the gcd-1 spiral: where sectors 1, 2, 3 meet (r/M = 1/2 and 1/3)
   { s: -27, r: 8, M: 24, Z: 30 },     // Grid, the free spiral pass
@@ -8382,7 +8385,7 @@ var INTRO_STOPS = [
   { s: 115, r: 1, M: 3, Z: 10 }       // Goldbach in Cayley
 ].map(o => Object.assign({ d: 8 }, o)), _introStopNow = null, _introStopBase = null, _introZL = 0;
 function introWarp(tr) { let acc = 0; for (let i = 0; i < INTRO_STOPS.length; i++) { const o = INTRO_STOPS[i], a = o.s + acc; if (tr < a) break; if (tr < a + o.d) return [o.s, i, (tr - a) / o.d]; acc += o.d; } return [tr - acc, -1, 0]; }   // real clock -> play time (+ the stop being held)
-var _introActU = null, _introCapFn = null;
+var _introActU = null, _introCapFn = null, _introExpLbl = false, _introExpCapB = 0;   // _introExpLbl: the 1080 x 1920 snapshot keeps the zoom-stop labels and caption
 /* The closing loop: a cycle of charts, each at its own M = G; M slides to it, then every Goldbach pair of E = 2(G + 1) is visited once
    with the strip locked and the camera on the marker, then on to the next chart. Ring sits between the others so each change is a
    single blend. Durations follow the pair counts, so the cycle is fixed and scrubbing lands on the same frame. */
@@ -8399,8 +8402,8 @@ function introLoopAt(t) {   // t = seconds into the loop -> { seg, prev, u (seco
   return { o, pv, u, G: Math.round(pv.G + (o.G - pv.G) * ez), gi: u < INTRO_LOOP_MV ? 0 : Math.min(o.n - 1, Math.floor((u - INTRO_LOOP_MV) / INTRO_LOOP_PAIR)), mv: ez };
 }
 function _introIsP(n) { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }   // seconds into the opening acts, or null
-function introDispT(T) { if (_introActU != null) return -44 + _introActU; if (T > -44 || _introStopNow) return T + INTRO_ACTS; return T; }   // the clock shown: the script's time with the acts' INTRO_ACTS s inserted at -44
-function introDispUnwarp(D) { if (D < -44) return introUnwarp(D); if (D < -44 + INTRO_ACTS) return introUnwarp(-44) + (D + 44); const T = D - INTRO_ACTS; return T <= -44 ? introUnwarp(-44) + INTRO_ACTS : introUnwarp(T); }   // the clock shown -> real clock
+function introDispT(T) { if (_introActU != null) return -44 + _introActU; if (_introStopNow && _introStopNow.i === 0) return -44; if (T > -44 || _introStopNow) return T + INTRO_ACTS; return T; }   // the boundary scan (stop 0) now plays first, right after M has grown 1 -> 512, with the clock held at -44   // the clock shown: the script's time with the acts' INTRO_ACTS s inserted at -44
+function introDispUnwarp(D) { const SW = INTRO_STOPS[0].d; if (D < -44) return introUnwarp(D); if (D < -44 + INTRO_ACTS) return -44 + SW + (D + 44); const T = D - INTRO_ACTS; return T <= -44 ? -44 + SW + INTRO_ACTS : introUnwarp(T); }   // the clock shown -> real clock
 function introUnwarp(t) { let acc = 0; for (const o of INTRO_STOPS) if (o.s < t) acc += o.d; return t + acc; }   // play time -> real clock (lands just after a stop at t)
 
 var _introLensInfo = null, _introLens = { on: false, x: -1, y: -1, z: 4, m: 0 }, _introPosRM = null, _introPosG = 1, _introLensOC = null, INTRO_LENS_MODES = ['r', 'r/M', 'θ', 'M', 's', 'kept'];
@@ -8521,8 +8524,10 @@ function introActBTick(A, any) {   // act B's spiral, Goldbach (strip locked), z
 function introSeqState(T) {   /* acts (slider = T + 10): 1 build -60..-40 · 2 coprime -40..-32 · 3 sieve -32..-8 · 4 hole 0 -> 1 -> 0 + circle method -2..15 · 5 helix 16..37 · then slope, grid, Goldbach, Cayley */
   const ez = u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }, lg = u => Math.max(1, Math.min(512, Math.round(Math.pow(512, u))));
   { const A = introOpenAct(_introActU); if (A) return { G: 512, h: A.h, cm: A.cm, b: false }; }   // the opening act replaces the old build (M growing 1 -> 512)
-  if (T < -54) { const S = T + 10; return { G: S < -58 ? 512 : S < -55 ? lg(1 - ez((S + 58) / 3)) : S < -46 ? lg(ez((S + 55) / 9)) : 512, h: 0, cm: false, b: false }; }   // the build: M collapses 512 -> 1 under the page text, then grows back to 512 by -46
-  if (T < -50) return { G: 512, h: 0, cm: false, b: false };   // act 0 (slider -60 to -55): M = 1 under the page description; act 1: M grows once, 1 -> 512, on the plain ring
+  if (T < -54) { const S = T + 10; return { G: S < -46 ? Math.max(1, Math.min(256, Math.round(Math.pow(256, ez((S + 60.79) / 14.79))))) : 256, h: 0.5 * (1 - ez((S + 49) / 4.5)), cm: S < -45, b: false }; }   // new: the page opens at M = 1 and grows slowly, 1 -> 512 by -46, with the plate fitted to the rings that exist   // the build: M collapses 512 -> 1 under the page text, then grows back to 512 by -46
+  if (T < -50) {   // the boundary scan (stop 0) runs at M = 256, hole open, circle method on; its last 5% hands over to the opening acts (M -> 512, hole closes); after the acts the script goes on as before
+      const sw = _introStopNow && _introStopNow.i === 0; if (!sw) return { G: 512, h: 0, cm: false, b: false };
+      const e = ez((_introStopNow.ph - 0.95) / 0.05); return { G: Math.round(256 * Math.pow(2, e)), h: 0, cm: false, b: false }; }   // act 0 (slider -60 to -55): M = 1 under the page description; act 1: M grows once, 1 -> 512, on the plain ring
   if (T < -16) return { G: 512, h: 0, cm: false, b: false };                     // acts 2-3: the full ring holds while the spiral plays
   if (T < 6) {   // act 4 (slider -2 to 16): hole 0 -> .5; M loops 512 -> 1 -> 512 under the circle method; hole .5 -> 1; M loops again on the unit circle; hole 1 -> 0
     const loop = (a) => T < a + 3 ? lg(1 - ez((T - a) / 3)) : lg(ez((T - a - 3) / 3));
@@ -8725,6 +8730,11 @@ function introViewTitleTick() {
     const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: 'Helix view' }[base] || base, lg = { ring: 'Ring view — the unit circle', cay: 'Cayley view — the Möbius map on the sphere', grid: 'Grid view — the (r, M) square', hel: 'Helix view — the angle unwrapped' }[base] || base;
     e.textContent = (C && _introClsA > 0.3 ? C.name + '  ·  ' + sh : lg) + (_introFarey ? '  ·  Farey graph' : _introCM ? '  ·  circle method' : ''); e.style.opacity = '1';
   }   // the title stays up (it sits above the plate, so it covers nothing): you always know which view is showing, from the first frame
+}
+function introVTitleText() {   // the view title as a string, from live state (used by the 1080x1920 / 1920x1080 export)
+  const V = _introVw, base = V.m > 0.5 ? V.mode : 'ring', C = clsView(CLS.intro);
+  const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: 'Helix view' }[base] || base, lg = { ring: 'Ring view \u2014 the unit circle', cay: 'Cayley view \u2014 the M\u00f6bius map on the sphere', grid: 'Grid view \u2014 the (r, M) square', hel: 'Helix view \u2014 the angle unwrapped' }[base] || base;
+  return (C && _introClsA > 0.3 ? C.name + '  \u00b7  ' + sh : lg) + (_introFarey ? '  \u00b7  Farey graph' : _introCM ? '  \u00b7  circle method' : '');
 }
 function introAbsToggle() { _introAbs = !_introAbs; const b = $('intro-abs-btn'); if (b) b.classList.toggle('on', _introAbs); }
 var _introGbScr = false, _introFar = null, _introColC = [], _introCop = (() => { const t = new Uint8Array(513 * 513); for (let r = 1; r <= 512; r++) for (let M = 1; M <= 512; M++) t[r * 513 + M] = gcd(r, M) === 1 ? 1 : 0; return t; })();
@@ -8975,7 +8985,7 @@ var _introSpHide = false;   // spiral hidden on demand (kept for the classical t
    view is drawn over the ring for the whole play. Chosen with ▼ ▲ by the time slider, applied at once and kept for restarts. */
 var _introStart = 0, _introStartId = '';
 function introStartList() { return [['ring', 'Ring'], ['cay', 'Cayley'], ['grid', 'Grid'], ['hel', 'Helix']].concat(CLS_VIEWS.filter(v => v.over || v.ring).map(v => [v.id, v.name.split(' · ')[0]])); }   // only the classical views that draw on the lattice itself; the charts (Ford, Chebyshev) need M to slide and stay in the classical tour
-function introStartBase() { const L = introStartList(), e = L[_introStart] || L[0]; return _introStart < 4 ? e[0] : 'ring'; }
+function introStartBase() { const L = introStartList(), e = L[_introStart] || L[0]; return _introStart < 4 ? e[0] : (e[0] === 'dirichlet' ? 'cay' : 'ring'); }
 function introStartApply() {
   const L = introStartList(); if (_introStartId) { const i = L.findIndex(q => q[0] === _introStartId); if (i >= 0) _introStart = i; _introStartId = ''; } if (_introStart >= L.length) _introStart = 0;
   const e = L[_introStart] || L[0], lb = $('intro-start-lbl'); if (lb) lb.textContent = 'start: ' + e[1];
@@ -8983,7 +8993,8 @@ function introStartApply() {
   else if (_introStart >= 4) clsSet('intro', e[0]); else if (CLS.intro && clsView(CLS.intro)) clsSet('intro', '');
 }
 function introStartStep(d) { const n = introStartList().length; _introStart = ((_introStart + d) % n + n) % n; introStartApply(); }
-try { localStorage.removeItem('sa2-intro-start-id'); } catch (e) {} _introStartId = 'dirichlet';   // every page load starts on Dirichlet (sector colours, × on the 1/n boundaries); a plate you pick holds for restarts within the visit
+try { localStorage.removeItem('sa2-intro-start-id'); } catch (e) {} try { setIntroRhoPair(0.4, 1.8); } catch (e) {}   // Cayley rho runs 0.4 to 2.2 from the first frame
+_introStartId = 'dirichlet';   // every page load starts on Dirichlet (primes in progressions, × on the 1/n boundaries), drawn on the Cayley view; a plate you pick holds for restarts within the visit
 const INTRO_CLS_TOUR = ['orchard', 'ford', 'farey', 'sb', 'dirichlet', 'chebyshev', 'lehmer', 'mobius', 'ramanujan', 'primroot'], INTRO_CLS_SEG = 7;
 const INTRO_CLS_LEN = { farey: 41 };   // the Farey tessellation gets its own act: circle method, hole 0 -> 1 -> 0.5, then k pi 2 -> 1 -> 8 -> 3 and back to 2
 const INTRO_CLS_AT = INTRO_CLS_TOUR.reduce((a, id) => (a.push(a[a.length - 1] + (INTRO_CLS_LEN[id] || INTRO_CLS_SEG)), a), [0]), INTRO_CLS_T = INTRO_CLS_AT[INTRO_CLS_AT.length - 1];
@@ -9011,8 +9022,8 @@ function introViewTick(T) {
     if (Tr >= 27.5 && Tr < 27.5 + DL) { T = 27.4; sweep = Tr >= 34; } else if (Tr >= 27.5 + DL) T = Tr - DL;
     const L = _introS0 + 33;   // the last 28 s (77.5 s to the 105.5 s end) stay in Cayley: x turn, then y and z together, then it holds
     if (_introActU != null) { const A = introOpenAct(_introActU), hw = A && A.B ? A.hel : 0; V.mode = hw > 0 ? 'hel' : V.mode; V.m = hw; V.x = 40 * hw; V.y = 0; V.z = 0; }   // the opening acts: Ring, Helix in act B
-    else if (T >= -60 && T < -54.5) { V.mode = 'hel'; V.m = sg(-60, -58) - sg(-56.5, -54.5); V.x = 60 * (sg(-59, -57.5) - sg(-57, -55.5)); V.y = 0; V.z = 0; }   // the build lifts into the Helix and back,
-    else if (T >= -52 && T < -44) { V.mode = 'hel'; V.m = sg(-52, -50) - sg(-46, -44); V.x = 60 * (sg(-51, -49) - sg(-47.5, -45.5)); V.y = 0; V.z = 0; }   // and again as the gcd-1 spiral comes in
+    else if (false && T >= -60 && T < -54.5) { V.mode = 'hel'; V.m = sg(-60, -58) - sg(-56.5, -54.5); V.x = 60 * (sg(-59, -57.5) - sg(-57, -55.5)); V.y = 0; V.z = 0; }   // the build lifts into the Helix and back,
+    else if (false && T >= -52 && T < -44) { V.mode = 'hel'; V.m = sg(-52, -50) - sg(-46, -44); V.x = 60 * (sg(-51, -49) - sg(-47.5, -45.5)); V.y = 0; V.z = 0; }   // and again as the gcd-1 spiral comes in
     else if (T < -40 || (T >= -22 && T < 6)) { V.mode = V.mode || 'hel'; V.m = 0; V.x = 0; V.y = 0; V.z = 0; }   // acts 1-4: the plain ring, except while the spiral loops:
     else if (T < -34) { V.mode = 'grid'; V.m = sg(-40, -38.5) - sg(-35.5, -34); V.x = 0; V.y = 0; V.z = 0; }   // Grid,
     else if (T < -28) { V.mode = 'hel'; V.m = sg(-34, -32.5) - sg(-29.5, -28); V.x = 60 * (sg(-33, -31.5) - sg(-30.5, -29)); V.y = 0; V.z = 0; }   // Helix (tilts),
@@ -9075,7 +9086,8 @@ function introViewTick(T) {
       const SO = !A && _introStopNow ? INTRO_STOPS[_introStopNow.i] : null; if (SO && SO.cls) { if (!_introClsTour) _introClsTour = { prev: CLS.intro }; if (CLS.intro !== SO.cls) { CLS.intro = SO.cls; const sl = $('intro-cls-sel'); if (sl && document.activeElement !== sl) sl.value = SO.cls; clsLblSync(); } _introClsA = Math.min(1, _introStopNow.ph * SO.d / 0.8, (1 - _introStopNow.ph) * SO.d / 0.8); } }
     { const base = introStartBase(); if (base !== 'ring') {   // the starting plate stands in for the plain ring: base fades out as a scripted view comes in, and back
         const sm = V.m, smode = V.mode;
-        if (sm <= 0.5) { V.mode = base; V.m = 1 - 2 * sm; if (base === 'hel') { V.x = 62; V.y = 0; V.z = 32; } else if (base === 'cay') { V.x = 0; V.y = 0; V.z = 0; } }
+        const rw = _introStopNow && _introStopNow.i === 0 ? 1 - ((u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); })((_introStopNow.ph - 0.95) / 0.05)) : (T >= -59 && T < -54 ? ((u => u * u * (3 - 2 * u))((T + 59) / 5)) : 0);   // the boundary scan is drawn on the Ring: the starting plate morphs out just before it and back in as it ends
+        if (sm <= 0.5) { V.mode = base; V.m = (1 - 2 * sm) * (1 - rw); if (base === 'hel') { V.x = 62; V.y = 0; V.z = 32; } else if (base === 'cay') { V.x = 0; V.y = 0; V.z = 0; } }
         else { V.mode = smode; V.m = 2 * sm - 1; } } }
     V.tm = V.m; return;
   }
@@ -9821,14 +9833,21 @@ async function introExport4k(land) {
   const W = land ? 1920 : 1080, H = land ? 1080 : 1920, hx = W / 2;
   const cv = document.createElement('canvas'); cv.width = W * 2; cv.height = H * 2;   // layout at 2x, so it stays sharp
   const x = cv.getContext('2d'); x.setTransform(2, 0, 0, 2, 0, 0);
-  const _vw = _introVw, _saveGM = _introGM; _introExpView = _vw.m > 0.5 ? (_vw.mode === 'grid' ? 'grid' : _vw.mode === 'hel' ? 'hel' : 'cay') : 'ring'; _introExpX = _vw.x; _introExpY = _vw.y; _introExpZ = _vw.z || 0; _introHX = _vw.mode === 'hel' && _vw.m > 0.02 ? [_vw.x || 0, _vw.y || 0, _vw.z || 0] : [62, 0, 32]; _introGM = Math.max(1, Math.min(512, Math.round(_introGcur || 1)));   // export the view that is on screen (Ring, Cayley or Grid) at the current M
-  _introExporting = land ? 'land' : true;
+  const _vw = _introVw, _saveGM = _introGM, _saveV = Object.assign({}, _introV); _introExpView = _vw.m > 0.5 ? (_vw.mode === 'grid' ? 'grid' : _vw.mode === 'hel' ? 'hel' : 'cay') : 'ring'; _introExpX = _vw.x; _introExpY = _vw.y; _introExpZ = _vw.z || 0; _introHX = _vw.mode === 'hel' && _vw.m > 0.02 ? [_vw.x || 0, _vw.y || 0, _vw.z || 0] : [62, 0, 32]; _introGM = Math.max(1, Math.min(512, Math.round(_introGcur || 1)));   // export the view that is on screen (Ring, Cayley or Grid) at the current M
+  _introExporting = land ? 'land' : true; _introExpLbl = true; { const f2 = land ? 17 : 19; _introExpCapB = H - (land ? 175 : 290) - 6 * (land ? 16 : 18) - 5 * f2 * 1.45 - f2 - 10; }   // the stop caption sits above the formula columns
   try {
-    introExpFit(W, H, Math.max(_introT - 10, 9.5)); _introPaint(x, W, H, Math.max(_introT - 10, 9.5));
+    if (_introZL > 0.02 && _introStopNow && _introStopM) for (let it = 0; it < 3; it++) {   // a zoom stop: re-aim the camera so its cell sits in the middle of the export plate (the live camera was aimed for the screen's shape)
+      const sc = document.createElement('canvas'); sc.width = W; sc.height = H; _introPaint(sc.getContext('2d'), W, H, Math.max(_introT - 10, 9.5)); _introCapFn = null; const gm = _introGeo, V = _introVw, M = _introStopM, r = _introStopR || M;
+      const th = _introTh(r, M), rad = _introRad(gm.R, M, gm.GZ); let px = gm.cx + rad * Math.cos(th), py = gm.cy - rad * Math.sin(th);
+      if (V.m > 0.002) { const q = introViewPos(r, M, th, V, gm.cx, gm.cy, gm.R, gm.G, gm.GZ); if (q) { px += (q[0] - px) * V.m; py += (q[1] - py) * V.m; } }
+      const ex = px - gm.cx0, ey = py - gm.cy0; if (Math.abs(ex) + Math.abs(ey) < 1) break; _introV.fx -= ex / W; _introV.fy -= ey / H; }
+    introExpFit(W, H, Math.max(_introT - 10, 9.5)); _introCapFn = null; _introPaint(x, W, H, Math.max(_introT - 10, 9.5)); if (_introCapFn) { try { _introCapFn(x); } catch (e) {} } _introCapFn = null;
     x.textAlign = 'center'; x.fillStyle = '#c8a84a'; x.font = '24px monospace'; x.fillText('W E S S E N   G E T A C H E W  ·  2 0 2 6', hx, land ? 40 : 90);
     x.fillStyle = '#e8e3db'; x.font = (land ? 72 : 104) + 'px "Cormorant Garamond", Georgia, serif'; x.fillText('Strip Arithmetic II', hx, land ? 112 : 190);
     x.fillStyle = 'rgba(232,227,219,.75)'; x.font = '19px monospace'; x.fillText('a sieve you can watch · Level 1: G up to 1024 · Level 2: main page, up to 10,000', hx, land ? 150 : 228);
-    { const ex = _introExpView, lab = ex === 'grid' ? 'Grid · M → · r ↑ · whole G × G square' : ex === 'cay' ? 'Cayley: w = (z−1)/(z+1)   x ' + Math.round(_introExpX) + '°  y ' + Math.round(_introExpY) + '°  z ' + Math.round(_introExpZ) + '°' : ex === 'hel' ? 'Helix: height θ/2π   x ' + Math.round(_introHX[0]) + '°  y ' + Math.round(_introHX[1]) + '°  z ' + Math.round(_introHX[2]) + '°' : 'Ring · r/M round the unit circle'; x.font = '20px monospace'; x.fillStyle = '#c8a84a'; x.fillText(lab, hx, land ? 174 : 266); }
+    { const ex = _introExpView, lab = ex === 'grid' ? 'Grid · M → · r ↑ · whole G × G square' : ex === 'cay' ? 'Cayley: w = (z−1)/(z+1)   x ' + Math.round(_introExpX) + '°  y ' + Math.round(_introExpY) + '°  z ' + Math.round(_introExpZ) + '°' : ex === 'hel' ? 'Helix: height θ/2π   x ' + Math.round(_introHX[0]) + '°  y ' + Math.round(_introHX[1]) + '°  z ' + Math.round(_introHX[2]) + '°' : 'Ring · r/M round the unit circle'; const vt = ((function () { try { return introVTitleText(); } catch (e) { return ''; } })() || (($('intro-vtitle') || {}).textContent || '')).trim();   // the view title shown above the live plate (classical view · view · layer)
+      if (vt) { let fz = land ? 26 : 30; x.font = 'italic ' + fz + 'px "Cormorant Garamond", Georgia, serif'; while (fz > 14 && x.measureText(vt).width > W - 60) { fz--; x.font = 'italic ' + fz + 'px "Cormorant Garamond", Georgia, serif'; } x.fillStyle = '#d4af37'; x.fillText(vt, hx, land ? 176 : 268); }
+      x.font = (vt ? 16 : 20) + 'px monospace'; x.fillStyle = vt ? 'rgba(200,168,74,.8)' : '#c8a84a'; x.fillText(lab, hx, vt ? (land ? 198 : 294) : (land ? 174 : 266)); }
     { const fs2 = land ? 17 : 19, lh2 = fs2 * 1.45, yB = H - (land ? 175 : 290) - 6 * (land ? 16 : 18) - 5 * lh2, cols = [   // the placement formula (left) and the sector formula (right), as at the open
         [['(r, M)  ↦  (ρ, θ)', '#f0e6c8'], ['ρ ≈ M / G', '#f0e6c8'], ['θ = ' + angTxt() + ' · r / M', '#f0e6c8'], ['gcd(r, M) = 1', '#d4af37']],
         [['sector  s = ⌊M / r⌋', '#f0e6c8'], ['M / (s+1) < r ≤ M / s', '#f0e6c8'], ['s = 1 gold, 2 teal, 3 blue …', '#d4af37'], ['area of S_s = 1 / (s(s+1))', '#f0e6c8']]];
@@ -9840,9 +9859,9 @@ async function introExport4k(land) {
         { t: fxL[0], fs: 22 * u, it: true, serif: true, c: '#f2e6c4' },
         { t: fxL[1], fs: 16 * u, c: 'rgba(232,227,219,.85)' },
         { t: fxL[2], fs: 16 * u, c: '#7fd6c8' },
-        { t: _introCtr, fs: 16 * u, c: 'rgba(232,227,219,.78)', gapBefore: true }
+        { t: (_introCtr || '').split('\n').filter(l => !(fxL[1] && l.includes(fxL[1]))).join('\n'), fs: 16 * u, c: 'rgba(232,227,219,.78)', gapBefore: true }   // the view's live line is already in the legend above
       ], { align: 'center' }); }
-  } finally { _introExporting = false; _introExpFit = 1; _introExpView = null; _introGM = _saveGM; }
+  } finally { Object.assign(_introV, _saveV); _introExporting = false; _introExpLbl = false; _introCapFn = null; _introExpFit = 1; _introExpView = null; _introGM = _saveGM; }
   const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
   if (!blob) return;
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'strip-arithmetic-II-opener-' + W + 'x' + H + '.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
