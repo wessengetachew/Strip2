@@ -2150,7 +2150,7 @@ walk anyway.</p>
         <div class="gr"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="512" value="1" oninput="introSetM(this.value)" style="flex:1 1 90px;min-width:70px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val" class="gv">M ≤ 1</span></div>
         <div class="gr"><span class="angk-host"></span></div>
         <div class="gr"><button class="chip" onclick="introToPiGrid()" title="Open the main page in Ring view with the 3 × 3 kπ grid (gold points labelled with r), starting at the current k and M">&theta; = k&pi;&middot;r/M &rarr; main &pi;-grid</button></div>
-        <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 512 and back">▶ M</button><button class="chip" onclick="introSetM(512)" title="All 512 rings">512</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for wrap, then unit.">angle: clamp</button></div>
+        <div class="gr"><button class="chip" id="intro-g-btn" onclick="introGPlay()" title="Play M from 1 up to 512 and back">▶ M</button><button class="chip" onclick="introSetM(512)" title="All 512 rings">512</button><button class="chip" id="intro-ang-btn" onclick="introCycleAng()" title="θ = 2π·min(r/M, 1): the r ≤ M wedge (default). Click for unit, then clamp.">angle: wrap</button></div>
         <div class="gr"><span>hole</span><input type="range" id="intro-hole-sl" min="0" max="100" value="0" oninput="if (_introHoleGl) { cancelAnimationFrame(_introHoleGl); _introHoleGl = 0; } introFull(); introSetHole(this.value / 100)" style="flex:1 1 80px;min-width:60px;" title="Ring hole h: inner radius as a fraction of the plate, as on the main page. At 1 every ring collapses onto one circle (roots of unity)."><button class="chip" id="intro-hole-btn" onclick="introFull(); introHoleGlide(0.5, 700)" title="Hole = 0.5: the roots-of-unity reading appears inside (order M = current ring count).">.5</button><button class="chip" id="intro-cm-btn" onclick="introToggleCM()" title="Click to cycle: circle method in the hole (Farey major arcs coloured by q, minor arcs grey, prime sum |S(α)|) → Farey graph on the lattice (neighbours |ad − bc| = 1 joined where the points sit, arcs bending toward the limit circle) → off.">circle method</button><button class="chip" id="intro-v-ring" onclick="introViewSet('ring')" title="Ring view (the unit circle).">Ring</button><button class="chip" id="intro-v-cay" onclick="introViewSet('cay')" title="Cayley view: the Mobius map w = (z-1)/(z+1) of the ring on a tilted Riemann sphere (x, y turns).">Cayley</button><button class="chip" id="intro-v-grid" onclick="introViewSet('grid')" title="Grid view: M to the right, r up, the whole G × G square.">Grid</button><button class="chip" id="intro-v-hel" onclick="introViewSet('hel')" title="Helix view: the ring with height θ/2π, so the angle is never wrapped (the Riemann surface of log). The x, y, z sliders turn it.">Helix</button><button class="chip" onclick="clsStep('intro', -1)" title="Previous classical view (Euclid’s orchard, Ford, Farey, Stern–Brocot, Dirichlet, Chebyshev, Lehmer, Möbius, Ramanujan, primitive roots), through off">&#9660;</button><button class="chip" onclick="clsStep('intro', 1)" title="Next classical view, through off">&#9650;</button><span id="intro-cls-lbl" class="chip" style="cursor:default;opacity:.85;" title="The classical view drawn on the lattice">classical: off</span><button class="chip" id="intro-v-rot" onclick="introViewRot()" title="Rotate Cayley a full 360 degrees about x, then y, then z.">&#9654; rotate x&middot;y&middot;z</button></div>
         <div class="gr"><span>Cayley x</span><input type="range" id="intro-vx-sl" min="0" max="360" value="0" oninput="introViewXY(this.value, null, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about x (degrees)."><span>y</span><input type="range" id="intro-vy-sl" min="0" max="360" value="0" oninput="introViewXY(null, this.value, null)" style="flex:1 1 60px;min-width:44px;" title="Tilt the Cayley sphere about y (degrees)."><span>z</span><input type="range" id="intro-vz-sl" min="0" max="360" value="0" oninput="introViewXY(null, null, this.value)" style="flex:1 1 60px;min-width:44px;" title="Turn the plane about z (degrees), applied after the x and y tilts."></div>
         <div class="gr" style="gap:4px;"><span style="min-width:2.4em;">x</span><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',0,true)">0</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',-45)">&minus;45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',45)">+45</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',90)">90</button><button class="chip" style="padding:2px 8px;" onclick="introViewAxis('x',180)">180</button></div>
@@ -8124,7 +8124,8 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
     introViewTick(_introT); introKAnim(_introT - 10);
     introViewTitleTick();
     if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } introKAnim(_introT - 10);
-      if (_introT < -43.9 && !_introVUser && _introActU == null && !_introStopNow) { const kt = _introVw.mode === 'cay' && _introVw.m > 0.5 ? 0.45 : 1; _introV.k += (kt - _introV.k) * 0.08; } }   // opening on Cayley: zoomed out so both poles (0 mod 1 and 0 mod 2) show as M grows else if (_introKOn) { _introKOn = false; }
+      if (_introT < -34 && !_introVUser && _introActU == null && !_introStopNow) { const hm = _introVw.m > 0.5, cayHold = (_introVw.mode === 'cay' || _introVw.mode === 'hel') && hm; if (cayHold || _introT < -43.9) {   /* a Cayley or (wrapped, very tall) Helix plate holds its own zoom; the automatic fit only owns the plain ring, so the two never fight */
+        const kt = cayHold ? (_introVw.mode === 'cay' ? 0.45 : 1.4) : 1; if (_introT < -60.5) _introV.k = kt; else _introV.k += (kt - _introV.k) * 0.08; } } }   // opening on Cayley: zoomed out so both poles (0 mod 1 and 0 mod 2) show as M grows else if (_introKOn) { _introKOn = false; }
     _introStopLM = ''; _introStopCap = ''; _introStopSv = 0;
     { const st = _introStopNow, gm = _introGeo;   // zoom stop: camera in to (r, M), hold with the r labels, back out
       if (st && gm && !_introVUser) {
@@ -8179,7 +8180,7 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
         } }
     }
     { const sT = _introT, gm = _introGeo;   // act 1: the placement formula over the sector as it draws, fading out before the spiral
-      if (_introSeq && gm && sT < -40 && _introActU == null) {
+      if (false && _introSeq && gm && sT < -40 && _introActU == null) {   // removed: the (r, M) -> (rho, theta) and sector text blocks over the opening plate
         const fa = Math.max(0, Math.min(1, (sT + INTRO_PRE) / 1.5, (-44.2 - sT) / 2.5));   // fades in from the first frame
         if (fa > 0.01) {
           const fs = Math.max(13, Math.min(22, W / 48)), lx = 14, y = W < 600 ? gm.cy + fs * 4.6 : (gm.top0 + gm.bot0) / 2 - fs * 2.2,   /* narrow screens: below the π ray */ rx = 2 * (gm.cx0 != null ? gm.cx0 : W / 2) - 14;   // mid-height, below the stat blocks: placement on the left, sector on the right
@@ -8199,7 +8200,7 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
         } } }
     { const sT = _introT;   // opening: from slider -36 to -2 keep every lattice point in view (zoom out only); then ease back to k = 1
       if (_introSeq && !_introVUser && !_introExporting && !_introStopNow) {
-        if (_introActU == null && ((sT >= 16 && sT < 36) || (sT >= -24 && sT < -18) || (sT >= -50 && sT < -34 && !(sT < -43.9 && _introVw.mode === 'cay' && _introVw.m > 0.5)))) introAutoFit(1);   // not while the opening Cayley plate is up: the fit ignores the circle-method arcs and cut them
+        if (_introActU == null && ((sT >= 16 && sT < 36) || (sT >= -24 && sT < -18) || (sT >= -50 && sT < -34 && !((_introVw.mode === 'cay' || _introVw.mode === 'hel') && (_introVw.m > 0.5 || sT < -43.9))))) introAutoFit(1);   // not while the opening Cayley plate is up: the fit ignores the circle-method arcs and cut them
         else if ((sT >= 36 && sT < 44) || (sT >= -18 && sT < -8) || (sT >= -34 && sT < -30)) { _introV.k += (1 - _introV.k) * 0.15; _introV.fx *= 0.85; _introV.fy *= 0.85; }
       } }
     if (_introLens.on && _introPosRM && !_introExporting) {   // magnifier: the canvas under it, scaled up, with labels placed from the true cell positions
@@ -8252,7 +8253,7 @@ function introGbTheory(E) {   // predicted unordered prime pairs g + s = E (g <=
 }
 function introGbPairsFor(G) { if (_introGbMemo[G]) return _introGbMemo[G]; const E = 2 * (G + 1), a = [], pr = n => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }; for (let g = 2; g <= E / 2; g++) if (pr(g) && pr(E - g)) a.push(g); return (_introGbMemo[G] = a); }
 let _introPAuto = true, _introPi = 0, _introMirror = true, _introGbOn = false, _introGbI = 0, _introGbDir = 1, _introGbTimer = 0, _introPtScale = 0.75, _introGbPairs = (() => { const E = 1026, a = []; const pr = n => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }; for (let g = 2; g <= E / 2; g++) if (pr(g) && pr(E - g)) a.push(g); return a; })();
-let _introAng = 'clamp', _introExporting = false, _introGM = null, _introGcur = 1, _introGDir = 1, _introGTimer = 0;
+let _introAng = 'wrap', _introExporting = false, _introGM = null, _introGcur = 1, _introGDir = 1, _introGTimer = 0;
 // the M slider is G: it scrubs the whole animation (rings 1..G) and every number on the screen follows
 function introSetM(v) { introFull(); if (_introGTimer) { clearInterval(_introGTimer); _introGTimer = 0; const b = $('intro-g-btn'); if (b) b.textContent = '▶ M'; } _introGM = Math.max(1, Math.min(512, v | 0)); _introSel = null; const p = $('intro-pop'); if (p) p.style.display = 'none'; }
 function introStepM(d) { introSetM(_introGcur + d); }
@@ -8727,13 +8728,13 @@ function introViewTitleTick() {
   const now = performance.now();
   if (key !== _introVTitle.key) {
     _introVTitle.key = key; _introVTitle.t = now;
-    const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: 'Helix view' }[base] || base, lg = { ring: 'Ring view — the unit circle', cay: 'Cayley view — the Möbius map on the sphere', grid: 'Grid view — the (r, M) square', hel: 'Helix view — the angle unwrapped' }[base] || base;
+    const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: _introAng === 'wrap' ? 'Helix view, wrapped' : 'Helix view' }[base] || base, lg = { ring: 'Ring view — the unit circle', cay: 'Cayley view — the Möbius map on the sphere', grid: 'Grid view — the (r, M) square', hel: _introAng === 'wrap' ? 'Helix view — the angle wrapped' : 'Helix view — the angle unwrapped' }[base] || base;
     e.textContent = (C && _introClsA > 0.3 ? C.name + '  ·  ' + sh : lg) + (_introFarey ? '  ·  Farey graph' : _introCM ? '  ·  circle method' : ''); e.style.opacity = '1';
   }   // the title stays up (it sits above the plate, so it covers nothing): you always know which view is showing, from the first frame
 }
 function introVTitleText() {   // the view title as a string, from live state (used by the 1080x1920 / 1920x1080 export)
   const V = _introVw, base = V.m > 0.5 ? V.mode : 'ring', C = clsView(CLS.intro);
-  const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: 'Helix view' }[base] || base, lg = { ring: 'Ring view \u2014 the unit circle', cay: 'Cayley view \u2014 the M\u00f6bius map on the sphere', grid: 'Grid view \u2014 the (r, M) square', hel: 'Helix view \u2014 the angle unwrapped' }[base] || base;
+  const sh = { ring: 'Ring view', cay: 'Cayley view', grid: 'Grid view', hel: _introAng === 'wrap' ? 'Helix view, wrapped' : 'Helix view' }[base] || base, lg = { ring: 'Ring view \u2014 the unit circle', cay: 'Cayley view \u2014 the M\u00f6bius map on the sphere', grid: 'Grid view \u2014 the (r, M) square', hel: _introAng === 'wrap' ? 'Helix view \u2014 the angle wrapped' : 'Helix view \u2014 the angle unwrapped' }[base] || base;
   return (C && _introClsA > 0.3 ? C.name + '  \u00b7  ' + sh : lg) + (_introFarey ? '  \u00b7  Farey graph' : _introCM ? '  \u00b7  circle method' : '');
 }
 function introAbsToggle() { _introAbs = !_introAbs; const b = $('intro-abs-btn'); if (b) b.classList.toggle('on', _introAbs); }
@@ -8985,7 +8986,7 @@ var _introSpHide = false;   // spiral hidden on demand (kept for the classical t
    view is drawn over the ring for the whole play. Chosen with ▼ ▲ by the time slider, applied at once and kept for restarts. */
 var _introStart = 0, _introStartId = '';
 function introStartList() { return [['ring', 'Ring'], ['cay', 'Cayley'], ['grid', 'Grid'], ['hel', 'Helix']].concat(CLS_VIEWS.filter(v => v.over || v.ring).map(v => [v.id, v.name.split(' · ')[0]])); }   // only the classical views that draw on the lattice itself; the charts (Ford, Chebyshev) need M to slide and stay in the classical tour
-function introStartBase() { const L = introStartList(), e = L[_introStart] || L[0]; return _introStart < 4 ? e[0] : (e[0] === 'dirichlet' ? 'cay' : 'ring'); }
+function introStartBase() { const L = introStartList(), e = L[_introStart] || L[0]; return _introStart < 4 ? e[0] : (e[0] === 'dirichlet' ? 'hel' : 'ring'); }
 function introStartApply() {
   const L = introStartList(); if (_introStartId) { const i = L.findIndex(q => q[0] === _introStartId); if (i >= 0) _introStart = i; _introStartId = ''; } if (_introStart >= L.length) _introStart = 0;
   const e = L[_introStart] || L[0], lb = $('intro-start-lbl'); if (lb) lb.textContent = 'start: ' + e[1];
@@ -9084,9 +9085,9 @@ function introViewTick(T) {
         _introClsA = own ? Math.min(1, u / 0.8 + 0.4) : Math.max(0, A.a); }
       introActBTick(A && A.B ? A : null, !!A);
       const SO = !A && _introStopNow ? INTRO_STOPS[_introStopNow.i] : null; if (SO && SO.cls) { if (!_introClsTour) _introClsTour = { prev: CLS.intro }; if (CLS.intro !== SO.cls) { CLS.intro = SO.cls; const sl = $('intro-cls-sel'); if (sl && document.activeElement !== sl) sl.value = SO.cls; clsLblSync(); } _introClsA = Math.min(1, _introStopNow.ph * SO.d / 0.8, (1 - _introStopNow.ph) * SO.d / 0.8); } }
-    { const base = introStartBase(); if (base !== 'ring') {   // the starting plate stands in for the plain ring: base fades out as a scripted view comes in, and back
+    { const base = introStartBase(); if (base !== 'ring' && T < -54) {   // the starting plate stands in for the ring only through the opening; the scan and everything after it run on the ring, as the script was written   // the starting plate stands in for the plain ring: base fades out as a scripted view comes in, and back
         const sm = V.m, smode = V.mode;
-        const rw = _introStopNow && _introStopNow.i === 0 ? 1 - ((u => { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); })((_introStopNow.ph - 0.95) / 0.05)) : (T >= -59 && T < -54 ? ((u => u * u * (3 - 2 * u))((T + 59) / 5)) : 0);   // the boundary scan is drawn on the Ring: the starting plate morphs out just before it and back in as it ends
+        const rw = T >= -59 ? ((u => u * u * (3 - 2 * u))((T + 59) / 5)) : 0;   // the boundary scan is drawn on the Ring: the starting plate morphs out just before it and back in as it ends
         if (sm <= 0.5) { V.mode = base; V.m = (1 - 2 * sm) * (1 - rw); if (base === 'hel') { V.x = 62; V.y = 0; V.z = 32; } else if (base === 'cay') { V.x = 0; V.y = 0; V.z = 0; } }
         else { V.mode = smode; V.m = 2 * sm - 1; } } }
     V.tm = V.m; return;
