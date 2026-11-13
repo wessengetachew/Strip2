@@ -1415,6 +1415,15 @@ walk anyway.</p>
     </div>
   </div>
 
+
+  <div class="prow">
+    <span class="plabel" title="Slide the loupe along a 1/n boundary: the cells (p, n&middot;p), p prime, are the Dirichlet &times;s">Sweep 1/n</span>
+    <button class="chip" id="msw-play" onclick="mswPlay()">&#9654;</button>
+    <button class="chip" data-mswn="1" onclick="mswLine(1)">1/1</button><button class="chip" data-mswn="2" onclick="mswLine(2)">1/2</button><button class="chip" data-mswn="3" onclick="mswLine(3)">1/3</button><button class="chip" data-mswn="4" onclick="mswLine(4)">1/4</button>
+    <span class="lbl">1/</span><input class="sval" id="msw-n" type="number" min="1" max="500" step="1" value="1" onchange="mswLine(this.value)" style="width:56px;">
+    <input type="range" id="msw-sl" min="0" max="1000" value="0" oninput="mswP(this.value)" style="max-width:160px;">
+    <span class="lbl" id="msw-lb">&nbsp;</span>
+  </div>
   <div class="prow">
     <span class="plabel">Lens place</span>
     <button class="chip on" id="lp-auto" onclick="setLensPin('auto')" title="The loupe follows the pointer and dodges to whichever corner it is not near.">Auto</button>
@@ -2146,6 +2155,11 @@ walk anyway.</p>
       <button class="chip" id="intro-fs-btn" onclick="introFS()" title="Full screen">&#9974; full</button>
     </div>
     <div id="intro-ctl" style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;text-align:left;font-family:var(--mono);font-size:11px;color:var(--cream2);">
+      <div class="ig"><div class="gl">Sweep &middot; primes along 1/n</div>
+        <div class="gr"><button class="chip" id="intro-sw-play" onclick="introSwPlay()" title="Slide along the chosen 1/n boundary reading the &times; marks (p, n&middot;p); pause to scrub it yourself">&#9654; sweep</button><button class="chip" data-swn="1" onclick="introSwLine(1)">1/1</button><button class="chip" data-swn="2" onclick="introSwLine(2)">1/2</button><button class="chip" data-swn="3" onclick="introSwLine(3)">1/3</button><button class="chip" data-swn="4" onclick="introSwLine(4)">1/4</button><span>1/</span><input type="number" id="intro-sw-n" min="1" max="128" step="1" value="1" style="width:52px;font-size:11px;" onchange="introSwLine(this.value)" title="Any boundary 1/n: the cells (p, n&middot;p) with p prime"></div>
+        <div class="gr"><input type="range" id="intro-sw-sl" min="0" max="1000" value="0" oninput="introSwP(this.value)" style="flex:1 1 140px;min-width:100px;" title="Position along the line"><span id="intro-sw-lb" style="min-width:9em;">&nbsp;</span></div>
+        <div class="gr"><span>zoom</span><input type="range" id="intro-sw-z" min="3" max="60" value="14" oninput="introSwZ(this.value)" style="flex:1 1 90px;min-width:70px;" title="Zoom on the line"><button class="chip" onclick="introSwExit()" title="Back to the play">&#10005; exit</button></div>
+      </div>
       <div class="ig"><div class="gl">Ring</div>
         <div class="gr"><button class="chip" onclick="introStepM(-1)" title="One ring fewer">&#9660;</button><input type="range" id="intro-m-sl" min="1" max="512" value="1" oninput="introSetM(this.value)" style="flex:1 1 90px;min-width:70px;" title="M: scrub the animation, rings 1..M; the counts and stats follow"><button class="chip" onclick="introStepM(1)" title="One ring more">&#9650;</button><span id="intro-m-val" class="gv">M ≤ 1</span></div>
         <div class="gr"><span class="angk-host"></span></div>
@@ -2332,6 +2346,7 @@ walk anyway.</p>
       <span class="hint">Ring &amp; Cayley only</span>
     </div>
     <div class="prow" style="padding:2px 0 6px;"><span class="angk-host"></span><span class="hint">&theta; = k&pi;&middot;r/M</span></div>
+    <div class="prow" style="padding:2px 0 6px;"><span class="lbl" title="Slide along a 1/n boundary: the cells (p, n&middot;p), p prime, are the Dirichlet &times;s">sweep 1/n</span><button class="chip" id="osw-play" onclick="oswPlay()">&#9654;</button><button class="chip" data-oswn="1" onclick="oswLine(1)">1/1</button><button class="chip" data-oswn="2" onclick="oswLine(2)">1/2</button><button class="chip" data-oswn="3" onclick="oswLine(3)">1/3</button><button class="chip" data-oswn="4" onclick="oswLine(4)">1/4</button><span class="lbl">1/</span><input type="number" id="osw-n" min="1" max="128" step="1" value="1" style="width:52px;" onchange="oswLine(this.value)"><input type="range" id="osw-sl" min="0" max="1000" value="0" oninput="oswP(this.value)" style="max-width:140px;"><span class="val" id="osw-lb">&nbsp;</span><span class="lbl">zoom</span><input type="range" id="osw-z" min="2" max="30" value="10" oninput="oswZ(this.value)" style="max-width:90px;"><button class="chip" onclick="oswExit()">&#10005;</button></div>
     <div class="prow" style="padding:2px 0 6px;">
       <span class="lbl" title="Dot size on the Ring and Cayley previews. Grid sizes its dots off the cell instead, so it isn't included.">point size</span>
       <input type="range" id="ol-pt-sz" min="0.3" max="3" step="0.1" value="1" oninput="olSetPtScale(this.value)" style="max-width:110px;">
@@ -6795,6 +6810,33 @@ function openerZoomAt(key, newK, ax, ay, S) {
   openerZoomClamp(key);
   openerRedrawTile(key);
 }
+var OSW = { on: false, n: 1, p: 0, z: 10, play: false, tl: 0, dur: 24 };   // opener boundary sweep: any 1/n line, all tiles follow the cell
+function oswCell() { const rmax = Math.max(3, Math.floor(Math.max(4, OPENER_G) / OSW.n)), r = 2 + (rmax - 2) * OSW.p; return [r, OSW.n * r, rmax]; }
+function oswUI() { const pb = $('osw-play'); if (pb) pb.innerHTML = OSW.on && OSW.play ? '&#10074;&#10074;' : '&#9654;'; document.querySelectorAll('[data-oswn]').forEach(b => b.classList.toggle('on', OSW.on && +b.dataset.oswn === OSW.n)); const nb = $('osw-n'); if (nb && document.activeElement !== nb) nb.value = OSW.n; const c = oswCell(), lb = $('osw-lb'); if (lb) lb.textContent = OSW.on ? '(' + Math.round(c[0]) + ', ' + Math.round(c[1]) + ')' : ''; }
+function oswFocus() {
+  if (!OSW.on) return; const c = oswCell(); OL.swXY = OL.swXY || {};
+  for (const key of ['ring', 'cayley', 'grid']) {
+    const q = OL.swXY[key]; if (!q) continue; const p = q.xy(c[0], c[1]); if (!p) continue;
+    let px = p[0], py = p[1]; const rot = key === 'ring' ? OPENER_ROT.r : key === 'grid' ? OPENER_ROT.g : 0;
+    if (rot) { const a = -rot * Math.PI / 180, dx = px - q.w / 2, dy = py - q.h / 2; px = q.w / 2 + dx * Math.cos(a) - dy * Math.sin(a); py = q.h / 2 + dx * Math.sin(a) + dy * Math.cos(a); }
+    OPENER_ZOOM[key] = { k: OSW.z, x: -OSW.z * (px - q.w / 2), y: -OSW.z * (py - q.h / 2) };
+    try { openerRedrawTile(key); } catch (e) {}
+  }
+  oswUI();
+}
+function oswStart() { if (!OSW.on) { OSW.on = true; OSW.tl = 0; } oswFocus(); }
+function oswLine(n) { n = Math.max(1, Math.min(Math.floor(Math.max(4, OPENER_G) / 2), Math.round(+n || 1))); OSW.n = n; OSW.p = 0; const sl = $('osw-sl'); if (sl) sl.value = 0; oswStart(); }
+function oswP(v) { OSW.p = Math.max(0, Math.min(1, +v / 1000)); OSW.play = false; oswStart(); }
+function oswZ(v) { OSW.z = Math.max(2, Math.min(30, +v || 10)); if (OSW.on) oswFocus(); }
+function oswLoop(now) { if (!OSW.on || !OSW.play) { OSW.tl = 0; return; } const dt = OSW.tl ? Math.min(0.1, (now - OSW.tl) / 1000) : 0; OSW.tl = now; OSW.p = Math.min(1, OSW.p + dt / OSW.dur); const sl = $('osw-sl'); if (sl) sl.value = Math.round(OSW.p * 1000); if (OSW.p >= 1) OSW.play = false; oswFocus(); if (OSW.play) requestAnimationFrame(oswLoop); else oswUI(); }
+function oswPlay() { if (!OSW.on) oswStart(); if (OSW.play) { OSW.play = false; oswUI(); return; } if (OSW.p >= 0.999) OSW.p = 0; OSW.play = true; OSW.tl = 0; requestAnimationFrame(oswLoop); oswUI(); }
+function oswExit() { if (!OSW.on) return; OSW.on = false; OSW.play = false; for (const key of ['ring', 'cayley', 'grid']) { try { openerZoomReset(key); } catch (e) {} } oswUI(); }
+function openerSwOverlay(ctx, key, xy) {   // the × at (p, n p) for p prime, labelled p near the focus; drawn in the tile's own (zoomed) frame
+  if (!OSW.on) return; const k = Math.max(1, (OPENER_ZOOM[key] || { k: 1 }).k), n = OSW.n, c = oswCell(), f = xy(c[0], c[1]); if (!f) return;
+  const arm = 4 / k, win = 110 / k; ctx.save(); ctx.lineWidth = 1.6 / k; ctx.strokeStyle = '#ff5a5a'; ctx.fillStyle = '#ff8a8a'; ctx.font = 'bold ' + (11 / k) + 'px monospace'; ctx.textAlign = 'left';
+  for (let pr = 2; pr <= c[2]; pr++) { if (!_introIsP(pr)) continue; const q = xy(pr, n * pr); if (!q) continue; ctx.beginPath(); ctx.moveTo(q[0] - arm, q[1] - arm); ctx.lineTo(q[0] + arm, q[1] + arm); ctx.moveTo(q[0] + arm, q[1] - arm); ctx.lineTo(q[0] - arm, q[1] + arm); ctx.stroke(); if (Math.hypot(q[0] - f[0], q[1] - f[1]) < win) ctx.fillText(String(pr), q[0] + arm * 1.4, q[1] + arm * 0.5); }
+  ctx.strokeStyle = 'rgba(255,232,160,.9)'; ctx.beginPath(); ctx.arc(f[0], f[1], 7 / k, 0, TAU); ctx.stroke(); ctx.restore();
+}
 function openerZoomReset(key) {
   OPENER_ZOOM[key] = { k: 1, x: 0, y: 0 };
   openerRedrawTile(key);
@@ -7012,6 +7054,7 @@ function openerDrawGrid(t, forceC) {
     { const o = clsOpenerOpt(); clsPlate(ctx, CLS.opener, gxy, OPENER_G, { kill: o.kill, closed: false, ptk: Math.max(1.1, cell * 0.45) }); }
     if (OPENER_CIRCLE_METHOD && OL.thetaMode !== 'unit') try { cmDrawGeneric(ctx, 'grid', gxy, OPENER_G, { S: Math.min(c.w, c.h), inward: true }); } catch (e) {}
     openerDrawLabels(ctx, gxy, olVis(_openerSq), Math.max(6, Math.min(10, cell * 0.32)) * (OL.lblScale || 1), OPENER_ROT.g);
+    OL.swXY = OL.swXY || {}; OL.swXY.grid = { xy: gxy, w: c.w, h: c.h }; openerSwOverlay(ctx, 'grid', gxy);
   }
   ctx.restore();
 }
@@ -7155,6 +7198,7 @@ function openerDrawRing(t, forceC) {
     openerDrawLift(ctx, rxy, S, c.w, c.h, 'ring');
     { const o = clsOpenerOpt(); clsPlate(ctx, CLS.opener, rxy, OPENER_G, { kill: o.kill, closed: true, ptk: Math.max(1.1, S / 2 / OPENER_G * 0.45 * (OL.ptScale || 1)) }); }
     openerDrawLabels(ctx, rxy, olVisSet(), Math.max(6, Math.min(9, outer / OPENER_G * 0.7)) * (OL.lblScale || 1), OPENER_ROT.r);
+    OL.swXY = OL.swXY || {}; OL.swXY.ring = { xy: rxy, w: c.w, h: c.h }; openerSwOverlay(ctx, 'ring', rxy);
   }
   openerDrawVoid(ctx, cx, cy, holeR, OPENER_ROT.r * Math.PI / 180);
   ctx.restore();
@@ -7374,6 +7418,7 @@ function openerDrawCayley(t, forceC) {
     { const o = clsOpenerOpt(); clsPlate(ctx, CLS.opener, cxy, OPENER_G, { kill: o.kill, closed: true, ptk: Math.max(1.1, dot) }); }
     if (OPENER_CIRCLE_METHOD && OL.thetaMode !== 'unit') try { { const hc = 0.3 * (OPENER_RING_HOLE || 0.5); cmDrawGeneric(ctx, OL.helix ? 'hel' : 'cay', cxy, OPENER_G, { S: Math.min(c.w, c.h), rho0: OPENER_RHO0 + OPENER_RHOD * hc, rhoD: OPENER_RHOD * (1 - hc) }); } } catch (e) {}
     openerDrawLabels(ctx, cxy, olVisSet(), Math.max(6, Math.min(9, Math.min(c.w, c.h) * 0.024)) * (OL.lblScale || 1));
+    OL.swXY = OL.swXY || {}; OL.swXY.cayley = { xy: cxy, w: c.w, h: c.h }; openerSwOverlay(ctx, 'cayley', cxy);
   }
   ctx.restore();
 }
@@ -7828,7 +7873,7 @@ function showIntro() {
       if (BQ) flushM();
     }
     x.globalAlpha = 1;
-    const bdFade = _introStopLM.startsWith('bd') ? Math.max(0, Math.min(1, (_introStopZ / ((_introStopLM === 'bd1' ? 14 : 40) * INTRO_STOP_ZX) - 0.75) / 0.2)) : 1;   // boundary scan: labels only once the camera is (nearly) all the way in; they fade as it starts to zoom out, and no labels are computed in between
+    const bdFade = _introStopLM.startsWith('bd') ? Math.max(0, Math.min(1, (_introStopZ / ((_introStopZref || (_introStopLM === 'bd1' ? 14 : 40)) * INTRO_STOP_ZX) - 0.75) / 0.2)) : 1;   // boundary scan: labels only once the camera is (nearly) all the way in; they fade as it starts to zoom out, and no labels are computed in between
     if (_introZL > 0.02 && (!_introExporting || _introExpLbl) && _introStopNow && _introStopLM !== 'none' && bdFade > 0.02) {   // zoom stop: every visible cell labelled with its r
       const o = INTRO_STOPS[_introStopNow.i], Mt = Math.min(G, Math.round(_introStopM || o.M)), sp = VW.mode === 'cay' && VM > 0.3 ? G : Math.ceil(G * 2.8 / _introStopZ) + 6, fsz = Math.round((_introStopLM.startsWith('bd') ? 14 : 11) * UI);
       x.save(); x.globalAlpha = _introZL * bdFade; x.font = 'bold ' + fsz + 'px monospace'; x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = 'rgba(255,248,220,.95)'; x.shadowColor = 'rgba(0,0,0,.9)'; x.shadowBlur = 3;
@@ -8120,14 +8165,14 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
     { const wv = calm ? [99, -1, 0] : introWarp(((_introPaused ? _introPauseAt : now) - _introT0) / 1000); _introT = wv[0]; { const tr1 = ((_introPaused ? _introPauseAt : now) - _introT0) / 1000, want = tr1 + INTRO_PRE >= 60 ? 'clamp' : 'wrap'; if (!_introAngUser && _introAng !== want) { _introAng = want; const ab = $('intro-ang-btn'); if (ab) ab.textContent = 'angle: ' + want; } }   // wrapped for the first minute, then clamped (r <= M) for a calmer plate
-    _introActU = wv[1] >= 0 && INTRO_STOPS[wv[1]].act ? wv[2] * INTRO_STOPS[wv[1]].d : null; _introStopNow = (wv[1] >= 0 && !_introExporting && _introActU == null) ? { i: wv[1], ph: wv[2] } : null; }
+    _introActU = wv[1] >= 0 && INTRO_STOPS[wv[1]].act ? wv[2] * INTRO_STOPS[wv[1]].d : null; _introStopNow = (wv[1] >= 0 && !_introExporting && _introActU == null) ? { i: wv[1], ph: wv[2] } : null; introSwTick(now); }
     if (!_introExporting && (_introSeq || (_introVw.script && !_introVw.man))) { const want = _introT > -43.99; if (want !== _introAbsWant) { _introAbsWant = want; if (_introAbs !== want) introAbsToggle(); } }   // formula mode comes on once the first zoom (-44 s) is over, for the rest of the play; scrubbing back before it turns it off; your own toggle holds until the play crosses -44 again
     introViewTick(_introT); introKAnim(_introT - 10);
     introViewTitleTick();
     if (_introSeq) { const q = introSeqState(_introT - 10); _introSeqG = q.G; _introBirth = q.b; if (Math.abs(q.h - _introHole) > 1e-4) introSetHole(q.h); if (q.cm !== _introCM) { _introCM = q.cm; const cb = $('intro-cm-btn'); if (cb) cb.classList.toggle('on', q.cm); } if (_introT > 37.2) { _introSeq = false; _introBirth = false; } introKAnim(_introT - 10);
       if (_introT < -34 && !_introVUser && _introActU == null && !_introStopNow) { const hm = _introVw.m > 0.5, cayHold = (_introVw.mode === 'cay' || _introVw.mode === 'hel') && hm; if (cayHold || _introT < -43.9) {   /* a Cayley or (wrapped, very tall) Helix plate holds its own zoom; the automatic fit only owns the plain ring, so the two never fight */
         const kt = cayHold ? (_introVw.mode === 'cay' ? 0.45 : 1.4) : 1; if (_introT < -60.5) _introV.k = kt; else _introV.k += (kt - _introV.k) * 0.08; } } }   // opening on Cayley: zoomed out so both poles (0 mod 1 and 0 mod 2) show as M grows else if (_introKOn) { _introKOn = false; }
-    _introStopLM = ''; _introStopCap = ''; _introStopSv = 0;
+    _introStopLM = ''; _introStopCap = ''; _introStopSv = 0; _introStopZref = 0;
     { const st = _introStopNow, gm = _introGeo;   // zoom stop: camera in to (r, M), hold with the r labels, back out
       if (st && gm && !_introVUser) {
         const o0 = INTRO_STOPS[st.i], ez = v => { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }, t0 = st.ph * o0.d; let nT = o0.tour ? o0.tour.length : 1; const sg = o0.d / nT; let jT = Math.min(nT - 1, Math.floor(t0 / sg));
@@ -8136,6 +8181,7 @@ if (stA > 0.01) { x.globalAlpha = (_introIso ? 0 : baseGA / (_introV.k > 1.3 ? 0
           const Gx = gm.G, fit = e => { let r = e.r, M = e.M; const nb = /^bd(\d)$/.exec(e.lm || ''); if (nb && e.r >= 50) { r = Math.max(2, Math.floor(Gx / +nb[1])); M = +nb[1] * r; }   /* the end of each line is the last cell that exists: it follows the M slider */
           if (M > Gx) { r = Math.max(1, Math.round(r * Gx / M)); M = Gx; } return Object.assign({}, e, { r: r, M: M }); },   /* the 1/2 line runs through the Cayley pole (rho = 1, theta = pi): it stops short of it */ a2 = fit(a), b2 = fit(b), bk = _introStopBase && _introStopBase.i === st.i ? _introStopBase.k : _introV.k, zf = e => e.Z <= 1 ? bk / INTRO_STOP_ZX : e.Z;   /* a zoom-out (Z = 1) returns to the camera the scan started from (both poles in view), not to a fixed zoom; the scan was written for M = 512: on a smaller plate each line ends at the last M that exists, keeping r/M */
           o = { d: o0.d, am: 0, aq: 0, r: a2.r + (b2.r - a2.r) * u, M: a2.M + (b2.M - a2.M) * u, Z: Math.exp(Math.log(zf(a)) + (Math.log(zf(b)) - Math.log(zf(a))) * u) }; t = t0; w = ez(t0 / 1.5) * (1 - ez((t0 - (o0.d - 1.5)) / 1.5)); jT = i0; nT = n; }
+        if (st.man) { const sw = _introSw, rmax = Math.max(3, Math.floor(gm.G / sw.n)), rr = 2 + (rmax - 2) * sw.p; o = { d: o0.d, am: 0, aq: 0, r: rr, M: sw.n * rr, Z: sw.z }; w = Math.min(1, sw.wz); jT = 0; nT = 1; _introStopLM = 'bd' + sw.n; _introStopZref = sw.z; _introStopCap = 'the 1/' + sw.n + ' line r = M/' + sw.n + ': × at (p, ' + (sw.n === 1 ? '' : sw.n + '·') + 'p) for p prime · each × labelled p'; }
         if (o0.sieve) { const L = o0.sieve, k = Math.max(0, Math.min(L.length - 1, Math.floor((t0 - 1.5) / ((o0.d - 3) / L.length)))); _introStopSv = L[k]; _introStopCap = 'C(n) locked to the prime spiral: p = ' + L[k] + ', n = p − 1 = ' + (L[k] - 1) + ' · every prime ≤ ' + L[k] + ' now removes all of its multiples r · removed r in red'; }
         if (o0.spiral) { const L = o0.spiral, k = Math.max(0, Math.min(L.length - 1, Math.floor(t0 / o0.d * L.length))); _introStopSv = L[k]; _introStopLk = !!o0.lock; }   // the prime spiral plays while the camera moves (C(n) left at 0)
         else if (o0.sieve) _introStopLk = true;
@@ -8345,6 +8391,22 @@ function introGPlay() {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 function _introTh(r, M) { return (ANG_K / 2) * (_introAng === 'wrap' ? 2 * Math.PI * r / M : _introAng === 'unit' ? 2 * Math.PI * r / Math.max(1, _introGcur) : 2 * Math.PI * Math.min(r / M, 1)); }
+var _introSw = { on: false, n: 1, p: 0, z: 14, play: false, dur: 24, wz: 0, tl: 0 }, _introStopZref = 0;   // manual boundary sweep: any 1/n line, scrub or play, own zoom
+function introSwG() { return Math.max(4, (_introGeo && _introGeo.G) || 256); }
+function introSwUI() { const S = _introSw, pb = $('intro-sw-play'); if (pb) pb.innerHTML = S.on && S.play ? '&#10074;&#10074; sweep' : '&#9654; sweep'; document.querySelectorAll('[data-swn]').forEach(b => b.classList.toggle('on', S.on && +b.dataset.swn === S.n)); const nb = $('intro-sw-n'); if (nb && document.activeElement !== nb) nb.value = S.n; const rmax = Math.max(3, Math.floor(introSwG() / S.n)), rr = Math.round(2 + (rmax - 2) * S.p), lb = $('intro-sw-lb'); if (lb) lb.textContent = S.on ? 'cell (' + rr + ', ' + S.n * rr + ')' : ''; }
+function introSwStart() { const S = _introSw; if (!S.on) { S.on = true; S.wz = 0; S.tl = 0; if (_introSeq) _introSeq = true; } introSwUI(); }
+function introSwLine(n) { const S = _introSw; n = Math.max(1, Math.min(Math.floor(introSwG() / 2), Math.round(+n || 1))); S.n = n; S.p = 0; const sl = $('intro-sw-sl'); if (sl) sl.value = 0; introSwStart(); }
+function introSwP(v) { const S = _introSw; S.p = Math.max(0, Math.min(1, +v / 1000)); S.play = false; introSwStart(); }
+function introSwZ(v) { _introSw.z = Math.max(3, Math.min(60, +v || 14)); }
+function introSwPlay() { const S = _introSw; if (!S.on) introSwStart(); if (S.play) S.play = false; else { if (S.p >= 0.999) S.p = 0; S.play = true; } introSwUI(); }
+function introSwExit() { const S = _introSw; if (!S.on) return; S.on = false; S.play = false; introSwUI(); try { introScrub(-46); introPause(false); } catch (e) {} }
+function introSwTick(now) {   // while the manual sweep is on the play is held on the boundary scan and the camera follows the controls
+  const S = _introSw; if (!S.on || _introExporting) { S.tl = 0; return; }
+  _introT = -44; _introActU = null; _introStopNow = { i: 0, ph: 0.5, man: true };
+  const dt = S.tl ? Math.min(0.1, (now - S.tl) / 1000) : 0; S.tl = now; S.wz += (1 - S.wz) * 0.08;
+  if (S.play) { S.p = Math.min(1, S.p + dt / S.dur); if (S.p >= 1) S.play = false; const sl = $('intro-sw-sl'); if (sl) sl.value = Math.round(S.p * 1000); }
+  introSwUI();
+}
 var _introAngUser = false;
 function introCycleAng() { _introAngUser = true; _introAng = _introAng === 'clamp' ? 'wrap' : _introAng === 'wrap' ? 'unit' : 'clamp'; const b = $('intro-ang-btn'); if (b) { b.textContent = 'angle: ' + _introAng; b.title = _introAng === 'clamp' ? 'θ = 2π·min(r/M, 1): the r ≤ M wedge (default)' : _introAng === 'wrap' ? 'θ = 2π·r/M, unbounded: r > M laps the ring (full G×G square)' : 'θ = 2π·r/G: radial spokes budgeted by G, not M (full G×G square)'; } }
 let _introClip = -1, _introRay0 = 0, _introBirthN = 0;
@@ -16228,6 +16290,19 @@ function hideLens() {
   lensAt = null; LENS_REDRAW = null;
 }
 
+var MSW = { on: false, n: 1, p: 0, play: false, tl: 0, dur: 30 };   // main plate: the loupe follows the cells (p, n p) along a 1/n boundary
+function mswCell() { const g = Math.max(4, COP_G || 0), rmax = Math.max(3, Math.floor(g / MSW.n)), r = Math.round(2 + (rmax - 2) * MSW.p); return { r: r, M: MSW.n * r, rmax: rmax }; }
+function mswUI() { const pb = $('msw-play'); if (pb) pb.innerHTML = MSW.on && MSW.play ? '&#10074;&#10074;' : '&#9654;'; document.querySelectorAll('[data-mswn]').forEach(b => b.classList.toggle('on', MSW.on && +b.dataset.mswn === MSW.n)); const nb = $('msw-n'); if (nb && document.activeElement !== nb) nb.value = MSW.n; const c = mswCell(), lb = $('msw-lb'); if (lb) lb.textContent = MSW.on ? '(' + c.r + ', ' + c.M + ')' + (_introIsP(c.r) ? '  × p = ' + c.r : '') : ''; }
+function mswApply() {
+  if (!MSW.on || !COP) return; const cv = $('cv'); if (!cv) return; const c = mswCell(), cssCv = cv.getBoundingClientRect().width || 1, cpc = cv.width / cssCv, Sdev = cssCv * cpc, p = projectCell(c.r, c.M, Sdev); if (!p) return;
+  if (!LENS_ON) { LENS_ON = true; try { syncLensChips(); } catch (e) {} }
+  drawLens(p[0] / cpc, p[1] / cpc); mswUI();
+}
+function mswStart() { if (!MSW.on) { MSW.on = true; MSW.tl = 0; if (LENS_ZOOM < 10) { try { setLensZoom(10); } catch (e) {} } } mswApply(); }   // the labels (r) need about x10
+function mswLine(n) { n = Math.max(1, Math.min(Math.floor(Math.max(4, COP_G || 0) / 2), Math.round(+n || 1))); MSW.n = n; MSW.p = 0; const sl = $('msw-sl'); if (sl) sl.value = 0; mswStart(); }
+function mswP(v) { MSW.p = Math.max(0, Math.min(1, +v / 1000)); MSW.play = false; mswStart(); }
+function mswLoop(now) { if (!MSW.on || !MSW.play) { MSW.tl = 0; return; } const dt = MSW.tl ? Math.min(0.1, (now - MSW.tl) / 1000) : 0; MSW.tl = now; MSW.p = Math.min(1, MSW.p + dt / MSW.dur); const sl = $('msw-sl'); if (sl) sl.value = Math.round(MSW.p * 1000); if (MSW.p >= 1) MSW.play = false; mswApply(); if (MSW.play) requestAnimationFrame(mswLoop); else mswUI(); }
+function mswPlay() { if (!MSW.on) mswStart(); if (MSW.play) { MSW.play = false; mswUI(); return; } if (MSW.p >= 0.999) MSW.p = 0; MSW.play = true; MSW.tl = 0; requestAnimationFrame(mswLoop); mswUI(); }
 /* Pure mapping, testable without a DOM: canvas CSS px -> 1-indexed cell. */
 function cellAt(cx, cy, S, g) {
   const r = Math.floor((cx / S) * g) + 1;
